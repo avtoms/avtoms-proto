@@ -1,0 +1,56 @@
+syntax = "proto3";
+
+package avtoms.notification.v1;
+
+import "avtoms/common/v1/common.proto";
+
+option go_package = "github.com/avtoms/proto/gen/go/avtoms/notification/v1;notificationv1";
+
+// NotificationService delivers messages to customers/staff across Telegram + SMS with fallback (M7 + M8).
+service NotificationService {
+  rpc SendSms(SendSmsRequest) returns (SendResponse);
+  rpc SendTelegram(SendTelegramRequest) returns (SendResponse);
+  // Notify picks the best channel (Telegram, falling back to SMS).
+  rpc Notify(NotifyRequest) returns (SendResponse);
+}
+
+enum Channel {
+  CHANNEL_UNSPECIFIED = 0;
+  CHANNEL_TELEGRAM = 1;
+  CHANNEL_SMS = 2;
+}
+
+enum Template {
+  TEMPLATE_UNSPECIFIED = 0;
+  TEMPLATE_OTP = 1;
+  TEMPLATE_MECHANIC_INVITE = 2;
+  TEMPLATE_ESTIMATE = 3;
+  TEMPLATE_READY_FOR_PICKUP = 4;
+  TEMPLATE_RECEIPT = 5;
+}
+
+message SendResponse {
+  string id = 1;
+  Channel channel = 2;
+  bool delivered = 3;
+}
+
+message SendSmsRequest {
+  string shop_id = 1;
+  string phone = 2;
+  string body = 3;
+}
+
+message SendTelegramRequest {
+  string shop_id = 1;
+  string telegram_handle = 2;
+  string body = 3;
+}
+
+message NotifyRequest {
+  string shop_id = 1;
+  string customer_id = 2;
+  Template template = 3;
+  avtoms.common.v1.Language language = 4;
+  map<string, string> params = 5;
+}

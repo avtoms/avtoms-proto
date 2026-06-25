@@ -1,0 +1,137 @@
+syntax = "proto3";
+
+package avtoms.workorder.v1;
+
+option go_package = "github.com/avtoms/proto/gen/go/avtoms/workorder/v1;workorderv1";
+
+// WorkOrderService owns work orders, line items, the pricing menu, and time tracking (M3 + M4 + M5).
+service WorkOrderService {
+  rpc CreateWorkOrder(CreateWorkOrderRequest) returns (WorkOrder);
+  rpc GetWorkOrder(GetWorkOrderRequest) returns (WorkOrder);
+  rpc AddLineItem(AddLineItemRequest) returns (WorkOrder);
+  rpc TransitionState(TransitionStateRequest) returns (WorkOrder);
+  rpc AssignMechanic(AssignMechanicRequest) returns (WorkOrder);
+
+  rpc StartTimer(StartTimerRequest) returns (TimeEntry);
+  rpc StopTimer(StopTimerRequest) returns (TimeEntry);
+
+  rpc ListMenuItems(ListMenuItemsRequest) returns (ListMenuItemsResponse);
+  rpc CreateMenuItem(CreateMenuItemRequest) returns (MenuItem);
+
+  rpc ListWorkOrders(ListWorkOrdersRequest) returns (ListWorkOrdersResponse);
+}
+
+message ListWorkOrdersRequest {
+  string shop_id = 1;
+  WorkOrderState state = 2; // optional filter; UNSPECIFIED (0) returns all
+  string assigned_mechanic_id = 3; // optional filter (for mechanic kanban)
+}
+message ListWorkOrdersResponse {
+  repeated WorkOrder work_orders = 1;
+}
+
+enum WorkOrderState {
+  WORK_ORDER_STATE_UNSPECIFIED = 0;
+  WORK_ORDER_STATE_DRAFT = 1;
+  WORK_ORDER_STATE_ESTIMATED = 2;
+  WORK_ORDER_STATE_APPROVED = 3;
+  WORK_ORDER_STATE_IN_PROGRESS = 4;
+  WORK_ORDER_STATE_READY = 5;
+  WORK_ORDER_STATE_INVOICED = 6;
+  WORK_ORDER_STATE_CLOSED = 7;
+  WORK_ORDER_STATE_CANCELED = 8;
+}
+
+enum LineItemKind {
+  LINE_ITEM_KIND_UNSPECIFIED = 0;
+  LINE_ITEM_KIND_LABOR = 1;
+  LINE_ITEM_KIND_PART = 2;
+}
+
+message LineItem {
+  string id = 1;
+  LineItemKind kind = 2;
+  string description = 3;
+  int64 unit_price = 4; // minor units (tiyin)
+  int32 quantity = 5;
+}
+
+message WorkOrder {
+  string id = 1;
+  string shop_id = 2;
+  string vehicle_id = 3;
+  string assigned_mechanic_id = 4;
+  WorkOrderState state = 5;
+  repeated LineItem line_items = 6;
+  int64 subtotal = 7;
+  int64 vat = 8;
+  int64 total = 9;
+  string notes = 10;
+  string created_at = 11;
+  // Set when a timer is currently running on this work order (the open time entry's start).
+  string active_timer_started_at = 12;
+  // Denormalized vehicle + customer info, filled by the gateway for display (read-only).
+  string plate = 13;
+  string make = 14;
+  string model = 15;
+  string customer_name = 16;
+}
+
+message TimeEntry {
+  string id = 1;
+  string work_order_id = 2;
+  string mechanic_id = 3;
+  string started_at = 4;
+  string stopped_at = 5;
+}
+
+message MenuItem {
+  string id = 1;
+  string shop_id = 2;
+  string name_uz_latn = 3;
+  string name_uz_cyrl = 4;
+  string name_ru = 5;
+  int64 default_price = 6;
+  bool active = 7;
+}
+
+message CreateWorkOrderRequest {
+  string shop_id = 1;
+  string vehicle_id = 2;
+}
+message GetWorkOrderRequest {
+  string id = 1;
+}
+message AddLineItemRequest {
+  string work_order_id = 1;
+  LineItem line_item = 2;
+}
+message TransitionStateRequest {
+  string work_order_id = 1;
+  WorkOrderState target = 2;
+}
+message AssignMechanicRequest {
+  string work_order_id = 1;
+  string mechanic_id = 2;
+}
+message StartTimerRequest {
+  string work_order_id = 1;
+  string mechanic_id = 2;
+}
+message StopTimerRequest {
+  string work_order_id = 1;
+  string mechanic_id = 2;
+}
+message ListMenuItemsRequest {
+  string shop_id = 1;
+}
+message ListMenuItemsResponse {
+  repeated MenuItem items = 1;
+}
+message CreateMenuItemRequest {
+  string shop_id = 1;
+  string name_uz_latn = 2;
+  string name_uz_cyrl = 3;
+  string name_ru = 4;
+  int64 default_price = 5;
+}

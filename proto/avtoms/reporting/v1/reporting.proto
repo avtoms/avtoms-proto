@@ -1,0 +1,50 @@
+syntax = "proto3";
+
+package avtoms.reporting.v1;
+
+option go_package = "github.com/avtoms/proto/gen/go/avtoms/reporting/v1;reportingv1";
+
+// ReportingService serves dashboard widgets and reports from a read model fed by events (M9).
+service ReportingService {
+  rpc GetDashboard(GetDashboardRequest) returns (Dashboard);
+  rpc GetReport(GetReportRequest) returns (Report);
+}
+
+enum ReportKind {
+  REPORT_KIND_UNSPECIFIED = 0;
+  REPORT_KIND_DAILY_REVENUE = 1;
+  REPORT_KIND_WEEKLY_WORK_ORDERS = 2;
+  REPORT_KIND_MECHANIC_ACTIVITY = 3;
+  REPORT_KIND_SERVICE_MENU_PERFORMANCE = 4;
+  REPORT_KIND_FISCAL_COMPLIANCE = 5;
+  REPORT_KIND_CUSTOMER_RETENTION = 6;
+}
+
+message Dashboard {
+  int64 todays_revenue = 1;
+  int32 jobs_in_progress = 2;
+  int32 ready_for_pickup = 3;
+  int32 awaiting_approval = 4;
+  string fiscal_health = 5; // green | yellow | red
+}
+
+message ReportRow {
+  map<string, string> cells = 1;
+}
+
+message Report {
+  ReportKind kind = 1;
+  repeated string columns = 2;
+  repeated ReportRow rows = 3;
+}
+
+message GetDashboardRequest {
+  string shop_id = 1;
+}
+
+message GetReportRequest {
+  string shop_id = 1;
+  ReportKind kind = 2;
+  string from = 3;
+  string to = 4;
+}

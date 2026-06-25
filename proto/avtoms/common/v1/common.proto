@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+package avtoms.common.v1;
+
+option go_package = "github.com/avtoms/proto/gen/go/avtoms/common/v1;commonv1";
+
+// Page is a reusable pagination request fragment.
+message Page {
+  int32 limit = 1;
+  string cursor = 2;
+}
+
+// PageInfo is returned alongside list responses.
+message PageInfo {
+  string next_cursor = 1;
+  int32 total = 2;
+}
+
+// Language is the set of locales the product supports.
+enum Language {
+  LANGUAGE_UNSPECIFIED = 0;
+  LANGUAGE_UZ_LATN = 1;
+  LANGUAGE_UZ_CYRL = 2;
+  LANGUAGE_RU = 3;
+}

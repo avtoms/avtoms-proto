@@ -1,0 +1,68 @@
+syntax = "proto3";
+
+package avtoms.invoice.v1;
+
+option go_package = "github.com/avtoms/proto/gen/go/avtoms/invoice/v1;invoicev1";
+
+// InvoiceService owns invoices and fiscal receipts via the OFD (M6).
+service InvoiceService {
+  rpc GenerateInvoice(GenerateInvoiceRequest) returns (Invoice);
+  rpc GetInvoice(GetInvoiceRequest) returns (Invoice);
+  rpc MarkPaid(MarkPaidRequest) returns (Invoice);
+  rpc VoidReceipt(VoidReceiptRequest) returns (Invoice);
+  rpc ResendReceipt(ResendReceiptRequest) returns (Invoice);
+  rpc ListInvoices(ListInvoicesRequest) returns (ListInvoicesResponse);
+}
+
+message ListInvoicesRequest {
+  string shop_id = 1;
+}
+message ListInvoicesResponse {
+  repeated Invoice invoices = 1;
+}
+
+enum FiscalStatus {
+  FISCAL_STATUS_UNSPECIFIED = 0;
+  FISCAL_STATUS_PENDING = 1;
+  FISCAL_STATUS_FISCALIZED = 2;
+  FISCAL_STATUS_FAILED = 3;
+  FISCAL_STATUS_VOIDED = 4;
+}
+
+enum PaymentMethod {
+  PAYMENT_METHOD_UNSPECIFIED = 0;
+  PAYMENT_METHOD_CASH = 1;
+  PAYMENT_METHOD_OTHER = 2;
+}
+
+message Invoice {
+  string id = 1;
+  string shop_id = 2;
+  string work_order_id = 3;
+  int64 total = 4;
+  FiscalStatus fiscal_status = 5;
+  string fiscal_qr = 6;
+  string fiscal_receipt_id = 7;
+  bool paid = 8;
+  PaymentMethod payment_method = 9;
+  string created_at = 10;
+}
+
+message GenerateInvoiceRequest {
+  string shop_id = 1;
+  string work_order_id = 2;
+  int64 total = 3;
+}
+message GetInvoiceRequest {
+  string id = 1;
+}
+message MarkPaidRequest {
+  string id = 1;
+  PaymentMethod payment_method = 2;
+}
+message VoidReceiptRequest {
+  string id = 1;
+}
+message ResendReceiptRequest {
+  string id = 1;
+}

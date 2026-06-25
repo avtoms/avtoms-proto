@@ -1,0 +1,130 @@
+syntax = "proto3";
+
+package avtoms.customer.v1;
+
+import "avtoms/common/v1/common.proto";
+
+option go_package = "github.com/avtoms/proto/gen/go/avtoms/customer/v1;customerv1";
+
+// CustomerService owns customers and vehicles (M2).
+service CustomerService {
+  rpc CreateCustomer(CreateCustomerRequest) returns (Customer);
+  rpc GetCustomer(GetCustomerRequest) returns (Customer);
+  rpc CreateVehicle(CreateVehicleRequest) returns (Vehicle);
+  rpc GetVehicle(GetVehicleRequest) returns (Vehicle);
+  rpc SearchByPlate(SearchByPlateRequest) returns (SearchByPlateResponse);
+  rpc SoftDeleteCustomer(SoftDeleteCustomerRequest) returns (Customer);
+  rpc ListCustomers(ListCustomersRequest) returns (ListCustomersResponse);
+
+  // Car reference catalog (global, admin-managed). Read by any role to populate dropdowns.
+  rpc ListCarMakes(ListCarMakesRequest) returns (ListCarMakesResponse);
+  rpc CreateCarMake(CreateCarMakeRequest) returns (CarMake);
+  rpc ListCarModels(ListCarModelsRequest) returns (ListCarModelsResponse);
+  rpc CreateCarModel(CreateCarModelRequest) returns (CarModel);
+}
+
+// CarMake is a vehicle manufacturer (e.g. Chevrolet). Global reference data.
+message CarMake {
+  string id = 1;
+  string name = 2;
+  string country = 3;
+}
+
+// CarModel belongs to a make (e.g. Cobalt) with an optional body type.
+message CarModel {
+  string id = 1;
+  string make_id = 2;
+  string name = 3;
+  string body_type = 4; // sedan | hatchback | suv | minivan | pickup | other
+}
+
+message ListCarMakesRequest {}
+message ListCarMakesResponse {
+  repeated CarMake makes = 1;
+}
+message CreateCarMakeRequest {
+  string name = 1;
+  string country = 2;
+}
+message ListCarModelsRequest {
+  string make_id = 1; // optional; empty returns all models
+}
+message ListCarModelsResponse {
+  repeated CarModel models = 1;
+}
+message CreateCarModelRequest {
+  string make_id = 1;
+  string name = 2;
+  string body_type = 3;
+}
+
+message ListCustomersRequest {
+  string shop_id = 1;
+  string query = 2; // optional name/phone filter
+}
+message ListCustomersResponse {
+  repeated Customer customers = 1;
+}
+
+message Customer {
+  string id = 1;
+  string shop_id = 2;
+  string phone = 3;
+  string name = 4;
+  avtoms.common.v1.Language language = 5;
+  string telegram_handle = 6;
+  bool walk_in = 7;
+  bool deleted = 8;
+  string created_at = 9;
+}
+
+message Vehicle {
+  string id = 1;
+  string customer_id = 2;
+  string plate = 3;
+  string vin = 4;
+  string make = 5;
+  string model = 6;
+  int32 year = 7;
+  int64 mileage = 8;
+  bool deleted = 9;
+}
+
+message CreateCustomerRequest {
+  string shop_id = 1;
+  string phone = 2;
+  string name = 3;
+  avtoms.common.v1.Language language = 4;
+  string telegram_handle = 5;
+  bool walk_in = 6;
+}
+
+message GetCustomerRequest {
+  string id = 1;
+}
+
+message CreateVehicleRequest {
+  string customer_id = 1;
+  string plate = 2;
+  string vin = 3;
+  string make = 4;
+  string model = 5;
+  int32 year = 6;
+  int64 mileage = 7;
+}
+
+message GetVehicleRequest {
+  string id = 1;
+}
+
+message SearchByPlateRequest {
+  string shop_id = 1;
+  string plate = 2;
+}
+message SearchByPlateResponse {
+  repeated Vehicle vehicles = 1;
+}
+
+message SoftDeleteCustomerRequest {
+  string id = 1;
+}

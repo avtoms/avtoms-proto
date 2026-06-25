@@ -1,0 +1,103 @@
+syntax = "proto3";
+
+package avtoms.auth.v1;
+
+option go_package = "github.com/avtoms/proto/gen/go/avtoms/auth/v1;authv1";
+
+// AuthService owns staff identity: OTP sign-in, tokens, and staff lifecycle (M1 + staff mgmt).
+service AuthService {
+  // RequestOtp triggers an OTP to be sent to the phone. Returns immediately;
+  // delivery happens asynchronously via the notification service.
+  rpc RequestOtp(RequestOtpRequest) returns (RequestOtpResponse);
+  rpc VerifyOtp(VerifyOtpRequest) returns (TokenPair);
+  rpc RefreshToken(RefreshTokenRequest) returns (TokenPair);
+
+  // Authenticate validates an access token; used by the gateway middleware.
+  rpc Authenticate(AuthenticateRequest) returns (AuthenticateResponse);
+
+  rpc InviteMechanic(InviteMechanicRequest) returns (Staff);
+  rpc DeactivateStaff(DeactivateStaffRequest) returns (Staff);
+  rpc ListStaff(ListStaffRequest) returns (ListStaffResponse);
+
+  // Super-admin user management (admin-only, across all shops).
+  rpc ListAllStaff(ListAllStaffRequest) returns (ListStaffResponse);
+  rpc SetStaffActive(SetStaffActiveRequest) returns (Staff);
+  rpc SetStaffRole(SetStaffRoleRequest) returns (Staff);
+}
+
+message ListAllStaffRequest {}
+message SetStaffActiveRequest {
+  string staff_id = 1;
+  bool active = 2;
+}
+message SetStaffRoleRequest {
+  string staff_id = 1;
+  Role role = 2;
+}
+
+enum Role {
+  ROLE_UNSPECIFIED = 0;
+  ROLE_OWNER = 1;
+  ROLE_MECHANIC = 2;
+  ROLE_ADMIN = 3;
+}
+
+message Staff {
+  string id = 1;
+  string shop_id = 2;
+  string phone = 3;
+  string name = 4;
+  Role role = 5;
+  bool active = 6;
+  string created_at = 7;
+}
+
+message RequestOtpRequest {
+  string phone = 1;
+}
+message RequestOtpResponse {
+  string challenge_id = 1;
+  int32 resend_after_seconds = 2;
+}
+
+message VerifyOtpRequest {
+  string challenge_id = 1;
+  string code = 2;
+}
+
+message RefreshTokenRequest {
+  string refresh_token = 1;
+}
+
+message TokenPair {
+  string access_token = 1;
+  string refresh_token = 2;
+  int64 expires_in = 3;
+  Staff staff = 4;
+}
+
+message AuthenticateRequest {
+  string access_token = 1;
+}
+message AuthenticateResponse {
+  string staff_id = 1;
+  string shop_id = 2;
+  Role role = 3;
+}
+
+message InviteMechanicRequest {
+  string shop_id = 1;
+  string phone = 2;
+  string name = 3;
+}
+
+message DeactivateStaffRequest {
+  string staff_id = 1;
+}
+
+message ListStaffRequest {
+  string shop_id = 1;
+}
+message ListStaffResponse {
+  repeated Staff staff = 1;
+}
