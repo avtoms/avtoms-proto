@@ -53,6 +53,41 @@ service WorkOrderService {
   rpc ListWarranties(ListWarrantiesRequest) returns (ListWarrantiesResponse);
   rpc CreateWarranty(CreateWarrantyRequest) returns (Warranty);
   rpc VoidWarranty(VoidWarrantyRequest) returns (Warranty);
+
+  // Customer estimate approval via a shareable token (e.g. a Telegram deep link).
+  rpc CreateApprovalLink(CreateApprovalLinkRequest) returns (ApprovalLink);
+  rpc ResolveApproval(ResolveApprovalRequest) returns (ApprovalInfo);
+  rpc DecideApproval(DecideApprovalRequest) returns (ApprovalInfo);
+}
+
+enum ApprovalStatus {
+  APPROVAL_STATUS_UNSPECIFIED = 0;
+  APPROVAL_STATUS_PENDING = 1;
+  APPROVAL_STATUS_APPROVED = 2;
+  APPROVAL_STATUS_DECLINED = 3;
+}
+// ApprovalLink is a freshly minted token for a work order's estimate.
+message ApprovalLink {
+  string token = 1;
+  string work_order_id = 2;
+}
+// ApprovalInfo describes an approval token + a short estimate summary for display.
+message ApprovalInfo {
+  string token = 1;
+  string work_order_id = 2;
+  ApprovalStatus status = 3;
+  int64 total = 4;            // estimate total (tiyin)
+  int32 line_item_count = 5;
+}
+message CreateApprovalLinkRequest {
+  string work_order_id = 1;
+}
+message ResolveApprovalRequest {
+  string token = 1;
+}
+message DecideApprovalRequest {
+  string token = 1;
+  bool approved = 2;
 }
 
 // Warranty covers a repair/part for a period (months) and/or distance (km) from a start date.

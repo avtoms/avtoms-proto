@@ -49,6 +49,9 @@ const (
 	WorkOrderService_ListWarranties_FullMethodName          = "/avtoms.workorder.v1.WorkOrderService/ListWarranties"
 	WorkOrderService_CreateWarranty_FullMethodName          = "/avtoms.workorder.v1.WorkOrderService/CreateWarranty"
 	WorkOrderService_VoidWarranty_FullMethodName            = "/avtoms.workorder.v1.WorkOrderService/VoidWarranty"
+	WorkOrderService_CreateApprovalLink_FullMethodName      = "/avtoms.workorder.v1.WorkOrderService/CreateApprovalLink"
+	WorkOrderService_ResolveApproval_FullMethodName         = "/avtoms.workorder.v1.WorkOrderService/ResolveApproval"
+	WorkOrderService_DecideApproval_FullMethodName          = "/avtoms.workorder.v1.WorkOrderService/DecideApproval"
 )
 
 // WorkOrderServiceClient is the client API for WorkOrderService service.
@@ -94,6 +97,10 @@ type WorkOrderServiceClient interface {
 	ListWarranties(ctx context.Context, in *ListWarrantiesRequest, opts ...grpc.CallOption) (*ListWarrantiesResponse, error)
 	CreateWarranty(ctx context.Context, in *CreateWarrantyRequest, opts ...grpc.CallOption) (*Warranty, error)
 	VoidWarranty(ctx context.Context, in *VoidWarrantyRequest, opts ...grpc.CallOption) (*Warranty, error)
+	// Customer estimate approval via a shareable token (e.g. a Telegram deep link).
+	CreateApprovalLink(ctx context.Context, in *CreateApprovalLinkRequest, opts ...grpc.CallOption) (*ApprovalLink, error)
+	ResolveApproval(ctx context.Context, in *ResolveApprovalRequest, opts ...grpc.CallOption) (*ApprovalInfo, error)
+	DecideApproval(ctx context.Context, in *DecideApprovalRequest, opts ...grpc.CallOption) (*ApprovalInfo, error)
 }
 
 type workOrderServiceClient struct {
@@ -404,6 +411,36 @@ func (c *workOrderServiceClient) VoidWarranty(ctx context.Context, in *VoidWarra
 	return out, nil
 }
 
+func (c *workOrderServiceClient) CreateApprovalLink(ctx context.Context, in *CreateApprovalLinkRequest, opts ...grpc.CallOption) (*ApprovalLink, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ApprovalLink)
+	err := c.cc.Invoke(ctx, WorkOrderService_CreateApprovalLink_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *workOrderServiceClient) ResolveApproval(ctx context.Context, in *ResolveApprovalRequest, opts ...grpc.CallOption) (*ApprovalInfo, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ApprovalInfo)
+	err := c.cc.Invoke(ctx, WorkOrderService_ResolveApproval_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *workOrderServiceClient) DecideApproval(ctx context.Context, in *DecideApprovalRequest, opts ...grpc.CallOption) (*ApprovalInfo, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ApprovalInfo)
+	err := c.cc.Invoke(ctx, WorkOrderService_DecideApproval_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // WorkOrderServiceServer is the server API for WorkOrderService service.
 // All implementations must embed UnimplementedWorkOrderServiceServer
 // for forward compatibility.
@@ -447,6 +484,10 @@ type WorkOrderServiceServer interface {
 	ListWarranties(context.Context, *ListWarrantiesRequest) (*ListWarrantiesResponse, error)
 	CreateWarranty(context.Context, *CreateWarrantyRequest) (*Warranty, error)
 	VoidWarranty(context.Context, *VoidWarrantyRequest) (*Warranty, error)
+	// Customer estimate approval via a shareable token (e.g. a Telegram deep link).
+	CreateApprovalLink(context.Context, *CreateApprovalLinkRequest) (*ApprovalLink, error)
+	ResolveApproval(context.Context, *ResolveApprovalRequest) (*ApprovalInfo, error)
+	DecideApproval(context.Context, *DecideApprovalRequest) (*ApprovalInfo, error)
 	mustEmbedUnimplementedWorkOrderServiceServer()
 }
 
@@ -546,6 +587,15 @@ func (UnimplementedWorkOrderServiceServer) CreateWarranty(context.Context, *Crea
 }
 func (UnimplementedWorkOrderServiceServer) VoidWarranty(context.Context, *VoidWarrantyRequest) (*Warranty, error) {
 	return nil, status.Error(codes.Unimplemented, "method VoidWarranty not implemented")
+}
+func (UnimplementedWorkOrderServiceServer) CreateApprovalLink(context.Context, *CreateApprovalLinkRequest) (*ApprovalLink, error) {
+	return nil, status.Error(codes.Unimplemented, "method CreateApprovalLink not implemented")
+}
+func (UnimplementedWorkOrderServiceServer) ResolveApproval(context.Context, *ResolveApprovalRequest) (*ApprovalInfo, error) {
+	return nil, status.Error(codes.Unimplemented, "method ResolveApproval not implemented")
+}
+func (UnimplementedWorkOrderServiceServer) DecideApproval(context.Context, *DecideApprovalRequest) (*ApprovalInfo, error) {
+	return nil, status.Error(codes.Unimplemented, "method DecideApproval not implemented")
 }
 func (UnimplementedWorkOrderServiceServer) mustEmbedUnimplementedWorkOrderServiceServer() {}
 func (UnimplementedWorkOrderServiceServer) testEmbeddedByValue()                          {}
@@ -1108,6 +1158,60 @@ func _WorkOrderService_VoidWarranty_Handler(srv interface{}, ctx context.Context
 	return interceptor(ctx, in, info, handler)
 }
 
+func _WorkOrderService_CreateApprovalLink_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateApprovalLinkRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WorkOrderServiceServer).CreateApprovalLink(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: WorkOrderService_CreateApprovalLink_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WorkOrderServiceServer).CreateApprovalLink(ctx, req.(*CreateApprovalLinkRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _WorkOrderService_ResolveApproval_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ResolveApprovalRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WorkOrderServiceServer).ResolveApproval(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: WorkOrderService_ResolveApproval_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WorkOrderServiceServer).ResolveApproval(ctx, req.(*ResolveApprovalRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _WorkOrderService_DecideApproval_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DecideApprovalRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WorkOrderServiceServer).DecideApproval(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: WorkOrderService_DecideApproval_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WorkOrderServiceServer).DecideApproval(ctx, req.(*DecideApprovalRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // WorkOrderService_ServiceDesc is the grpc.ServiceDesc for WorkOrderService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -1234,6 +1338,18 @@ var WorkOrderService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "VoidWarranty",
 			Handler:    _WorkOrderService_VoidWarranty_Handler,
+		},
+		{
+			MethodName: "CreateApprovalLink",
+			Handler:    _WorkOrderService_CreateApprovalLink_Handler,
+		},
+		{
+			MethodName: "ResolveApproval",
+			Handler:    _WorkOrderService_ResolveApproval_Handler,
+		},
+		{
+			MethodName: "DecideApproval",
+			Handler:    _WorkOrderService_DecideApproval_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
