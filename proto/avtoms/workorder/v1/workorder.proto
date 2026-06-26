@@ -29,6 +29,58 @@ service WorkOrderService {
   rpc ListParts(ListPartsRequest) returns (ListPartsResponse);
   rpc CreatePart(CreatePartRequest) returns (Part);
   rpc AdjustStock(AdjustStockRequest) returns (Part);
+
+  // Appointments / scheduling.
+  rpc ListAppointments(ListAppointmentsRequest) returns (ListAppointmentsResponse);
+  rpc CreateAppointment(CreateAppointmentRequest) returns (Appointment);
+  rpc SetAppointmentState(SetAppointmentStateRequest) returns (Appointment);
+}
+
+enum AppointmentState {
+  APPOINTMENT_STATE_UNSPECIFIED = 0;
+  APPOINTMENT_STATE_SCHEDULED = 1;
+  APPOINTMENT_STATE_DONE = 2;
+  APPOINTMENT_STATE_CANCELED = 3;
+}
+
+// Appointment is a booked job slot.
+message Appointment {
+  string id = 1;
+  string shop_id = 2;
+  string title = 3;             // service / reason
+  string customer_name = 4;     // free text (walk-in or denormalized)
+  string phone = 5;
+  string vehicle_id = 6;        // optional link to a vehicle
+  string plate = 7;             // free-text plate for quick display
+  string mechanic_id = 8;       // optional assigned mechanic
+  string scheduled_at = 9;      // RFC3339
+  int32 duration_minutes = 10;
+  AppointmentState state = 11;
+  string notes = 12;
+}
+message ListAppointmentsRequest {
+  string shop_id = 1;
+  string from = 2; // RFC3339 lower bound (optional)
+  string to = 3;   // RFC3339 upper bound (optional)
+}
+message ListAppointmentsResponse {
+  repeated Appointment appointments = 1;
+}
+message CreateAppointmentRequest {
+  string shop_id = 1;
+  string title = 2;
+  string customer_name = 3;
+  string phone = 4;
+  string vehicle_id = 5;
+  string plate = 6;
+  string mechanic_id = 7;
+  string scheduled_at = 8;
+  int32 duration_minutes = 9;
+  string notes = 10;
+}
+message SetAppointmentStateRequest {
+  string id = 1;
+  AppointmentState state = 2;
 }
 
 // Part is an inventory item the shop stocks (a real, counted part/material).

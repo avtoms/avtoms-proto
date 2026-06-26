@@ -19,22 +19,25 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	WorkOrderService_CreateWorkOrder_FullMethodName    = "/avtoms.workorder.v1.WorkOrderService/CreateWorkOrder"
-	WorkOrderService_GetWorkOrder_FullMethodName       = "/avtoms.workorder.v1.WorkOrderService/GetWorkOrder"
-	WorkOrderService_AddLineItem_FullMethodName        = "/avtoms.workorder.v1.WorkOrderService/AddLineItem"
-	WorkOrderService_RemoveLineItem_FullMethodName     = "/avtoms.workorder.v1.WorkOrderService/RemoveLineItem"
-	WorkOrderService_TransitionState_FullMethodName    = "/avtoms.workorder.v1.WorkOrderService/TransitionState"
-	WorkOrderService_AssignMechanic_FullMethodName     = "/avtoms.workorder.v1.WorkOrderService/AssignMechanic"
-	WorkOrderService_StartTimer_FullMethodName         = "/avtoms.workorder.v1.WorkOrderService/StartTimer"
-	WorkOrderService_StopTimer_FullMethodName          = "/avtoms.workorder.v1.WorkOrderService/StopTimer"
-	WorkOrderService_ListMenuItems_FullMethodName      = "/avtoms.workorder.v1.WorkOrderService/ListMenuItems"
-	WorkOrderService_CreateMenuItem_FullMethodName     = "/avtoms.workorder.v1.WorkOrderService/CreateMenuItem"
-	WorkOrderService_ListWorkOrders_FullMethodName     = "/avtoms.workorder.v1.WorkOrderService/ListWorkOrders"
-	WorkOrderService_GetShopSettings_FullMethodName    = "/avtoms.workorder.v1.WorkOrderService/GetShopSettings"
-	WorkOrderService_UpdateShopSettings_FullMethodName = "/avtoms.workorder.v1.WorkOrderService/UpdateShopSettings"
-	WorkOrderService_ListParts_FullMethodName          = "/avtoms.workorder.v1.WorkOrderService/ListParts"
-	WorkOrderService_CreatePart_FullMethodName         = "/avtoms.workorder.v1.WorkOrderService/CreatePart"
-	WorkOrderService_AdjustStock_FullMethodName        = "/avtoms.workorder.v1.WorkOrderService/AdjustStock"
+	WorkOrderService_CreateWorkOrder_FullMethodName     = "/avtoms.workorder.v1.WorkOrderService/CreateWorkOrder"
+	WorkOrderService_GetWorkOrder_FullMethodName        = "/avtoms.workorder.v1.WorkOrderService/GetWorkOrder"
+	WorkOrderService_AddLineItem_FullMethodName         = "/avtoms.workorder.v1.WorkOrderService/AddLineItem"
+	WorkOrderService_RemoveLineItem_FullMethodName      = "/avtoms.workorder.v1.WorkOrderService/RemoveLineItem"
+	WorkOrderService_TransitionState_FullMethodName     = "/avtoms.workorder.v1.WorkOrderService/TransitionState"
+	WorkOrderService_AssignMechanic_FullMethodName      = "/avtoms.workorder.v1.WorkOrderService/AssignMechanic"
+	WorkOrderService_StartTimer_FullMethodName          = "/avtoms.workorder.v1.WorkOrderService/StartTimer"
+	WorkOrderService_StopTimer_FullMethodName           = "/avtoms.workorder.v1.WorkOrderService/StopTimer"
+	WorkOrderService_ListMenuItems_FullMethodName       = "/avtoms.workorder.v1.WorkOrderService/ListMenuItems"
+	WorkOrderService_CreateMenuItem_FullMethodName      = "/avtoms.workorder.v1.WorkOrderService/CreateMenuItem"
+	WorkOrderService_ListWorkOrders_FullMethodName      = "/avtoms.workorder.v1.WorkOrderService/ListWorkOrders"
+	WorkOrderService_GetShopSettings_FullMethodName     = "/avtoms.workorder.v1.WorkOrderService/GetShopSettings"
+	WorkOrderService_UpdateShopSettings_FullMethodName  = "/avtoms.workorder.v1.WorkOrderService/UpdateShopSettings"
+	WorkOrderService_ListParts_FullMethodName           = "/avtoms.workorder.v1.WorkOrderService/ListParts"
+	WorkOrderService_CreatePart_FullMethodName          = "/avtoms.workorder.v1.WorkOrderService/CreatePart"
+	WorkOrderService_AdjustStock_FullMethodName         = "/avtoms.workorder.v1.WorkOrderService/AdjustStock"
+	WorkOrderService_ListAppointments_FullMethodName    = "/avtoms.workorder.v1.WorkOrderService/ListAppointments"
+	WorkOrderService_CreateAppointment_FullMethodName   = "/avtoms.workorder.v1.WorkOrderService/CreateAppointment"
+	WorkOrderService_SetAppointmentState_FullMethodName = "/avtoms.workorder.v1.WorkOrderService/SetAppointmentState"
 )
 
 // WorkOrderServiceClient is the client API for WorkOrderService service.
@@ -61,6 +64,10 @@ type WorkOrderServiceClient interface {
 	ListParts(ctx context.Context, in *ListPartsRequest, opts ...grpc.CallOption) (*ListPartsResponse, error)
 	CreatePart(ctx context.Context, in *CreatePartRequest, opts ...grpc.CallOption) (*Part, error)
 	AdjustStock(ctx context.Context, in *AdjustStockRequest, opts ...grpc.CallOption) (*Part, error)
+	// Appointments / scheduling.
+	ListAppointments(ctx context.Context, in *ListAppointmentsRequest, opts ...grpc.CallOption) (*ListAppointmentsResponse, error)
+	CreateAppointment(ctx context.Context, in *CreateAppointmentRequest, opts ...grpc.CallOption) (*Appointment, error)
+	SetAppointmentState(ctx context.Context, in *SetAppointmentStateRequest, opts ...grpc.CallOption) (*Appointment, error)
 }
 
 type workOrderServiceClient struct {
@@ -231,6 +238,36 @@ func (c *workOrderServiceClient) AdjustStock(ctx context.Context, in *AdjustStoc
 	return out, nil
 }
 
+func (c *workOrderServiceClient) ListAppointments(ctx context.Context, in *ListAppointmentsRequest, opts ...grpc.CallOption) (*ListAppointmentsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListAppointmentsResponse)
+	err := c.cc.Invoke(ctx, WorkOrderService_ListAppointments_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *workOrderServiceClient) CreateAppointment(ctx context.Context, in *CreateAppointmentRequest, opts ...grpc.CallOption) (*Appointment, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Appointment)
+	err := c.cc.Invoke(ctx, WorkOrderService_CreateAppointment_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *workOrderServiceClient) SetAppointmentState(ctx context.Context, in *SetAppointmentStateRequest, opts ...grpc.CallOption) (*Appointment, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Appointment)
+	err := c.cc.Invoke(ctx, WorkOrderService_SetAppointmentState_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // WorkOrderServiceServer is the server API for WorkOrderService service.
 // All implementations must embed UnimplementedWorkOrderServiceServer
 // for forward compatibility.
@@ -255,6 +292,10 @@ type WorkOrderServiceServer interface {
 	ListParts(context.Context, *ListPartsRequest) (*ListPartsResponse, error)
 	CreatePart(context.Context, *CreatePartRequest) (*Part, error)
 	AdjustStock(context.Context, *AdjustStockRequest) (*Part, error)
+	// Appointments / scheduling.
+	ListAppointments(context.Context, *ListAppointmentsRequest) (*ListAppointmentsResponse, error)
+	CreateAppointment(context.Context, *CreateAppointmentRequest) (*Appointment, error)
+	SetAppointmentState(context.Context, *SetAppointmentStateRequest) (*Appointment, error)
 	mustEmbedUnimplementedWorkOrderServiceServer()
 }
 
@@ -312,6 +353,15 @@ func (UnimplementedWorkOrderServiceServer) CreatePart(context.Context, *CreatePa
 }
 func (UnimplementedWorkOrderServiceServer) AdjustStock(context.Context, *AdjustStockRequest) (*Part, error) {
 	return nil, status.Error(codes.Unimplemented, "method AdjustStock not implemented")
+}
+func (UnimplementedWorkOrderServiceServer) ListAppointments(context.Context, *ListAppointmentsRequest) (*ListAppointmentsResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListAppointments not implemented")
+}
+func (UnimplementedWorkOrderServiceServer) CreateAppointment(context.Context, *CreateAppointmentRequest) (*Appointment, error) {
+	return nil, status.Error(codes.Unimplemented, "method CreateAppointment not implemented")
+}
+func (UnimplementedWorkOrderServiceServer) SetAppointmentState(context.Context, *SetAppointmentStateRequest) (*Appointment, error) {
+	return nil, status.Error(codes.Unimplemented, "method SetAppointmentState not implemented")
 }
 func (UnimplementedWorkOrderServiceServer) mustEmbedUnimplementedWorkOrderServiceServer() {}
 func (UnimplementedWorkOrderServiceServer) testEmbeddedByValue()                          {}
@@ -622,6 +672,60 @@ func _WorkOrderService_AdjustStock_Handler(srv interface{}, ctx context.Context,
 	return interceptor(ctx, in, info, handler)
 }
 
+func _WorkOrderService_ListAppointments_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListAppointmentsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WorkOrderServiceServer).ListAppointments(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: WorkOrderService_ListAppointments_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WorkOrderServiceServer).ListAppointments(ctx, req.(*ListAppointmentsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _WorkOrderService_CreateAppointment_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateAppointmentRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WorkOrderServiceServer).CreateAppointment(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: WorkOrderService_CreateAppointment_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WorkOrderServiceServer).CreateAppointment(ctx, req.(*CreateAppointmentRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _WorkOrderService_SetAppointmentState_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SetAppointmentStateRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WorkOrderServiceServer).SetAppointmentState(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: WorkOrderService_SetAppointmentState_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WorkOrderServiceServer).SetAppointmentState(ctx, req.(*SetAppointmentStateRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // WorkOrderService_ServiceDesc is the grpc.ServiceDesc for WorkOrderService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -692,6 +796,18 @@ var WorkOrderService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "AdjustStock",
 			Handler:    _WorkOrderService_AdjustStock_Handler,
+		},
+		{
+			MethodName: "ListAppointments",
+			Handler:    _WorkOrderService_ListAppointments_Handler,
+		},
+		{
+			MethodName: "CreateAppointment",
+			Handler:    _WorkOrderService_CreateAppointment_Handler,
+		},
+		{
+			MethodName: "SetAppointmentState",
+			Handler:    _WorkOrderService_SetAppointmentState_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
