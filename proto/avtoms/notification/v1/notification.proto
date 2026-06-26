@@ -17,6 +17,17 @@ service NotificationService {
   rpc ListIntegrations(ListIntegrationsRequest) returns (ListIntegrationsResponse);
   rpc GetIntegration(GetIntegrationRequest) returns (Integration);
   rpc UpdateIntegration(UpdateIntegrationRequest) returns (Integration);
+  // SendTestSms sends a one-off SMS synchronously and returns the gateway's actual
+  // result/error, so the super admin can verify the credentials work.
+  rpc SendTestSms(SendTestSmsRequest) returns (TestSmsResult);
+}
+
+message SendTestSmsRequest {
+  string phone = 1;
+}
+message TestSmsResult {
+  bool delivered = 1;
+  string detail = 2; // human-readable result or the gateway's error
 }
 
 // Integration is a third-party provider's credential set. Secret values (password/token)
