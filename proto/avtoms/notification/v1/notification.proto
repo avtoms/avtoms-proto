@@ -12,6 +12,30 @@ service NotificationService {
   rpc SendTelegram(SendTelegramRequest) returns (SendResponse);
   // Notify picks the best channel (Telegram, falling back to SMS).
   rpc Notify(NotifyRequest) returns (SendResponse);
+
+  // Integration credentials, managed by the super admin (e.g. the PlayMobile SMS gateway).
+  rpc ListIntegrations(ListIntegrationsRequest) returns (ListIntegrationsResponse);
+  rpc GetIntegration(GetIntegrationRequest) returns (Integration);
+  rpc UpdateIntegration(UpdateIntegrationRequest) returns (Integration);
+}
+
+// Integration is a third-party provider's credential set. Secret values (password/token)
+// are blanked on read; `configured` reports whether the provider has been set up.
+message Integration {
+  string provider = 1;            // e.g. "playmobile"
+  map<string, string> values = 2; // key -> value; secret keys returned blank
+  bool configured = 3;
+}
+message ListIntegrationsRequest {}
+message ListIntegrationsResponse {
+  repeated Integration integrations = 1;
+}
+message GetIntegrationRequest {
+  string provider = 1;
+}
+message UpdateIntegrationRequest {
+  string provider = 1;
+  map<string, string> values = 2; // empty secret value keeps the stored one
 }
 
 enum Channel {

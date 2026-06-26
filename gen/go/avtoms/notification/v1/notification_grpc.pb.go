@@ -19,9 +19,12 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	NotificationService_SendSms_FullMethodName      = "/avtoms.notification.v1.NotificationService/SendSms"
-	NotificationService_SendTelegram_FullMethodName = "/avtoms.notification.v1.NotificationService/SendTelegram"
-	NotificationService_Notify_FullMethodName       = "/avtoms.notification.v1.NotificationService/Notify"
+	NotificationService_SendSms_FullMethodName           = "/avtoms.notification.v1.NotificationService/SendSms"
+	NotificationService_SendTelegram_FullMethodName      = "/avtoms.notification.v1.NotificationService/SendTelegram"
+	NotificationService_Notify_FullMethodName            = "/avtoms.notification.v1.NotificationService/Notify"
+	NotificationService_ListIntegrations_FullMethodName  = "/avtoms.notification.v1.NotificationService/ListIntegrations"
+	NotificationService_GetIntegration_FullMethodName    = "/avtoms.notification.v1.NotificationService/GetIntegration"
+	NotificationService_UpdateIntegration_FullMethodName = "/avtoms.notification.v1.NotificationService/UpdateIntegration"
 )
 
 // NotificationServiceClient is the client API for NotificationService service.
@@ -34,6 +37,10 @@ type NotificationServiceClient interface {
 	SendTelegram(ctx context.Context, in *SendTelegramRequest, opts ...grpc.CallOption) (*SendResponse, error)
 	// Notify picks the best channel (Telegram, falling back to SMS).
 	Notify(ctx context.Context, in *NotifyRequest, opts ...grpc.CallOption) (*SendResponse, error)
+	// Integration credentials, managed by the super admin (e.g. the PlayMobile SMS gateway).
+	ListIntegrations(ctx context.Context, in *ListIntegrationsRequest, opts ...grpc.CallOption) (*ListIntegrationsResponse, error)
+	GetIntegration(ctx context.Context, in *GetIntegrationRequest, opts ...grpc.CallOption) (*Integration, error)
+	UpdateIntegration(ctx context.Context, in *UpdateIntegrationRequest, opts ...grpc.CallOption) (*Integration, error)
 }
 
 type notificationServiceClient struct {
@@ -74,6 +81,36 @@ func (c *notificationServiceClient) Notify(ctx context.Context, in *NotifyReques
 	return out, nil
 }
 
+func (c *notificationServiceClient) ListIntegrations(ctx context.Context, in *ListIntegrationsRequest, opts ...grpc.CallOption) (*ListIntegrationsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListIntegrationsResponse)
+	err := c.cc.Invoke(ctx, NotificationService_ListIntegrations_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *notificationServiceClient) GetIntegration(ctx context.Context, in *GetIntegrationRequest, opts ...grpc.CallOption) (*Integration, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Integration)
+	err := c.cc.Invoke(ctx, NotificationService_GetIntegration_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *notificationServiceClient) UpdateIntegration(ctx context.Context, in *UpdateIntegrationRequest, opts ...grpc.CallOption) (*Integration, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Integration)
+	err := c.cc.Invoke(ctx, NotificationService_UpdateIntegration_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // NotificationServiceServer is the server API for NotificationService service.
 // All implementations must embed UnimplementedNotificationServiceServer
 // for forward compatibility.
@@ -84,6 +121,10 @@ type NotificationServiceServer interface {
 	SendTelegram(context.Context, *SendTelegramRequest) (*SendResponse, error)
 	// Notify picks the best channel (Telegram, falling back to SMS).
 	Notify(context.Context, *NotifyRequest) (*SendResponse, error)
+	// Integration credentials, managed by the super admin (e.g. the PlayMobile SMS gateway).
+	ListIntegrations(context.Context, *ListIntegrationsRequest) (*ListIntegrationsResponse, error)
+	GetIntegration(context.Context, *GetIntegrationRequest) (*Integration, error)
+	UpdateIntegration(context.Context, *UpdateIntegrationRequest) (*Integration, error)
 	mustEmbedUnimplementedNotificationServiceServer()
 }
 
@@ -102,6 +143,15 @@ func (UnimplementedNotificationServiceServer) SendTelegram(context.Context, *Sen
 }
 func (UnimplementedNotificationServiceServer) Notify(context.Context, *NotifyRequest) (*SendResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method Notify not implemented")
+}
+func (UnimplementedNotificationServiceServer) ListIntegrations(context.Context, *ListIntegrationsRequest) (*ListIntegrationsResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListIntegrations not implemented")
+}
+func (UnimplementedNotificationServiceServer) GetIntegration(context.Context, *GetIntegrationRequest) (*Integration, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetIntegration not implemented")
+}
+func (UnimplementedNotificationServiceServer) UpdateIntegration(context.Context, *UpdateIntegrationRequest) (*Integration, error) {
+	return nil, status.Error(codes.Unimplemented, "method UpdateIntegration not implemented")
 }
 func (UnimplementedNotificationServiceServer) mustEmbedUnimplementedNotificationServiceServer() {}
 func (UnimplementedNotificationServiceServer) testEmbeddedByValue()                             {}
@@ -178,6 +228,60 @@ func _NotificationService_Notify_Handler(srv interface{}, ctx context.Context, d
 	return interceptor(ctx, in, info, handler)
 }
 
+func _NotificationService_ListIntegrations_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListIntegrationsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(NotificationServiceServer).ListIntegrations(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: NotificationService_ListIntegrations_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(NotificationServiceServer).ListIntegrations(ctx, req.(*ListIntegrationsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _NotificationService_GetIntegration_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetIntegrationRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(NotificationServiceServer).GetIntegration(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: NotificationService_GetIntegration_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(NotificationServiceServer).GetIntegration(ctx, req.(*GetIntegrationRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _NotificationService_UpdateIntegration_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateIntegrationRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(NotificationServiceServer).UpdateIntegration(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: NotificationService_UpdateIntegration_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(NotificationServiceServer).UpdateIntegration(ctx, req.(*UpdateIntegrationRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // NotificationService_ServiceDesc is the grpc.ServiceDesc for NotificationService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -196,6 +300,18 @@ var NotificationService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Notify",
 			Handler:    _NotificationService_Notify_Handler,
+		},
+		{
+			MethodName: "ListIntegrations",
+			Handler:    _NotificationService_ListIntegrations_Handler,
+		},
+		{
+			MethodName: "GetIntegration",
+			Handler:    _NotificationService_GetIntegration_Handler,
+		},
+		{
+			MethodName: "UpdateIntegration",
+			Handler:    _NotificationService_UpdateIntegration_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
