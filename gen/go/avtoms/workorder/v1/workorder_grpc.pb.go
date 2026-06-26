@@ -46,6 +46,9 @@ const (
 	WorkOrderService_CreateShopExpense_FullMethodName       = "/avtoms.workorder.v1.WorkOrderService/CreateShopExpense"
 	WorkOrderService_DeleteShopExpense_FullMethodName       = "/avtoms.workorder.v1.WorkOrderService/DeleteShopExpense"
 	WorkOrderService_GetProfitAndLoss_FullMethodName        = "/avtoms.workorder.v1.WorkOrderService/GetProfitAndLoss"
+	WorkOrderService_ListWarranties_FullMethodName          = "/avtoms.workorder.v1.WorkOrderService/ListWarranties"
+	WorkOrderService_CreateWarranty_FullMethodName          = "/avtoms.workorder.v1.WorkOrderService/CreateWarranty"
+	WorkOrderService_VoidWarranty_FullMethodName            = "/avtoms.workorder.v1.WorkOrderService/VoidWarranty"
 )
 
 // WorkOrderServiceClient is the client API for WorkOrderService service.
@@ -87,6 +90,10 @@ type WorkOrderServiceClient interface {
 	CreateShopExpense(ctx context.Context, in *CreateShopExpenseRequest, opts ...grpc.CallOption) (*ShopExpense, error)
 	DeleteShopExpense(ctx context.Context, in *DeleteShopExpenseRequest, opts ...grpc.CallOption) (*DeleteShopExpenseResponse, error)
 	GetProfitAndLoss(ctx context.Context, in *GetProfitAndLossRequest, opts ...grpc.CallOption) (*ProfitAndLoss, error)
+	// Warranties on completed work (months / km coverage per vehicle).
+	ListWarranties(ctx context.Context, in *ListWarrantiesRequest, opts ...grpc.CallOption) (*ListWarrantiesResponse, error)
+	CreateWarranty(ctx context.Context, in *CreateWarrantyRequest, opts ...grpc.CallOption) (*Warranty, error)
+	VoidWarranty(ctx context.Context, in *VoidWarrantyRequest, opts ...grpc.CallOption) (*Warranty, error)
 }
 
 type workOrderServiceClient struct {
@@ -367,6 +374,36 @@ func (c *workOrderServiceClient) GetProfitAndLoss(ctx context.Context, in *GetPr
 	return out, nil
 }
 
+func (c *workOrderServiceClient) ListWarranties(ctx context.Context, in *ListWarrantiesRequest, opts ...grpc.CallOption) (*ListWarrantiesResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListWarrantiesResponse)
+	err := c.cc.Invoke(ctx, WorkOrderService_ListWarranties_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *workOrderServiceClient) CreateWarranty(ctx context.Context, in *CreateWarrantyRequest, opts ...grpc.CallOption) (*Warranty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Warranty)
+	err := c.cc.Invoke(ctx, WorkOrderService_CreateWarranty_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *workOrderServiceClient) VoidWarranty(ctx context.Context, in *VoidWarrantyRequest, opts ...grpc.CallOption) (*Warranty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Warranty)
+	err := c.cc.Invoke(ctx, WorkOrderService_VoidWarranty_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // WorkOrderServiceServer is the server API for WorkOrderService service.
 // All implementations must embed UnimplementedWorkOrderServiceServer
 // for forward compatibility.
@@ -406,6 +443,10 @@ type WorkOrderServiceServer interface {
 	CreateShopExpense(context.Context, *CreateShopExpenseRequest) (*ShopExpense, error)
 	DeleteShopExpense(context.Context, *DeleteShopExpenseRequest) (*DeleteShopExpenseResponse, error)
 	GetProfitAndLoss(context.Context, *GetProfitAndLossRequest) (*ProfitAndLoss, error)
+	// Warranties on completed work (months / km coverage per vehicle).
+	ListWarranties(context.Context, *ListWarrantiesRequest) (*ListWarrantiesResponse, error)
+	CreateWarranty(context.Context, *CreateWarrantyRequest) (*Warranty, error)
+	VoidWarranty(context.Context, *VoidWarrantyRequest) (*Warranty, error)
 	mustEmbedUnimplementedWorkOrderServiceServer()
 }
 
@@ -496,6 +537,15 @@ func (UnimplementedWorkOrderServiceServer) DeleteShopExpense(context.Context, *D
 }
 func (UnimplementedWorkOrderServiceServer) GetProfitAndLoss(context.Context, *GetProfitAndLossRequest) (*ProfitAndLoss, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetProfitAndLoss not implemented")
+}
+func (UnimplementedWorkOrderServiceServer) ListWarranties(context.Context, *ListWarrantiesRequest) (*ListWarrantiesResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListWarranties not implemented")
+}
+func (UnimplementedWorkOrderServiceServer) CreateWarranty(context.Context, *CreateWarrantyRequest) (*Warranty, error) {
+	return nil, status.Error(codes.Unimplemented, "method CreateWarranty not implemented")
+}
+func (UnimplementedWorkOrderServiceServer) VoidWarranty(context.Context, *VoidWarrantyRequest) (*Warranty, error) {
+	return nil, status.Error(codes.Unimplemented, "method VoidWarranty not implemented")
 }
 func (UnimplementedWorkOrderServiceServer) mustEmbedUnimplementedWorkOrderServiceServer() {}
 func (UnimplementedWorkOrderServiceServer) testEmbeddedByValue()                          {}
@@ -1004,6 +1054,60 @@ func _WorkOrderService_GetProfitAndLoss_Handler(srv interface{}, ctx context.Con
 	return interceptor(ctx, in, info, handler)
 }
 
+func _WorkOrderService_ListWarranties_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListWarrantiesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WorkOrderServiceServer).ListWarranties(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: WorkOrderService_ListWarranties_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WorkOrderServiceServer).ListWarranties(ctx, req.(*ListWarrantiesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _WorkOrderService_CreateWarranty_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateWarrantyRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WorkOrderServiceServer).CreateWarranty(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: WorkOrderService_CreateWarranty_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WorkOrderServiceServer).CreateWarranty(ctx, req.(*CreateWarrantyRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _WorkOrderService_VoidWarranty_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(VoidWarrantyRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WorkOrderServiceServer).VoidWarranty(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: WorkOrderService_VoidWarranty_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WorkOrderServiceServer).VoidWarranty(ctx, req.(*VoidWarrantyRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // WorkOrderService_ServiceDesc is the grpc.ServiceDesc for WorkOrderService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -1118,6 +1222,18 @@ var WorkOrderService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetProfitAndLoss",
 			Handler:    _WorkOrderService_GetProfitAndLoss_Handler,
+		},
+		{
+			MethodName: "ListWarranties",
+			Handler:    _WorkOrderService_ListWarranties_Handler,
+		},
+		{
+			MethodName: "CreateWarranty",
+			Handler:    _WorkOrderService_CreateWarranty_Handler,
+		},
+		{
+			MethodName: "VoidWarranty",
+			Handler:    _WorkOrderService_VoidWarranty_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

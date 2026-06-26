@@ -48,6 +48,47 @@ service WorkOrderService {
   rpc CreateShopExpense(CreateShopExpenseRequest) returns (ShopExpense);
   rpc DeleteShopExpense(DeleteShopExpenseRequest) returns (DeleteShopExpenseResponse);
   rpc GetProfitAndLoss(GetProfitAndLossRequest) returns (ProfitAndLoss);
+
+  // Warranties on completed work (months / km coverage per vehicle).
+  rpc ListWarranties(ListWarrantiesRequest) returns (ListWarrantiesResponse);
+  rpc CreateWarranty(CreateWarrantyRequest) returns (Warranty);
+  rpc VoidWarranty(VoidWarrantyRequest) returns (Warranty);
+}
+
+// Warranty covers a repair/part for a period (months) and/or distance (km) from a start date.
+message Warranty {
+  string id = 1;
+  string shop_id = 2;
+  string vehicle_id = 3;     // the covered vehicle
+  string work_order_id = 4;  // optional originating work order
+  string title = 5;          // what is covered, e.g. "Brake pads", "Engine rebuild"
+  int32 months = 6;          // coverage length in months (0 = none)
+  int64 km_limit = 7;        // coverage distance in km (0 = none)
+  string starts_on = 8;      // RFC3339 date coverage began
+  string expires_on = 9;     // RFC3339 date coverage ends (computed: starts_on + months)
+  string note = 10;
+  bool voided = 11;
+  string created_at = 12;
+}
+message ListWarrantiesRequest {
+  string shop_id = 1;
+  string vehicle_id = 2; // optional filter (a vehicle's warranties)
+}
+message ListWarrantiesResponse {
+  repeated Warranty warranties = 1;
+}
+message CreateWarrantyRequest {
+  string shop_id = 1;
+  string vehicle_id = 2;
+  string work_order_id = 3;
+  string title = 4;
+  int32 months = 5;
+  int64 km_limit = 6;
+  string starts_on = 7; // optional; defaults to now
+  string note = 8;
+}
+message VoidWarrantyRequest {
+  string id = 1;
 }
 
 // ShopExpense is a shop overhead cost (rent, salary, utilities, ...), distinct from
