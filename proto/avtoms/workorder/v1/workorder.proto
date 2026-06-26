@@ -9,6 +9,7 @@ service WorkOrderService {
   rpc CreateWorkOrder(CreateWorkOrderRequest) returns (WorkOrder);
   rpc GetWorkOrder(GetWorkOrderRequest) returns (WorkOrder);
   rpc AddLineItem(AddLineItemRequest) returns (WorkOrder);
+  rpc RemoveLineItem(RemoveLineItemRequest) returns (WorkOrder);
   rpc TransitionState(TransitionStateRequest) returns (WorkOrder);
   rpc AssignMechanic(AssignMechanicRequest) returns (WorkOrder);
 
@@ -160,6 +161,10 @@ message AddLineItemRequest {
   // Set by the gateway from the caller's role (owner/admin) to bypass the per-shop
   // discount cap. Not set by end clients.
   bool allow_discount_override = 3;
+}
+message RemoveLineItemRequest {
+  string work_order_id = 1;
+  string line_item_id = 2;
 }
 message TransitionStateRequest {
   string work_order_id = 1;

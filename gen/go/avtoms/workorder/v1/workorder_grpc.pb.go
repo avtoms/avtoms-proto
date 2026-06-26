@@ -22,6 +22,7 @@ const (
 	WorkOrderService_CreateWorkOrder_FullMethodName    = "/avtoms.workorder.v1.WorkOrderService/CreateWorkOrder"
 	WorkOrderService_GetWorkOrder_FullMethodName       = "/avtoms.workorder.v1.WorkOrderService/GetWorkOrder"
 	WorkOrderService_AddLineItem_FullMethodName        = "/avtoms.workorder.v1.WorkOrderService/AddLineItem"
+	WorkOrderService_RemoveLineItem_FullMethodName     = "/avtoms.workorder.v1.WorkOrderService/RemoveLineItem"
 	WorkOrderService_TransitionState_FullMethodName    = "/avtoms.workorder.v1.WorkOrderService/TransitionState"
 	WorkOrderService_AssignMechanic_FullMethodName     = "/avtoms.workorder.v1.WorkOrderService/AssignMechanic"
 	WorkOrderService_StartTimer_FullMethodName         = "/avtoms.workorder.v1.WorkOrderService/StartTimer"
@@ -42,6 +43,7 @@ type WorkOrderServiceClient interface {
 	CreateWorkOrder(ctx context.Context, in *CreateWorkOrderRequest, opts ...grpc.CallOption) (*WorkOrder, error)
 	GetWorkOrder(ctx context.Context, in *GetWorkOrderRequest, opts ...grpc.CallOption) (*WorkOrder, error)
 	AddLineItem(ctx context.Context, in *AddLineItemRequest, opts ...grpc.CallOption) (*WorkOrder, error)
+	RemoveLineItem(ctx context.Context, in *RemoveLineItemRequest, opts ...grpc.CallOption) (*WorkOrder, error)
 	TransitionState(ctx context.Context, in *TransitionStateRequest, opts ...grpc.CallOption) (*WorkOrder, error)
 	AssignMechanic(ctx context.Context, in *AssignMechanicRequest, opts ...grpc.CallOption) (*WorkOrder, error)
 	StartTimer(ctx context.Context, in *StartTimerRequest, opts ...grpc.CallOption) (*TimeEntry, error)
@@ -86,6 +88,16 @@ func (c *workOrderServiceClient) AddLineItem(ctx context.Context, in *AddLineIte
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(WorkOrder)
 	err := c.cc.Invoke(ctx, WorkOrderService_AddLineItem_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *workOrderServiceClient) RemoveLineItem(ctx context.Context, in *RemoveLineItemRequest, opts ...grpc.CallOption) (*WorkOrder, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(WorkOrder)
+	err := c.cc.Invoke(ctx, WorkOrderService_RemoveLineItem_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -191,6 +203,7 @@ type WorkOrderServiceServer interface {
 	CreateWorkOrder(context.Context, *CreateWorkOrderRequest) (*WorkOrder, error)
 	GetWorkOrder(context.Context, *GetWorkOrderRequest) (*WorkOrder, error)
 	AddLineItem(context.Context, *AddLineItemRequest) (*WorkOrder, error)
+	RemoveLineItem(context.Context, *RemoveLineItemRequest) (*WorkOrder, error)
 	TransitionState(context.Context, *TransitionStateRequest) (*WorkOrder, error)
 	AssignMechanic(context.Context, *AssignMechanicRequest) (*WorkOrder, error)
 	StartTimer(context.Context, *StartTimerRequest) (*TimeEntry, error)
@@ -219,6 +232,9 @@ func (UnimplementedWorkOrderServiceServer) GetWorkOrder(context.Context, *GetWor
 }
 func (UnimplementedWorkOrderServiceServer) AddLineItem(context.Context, *AddLineItemRequest) (*WorkOrder, error) {
 	return nil, status.Error(codes.Unimplemented, "method AddLineItem not implemented")
+}
+func (UnimplementedWorkOrderServiceServer) RemoveLineItem(context.Context, *RemoveLineItemRequest) (*WorkOrder, error) {
+	return nil, status.Error(codes.Unimplemented, "method RemoveLineItem not implemented")
 }
 func (UnimplementedWorkOrderServiceServer) TransitionState(context.Context, *TransitionStateRequest) (*WorkOrder, error) {
 	return nil, status.Error(codes.Unimplemented, "method TransitionState not implemented")
@@ -318,6 +334,24 @@ func _WorkOrderService_AddLineItem_Handler(srv interface{}, ctx context.Context,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(WorkOrderServiceServer).AddLineItem(ctx, req.(*AddLineItemRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _WorkOrderService_RemoveLineItem_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RemoveLineItemRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WorkOrderServiceServer).RemoveLineItem(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: WorkOrderService_RemoveLineItem_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WorkOrderServiceServer).RemoveLineItem(ctx, req.(*RemoveLineItemRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -502,6 +536,10 @@ var WorkOrderService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "AddLineItem",
 			Handler:    _WorkOrderService_AddLineItem_Handler,
+		},
+		{
+			MethodName: "RemoveLineItem",
+			Handler:    _WorkOrderService_RemoveLineItem_Handler,
 		},
 		{
 			MethodName: "TransitionState",
