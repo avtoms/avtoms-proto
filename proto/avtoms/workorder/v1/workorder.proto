@@ -37,6 +37,57 @@ service WorkOrderService {
 
   // Per-work-order audit trail.
   rpc GetAuditLog(GetAuditLogRequest) returns (GetAuditLogResponse);
+
+  // Service reminders (next oil change, inspection due, etc.).
+  rpc ListServiceReminders(ListServiceRemindersRequest) returns (ListServiceRemindersResponse);
+  rpc CreateServiceReminder(CreateServiceReminderRequest) returns (ServiceReminder);
+  rpc SetServiceReminderState(SetServiceReminderStateRequest) returns (ServiceReminder);
+}
+
+enum ServiceReminderState {
+  SERVICE_REMINDER_STATE_UNSPECIFIED = 0;
+  SERVICE_REMINDER_STATE_PENDING = 1;
+  SERVICE_REMINDER_STATE_DONE = 2;
+  SERVICE_REMINDER_STATE_DISMISSED = 3;
+}
+
+// ServiceReminder is a future maintenance reminder for a vehicle (oil change,
+// technical inspection, timing-belt, insurance renewal, ...).
+message ServiceReminder {
+  string id = 1;
+  string shop_id = 2;
+  string vehicle_id = 3;     // optional link to a vehicle
+  string customer_name = 4;  // denormalized for display / SMS
+  string phone = 5;          // denormalized for SMS
+  string plate = 6;          // free-text plate for quick display
+  string title = 7;          // e.g. "Oil change", "Technical inspection"
+  string due_date = 8;       // RFC3339 date the service is due (optional)
+  int64 due_mileage = 9;     // odometer target in km (optional, 0 = none)
+  string notes = 10;
+  ServiceReminderState state = 11;
+  string created_at = 12;
+}
+message ListServiceRemindersRequest {
+  string shop_id = 1;
+  string vehicle_id = 2; // optional filter (a vehicle's reminders)
+}
+message ListServiceRemindersResponse {
+  repeated ServiceReminder reminders = 1;
+}
+message CreateServiceReminderRequest {
+  string shop_id = 1;
+  string vehicle_id = 2;
+  string customer_name = 3;
+  string phone = 4;
+  string plate = 5;
+  string title = 6;
+  string due_date = 7;
+  int64 due_mileage = 8;
+  string notes = 9;
+}
+message SetServiceReminderStateRequest {
+  string id = 1;
+  ServiceReminderState state = 2;
 }
 
 // AuditEntry records one change to a work order.

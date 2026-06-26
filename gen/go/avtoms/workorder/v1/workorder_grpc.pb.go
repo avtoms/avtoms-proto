@@ -19,26 +19,29 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	WorkOrderService_CreateWorkOrder_FullMethodName     = "/avtoms.workorder.v1.WorkOrderService/CreateWorkOrder"
-	WorkOrderService_GetWorkOrder_FullMethodName        = "/avtoms.workorder.v1.WorkOrderService/GetWorkOrder"
-	WorkOrderService_AddLineItem_FullMethodName         = "/avtoms.workorder.v1.WorkOrderService/AddLineItem"
-	WorkOrderService_RemoveLineItem_FullMethodName      = "/avtoms.workorder.v1.WorkOrderService/RemoveLineItem"
-	WorkOrderService_TransitionState_FullMethodName     = "/avtoms.workorder.v1.WorkOrderService/TransitionState"
-	WorkOrderService_AssignMechanic_FullMethodName      = "/avtoms.workorder.v1.WorkOrderService/AssignMechanic"
-	WorkOrderService_StartTimer_FullMethodName          = "/avtoms.workorder.v1.WorkOrderService/StartTimer"
-	WorkOrderService_StopTimer_FullMethodName           = "/avtoms.workorder.v1.WorkOrderService/StopTimer"
-	WorkOrderService_ListMenuItems_FullMethodName       = "/avtoms.workorder.v1.WorkOrderService/ListMenuItems"
-	WorkOrderService_CreateMenuItem_FullMethodName      = "/avtoms.workorder.v1.WorkOrderService/CreateMenuItem"
-	WorkOrderService_ListWorkOrders_FullMethodName      = "/avtoms.workorder.v1.WorkOrderService/ListWorkOrders"
-	WorkOrderService_GetShopSettings_FullMethodName     = "/avtoms.workorder.v1.WorkOrderService/GetShopSettings"
-	WorkOrderService_UpdateShopSettings_FullMethodName  = "/avtoms.workorder.v1.WorkOrderService/UpdateShopSettings"
-	WorkOrderService_ListParts_FullMethodName           = "/avtoms.workorder.v1.WorkOrderService/ListParts"
-	WorkOrderService_CreatePart_FullMethodName          = "/avtoms.workorder.v1.WorkOrderService/CreatePart"
-	WorkOrderService_AdjustStock_FullMethodName         = "/avtoms.workorder.v1.WorkOrderService/AdjustStock"
-	WorkOrderService_ListAppointments_FullMethodName    = "/avtoms.workorder.v1.WorkOrderService/ListAppointments"
-	WorkOrderService_CreateAppointment_FullMethodName   = "/avtoms.workorder.v1.WorkOrderService/CreateAppointment"
-	WorkOrderService_SetAppointmentState_FullMethodName = "/avtoms.workorder.v1.WorkOrderService/SetAppointmentState"
-	WorkOrderService_GetAuditLog_FullMethodName         = "/avtoms.workorder.v1.WorkOrderService/GetAuditLog"
+	WorkOrderService_CreateWorkOrder_FullMethodName         = "/avtoms.workorder.v1.WorkOrderService/CreateWorkOrder"
+	WorkOrderService_GetWorkOrder_FullMethodName            = "/avtoms.workorder.v1.WorkOrderService/GetWorkOrder"
+	WorkOrderService_AddLineItem_FullMethodName             = "/avtoms.workorder.v1.WorkOrderService/AddLineItem"
+	WorkOrderService_RemoveLineItem_FullMethodName          = "/avtoms.workorder.v1.WorkOrderService/RemoveLineItem"
+	WorkOrderService_TransitionState_FullMethodName         = "/avtoms.workorder.v1.WorkOrderService/TransitionState"
+	WorkOrderService_AssignMechanic_FullMethodName          = "/avtoms.workorder.v1.WorkOrderService/AssignMechanic"
+	WorkOrderService_StartTimer_FullMethodName              = "/avtoms.workorder.v1.WorkOrderService/StartTimer"
+	WorkOrderService_StopTimer_FullMethodName               = "/avtoms.workorder.v1.WorkOrderService/StopTimer"
+	WorkOrderService_ListMenuItems_FullMethodName           = "/avtoms.workorder.v1.WorkOrderService/ListMenuItems"
+	WorkOrderService_CreateMenuItem_FullMethodName          = "/avtoms.workorder.v1.WorkOrderService/CreateMenuItem"
+	WorkOrderService_ListWorkOrders_FullMethodName          = "/avtoms.workorder.v1.WorkOrderService/ListWorkOrders"
+	WorkOrderService_GetShopSettings_FullMethodName         = "/avtoms.workorder.v1.WorkOrderService/GetShopSettings"
+	WorkOrderService_UpdateShopSettings_FullMethodName      = "/avtoms.workorder.v1.WorkOrderService/UpdateShopSettings"
+	WorkOrderService_ListParts_FullMethodName               = "/avtoms.workorder.v1.WorkOrderService/ListParts"
+	WorkOrderService_CreatePart_FullMethodName              = "/avtoms.workorder.v1.WorkOrderService/CreatePart"
+	WorkOrderService_AdjustStock_FullMethodName             = "/avtoms.workorder.v1.WorkOrderService/AdjustStock"
+	WorkOrderService_ListAppointments_FullMethodName        = "/avtoms.workorder.v1.WorkOrderService/ListAppointments"
+	WorkOrderService_CreateAppointment_FullMethodName       = "/avtoms.workorder.v1.WorkOrderService/CreateAppointment"
+	WorkOrderService_SetAppointmentState_FullMethodName     = "/avtoms.workorder.v1.WorkOrderService/SetAppointmentState"
+	WorkOrderService_GetAuditLog_FullMethodName             = "/avtoms.workorder.v1.WorkOrderService/GetAuditLog"
+	WorkOrderService_ListServiceReminders_FullMethodName    = "/avtoms.workorder.v1.WorkOrderService/ListServiceReminders"
+	WorkOrderService_CreateServiceReminder_FullMethodName   = "/avtoms.workorder.v1.WorkOrderService/CreateServiceReminder"
+	WorkOrderService_SetServiceReminderState_FullMethodName = "/avtoms.workorder.v1.WorkOrderService/SetServiceReminderState"
 )
 
 // WorkOrderServiceClient is the client API for WorkOrderService service.
@@ -71,6 +74,10 @@ type WorkOrderServiceClient interface {
 	SetAppointmentState(ctx context.Context, in *SetAppointmentStateRequest, opts ...grpc.CallOption) (*Appointment, error)
 	// Per-work-order audit trail.
 	GetAuditLog(ctx context.Context, in *GetAuditLogRequest, opts ...grpc.CallOption) (*GetAuditLogResponse, error)
+	// Service reminders (next oil change, inspection due, etc.).
+	ListServiceReminders(ctx context.Context, in *ListServiceRemindersRequest, opts ...grpc.CallOption) (*ListServiceRemindersResponse, error)
+	CreateServiceReminder(ctx context.Context, in *CreateServiceReminderRequest, opts ...grpc.CallOption) (*ServiceReminder, error)
+	SetServiceReminderState(ctx context.Context, in *SetServiceReminderStateRequest, opts ...grpc.CallOption) (*ServiceReminder, error)
 }
 
 type workOrderServiceClient struct {
@@ -281,6 +288,36 @@ func (c *workOrderServiceClient) GetAuditLog(ctx context.Context, in *GetAuditLo
 	return out, nil
 }
 
+func (c *workOrderServiceClient) ListServiceReminders(ctx context.Context, in *ListServiceRemindersRequest, opts ...grpc.CallOption) (*ListServiceRemindersResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListServiceRemindersResponse)
+	err := c.cc.Invoke(ctx, WorkOrderService_ListServiceReminders_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *workOrderServiceClient) CreateServiceReminder(ctx context.Context, in *CreateServiceReminderRequest, opts ...grpc.CallOption) (*ServiceReminder, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ServiceReminder)
+	err := c.cc.Invoke(ctx, WorkOrderService_CreateServiceReminder_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *workOrderServiceClient) SetServiceReminderState(ctx context.Context, in *SetServiceReminderStateRequest, opts ...grpc.CallOption) (*ServiceReminder, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ServiceReminder)
+	err := c.cc.Invoke(ctx, WorkOrderService_SetServiceReminderState_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // WorkOrderServiceServer is the server API for WorkOrderService service.
 // All implementations must embed UnimplementedWorkOrderServiceServer
 // for forward compatibility.
@@ -311,6 +348,10 @@ type WorkOrderServiceServer interface {
 	SetAppointmentState(context.Context, *SetAppointmentStateRequest) (*Appointment, error)
 	// Per-work-order audit trail.
 	GetAuditLog(context.Context, *GetAuditLogRequest) (*GetAuditLogResponse, error)
+	// Service reminders (next oil change, inspection due, etc.).
+	ListServiceReminders(context.Context, *ListServiceRemindersRequest) (*ListServiceRemindersResponse, error)
+	CreateServiceReminder(context.Context, *CreateServiceReminderRequest) (*ServiceReminder, error)
+	SetServiceReminderState(context.Context, *SetServiceReminderStateRequest) (*ServiceReminder, error)
 	mustEmbedUnimplementedWorkOrderServiceServer()
 }
 
@@ -380,6 +421,15 @@ func (UnimplementedWorkOrderServiceServer) SetAppointmentState(context.Context, 
 }
 func (UnimplementedWorkOrderServiceServer) GetAuditLog(context.Context, *GetAuditLogRequest) (*GetAuditLogResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetAuditLog not implemented")
+}
+func (UnimplementedWorkOrderServiceServer) ListServiceReminders(context.Context, *ListServiceRemindersRequest) (*ListServiceRemindersResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListServiceReminders not implemented")
+}
+func (UnimplementedWorkOrderServiceServer) CreateServiceReminder(context.Context, *CreateServiceReminderRequest) (*ServiceReminder, error) {
+	return nil, status.Error(codes.Unimplemented, "method CreateServiceReminder not implemented")
+}
+func (UnimplementedWorkOrderServiceServer) SetServiceReminderState(context.Context, *SetServiceReminderStateRequest) (*ServiceReminder, error) {
+	return nil, status.Error(codes.Unimplemented, "method SetServiceReminderState not implemented")
 }
 func (UnimplementedWorkOrderServiceServer) mustEmbedUnimplementedWorkOrderServiceServer() {}
 func (UnimplementedWorkOrderServiceServer) testEmbeddedByValue()                          {}
@@ -762,6 +812,60 @@ func _WorkOrderService_GetAuditLog_Handler(srv interface{}, ctx context.Context,
 	return interceptor(ctx, in, info, handler)
 }
 
+func _WorkOrderService_ListServiceReminders_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListServiceRemindersRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WorkOrderServiceServer).ListServiceReminders(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: WorkOrderService_ListServiceReminders_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WorkOrderServiceServer).ListServiceReminders(ctx, req.(*ListServiceRemindersRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _WorkOrderService_CreateServiceReminder_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateServiceReminderRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WorkOrderServiceServer).CreateServiceReminder(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: WorkOrderService_CreateServiceReminder_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WorkOrderServiceServer).CreateServiceReminder(ctx, req.(*CreateServiceReminderRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _WorkOrderService_SetServiceReminderState_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SetServiceReminderStateRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WorkOrderServiceServer).SetServiceReminderState(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: WorkOrderService_SetServiceReminderState_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WorkOrderServiceServer).SetServiceReminderState(ctx, req.(*SetServiceReminderStateRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // WorkOrderService_ServiceDesc is the grpc.ServiceDesc for WorkOrderService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -848,6 +952,18 @@ var WorkOrderService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetAuditLog",
 			Handler:    _WorkOrderService_GetAuditLog_Handler,
+		},
+		{
+			MethodName: "ListServiceReminders",
+			Handler:    _WorkOrderService_ListServiceReminders_Handler,
+		},
+		{
+			MethodName: "CreateServiceReminder",
+			Handler:    _WorkOrderService_CreateServiceReminder_Handler,
+		},
+		{
+			MethodName: "SetServiceReminderState",
+			Handler:    _WorkOrderService_SetServiceReminderState_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
