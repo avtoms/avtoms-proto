@@ -770,9 +770,10 @@ func (x *TimeEntry) GetStoppedAt() string {
 type MenuMaterial struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	Quantity      int32                  `protobuf:"varint,2,opt,name=quantity,proto3" json:"quantity,omitempty"`
+	Quantity      float64                `protobuf:"fixed64,2,opt,name=quantity,proto3" json:"quantity,omitempty"`                   // amount, may be fractional (e.g. 4.5)
 	UnitCost      int64                  `protobuf:"varint,3,opt,name=unit_cost,json=unitCost,proto3" json:"unit_cost,omitempty"`    // shop expense per unit, in tiyin
 	UnitPrice     int64                  `protobuf:"varint,4,opt,name=unit_price,json=unitPrice,proto3" json:"unit_price,omitempty"` // optional retail price per unit, in tiyin
+	Unit          string                 `protobuf:"bytes,5,opt,name=unit,proto3" json:"unit,omitempty"`                             // free-text unit of measure: litr, kg, dona, metr, ...
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -814,7 +815,7 @@ func (x *MenuMaterial) GetName() string {
 	return ""
 }
 
-func (x *MenuMaterial) GetQuantity() int32 {
+func (x *MenuMaterial) GetQuantity() float64 {
 	if x != nil {
 		return x.Quantity
 	}
@@ -833,6 +834,13 @@ func (x *MenuMaterial) GetUnitPrice() int64 {
 		return x.UnitPrice
 	}
 	return 0
+}
+
+func (x *MenuMaterial) GetUnit() string {
+	if x != nil {
+		return x.Unit
+	}
+	return ""
 }
 
 type MenuItem struct {
@@ -1640,13 +1648,14 @@ const file_avtoms_workorder_v1_workorder_proto_rawDesc = "" +
 	"\n" +
 	"started_at\x18\x04 \x01(\tR\tstartedAt\x12\x1d\n" +
 	"\n" +
-	"stopped_at\x18\x05 \x01(\tR\tstoppedAt\"z\n" +
+	"stopped_at\x18\x05 \x01(\tR\tstoppedAt\"\x8e\x01\n" +
 	"\fMenuMaterial\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12\x1a\n" +
-	"\bquantity\x18\x02 \x01(\x05R\bquantity\x12\x1b\n" +
+	"\bquantity\x18\x02 \x01(\x01R\bquantity\x12\x1b\n" +
 	"\tunit_cost\x18\x03 \x01(\x03R\bunitCost\x12\x1d\n" +
 	"\n" +
-	"unit_price\x18\x04 \x01(\x03R\tunitPrice\"\xfa\x02\n" +
+	"unit_price\x18\x04 \x01(\x03R\tunitPrice\x12\x12\n" +
+	"\x04unit\x18\x05 \x01(\tR\x04unit\"\xfa\x02\n" +
 	"\bMenuItem\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x17\n" +
 	"\ashop_id\x18\x02 \x01(\tR\x06shopId\x12 \n" +

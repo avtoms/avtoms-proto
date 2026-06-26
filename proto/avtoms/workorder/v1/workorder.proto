@@ -125,9 +125,10 @@ message TimeEntry {
 // entry on a service template). Reference/spec data shown in the catalog; not auto-billed.
 message MenuMaterial {
   string name = 1;
-  int32 quantity = 2;
+  double quantity = 2;  // amount, may be fractional (e.g. 4.5)
   int64 unit_cost = 3;  // shop expense per unit, in tiyin
   int64 unit_price = 4; // optional retail price per unit, in tiyin
+  string unit = 5;      // free-text unit of measure: litr, kg, dona, metr, ...
 }
 
 message MenuItem {
