@@ -19,6 +19,25 @@ service WorkOrderService {
   rpc CreateMenuItem(CreateMenuItemRequest) returns (MenuItem);
 
   rpc ListWorkOrders(ListWorkOrdersRequest) returns (ListWorkOrdersResponse);
+
+  // Per-shop pricing policy (currently the negotiated-discount cap).
+  rpc GetShopSettings(GetShopSettingsRequest) returns (ShopSettings);
+  rpc UpdateShopSettings(UpdateShopSettingsRequest) returns (ShopSettings);
+}
+
+// ShopSettings holds per-shop pricing policy.
+message ShopSettings {
+  string shop_id = 1;
+  // Maximum discount a mechanic may apply to a menu-priced line, in percent (0-100).
+  // 100 means no cap (the opt-in default). Owners/admins always bypass the cap.
+  int32 max_discount_percent = 2;
+}
+message GetShopSettingsRequest {
+  string shop_id = 1;
+}
+message UpdateShopSettingsRequest {
+  string shop_id = 1;
+  int32 max_discount_percent = 2;
 }
 
 message ListWorkOrdersRequest {
@@ -124,6 +143,9 @@ message GetWorkOrderRequest {
 message AddLineItemRequest {
   string work_order_id = 1;
   LineItem line_item = 2;
+  // Set by the gateway from the caller's role (owner/admin) to bypass the per-shop
+  // discount cap. Not set by end clients.
+  bool allow_discount_override = 3;
 }
 message TransitionStateRequest {
   string work_order_id = 1;

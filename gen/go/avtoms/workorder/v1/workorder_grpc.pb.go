@@ -19,16 +19,18 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	WorkOrderService_CreateWorkOrder_FullMethodName = "/avtoms.workorder.v1.WorkOrderService/CreateWorkOrder"
-	WorkOrderService_GetWorkOrder_FullMethodName    = "/avtoms.workorder.v1.WorkOrderService/GetWorkOrder"
-	WorkOrderService_AddLineItem_FullMethodName     = "/avtoms.workorder.v1.WorkOrderService/AddLineItem"
-	WorkOrderService_TransitionState_FullMethodName = "/avtoms.workorder.v1.WorkOrderService/TransitionState"
-	WorkOrderService_AssignMechanic_FullMethodName  = "/avtoms.workorder.v1.WorkOrderService/AssignMechanic"
-	WorkOrderService_StartTimer_FullMethodName      = "/avtoms.workorder.v1.WorkOrderService/StartTimer"
-	WorkOrderService_StopTimer_FullMethodName       = "/avtoms.workorder.v1.WorkOrderService/StopTimer"
-	WorkOrderService_ListMenuItems_FullMethodName   = "/avtoms.workorder.v1.WorkOrderService/ListMenuItems"
-	WorkOrderService_CreateMenuItem_FullMethodName  = "/avtoms.workorder.v1.WorkOrderService/CreateMenuItem"
-	WorkOrderService_ListWorkOrders_FullMethodName  = "/avtoms.workorder.v1.WorkOrderService/ListWorkOrders"
+	WorkOrderService_CreateWorkOrder_FullMethodName    = "/avtoms.workorder.v1.WorkOrderService/CreateWorkOrder"
+	WorkOrderService_GetWorkOrder_FullMethodName       = "/avtoms.workorder.v1.WorkOrderService/GetWorkOrder"
+	WorkOrderService_AddLineItem_FullMethodName        = "/avtoms.workorder.v1.WorkOrderService/AddLineItem"
+	WorkOrderService_TransitionState_FullMethodName    = "/avtoms.workorder.v1.WorkOrderService/TransitionState"
+	WorkOrderService_AssignMechanic_FullMethodName     = "/avtoms.workorder.v1.WorkOrderService/AssignMechanic"
+	WorkOrderService_StartTimer_FullMethodName         = "/avtoms.workorder.v1.WorkOrderService/StartTimer"
+	WorkOrderService_StopTimer_FullMethodName          = "/avtoms.workorder.v1.WorkOrderService/StopTimer"
+	WorkOrderService_ListMenuItems_FullMethodName      = "/avtoms.workorder.v1.WorkOrderService/ListMenuItems"
+	WorkOrderService_CreateMenuItem_FullMethodName     = "/avtoms.workorder.v1.WorkOrderService/CreateMenuItem"
+	WorkOrderService_ListWorkOrders_FullMethodName     = "/avtoms.workorder.v1.WorkOrderService/ListWorkOrders"
+	WorkOrderService_GetShopSettings_FullMethodName    = "/avtoms.workorder.v1.WorkOrderService/GetShopSettings"
+	WorkOrderService_UpdateShopSettings_FullMethodName = "/avtoms.workorder.v1.WorkOrderService/UpdateShopSettings"
 )
 
 // WorkOrderServiceClient is the client API for WorkOrderService service.
@@ -47,6 +49,9 @@ type WorkOrderServiceClient interface {
 	ListMenuItems(ctx context.Context, in *ListMenuItemsRequest, opts ...grpc.CallOption) (*ListMenuItemsResponse, error)
 	CreateMenuItem(ctx context.Context, in *CreateMenuItemRequest, opts ...grpc.CallOption) (*MenuItem, error)
 	ListWorkOrders(ctx context.Context, in *ListWorkOrdersRequest, opts ...grpc.CallOption) (*ListWorkOrdersResponse, error)
+	// Per-shop pricing policy (currently the negotiated-discount cap).
+	GetShopSettings(ctx context.Context, in *GetShopSettingsRequest, opts ...grpc.CallOption) (*ShopSettings, error)
+	UpdateShopSettings(ctx context.Context, in *UpdateShopSettingsRequest, opts ...grpc.CallOption) (*ShopSettings, error)
 }
 
 type workOrderServiceClient struct {
@@ -157,6 +162,26 @@ func (c *workOrderServiceClient) ListWorkOrders(ctx context.Context, in *ListWor
 	return out, nil
 }
 
+func (c *workOrderServiceClient) GetShopSettings(ctx context.Context, in *GetShopSettingsRequest, opts ...grpc.CallOption) (*ShopSettings, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ShopSettings)
+	err := c.cc.Invoke(ctx, WorkOrderService_GetShopSettings_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *workOrderServiceClient) UpdateShopSettings(ctx context.Context, in *UpdateShopSettingsRequest, opts ...grpc.CallOption) (*ShopSettings, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ShopSettings)
+	err := c.cc.Invoke(ctx, WorkOrderService_UpdateShopSettings_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // WorkOrderServiceServer is the server API for WorkOrderService service.
 // All implementations must embed UnimplementedWorkOrderServiceServer
 // for forward compatibility.
@@ -173,6 +198,9 @@ type WorkOrderServiceServer interface {
 	ListMenuItems(context.Context, *ListMenuItemsRequest) (*ListMenuItemsResponse, error)
 	CreateMenuItem(context.Context, *CreateMenuItemRequest) (*MenuItem, error)
 	ListWorkOrders(context.Context, *ListWorkOrdersRequest) (*ListWorkOrdersResponse, error)
+	// Per-shop pricing policy (currently the negotiated-discount cap).
+	GetShopSettings(context.Context, *GetShopSettingsRequest) (*ShopSettings, error)
+	UpdateShopSettings(context.Context, *UpdateShopSettingsRequest) (*ShopSettings, error)
 	mustEmbedUnimplementedWorkOrderServiceServer()
 }
 
@@ -212,6 +240,12 @@ func (UnimplementedWorkOrderServiceServer) CreateMenuItem(context.Context, *Crea
 }
 func (UnimplementedWorkOrderServiceServer) ListWorkOrders(context.Context, *ListWorkOrdersRequest) (*ListWorkOrdersResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method ListWorkOrders not implemented")
+}
+func (UnimplementedWorkOrderServiceServer) GetShopSettings(context.Context, *GetShopSettingsRequest) (*ShopSettings, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetShopSettings not implemented")
+}
+func (UnimplementedWorkOrderServiceServer) UpdateShopSettings(context.Context, *UpdateShopSettingsRequest) (*ShopSettings, error) {
+	return nil, status.Error(codes.Unimplemented, "method UpdateShopSettings not implemented")
 }
 func (UnimplementedWorkOrderServiceServer) mustEmbedUnimplementedWorkOrderServiceServer() {}
 func (UnimplementedWorkOrderServiceServer) testEmbeddedByValue()                          {}
@@ -414,6 +448,42 @@ func _WorkOrderService_ListWorkOrders_Handler(srv interface{}, ctx context.Conte
 	return interceptor(ctx, in, info, handler)
 }
 
+func _WorkOrderService_GetShopSettings_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetShopSettingsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WorkOrderServiceServer).GetShopSettings(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: WorkOrderService_GetShopSettings_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WorkOrderServiceServer).GetShopSettings(ctx, req.(*GetShopSettingsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _WorkOrderService_UpdateShopSettings_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateShopSettingsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WorkOrderServiceServer).UpdateShopSettings(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: WorkOrderService_UpdateShopSettings_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WorkOrderServiceServer).UpdateShopSettings(ctx, req.(*UpdateShopSettingsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // WorkOrderService_ServiceDesc is the grpc.ServiceDesc for WorkOrderService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -460,6 +530,14 @@ var WorkOrderService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ListWorkOrders",
 			Handler:    _WorkOrderService_ListWorkOrders_Handler,
+		},
+		{
+			MethodName: "GetShopSettings",
+			Handler:    _WorkOrderService_GetShopSettings_Handler,
+		},
+		{
+			MethodName: "UpdateShopSettings",
+			Handler:    _WorkOrderService_UpdateShopSettings_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
