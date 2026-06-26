@@ -44,16 +44,28 @@ enum WorkOrderState {
 
 enum LineItemKind {
   LINE_ITEM_KIND_UNSPECIFIED = 0;
-  LINE_ITEM_KIND_LABOR = 1;
-  LINE_ITEM_KIND_PART = 2;
+  LINE_ITEM_KIND_LABOR = 1; // deprecated alias kept for backward compatibility; prefer SERVICE
+  LINE_ITEM_KIND_PART = 2;  // deprecated alias kept for backward compatibility; prefer MATERIAL
+  LINE_ITEM_KIND_SERVICE = 3;  // a repair service performed (price negotiable per customer)
+  LINE_ITEM_KIND_MATERIAL = 4; // a material/tool/part consumed during the repair (an expense)
 }
 
 message LineItem {
   string id = 1;
   LineItemKind kind = 2;
   string description = 3;
-  int64 unit_price = 4; // minor units (tiyin)
+  // What the customer is charged per unit, in minor units (tiyin). For a SERVICE this is the
+  // agreed/negotiated price, which may be below the menu default (see default_price).
+  int64 unit_price = 4;
   int32 quantity = 5;
+  // The shop's expense (buy/cost price) per unit, in tiyin. 0 when not tracked.
+  // Per-line margin is (unit_price - cost) * quantity.
+  int64 cost = 6;
+  // Optional source menu item this line was created from (empty for ad-hoc lines).
+  string menu_item_id = 7;
+  // Snapshot of the menu item's default_price when the line was added, in tiyin.
+  // Enables a negotiation/discount audit: discount = (default_price - unit_price) * quantity.
+  int64 default_price = 8;
 }
 
 message WorkOrder {
@@ -75,6 +87,10 @@ message WorkOrder {
   string make = 14;
   string model = 15;
   string customer_name = 16;
+  // Sum of cost*quantity across line items, in tiyin: the shop's total expense on this order.
+  int64 total_cost = 17;
+  // Gross margin before VAT, in tiyin: subtotal - total_cost.
+  int64 total_margin = 18;
 }
 
 message TimeEntry {
@@ -93,6 +109,9 @@ message MenuItem {
   string name_ru = 5;
   int64 default_price = 6;
   bool active = 7;
+  // Default shop expense (cost) for this menu item per unit, in tiyin. 0 when not tracked.
+  // Seeds a line item's cost when it is created from this menu item.
+  int64 default_cost = 8;
 }
 
 message CreateWorkOrderRequest {
@@ -134,4 +153,5 @@ message CreateMenuItemRequest {
   string name_uz_cyrl = 3;
   string name_ru = 4;
   int64 default_price = 5;
+  int64 default_cost = 6; // optional default shop expense per unit, in tiyin
 }

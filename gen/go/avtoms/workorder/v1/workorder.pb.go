@@ -92,8 +92,10 @@ type LineItemKind int32
 
 const (
 	LineItemKind_LINE_ITEM_KIND_UNSPECIFIED LineItemKind = 0
-	LineItemKind_LINE_ITEM_KIND_LABOR       LineItemKind = 1
-	LineItemKind_LINE_ITEM_KIND_PART        LineItemKind = 2
+	LineItemKind_LINE_ITEM_KIND_LABOR       LineItemKind = 1 // deprecated alias kept for backward compatibility; prefer SERVICE
+	LineItemKind_LINE_ITEM_KIND_PART        LineItemKind = 2 // deprecated alias kept for backward compatibility; prefer MATERIAL
+	LineItemKind_LINE_ITEM_KIND_SERVICE     LineItemKind = 3 // a repair service performed (price negotiable per customer)
+	LineItemKind_LINE_ITEM_KIND_MATERIAL    LineItemKind = 4 // a material/tool/part consumed during the repair (an expense)
 )
 
 // Enum value maps for LineItemKind.
@@ -102,11 +104,15 @@ var (
 		0: "LINE_ITEM_KIND_UNSPECIFIED",
 		1: "LINE_ITEM_KIND_LABOR",
 		2: "LINE_ITEM_KIND_PART",
+		3: "LINE_ITEM_KIND_SERVICE",
+		4: "LINE_ITEM_KIND_MATERIAL",
 	}
 	LineItemKind_value = map[string]int32{
 		"LINE_ITEM_KIND_UNSPECIFIED": 0,
 		"LINE_ITEM_KIND_LABOR":       1,
 		"LINE_ITEM_KIND_PART":        2,
+		"LINE_ITEM_KIND_SERVICE":     3,
+		"LINE_ITEM_KIND_MATERIAL":    4,
 	}
 )
 
@@ -242,12 +248,22 @@ func (x *ListWorkOrdersResponse) GetWorkOrders() []*WorkOrder {
 }
 
 type LineItem struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	Kind          LineItemKind           `protobuf:"varint,2,opt,name=kind,proto3,enum=avtoms.workorder.v1.LineItemKind" json:"kind,omitempty"`
-	Description   string                 `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
-	UnitPrice     int64                  `protobuf:"varint,4,opt,name=unit_price,json=unitPrice,proto3" json:"unit_price,omitempty"` // minor units (tiyin)
-	Quantity      int32                  `protobuf:"varint,5,opt,name=quantity,proto3" json:"quantity,omitempty"`
+	state       protoimpl.MessageState `protogen:"open.v1"`
+	Id          string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Kind        LineItemKind           `protobuf:"varint,2,opt,name=kind,proto3,enum=avtoms.workorder.v1.LineItemKind" json:"kind,omitempty"`
+	Description string                 `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
+	// What the customer is charged per unit, in minor units (tiyin). For a SERVICE this is the
+	// agreed/negotiated price, which may be below the menu default (see default_price).
+	UnitPrice int64 `protobuf:"varint,4,opt,name=unit_price,json=unitPrice,proto3" json:"unit_price,omitempty"`
+	Quantity  int32 `protobuf:"varint,5,opt,name=quantity,proto3" json:"quantity,omitempty"`
+	// The shop's expense (buy/cost price) per unit, in tiyin. 0 when not tracked.
+	// Per-line margin is (unit_price - cost) * quantity.
+	Cost int64 `protobuf:"varint,6,opt,name=cost,proto3" json:"cost,omitempty"`
+	// Optional source menu item this line was created from (empty for ad-hoc lines).
+	MenuItemId string `protobuf:"bytes,7,opt,name=menu_item_id,json=menuItemId,proto3" json:"menu_item_id,omitempty"`
+	// Snapshot of the menu item's default_price when the line was added, in tiyin.
+	// Enables a negotiation/discount audit: discount = (default_price - unit_price) * quantity.
+	DefaultPrice  int64 `protobuf:"varint,8,opt,name=default_price,json=defaultPrice,proto3" json:"default_price,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -317,6 +333,27 @@ func (x *LineItem) GetQuantity() int32 {
 	return 0
 }
 
+func (x *LineItem) GetCost() int64 {
+	if x != nil {
+		return x.Cost
+	}
+	return 0
+}
+
+func (x *LineItem) GetMenuItemId() string {
+	if x != nil {
+		return x.MenuItemId
+	}
+	return ""
+}
+
+func (x *LineItem) GetDefaultPrice() int64 {
+	if x != nil {
+		return x.DefaultPrice
+	}
+	return 0
+}
+
 type WorkOrder struct {
 	state              protoimpl.MessageState `protogen:"open.v1"`
 	Id                 string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
@@ -333,10 +370,14 @@ type WorkOrder struct {
 	// Set when a timer is currently running on this work order (the open time entry's start).
 	ActiveTimerStartedAt string `protobuf:"bytes,12,opt,name=active_timer_started_at,json=activeTimerStartedAt,proto3" json:"active_timer_started_at,omitempty"`
 	// Denormalized vehicle + customer info, filled by the gateway for display (read-only).
-	Plate         string `protobuf:"bytes,13,opt,name=plate,proto3" json:"plate,omitempty"`
-	Make          string `protobuf:"bytes,14,opt,name=make,proto3" json:"make,omitempty"`
-	Model         string `protobuf:"bytes,15,opt,name=model,proto3" json:"model,omitempty"`
-	CustomerName  string `protobuf:"bytes,16,opt,name=customer_name,json=customerName,proto3" json:"customer_name,omitempty"`
+	Plate        string `protobuf:"bytes,13,opt,name=plate,proto3" json:"plate,omitempty"`
+	Make         string `protobuf:"bytes,14,opt,name=make,proto3" json:"make,omitempty"`
+	Model        string `protobuf:"bytes,15,opt,name=model,proto3" json:"model,omitempty"`
+	CustomerName string `protobuf:"bytes,16,opt,name=customer_name,json=customerName,proto3" json:"customer_name,omitempty"`
+	// Sum of cost*quantity across line items, in tiyin: the shop's total expense on this order.
+	TotalCost int64 `protobuf:"varint,17,opt,name=total_cost,json=totalCost,proto3" json:"total_cost,omitempty"`
+	// Gross margin before VAT, in tiyin: subtotal - total_cost.
+	TotalMargin   int64 `protobuf:"varint,18,opt,name=total_margin,json=totalMargin,proto3" json:"total_margin,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -483,6 +524,20 @@ func (x *WorkOrder) GetCustomerName() string {
 	return ""
 }
 
+func (x *WorkOrder) GetTotalCost() int64 {
+	if x != nil {
+		return x.TotalCost
+	}
+	return 0
+}
+
+func (x *WorkOrder) GetTotalMargin() int64 {
+	if x != nil {
+		return x.TotalMargin
+	}
+	return 0
+}
+
 type TimeEntry struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
@@ -560,14 +615,17 @@ func (x *TimeEntry) GetStoppedAt() string {
 }
 
 type MenuItem struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	ShopId        string                 `protobuf:"bytes,2,opt,name=shop_id,json=shopId,proto3" json:"shop_id,omitempty"`
-	NameUzLatn    string                 `protobuf:"bytes,3,opt,name=name_uz_latn,json=nameUzLatn,proto3" json:"name_uz_latn,omitempty"`
-	NameUzCyrl    string                 `protobuf:"bytes,4,opt,name=name_uz_cyrl,json=nameUzCyrl,proto3" json:"name_uz_cyrl,omitempty"`
-	NameRu        string                 `protobuf:"bytes,5,opt,name=name_ru,json=nameRu,proto3" json:"name_ru,omitempty"`
-	DefaultPrice  int64                  `protobuf:"varint,6,opt,name=default_price,json=defaultPrice,proto3" json:"default_price,omitempty"`
-	Active        bool                   `protobuf:"varint,7,opt,name=active,proto3" json:"active,omitempty"`
+	state        protoimpl.MessageState `protogen:"open.v1"`
+	Id           string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	ShopId       string                 `protobuf:"bytes,2,opt,name=shop_id,json=shopId,proto3" json:"shop_id,omitempty"`
+	NameUzLatn   string                 `protobuf:"bytes,3,opt,name=name_uz_latn,json=nameUzLatn,proto3" json:"name_uz_latn,omitempty"`
+	NameUzCyrl   string                 `protobuf:"bytes,4,opt,name=name_uz_cyrl,json=nameUzCyrl,proto3" json:"name_uz_cyrl,omitempty"`
+	NameRu       string                 `protobuf:"bytes,5,opt,name=name_ru,json=nameRu,proto3" json:"name_ru,omitempty"`
+	DefaultPrice int64                  `protobuf:"varint,6,opt,name=default_price,json=defaultPrice,proto3" json:"default_price,omitempty"`
+	Active       bool                   `protobuf:"varint,7,opt,name=active,proto3" json:"active,omitempty"`
+	// Default shop expense (cost) for this menu item per unit, in tiyin. 0 when not tracked.
+	// Seeds a line item's cost when it is created from this menu item.
+	DefaultCost   int64 `protobuf:"varint,8,opt,name=default_cost,json=defaultCost,proto3" json:"default_cost,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -649,6 +707,13 @@ func (x *MenuItem) GetActive() bool {
 		return x.Active
 	}
 	return false
+}
+
+func (x *MenuItem) GetDefaultCost() int64 {
+	if x != nil {
+		return x.DefaultCost
+	}
+	return 0
 }
 
 type CreateWorkOrderRequest struct {
@@ -1102,6 +1167,7 @@ type CreateMenuItemRequest struct {
 	NameUzCyrl    string                 `protobuf:"bytes,3,opt,name=name_uz_cyrl,json=nameUzCyrl,proto3" json:"name_uz_cyrl,omitempty"`
 	NameRu        string                 `protobuf:"bytes,4,opt,name=name_ru,json=nameRu,proto3" json:"name_ru,omitempty"`
 	DefaultPrice  int64                  `protobuf:"varint,5,opt,name=default_price,json=defaultPrice,proto3" json:"default_price,omitempty"`
+	DefaultCost   int64                  `protobuf:"varint,6,opt,name=default_cost,json=defaultCost,proto3" json:"default_cost,omitempty"` // optional default shop expense per unit, in tiyin
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1171,6 +1237,13 @@ func (x *CreateMenuItemRequest) GetDefaultPrice() int64 {
 	return 0
 }
 
+func (x *CreateMenuItemRequest) GetDefaultCost() int64 {
+	if x != nil {
+		return x.DefaultCost
+	}
+	return 0
+}
+
 var File_avtoms_workorder_v1_workorder_proto protoreflect.FileDescriptor
 
 const file_avtoms_workorder_v1_workorder_proto_rawDesc = "" +
@@ -1182,14 +1255,18 @@ const file_avtoms_workorder_v1_workorder_proto_rawDesc = "" +
 	"\x14assigned_mechanic_id\x18\x03 \x01(\tR\x12assignedMechanicId\"Y\n" +
 	"\x16ListWorkOrdersResponse\x12?\n" +
 	"\vwork_orders\x18\x01 \x03(\v2\x1e.avtoms.workorder.v1.WorkOrderR\n" +
-	"workOrders\"\xae\x01\n" +
+	"workOrders\"\x89\x02\n" +
 	"\bLineItem\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x125\n" +
 	"\x04kind\x18\x02 \x01(\x0e2!.avtoms.workorder.v1.LineItemKindR\x04kind\x12 \n" +
 	"\vdescription\x18\x03 \x01(\tR\vdescription\x12\x1d\n" +
 	"\n" +
 	"unit_price\x18\x04 \x01(\x03R\tunitPrice\x12\x1a\n" +
-	"\bquantity\x18\x05 \x01(\x05R\bquantity\"\x93\x04\n" +
+	"\bquantity\x18\x05 \x01(\x05R\bquantity\x12\x12\n" +
+	"\x04cost\x18\x06 \x01(\x03R\x04cost\x12 \n" +
+	"\fmenu_item_id\x18\a \x01(\tR\n" +
+	"menuItemId\x12#\n" +
+	"\rdefault_price\x18\b \x01(\x03R\fdefaultPrice\"\xd5\x04\n" +
 	"\tWorkOrder\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x17\n" +
 	"\ashop_id\x18\x02 \x01(\tR\x06shopId\x12\x1d\n" +
@@ -1210,7 +1287,10 @@ const file_avtoms_workorder_v1_workorder_proto_rawDesc = "" +
 	"\x05plate\x18\r \x01(\tR\x05plate\x12\x12\n" +
 	"\x04make\x18\x0e \x01(\tR\x04make\x12\x14\n" +
 	"\x05model\x18\x0f \x01(\tR\x05model\x12#\n" +
-	"\rcustomer_name\x18\x10 \x01(\tR\fcustomerName\"\x9e\x01\n" +
+	"\rcustomer_name\x18\x10 \x01(\tR\fcustomerName\x12\x1d\n" +
+	"\n" +
+	"total_cost\x18\x11 \x01(\x03R\ttotalCost\x12!\n" +
+	"\ftotal_margin\x18\x12 \x01(\x03R\vtotalMargin\"\x9e\x01\n" +
 	"\tTimeEntry\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\"\n" +
 	"\rwork_order_id\x18\x02 \x01(\tR\vworkOrderId\x12\x1f\n" +
@@ -1219,7 +1299,7 @@ const file_avtoms_workorder_v1_workorder_proto_rawDesc = "" +
 	"\n" +
 	"started_at\x18\x04 \x01(\tR\tstartedAt\x12\x1d\n" +
 	"\n" +
-	"stopped_at\x18\x05 \x01(\tR\tstoppedAt\"\xcd\x01\n" +
+	"stopped_at\x18\x05 \x01(\tR\tstoppedAt\"\xf0\x01\n" +
 	"\bMenuItem\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x17\n" +
 	"\ashop_id\x18\x02 \x01(\tR\x06shopId\x12 \n" +
@@ -1229,7 +1309,8 @@ const file_avtoms_workorder_v1_workorder_proto_rawDesc = "" +
 	"nameUzCyrl\x12\x17\n" +
 	"\aname_ru\x18\x05 \x01(\tR\x06nameRu\x12#\n" +
 	"\rdefault_price\x18\x06 \x01(\x03R\fdefaultPrice\x12\x16\n" +
-	"\x06active\x18\a \x01(\bR\x06active\"P\n" +
+	"\x06active\x18\a \x01(\bR\x06active\x12!\n" +
+	"\fdefault_cost\x18\b \x01(\x03R\vdefaultCost\"P\n" +
 	"\x16CreateWorkOrderRequest\x12\x17\n" +
 	"\ashop_id\x18\x01 \x01(\tR\x06shopId\x12\x1d\n" +
 	"\n" +
@@ -1257,7 +1338,7 @@ const file_avtoms_workorder_v1_workorder_proto_rawDesc = "" +
 	"\x14ListMenuItemsRequest\x12\x17\n" +
 	"\ashop_id\x18\x01 \x01(\tR\x06shopId\"L\n" +
 	"\x15ListMenuItemsResponse\x123\n" +
-	"\x05items\x18\x01 \x03(\v2\x1d.avtoms.workorder.v1.MenuItemR\x05items\"\xb2\x01\n" +
+	"\x05items\x18\x01 \x03(\v2\x1d.avtoms.workorder.v1.MenuItemR\x05items\"\xd5\x01\n" +
 	"\x15CreateMenuItemRequest\x12\x17\n" +
 	"\ashop_id\x18\x01 \x01(\tR\x06shopId\x12 \n" +
 	"\fname_uz_latn\x18\x02 \x01(\tR\n" +
@@ -1265,7 +1346,8 @@ const file_avtoms_workorder_v1_workorder_proto_rawDesc = "" +
 	"\fname_uz_cyrl\x18\x03 \x01(\tR\n" +
 	"nameUzCyrl\x12\x17\n" +
 	"\aname_ru\x18\x04 \x01(\tR\x06nameRu\x12#\n" +
-	"\rdefault_price\x18\x05 \x01(\x03R\fdefaultPrice*\xa6\x02\n" +
+	"\rdefault_price\x18\x05 \x01(\x03R\fdefaultPrice\x12!\n" +
+	"\fdefault_cost\x18\x06 \x01(\x03R\vdefaultCost*\xa6\x02\n" +
 	"\x0eWorkOrderState\x12 \n" +
 	"\x1cWORK_ORDER_STATE_UNSPECIFIED\x10\x00\x12\x1a\n" +
 	"\x16WORK_ORDER_STATE_DRAFT\x10\x01\x12\x1e\n" +
@@ -1275,11 +1357,13 @@ const file_avtoms_workorder_v1_workorder_proto_rawDesc = "" +
 	"\x16WORK_ORDER_STATE_READY\x10\x05\x12\x1d\n" +
 	"\x19WORK_ORDER_STATE_INVOICED\x10\x06\x12\x1b\n" +
 	"\x17WORK_ORDER_STATE_CLOSED\x10\a\x12\x1d\n" +
-	"\x19WORK_ORDER_STATE_CANCELED\x10\b*a\n" +
+	"\x19WORK_ORDER_STATE_CANCELED\x10\b*\x9a\x01\n" +
 	"\fLineItemKind\x12\x1e\n" +
 	"\x1aLINE_ITEM_KIND_UNSPECIFIED\x10\x00\x12\x18\n" +
 	"\x14LINE_ITEM_KIND_LABOR\x10\x01\x12\x17\n" +
-	"\x13LINE_ITEM_KIND_PART\x10\x022\xbc\a\n" +
+	"\x13LINE_ITEM_KIND_PART\x10\x02\x12\x1a\n" +
+	"\x16LINE_ITEM_KIND_SERVICE\x10\x03\x12\x1b\n" +
+	"\x17LINE_ITEM_KIND_MATERIAL\x10\x042\xbc\a\n" +
 	"\x10WorkOrderService\x12^\n" +
 	"\x0fCreateWorkOrder\x12+.avtoms.workorder.v1.CreateWorkOrderRequest\x1a\x1e.avtoms.workorder.v1.WorkOrder\x12X\n" +
 	"\fGetWorkOrder\x12(.avtoms.workorder.v1.GetWorkOrderRequest\x1a\x1e.avtoms.workorder.v1.WorkOrder\x12V\n" +
