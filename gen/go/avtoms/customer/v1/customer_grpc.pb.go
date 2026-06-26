@@ -23,6 +23,7 @@ const (
 	CustomerService_GetCustomer_FullMethodName        = "/avtoms.customer.v1.CustomerService/GetCustomer"
 	CustomerService_CreateVehicle_FullMethodName      = "/avtoms.customer.v1.CustomerService/CreateVehicle"
 	CustomerService_GetVehicle_FullMethodName         = "/avtoms.customer.v1.CustomerService/GetVehicle"
+	CustomerService_ListVehicles_FullMethodName       = "/avtoms.customer.v1.CustomerService/ListVehicles"
 	CustomerService_SearchByPlate_FullMethodName      = "/avtoms.customer.v1.CustomerService/SearchByPlate"
 	CustomerService_SoftDeleteCustomer_FullMethodName = "/avtoms.customer.v1.CustomerService/SoftDeleteCustomer"
 	CustomerService_ListCustomers_FullMethodName      = "/avtoms.customer.v1.CustomerService/ListCustomers"
@@ -42,6 +43,7 @@ type CustomerServiceClient interface {
 	GetCustomer(ctx context.Context, in *GetCustomerRequest, opts ...grpc.CallOption) (*Customer, error)
 	CreateVehicle(ctx context.Context, in *CreateVehicleRequest, opts ...grpc.CallOption) (*Vehicle, error)
 	GetVehicle(ctx context.Context, in *GetVehicleRequest, opts ...grpc.CallOption) (*Vehicle, error)
+	ListVehicles(ctx context.Context, in *ListVehiclesRequest, opts ...grpc.CallOption) (*ListVehiclesResponse, error)
 	SearchByPlate(ctx context.Context, in *SearchByPlateRequest, opts ...grpc.CallOption) (*SearchByPlateResponse, error)
 	SoftDeleteCustomer(ctx context.Context, in *SoftDeleteCustomerRequest, opts ...grpc.CallOption) (*Customer, error)
 	ListCustomers(ctx context.Context, in *ListCustomersRequest, opts ...grpc.CallOption) (*ListCustomersResponse, error)
@@ -94,6 +96,16 @@ func (c *customerServiceClient) GetVehicle(ctx context.Context, in *GetVehicleRe
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(Vehicle)
 	err := c.cc.Invoke(ctx, CustomerService_GetVehicle_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *customerServiceClient) ListVehicles(ctx context.Context, in *ListVehiclesRequest, opts ...grpc.CallOption) (*ListVehiclesResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListVehiclesResponse)
+	err := c.cc.Invoke(ctx, CustomerService_ListVehicles_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -180,6 +192,7 @@ type CustomerServiceServer interface {
 	GetCustomer(context.Context, *GetCustomerRequest) (*Customer, error)
 	CreateVehicle(context.Context, *CreateVehicleRequest) (*Vehicle, error)
 	GetVehicle(context.Context, *GetVehicleRequest) (*Vehicle, error)
+	ListVehicles(context.Context, *ListVehiclesRequest) (*ListVehiclesResponse, error)
 	SearchByPlate(context.Context, *SearchByPlateRequest) (*SearchByPlateResponse, error)
 	SoftDeleteCustomer(context.Context, *SoftDeleteCustomerRequest) (*Customer, error)
 	ListCustomers(context.Context, *ListCustomersRequest) (*ListCustomersResponse, error)
@@ -209,6 +222,9 @@ func (UnimplementedCustomerServiceServer) CreateVehicle(context.Context, *Create
 }
 func (UnimplementedCustomerServiceServer) GetVehicle(context.Context, *GetVehicleRequest) (*Vehicle, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetVehicle not implemented")
+}
+func (UnimplementedCustomerServiceServer) ListVehicles(context.Context, *ListVehiclesRequest) (*ListVehiclesResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListVehicles not implemented")
 }
 func (UnimplementedCustomerServiceServer) SearchByPlate(context.Context, *SearchByPlateRequest) (*SearchByPlateResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method SearchByPlate not implemented")
@@ -320,6 +336,24 @@ func _CustomerService_GetVehicle_Handler(srv interface{}, ctx context.Context, d
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(CustomerServiceServer).GetVehicle(ctx, req.(*GetVehicleRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _CustomerService_ListVehicles_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListVehiclesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CustomerServiceServer).ListVehicles(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CustomerService_ListVehicles_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CustomerServiceServer).ListVehicles(ctx, req.(*ListVehiclesRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -472,6 +506,10 @@ var CustomerService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetVehicle",
 			Handler:    _CustomerService_GetVehicle_Handler,
+		},
+		{
+			MethodName: "ListVehicles",
+			Handler:    _CustomerService_ListVehicles_Handler,
 		},
 		{
 			MethodName: "SearchByPlate",
