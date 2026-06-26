@@ -120,6 +120,15 @@ message TimeEntry {
   string stopped_at = 5;
 }
 
+// MenuMaterial is a part/material a service is expected to consume (a bill-of-materials
+// entry on a service template). Reference/spec data shown in the catalog; not auto-billed.
+message MenuMaterial {
+  string name = 1;
+  int32 quantity = 2;
+  int64 unit_cost = 3;  // shop expense per unit, in tiyin
+  int64 unit_price = 4; // optional retail price per unit, in tiyin
+}
+
 message MenuItem {
   string id = 1;
   string shop_id = 2;
@@ -131,6 +140,11 @@ message MenuItem {
   // Default shop expense (cost) for this menu item per unit, in tiyin. 0 when not tracked.
   // Seeds a line item's cost when it is created from this menu item.
   int64 default_cost = 8;
+  // Service template details (real "canned job"): category, estimated labour time, and the
+  // materials the repair is expected to need.
+  string category = 9;
+  int32 estimated_minutes = 10;
+  repeated MenuMaterial materials = 11;
 }
 
 message CreateWorkOrderRequest {
@@ -176,4 +190,7 @@ message CreateMenuItemRequest {
   string name_ru = 4;
   int64 default_price = 5;
   int64 default_cost = 6; // optional default shop expense per unit, in tiyin
+  string category = 7;
+  int32 estimated_minutes = 8;
+  repeated MenuMaterial materials = 9; // materials this service is expected to need
 }
