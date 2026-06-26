@@ -79,6 +79,16 @@ message Customer {
   string created_at = 9;
 }
 
+// PlateType is the Uzbek number-plate category, which drives validation and the plate
+// design (colours). UNSPECIFIED is treated as STANDARD.
+enum PlateType {
+  PLATE_TYPE_UNSPECIFIED = 0;
+  PLATE_TYPE_STANDARD = 1; // white, "01 A 123 BC"
+  PLATE_TYPE_ELECTRIC = 2; // white with a green region box, same format as standard
+  PLATE_TYPE_FOREIGN = 3;  // yellow, "01 H 123456" (region + H + 6 digits)
+  PLATE_TYPE_MOPED = 4;    // square, "123 ABC" (3 digits + 3 letters)
+}
+
 message Vehicle {
   string id = 1;
   string customer_id = 2;
@@ -89,6 +99,7 @@ message Vehicle {
   int32 year = 7;
   int64 mileage = 8;
   bool deleted = 9;
+  PlateType plate_type = 10;
 }
 
 message CreateCustomerRequest {
@@ -112,6 +123,7 @@ message CreateVehicleRequest {
   string model = 5;
   int32 year = 6;
   int64 mileage = 7;
+  PlateType plate_type = 8;
 }
 
 message GetVehicleRequest {
