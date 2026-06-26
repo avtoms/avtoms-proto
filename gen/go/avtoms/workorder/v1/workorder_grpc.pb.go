@@ -42,6 +42,10 @@ const (
 	WorkOrderService_ListServiceReminders_FullMethodName    = "/avtoms.workorder.v1.WorkOrderService/ListServiceReminders"
 	WorkOrderService_CreateServiceReminder_FullMethodName   = "/avtoms.workorder.v1.WorkOrderService/CreateServiceReminder"
 	WorkOrderService_SetServiceReminderState_FullMethodName = "/avtoms.workorder.v1.WorkOrderService/SetServiceReminderState"
+	WorkOrderService_ListShopExpenses_FullMethodName        = "/avtoms.workorder.v1.WorkOrderService/ListShopExpenses"
+	WorkOrderService_CreateShopExpense_FullMethodName       = "/avtoms.workorder.v1.WorkOrderService/CreateShopExpense"
+	WorkOrderService_DeleteShopExpense_FullMethodName       = "/avtoms.workorder.v1.WorkOrderService/DeleteShopExpense"
+	WorkOrderService_GetProfitAndLoss_FullMethodName        = "/avtoms.workorder.v1.WorkOrderService/GetProfitAndLoss"
 )
 
 // WorkOrderServiceClient is the client API for WorkOrderService service.
@@ -78,6 +82,11 @@ type WorkOrderServiceClient interface {
 	ListServiceReminders(ctx context.Context, in *ListServiceRemindersRequest, opts ...grpc.CallOption) (*ListServiceRemindersResponse, error)
 	CreateServiceReminder(ctx context.Context, in *CreateServiceReminderRequest, opts ...grpc.CallOption) (*ServiceReminder, error)
 	SetServiceReminderState(ctx context.Context, in *SetServiceReminderStateRequest, opts ...grpc.CallOption) (*ServiceReminder, error)
+	// Shop overhead expenses + profit-and-loss.
+	ListShopExpenses(ctx context.Context, in *ListShopExpensesRequest, opts ...grpc.CallOption) (*ListShopExpensesResponse, error)
+	CreateShopExpense(ctx context.Context, in *CreateShopExpenseRequest, opts ...grpc.CallOption) (*ShopExpense, error)
+	DeleteShopExpense(ctx context.Context, in *DeleteShopExpenseRequest, opts ...grpc.CallOption) (*DeleteShopExpenseResponse, error)
+	GetProfitAndLoss(ctx context.Context, in *GetProfitAndLossRequest, opts ...grpc.CallOption) (*ProfitAndLoss, error)
 }
 
 type workOrderServiceClient struct {
@@ -318,6 +327,46 @@ func (c *workOrderServiceClient) SetServiceReminderState(ctx context.Context, in
 	return out, nil
 }
 
+func (c *workOrderServiceClient) ListShopExpenses(ctx context.Context, in *ListShopExpensesRequest, opts ...grpc.CallOption) (*ListShopExpensesResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListShopExpensesResponse)
+	err := c.cc.Invoke(ctx, WorkOrderService_ListShopExpenses_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *workOrderServiceClient) CreateShopExpense(ctx context.Context, in *CreateShopExpenseRequest, opts ...grpc.CallOption) (*ShopExpense, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ShopExpense)
+	err := c.cc.Invoke(ctx, WorkOrderService_CreateShopExpense_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *workOrderServiceClient) DeleteShopExpense(ctx context.Context, in *DeleteShopExpenseRequest, opts ...grpc.CallOption) (*DeleteShopExpenseResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(DeleteShopExpenseResponse)
+	err := c.cc.Invoke(ctx, WorkOrderService_DeleteShopExpense_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *workOrderServiceClient) GetProfitAndLoss(ctx context.Context, in *GetProfitAndLossRequest, opts ...grpc.CallOption) (*ProfitAndLoss, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ProfitAndLoss)
+	err := c.cc.Invoke(ctx, WorkOrderService_GetProfitAndLoss_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // WorkOrderServiceServer is the server API for WorkOrderService service.
 // All implementations must embed UnimplementedWorkOrderServiceServer
 // for forward compatibility.
@@ -352,6 +401,11 @@ type WorkOrderServiceServer interface {
 	ListServiceReminders(context.Context, *ListServiceRemindersRequest) (*ListServiceRemindersResponse, error)
 	CreateServiceReminder(context.Context, *CreateServiceReminderRequest) (*ServiceReminder, error)
 	SetServiceReminderState(context.Context, *SetServiceReminderStateRequest) (*ServiceReminder, error)
+	// Shop overhead expenses + profit-and-loss.
+	ListShopExpenses(context.Context, *ListShopExpensesRequest) (*ListShopExpensesResponse, error)
+	CreateShopExpense(context.Context, *CreateShopExpenseRequest) (*ShopExpense, error)
+	DeleteShopExpense(context.Context, *DeleteShopExpenseRequest) (*DeleteShopExpenseResponse, error)
+	GetProfitAndLoss(context.Context, *GetProfitAndLossRequest) (*ProfitAndLoss, error)
 	mustEmbedUnimplementedWorkOrderServiceServer()
 }
 
@@ -430,6 +484,18 @@ func (UnimplementedWorkOrderServiceServer) CreateServiceReminder(context.Context
 }
 func (UnimplementedWorkOrderServiceServer) SetServiceReminderState(context.Context, *SetServiceReminderStateRequest) (*ServiceReminder, error) {
 	return nil, status.Error(codes.Unimplemented, "method SetServiceReminderState not implemented")
+}
+func (UnimplementedWorkOrderServiceServer) ListShopExpenses(context.Context, *ListShopExpensesRequest) (*ListShopExpensesResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListShopExpenses not implemented")
+}
+func (UnimplementedWorkOrderServiceServer) CreateShopExpense(context.Context, *CreateShopExpenseRequest) (*ShopExpense, error) {
+	return nil, status.Error(codes.Unimplemented, "method CreateShopExpense not implemented")
+}
+func (UnimplementedWorkOrderServiceServer) DeleteShopExpense(context.Context, *DeleteShopExpenseRequest) (*DeleteShopExpenseResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method DeleteShopExpense not implemented")
+}
+func (UnimplementedWorkOrderServiceServer) GetProfitAndLoss(context.Context, *GetProfitAndLossRequest) (*ProfitAndLoss, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetProfitAndLoss not implemented")
 }
 func (UnimplementedWorkOrderServiceServer) mustEmbedUnimplementedWorkOrderServiceServer() {}
 func (UnimplementedWorkOrderServiceServer) testEmbeddedByValue()                          {}
@@ -866,6 +932,78 @@ func _WorkOrderService_SetServiceReminderState_Handler(srv interface{}, ctx cont
 	return interceptor(ctx, in, info, handler)
 }
 
+func _WorkOrderService_ListShopExpenses_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListShopExpensesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WorkOrderServiceServer).ListShopExpenses(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: WorkOrderService_ListShopExpenses_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WorkOrderServiceServer).ListShopExpenses(ctx, req.(*ListShopExpensesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _WorkOrderService_CreateShopExpense_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateShopExpenseRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WorkOrderServiceServer).CreateShopExpense(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: WorkOrderService_CreateShopExpense_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WorkOrderServiceServer).CreateShopExpense(ctx, req.(*CreateShopExpenseRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _WorkOrderService_DeleteShopExpense_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteShopExpenseRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WorkOrderServiceServer).DeleteShopExpense(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: WorkOrderService_DeleteShopExpense_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WorkOrderServiceServer).DeleteShopExpense(ctx, req.(*DeleteShopExpenseRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _WorkOrderService_GetProfitAndLoss_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetProfitAndLossRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WorkOrderServiceServer).GetProfitAndLoss(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: WorkOrderService_GetProfitAndLoss_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WorkOrderServiceServer).GetProfitAndLoss(ctx, req.(*GetProfitAndLossRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // WorkOrderService_ServiceDesc is the grpc.ServiceDesc for WorkOrderService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -964,6 +1102,22 @@ var WorkOrderService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "SetServiceReminderState",
 			Handler:    _WorkOrderService_SetServiceReminderState_Handler,
+		},
+		{
+			MethodName: "ListShopExpenses",
+			Handler:    _WorkOrderService_ListShopExpenses_Handler,
+		},
+		{
+			MethodName: "CreateShopExpense",
+			Handler:    _WorkOrderService_CreateShopExpense_Handler,
+		},
+		{
+			MethodName: "DeleteShopExpense",
+			Handler:    _WorkOrderService_DeleteShopExpense_Handler,
+		},
+		{
+			MethodName: "GetProfitAndLoss",
+			Handler:    _WorkOrderService_GetProfitAndLoss_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

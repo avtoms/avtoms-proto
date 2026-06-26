@@ -42,6 +42,69 @@ service WorkOrderService {
   rpc ListServiceReminders(ListServiceRemindersRequest) returns (ListServiceRemindersResponse);
   rpc CreateServiceReminder(CreateServiceReminderRequest) returns (ServiceReminder);
   rpc SetServiceReminderState(SetServiceReminderStateRequest) returns (ServiceReminder);
+
+  // Shop overhead expenses + profit-and-loss.
+  rpc ListShopExpenses(ListShopExpensesRequest) returns (ListShopExpensesResponse);
+  rpc CreateShopExpense(CreateShopExpenseRequest) returns (ShopExpense);
+  rpc DeleteShopExpense(DeleteShopExpenseRequest) returns (DeleteShopExpenseResponse);
+  rpc GetProfitAndLoss(GetProfitAndLossRequest) returns (ProfitAndLoss);
+}
+
+// ShopExpense is a shop overhead cost (rent, salary, utilities, ...), distinct from
+// the per-work-order material/part costs already tracked on line items.
+message ShopExpense {
+  string id = 1;
+  string shop_id = 2;
+  string category = 3;    // rent, salary, utilities, supplies, tax, other
+  int64 amount = 4;       // tiyin
+  string incurred_on = 5; // RFC3339 date the cost was incurred
+  string note = 6;
+  string created_at = 7;
+}
+message ListShopExpensesRequest {
+  string shop_id = 1;
+  string from = 2; // RFC3339 lower bound (optional)
+  string to = 3;   // RFC3339 upper bound (optional)
+}
+message ListShopExpensesResponse {
+  repeated ShopExpense expenses = 1;
+}
+message CreateShopExpenseRequest {
+  string shop_id = 1;
+  string category = 2;
+  int64 amount = 3;
+  string incurred_on = 4;
+  string note = 5;
+}
+message DeleteShopExpenseRequest {
+  string id = 1;
+}
+message DeleteShopExpenseResponse {
+  bool deleted = 1;
+}
+
+// ExpenseBucket is one category's total in a P&L.
+message ExpenseBucket {
+  string category = 1;
+  int64 amount = 2;
+}
+// ProfitAndLoss summarizes a period's economics for a shop.
+message ProfitAndLoss {
+  string shop_id = 1;
+  string from = 2;
+  string to = 3;
+  int64 revenue = 4;        // sum of work-order subtotals (pre-VAT) for invoiced/closed orders in range
+  int64 cost_of_goods = 5;  // sum of line-item costs (parts/materials) on those orders
+  int64 gross_margin = 6;   // revenue - cost_of_goods
+  int64 overhead = 7;       // sum of shop expenses in range
+  int64 net_profit = 8;     // gross_margin - overhead
+  int32 work_order_count = 9;
+  repeated ExpenseBucket by_category = 10; // overhead broken down by category
+}
+message GetProfitAndLossRequest {
+  string shop_id = 1;
+  string from = 2; // RFC3339 lower bound (optional)
+  string to = 3;   // RFC3339 upper bound (optional)
 }
 
 enum ServiceReminderState {
