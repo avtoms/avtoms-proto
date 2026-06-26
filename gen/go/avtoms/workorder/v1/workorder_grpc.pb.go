@@ -32,6 +32,9 @@ const (
 	WorkOrderService_ListWorkOrders_FullMethodName     = "/avtoms.workorder.v1.WorkOrderService/ListWorkOrders"
 	WorkOrderService_GetShopSettings_FullMethodName    = "/avtoms.workorder.v1.WorkOrderService/GetShopSettings"
 	WorkOrderService_UpdateShopSettings_FullMethodName = "/avtoms.workorder.v1.WorkOrderService/UpdateShopSettings"
+	WorkOrderService_ListParts_FullMethodName          = "/avtoms.workorder.v1.WorkOrderService/ListParts"
+	WorkOrderService_CreatePart_FullMethodName         = "/avtoms.workorder.v1.WorkOrderService/CreatePart"
+	WorkOrderService_AdjustStock_FullMethodName        = "/avtoms.workorder.v1.WorkOrderService/AdjustStock"
 )
 
 // WorkOrderServiceClient is the client API for WorkOrderService service.
@@ -54,6 +57,10 @@ type WorkOrderServiceClient interface {
 	// Per-shop pricing policy (currently the negotiated-discount cap).
 	GetShopSettings(ctx context.Context, in *GetShopSettingsRequest, opts ...grpc.CallOption) (*ShopSettings, error)
 	UpdateShopSettings(ctx context.Context, in *UpdateShopSettingsRequest, opts ...grpc.CallOption) (*ShopSettings, error)
+	// Parts inventory.
+	ListParts(ctx context.Context, in *ListPartsRequest, opts ...grpc.CallOption) (*ListPartsResponse, error)
+	CreatePart(ctx context.Context, in *CreatePartRequest, opts ...grpc.CallOption) (*Part, error)
+	AdjustStock(ctx context.Context, in *AdjustStockRequest, opts ...grpc.CallOption) (*Part, error)
 }
 
 type workOrderServiceClient struct {
@@ -194,6 +201,36 @@ func (c *workOrderServiceClient) UpdateShopSettings(ctx context.Context, in *Upd
 	return out, nil
 }
 
+func (c *workOrderServiceClient) ListParts(ctx context.Context, in *ListPartsRequest, opts ...grpc.CallOption) (*ListPartsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListPartsResponse)
+	err := c.cc.Invoke(ctx, WorkOrderService_ListParts_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *workOrderServiceClient) CreatePart(ctx context.Context, in *CreatePartRequest, opts ...grpc.CallOption) (*Part, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Part)
+	err := c.cc.Invoke(ctx, WorkOrderService_CreatePart_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *workOrderServiceClient) AdjustStock(ctx context.Context, in *AdjustStockRequest, opts ...grpc.CallOption) (*Part, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Part)
+	err := c.cc.Invoke(ctx, WorkOrderService_AdjustStock_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // WorkOrderServiceServer is the server API for WorkOrderService service.
 // All implementations must embed UnimplementedWorkOrderServiceServer
 // for forward compatibility.
@@ -214,6 +251,10 @@ type WorkOrderServiceServer interface {
 	// Per-shop pricing policy (currently the negotiated-discount cap).
 	GetShopSettings(context.Context, *GetShopSettingsRequest) (*ShopSettings, error)
 	UpdateShopSettings(context.Context, *UpdateShopSettingsRequest) (*ShopSettings, error)
+	// Parts inventory.
+	ListParts(context.Context, *ListPartsRequest) (*ListPartsResponse, error)
+	CreatePart(context.Context, *CreatePartRequest) (*Part, error)
+	AdjustStock(context.Context, *AdjustStockRequest) (*Part, error)
 	mustEmbedUnimplementedWorkOrderServiceServer()
 }
 
@@ -262,6 +303,15 @@ func (UnimplementedWorkOrderServiceServer) GetShopSettings(context.Context, *Get
 }
 func (UnimplementedWorkOrderServiceServer) UpdateShopSettings(context.Context, *UpdateShopSettingsRequest) (*ShopSettings, error) {
 	return nil, status.Error(codes.Unimplemented, "method UpdateShopSettings not implemented")
+}
+func (UnimplementedWorkOrderServiceServer) ListParts(context.Context, *ListPartsRequest) (*ListPartsResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListParts not implemented")
+}
+func (UnimplementedWorkOrderServiceServer) CreatePart(context.Context, *CreatePartRequest) (*Part, error) {
+	return nil, status.Error(codes.Unimplemented, "method CreatePart not implemented")
+}
+func (UnimplementedWorkOrderServiceServer) AdjustStock(context.Context, *AdjustStockRequest) (*Part, error) {
+	return nil, status.Error(codes.Unimplemented, "method AdjustStock not implemented")
 }
 func (UnimplementedWorkOrderServiceServer) mustEmbedUnimplementedWorkOrderServiceServer() {}
 func (UnimplementedWorkOrderServiceServer) testEmbeddedByValue()                          {}
@@ -518,6 +568,60 @@ func _WorkOrderService_UpdateShopSettings_Handler(srv interface{}, ctx context.C
 	return interceptor(ctx, in, info, handler)
 }
 
+func _WorkOrderService_ListParts_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListPartsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WorkOrderServiceServer).ListParts(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: WorkOrderService_ListParts_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WorkOrderServiceServer).ListParts(ctx, req.(*ListPartsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _WorkOrderService_CreatePart_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreatePartRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WorkOrderServiceServer).CreatePart(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: WorkOrderService_CreatePart_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WorkOrderServiceServer).CreatePart(ctx, req.(*CreatePartRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _WorkOrderService_AdjustStock_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AdjustStockRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WorkOrderServiceServer).AdjustStock(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: WorkOrderService_AdjustStock_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WorkOrderServiceServer).AdjustStock(ctx, req.(*AdjustStockRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // WorkOrderService_ServiceDesc is the grpc.ServiceDesc for WorkOrderService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -576,6 +680,18 @@ var WorkOrderService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "UpdateShopSettings",
 			Handler:    _WorkOrderService_UpdateShopSettings_Handler,
+		},
+		{
+			MethodName: "ListParts",
+			Handler:    _WorkOrderService_ListParts_Handler,
+		},
+		{
+			MethodName: "CreatePart",
+			Handler:    _WorkOrderService_CreatePart_Handler,
+		},
+		{
+			MethodName: "AdjustStock",
+			Handler:    _WorkOrderService_AdjustStock_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

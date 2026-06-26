@@ -24,6 +24,48 @@ service WorkOrderService {
   // Per-shop pricing policy (currently the negotiated-discount cap).
   rpc GetShopSettings(GetShopSettingsRequest) returns (ShopSettings);
   rpc UpdateShopSettings(UpdateShopSettingsRequest) returns (ShopSettings);
+
+  // Parts inventory.
+  rpc ListParts(ListPartsRequest) returns (ListPartsResponse);
+  rpc CreatePart(CreatePartRequest) returns (Part);
+  rpc AdjustStock(AdjustStockRequest) returns (Part);
+}
+
+// Part is an inventory item the shop stocks (a real, counted part/material).
+message Part {
+  string id = 1;
+  string shop_id = 2;
+  string name = 3;
+  string sku = 4;             // optional stock-keeping unit / article number
+  string unit = 5;            // unit of measure: dona, litr, kg, ...
+  double quantity_on_hand = 6;
+  double reorder_level = 7;   // low-stock threshold; below this it's flagged
+  int64 unit_cost = 8;        // buy price per unit (tiyin)
+  int64 unit_price = 9;       // sell price per unit (tiyin)
+  string supplier = 10;       // optional supplier/vendor name
+  bool active = 11;
+}
+message ListPartsRequest {
+  string shop_id = 1;
+}
+message ListPartsResponse {
+  repeated Part parts = 1;
+}
+message CreatePartRequest {
+  string shop_id = 1;
+  string name = 2;
+  string sku = 3;
+  string unit = 4;
+  double quantity_on_hand = 5;
+  double reorder_level = 6;
+  int64 unit_cost = 7;
+  int64 unit_price = 8;
+  string supplier = 9;
+}
+message AdjustStockRequest {
+  string part_id = 1;
+  double delta = 2;    // positive = receive stock, negative = consume/correct
+  string reason = 3;   // free-text note (e.g. "received", "used", "stocktake")
 }
 
 // ShopSettings holds per-shop pricing policy.
