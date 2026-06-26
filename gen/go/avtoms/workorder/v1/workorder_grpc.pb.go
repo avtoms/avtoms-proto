@@ -38,6 +38,7 @@ const (
 	WorkOrderService_ListAppointments_FullMethodName    = "/avtoms.workorder.v1.WorkOrderService/ListAppointments"
 	WorkOrderService_CreateAppointment_FullMethodName   = "/avtoms.workorder.v1.WorkOrderService/CreateAppointment"
 	WorkOrderService_SetAppointmentState_FullMethodName = "/avtoms.workorder.v1.WorkOrderService/SetAppointmentState"
+	WorkOrderService_GetAuditLog_FullMethodName         = "/avtoms.workorder.v1.WorkOrderService/GetAuditLog"
 )
 
 // WorkOrderServiceClient is the client API for WorkOrderService service.
@@ -68,6 +69,8 @@ type WorkOrderServiceClient interface {
 	ListAppointments(ctx context.Context, in *ListAppointmentsRequest, opts ...grpc.CallOption) (*ListAppointmentsResponse, error)
 	CreateAppointment(ctx context.Context, in *CreateAppointmentRequest, opts ...grpc.CallOption) (*Appointment, error)
 	SetAppointmentState(ctx context.Context, in *SetAppointmentStateRequest, opts ...grpc.CallOption) (*Appointment, error)
+	// Per-work-order audit trail.
+	GetAuditLog(ctx context.Context, in *GetAuditLogRequest, opts ...grpc.CallOption) (*GetAuditLogResponse, error)
 }
 
 type workOrderServiceClient struct {
@@ -268,6 +271,16 @@ func (c *workOrderServiceClient) SetAppointmentState(ctx context.Context, in *Se
 	return out, nil
 }
 
+func (c *workOrderServiceClient) GetAuditLog(ctx context.Context, in *GetAuditLogRequest, opts ...grpc.CallOption) (*GetAuditLogResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetAuditLogResponse)
+	err := c.cc.Invoke(ctx, WorkOrderService_GetAuditLog_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // WorkOrderServiceServer is the server API for WorkOrderService service.
 // All implementations must embed UnimplementedWorkOrderServiceServer
 // for forward compatibility.
@@ -296,6 +309,8 @@ type WorkOrderServiceServer interface {
 	ListAppointments(context.Context, *ListAppointmentsRequest) (*ListAppointmentsResponse, error)
 	CreateAppointment(context.Context, *CreateAppointmentRequest) (*Appointment, error)
 	SetAppointmentState(context.Context, *SetAppointmentStateRequest) (*Appointment, error)
+	// Per-work-order audit trail.
+	GetAuditLog(context.Context, *GetAuditLogRequest) (*GetAuditLogResponse, error)
 	mustEmbedUnimplementedWorkOrderServiceServer()
 }
 
@@ -362,6 +377,9 @@ func (UnimplementedWorkOrderServiceServer) CreateAppointment(context.Context, *C
 }
 func (UnimplementedWorkOrderServiceServer) SetAppointmentState(context.Context, *SetAppointmentStateRequest) (*Appointment, error) {
 	return nil, status.Error(codes.Unimplemented, "method SetAppointmentState not implemented")
+}
+func (UnimplementedWorkOrderServiceServer) GetAuditLog(context.Context, *GetAuditLogRequest) (*GetAuditLogResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetAuditLog not implemented")
 }
 func (UnimplementedWorkOrderServiceServer) mustEmbedUnimplementedWorkOrderServiceServer() {}
 func (UnimplementedWorkOrderServiceServer) testEmbeddedByValue()                          {}
@@ -726,6 +744,24 @@ func _WorkOrderService_SetAppointmentState_Handler(srv interface{}, ctx context.
 	return interceptor(ctx, in, info, handler)
 }
 
+func _WorkOrderService_GetAuditLog_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetAuditLogRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WorkOrderServiceServer).GetAuditLog(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: WorkOrderService_GetAuditLog_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WorkOrderServiceServer).GetAuditLog(ctx, req.(*GetAuditLogRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // WorkOrderService_ServiceDesc is the grpc.ServiceDesc for WorkOrderService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -808,6 +844,10 @@ var WorkOrderService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "SetAppointmentState",
 			Handler:    _WorkOrderService_SetAppointmentState_Handler,
+		},
+		{
+			MethodName: "GetAuditLog",
+			Handler:    _WorkOrderService_GetAuditLog_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

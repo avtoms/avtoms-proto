@@ -34,6 +34,25 @@ service WorkOrderService {
   rpc ListAppointments(ListAppointmentsRequest) returns (ListAppointmentsResponse);
   rpc CreateAppointment(CreateAppointmentRequest) returns (Appointment);
   rpc SetAppointmentState(SetAppointmentStateRequest) returns (Appointment);
+
+  // Per-work-order audit trail.
+  rpc GetAuditLog(GetAuditLogRequest) returns (GetAuditLogResponse);
+}
+
+// AuditEntry records one change to a work order.
+message AuditEntry {
+  string id = 1;
+  string work_order_id = 2;
+  string actor_id = 3;   // staff id who made the change (from the gateway), may be empty
+  string action = 4;     // e.g. "state", "line_added", "line_removed", "mechanic_assigned"
+  string detail = 5;     // human-readable detail
+  string created_at = 6; // RFC3339
+}
+message GetAuditLogRequest {
+  string work_order_id = 1;
+}
+message GetAuditLogResponse {
+  repeated AuditEntry entries = 1;
 }
 
 enum AppointmentState {
@@ -139,6 +158,7 @@ message ListWorkOrdersRequest {
   string shop_id = 1;
   WorkOrderState state = 2; // optional filter; UNSPECIFIED (0) returns all
   string assigned_mechanic_id = 3; // optional filter (for mechanic kanban)
+  string vehicle_id = 4; // optional filter — a vehicle's service history
 }
 message ListWorkOrdersResponse {
   repeated WorkOrder work_orders = 1;
