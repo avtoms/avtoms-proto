@@ -222,6 +222,7 @@ type Staff struct {
 	Role          Role                   `protobuf:"varint,5,opt,name=role,proto3,enum=avtoms.auth.v1.Role" json:"role,omitempty"`
 	Active        bool                   `protobuf:"varint,6,opt,name=active,proto3" json:"active,omitempty"`
 	CreatedAt     string                 `protobuf:"bytes,7,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	AvatarUrl     string                 `protobuf:"bytes,8,opt,name=avatar_url,json=avatarUrl,proto3" json:"avatar_url,omitempty"` // profile photo URL (object storage), may be empty
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -305,6 +306,81 @@ func (x *Staff) GetCreatedAt() string {
 	return ""
 }
 
+func (x *Staff) GetAvatarUrl() string {
+	if x != nil {
+		return x.AvatarUrl
+	}
+	return ""
+}
+
+type UpdateStaffRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	StaffId       string                 `protobuf:"bytes,1,opt,name=staff_id,json=staffId,proto3" json:"staff_id,omitempty"`
+	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	Phone         string                 `protobuf:"bytes,3,opt,name=phone,proto3" json:"phone,omitempty"`
+	AvatarUrl     string                 `protobuf:"bytes,4,opt,name=avatar_url,json=avatarUrl,proto3" json:"avatar_url,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdateStaffRequest) Reset() {
+	*x = UpdateStaffRequest{}
+	mi := &file_avtoms_auth_v1_auth_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateStaffRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateStaffRequest) ProtoMessage() {}
+
+func (x *UpdateStaffRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_avtoms_auth_v1_auth_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateStaffRequest.ProtoReflect.Descriptor instead.
+func (*UpdateStaffRequest) Descriptor() ([]byte, []int) {
+	return file_avtoms_auth_v1_auth_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *UpdateStaffRequest) GetStaffId() string {
+	if x != nil {
+		return x.StaffId
+	}
+	return ""
+}
+
+func (x *UpdateStaffRequest) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *UpdateStaffRequest) GetPhone() string {
+	if x != nil {
+		return x.Phone
+	}
+	return ""
+}
+
+func (x *UpdateStaffRequest) GetAvatarUrl() string {
+	if x != nil {
+		return x.AvatarUrl
+	}
+	return ""
+}
+
 type RequestOtpRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Phone         string                 `protobuf:"bytes,1,opt,name=phone,proto3" json:"phone,omitempty"`
@@ -314,7 +390,7 @@ type RequestOtpRequest struct {
 
 func (x *RequestOtpRequest) Reset() {
 	*x = RequestOtpRequest{}
-	mi := &file_avtoms_auth_v1_auth_proto_msgTypes[4]
+	mi := &file_avtoms_auth_v1_auth_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -326,7 +402,7 @@ func (x *RequestOtpRequest) String() string {
 func (*RequestOtpRequest) ProtoMessage() {}
 
 func (x *RequestOtpRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_auth_v1_auth_proto_msgTypes[4]
+	mi := &file_avtoms_auth_v1_auth_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -339,7 +415,7 @@ func (x *RequestOtpRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RequestOtpRequest.ProtoReflect.Descriptor instead.
 func (*RequestOtpRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_auth_v1_auth_proto_rawDescGZIP(), []int{4}
+	return file_avtoms_auth_v1_auth_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *RequestOtpRequest) GetPhone() string {
@@ -359,7 +435,7 @@ type RequestOtpResponse struct {
 
 func (x *RequestOtpResponse) Reset() {
 	*x = RequestOtpResponse{}
-	mi := &file_avtoms_auth_v1_auth_proto_msgTypes[5]
+	mi := &file_avtoms_auth_v1_auth_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -371,7 +447,7 @@ func (x *RequestOtpResponse) String() string {
 func (*RequestOtpResponse) ProtoMessage() {}
 
 func (x *RequestOtpResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_auth_v1_auth_proto_msgTypes[5]
+	mi := &file_avtoms_auth_v1_auth_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -384,7 +460,7 @@ func (x *RequestOtpResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RequestOtpResponse.ProtoReflect.Descriptor instead.
 func (*RequestOtpResponse) Descriptor() ([]byte, []int) {
-	return file_avtoms_auth_v1_auth_proto_rawDescGZIP(), []int{5}
+	return file_avtoms_auth_v1_auth_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *RequestOtpResponse) GetChallengeId() string {
@@ -411,7 +487,7 @@ type VerifyOtpRequest struct {
 
 func (x *VerifyOtpRequest) Reset() {
 	*x = VerifyOtpRequest{}
-	mi := &file_avtoms_auth_v1_auth_proto_msgTypes[6]
+	mi := &file_avtoms_auth_v1_auth_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -423,7 +499,7 @@ func (x *VerifyOtpRequest) String() string {
 func (*VerifyOtpRequest) ProtoMessage() {}
 
 func (x *VerifyOtpRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_auth_v1_auth_proto_msgTypes[6]
+	mi := &file_avtoms_auth_v1_auth_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -436,7 +512,7 @@ func (x *VerifyOtpRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use VerifyOtpRequest.ProtoReflect.Descriptor instead.
 func (*VerifyOtpRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_auth_v1_auth_proto_rawDescGZIP(), []int{6}
+	return file_avtoms_auth_v1_auth_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *VerifyOtpRequest) GetChallengeId() string {
@@ -462,7 +538,7 @@ type RefreshTokenRequest struct {
 
 func (x *RefreshTokenRequest) Reset() {
 	*x = RefreshTokenRequest{}
-	mi := &file_avtoms_auth_v1_auth_proto_msgTypes[7]
+	mi := &file_avtoms_auth_v1_auth_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -474,7 +550,7 @@ func (x *RefreshTokenRequest) String() string {
 func (*RefreshTokenRequest) ProtoMessage() {}
 
 func (x *RefreshTokenRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_auth_v1_auth_proto_msgTypes[7]
+	mi := &file_avtoms_auth_v1_auth_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -487,7 +563,7 @@ func (x *RefreshTokenRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RefreshTokenRequest.ProtoReflect.Descriptor instead.
 func (*RefreshTokenRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_auth_v1_auth_proto_rawDescGZIP(), []int{7}
+	return file_avtoms_auth_v1_auth_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *RefreshTokenRequest) GetRefreshToken() string {
@@ -509,7 +585,7 @@ type TokenPair struct {
 
 func (x *TokenPair) Reset() {
 	*x = TokenPair{}
-	mi := &file_avtoms_auth_v1_auth_proto_msgTypes[8]
+	mi := &file_avtoms_auth_v1_auth_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -521,7 +597,7 @@ func (x *TokenPair) String() string {
 func (*TokenPair) ProtoMessage() {}
 
 func (x *TokenPair) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_auth_v1_auth_proto_msgTypes[8]
+	mi := &file_avtoms_auth_v1_auth_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -534,7 +610,7 @@ func (x *TokenPair) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TokenPair.ProtoReflect.Descriptor instead.
 func (*TokenPair) Descriptor() ([]byte, []int) {
-	return file_avtoms_auth_v1_auth_proto_rawDescGZIP(), []int{8}
+	return file_avtoms_auth_v1_auth_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *TokenPair) GetAccessToken() string {
@@ -574,7 +650,7 @@ type AuthenticateRequest struct {
 
 func (x *AuthenticateRequest) Reset() {
 	*x = AuthenticateRequest{}
-	mi := &file_avtoms_auth_v1_auth_proto_msgTypes[9]
+	mi := &file_avtoms_auth_v1_auth_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -586,7 +662,7 @@ func (x *AuthenticateRequest) String() string {
 func (*AuthenticateRequest) ProtoMessage() {}
 
 func (x *AuthenticateRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_auth_v1_auth_proto_msgTypes[9]
+	mi := &file_avtoms_auth_v1_auth_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -599,7 +675,7 @@ func (x *AuthenticateRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AuthenticateRequest.ProtoReflect.Descriptor instead.
 func (*AuthenticateRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_auth_v1_auth_proto_rawDescGZIP(), []int{9}
+	return file_avtoms_auth_v1_auth_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *AuthenticateRequest) GetAccessToken() string {
@@ -620,7 +696,7 @@ type AuthenticateResponse struct {
 
 func (x *AuthenticateResponse) Reset() {
 	*x = AuthenticateResponse{}
-	mi := &file_avtoms_auth_v1_auth_proto_msgTypes[10]
+	mi := &file_avtoms_auth_v1_auth_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -632,7 +708,7 @@ func (x *AuthenticateResponse) String() string {
 func (*AuthenticateResponse) ProtoMessage() {}
 
 func (x *AuthenticateResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_auth_v1_auth_proto_msgTypes[10]
+	mi := &file_avtoms_auth_v1_auth_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -645,7 +721,7 @@ func (x *AuthenticateResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AuthenticateResponse.ProtoReflect.Descriptor instead.
 func (*AuthenticateResponse) Descriptor() ([]byte, []int) {
-	return file_avtoms_auth_v1_auth_proto_rawDescGZIP(), []int{10}
+	return file_avtoms_auth_v1_auth_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *AuthenticateResponse) GetStaffId() string {
@@ -680,7 +756,7 @@ type InviteMechanicRequest struct {
 
 func (x *InviteMechanicRequest) Reset() {
 	*x = InviteMechanicRequest{}
-	mi := &file_avtoms_auth_v1_auth_proto_msgTypes[11]
+	mi := &file_avtoms_auth_v1_auth_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -692,7 +768,7 @@ func (x *InviteMechanicRequest) String() string {
 func (*InviteMechanicRequest) ProtoMessage() {}
 
 func (x *InviteMechanicRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_auth_v1_auth_proto_msgTypes[11]
+	mi := &file_avtoms_auth_v1_auth_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -705,7 +781,7 @@ func (x *InviteMechanicRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use InviteMechanicRequest.ProtoReflect.Descriptor instead.
 func (*InviteMechanicRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_auth_v1_auth_proto_rawDescGZIP(), []int{11}
+	return file_avtoms_auth_v1_auth_proto_rawDescGZIP(), []int{12}
 }
 
 func (x *InviteMechanicRequest) GetShopId() string {
@@ -738,7 +814,7 @@ type DeactivateStaffRequest struct {
 
 func (x *DeactivateStaffRequest) Reset() {
 	*x = DeactivateStaffRequest{}
-	mi := &file_avtoms_auth_v1_auth_proto_msgTypes[12]
+	mi := &file_avtoms_auth_v1_auth_proto_msgTypes[13]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -750,7 +826,7 @@ func (x *DeactivateStaffRequest) String() string {
 func (*DeactivateStaffRequest) ProtoMessage() {}
 
 func (x *DeactivateStaffRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_auth_v1_auth_proto_msgTypes[12]
+	mi := &file_avtoms_auth_v1_auth_proto_msgTypes[13]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -763,7 +839,7 @@ func (x *DeactivateStaffRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeactivateStaffRequest.ProtoReflect.Descriptor instead.
 func (*DeactivateStaffRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_auth_v1_auth_proto_rawDescGZIP(), []int{12}
+	return file_avtoms_auth_v1_auth_proto_rawDescGZIP(), []int{13}
 }
 
 func (x *DeactivateStaffRequest) GetStaffId() string {
@@ -782,7 +858,7 @@ type ListStaffRequest struct {
 
 func (x *ListStaffRequest) Reset() {
 	*x = ListStaffRequest{}
-	mi := &file_avtoms_auth_v1_auth_proto_msgTypes[13]
+	mi := &file_avtoms_auth_v1_auth_proto_msgTypes[14]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -794,7 +870,7 @@ func (x *ListStaffRequest) String() string {
 func (*ListStaffRequest) ProtoMessage() {}
 
 func (x *ListStaffRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_auth_v1_auth_proto_msgTypes[13]
+	mi := &file_avtoms_auth_v1_auth_proto_msgTypes[14]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -807,7 +883,7 @@ func (x *ListStaffRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListStaffRequest.ProtoReflect.Descriptor instead.
 func (*ListStaffRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_auth_v1_auth_proto_rawDescGZIP(), []int{13}
+	return file_avtoms_auth_v1_auth_proto_rawDescGZIP(), []int{14}
 }
 
 func (x *ListStaffRequest) GetShopId() string {
@@ -826,7 +902,7 @@ type ListStaffResponse struct {
 
 func (x *ListStaffResponse) Reset() {
 	*x = ListStaffResponse{}
-	mi := &file_avtoms_auth_v1_auth_proto_msgTypes[14]
+	mi := &file_avtoms_auth_v1_auth_proto_msgTypes[15]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -838,7 +914,7 @@ func (x *ListStaffResponse) String() string {
 func (*ListStaffResponse) ProtoMessage() {}
 
 func (x *ListStaffResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_auth_v1_auth_proto_msgTypes[14]
+	mi := &file_avtoms_auth_v1_auth_proto_msgTypes[15]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -851,7 +927,7 @@ func (x *ListStaffResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListStaffResponse.ProtoReflect.Descriptor instead.
 func (*ListStaffResponse) Descriptor() ([]byte, []int) {
-	return file_avtoms_auth_v1_auth_proto_rawDescGZIP(), []int{14}
+	return file_avtoms_auth_v1_auth_proto_rawDescGZIP(), []int{15}
 }
 
 func (x *ListStaffResponse) GetStaff() []*Staff {
@@ -872,7 +948,7 @@ const file_avtoms_auth_v1_auth_proto_rawDesc = "" +
 	"\x06active\x18\x02 \x01(\bR\x06active\"Z\n" +
 	"\x13SetStaffRoleRequest\x12\x19\n" +
 	"\bstaff_id\x18\x01 \x01(\tR\astaffId\x12(\n" +
-	"\x04role\x18\x02 \x01(\x0e2\x14.avtoms.auth.v1.RoleR\x04role\"\xbb\x01\n" +
+	"\x04role\x18\x02 \x01(\x0e2\x14.avtoms.auth.v1.RoleR\x04role\"\xda\x01\n" +
 	"\x05Staff\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x17\n" +
 	"\ashop_id\x18\x02 \x01(\tR\x06shopId\x12\x14\n" +
@@ -881,7 +957,15 @@ const file_avtoms_auth_v1_auth_proto_rawDesc = "" +
 	"\x04role\x18\x05 \x01(\x0e2\x14.avtoms.auth.v1.RoleR\x04role\x12\x16\n" +
 	"\x06active\x18\x06 \x01(\bR\x06active\x12\x1d\n" +
 	"\n" +
-	"created_at\x18\a \x01(\tR\tcreatedAt\")\n" +
+	"created_at\x18\a \x01(\tR\tcreatedAt\x12\x1d\n" +
+	"\n" +
+	"avatar_url\x18\b \x01(\tR\tavatarUrl\"x\n" +
+	"\x12UpdateStaffRequest\x12\x19\n" +
+	"\bstaff_id\x18\x01 \x01(\tR\astaffId\x12\x12\n" +
+	"\x04name\x18\x02 \x01(\tR\x04name\x12\x14\n" +
+	"\x05phone\x18\x03 \x01(\tR\x05phone\x12\x1d\n" +
+	"\n" +
+	"avatar_url\x18\x04 \x01(\tR\tavatarUrl\")\n" +
 	"\x11RequestOtpRequest\x12\x14\n" +
 	"\x05phone\x18\x01 \x01(\tR\x05phone\"i\n" +
 	"\x12RequestOtpResponse\x12!\n" +
@@ -920,7 +1004,7 @@ const file_avtoms_auth_v1_auth_proto_rawDesc = "" +
 	"ROLE_OWNER\x10\x01\x12\x11\n" +
 	"\rROLE_MECHANIC\x10\x02\x12\x0e\n" +
 	"\n" +
-	"ROLE_ADMIN\x10\x032\xbf\x06\n" +
+	"ROLE_ADMIN\x10\x032\x89\a\n" +
 	"\vAuthService\x12S\n" +
 	"\n" +
 	"RequestOtp\x12!.avtoms.auth.v1.RequestOtpRequest\x1a\".avtoms.auth.v1.RequestOtpResponse\x12H\n" +
@@ -928,7 +1012,8 @@ const file_avtoms_auth_v1_auth_proto_rawDesc = "" +
 	"\fRefreshToken\x12#.avtoms.auth.v1.RefreshTokenRequest\x1a\x19.avtoms.auth.v1.TokenPair\x12Y\n" +
 	"\fAuthenticate\x12#.avtoms.auth.v1.AuthenticateRequest\x1a$.avtoms.auth.v1.AuthenticateResponse\x12N\n" +
 	"\x0eInviteMechanic\x12%.avtoms.auth.v1.InviteMechanicRequest\x1a\x15.avtoms.auth.v1.Staff\x12P\n" +
-	"\x0fDeactivateStaff\x12&.avtoms.auth.v1.DeactivateStaffRequest\x1a\x15.avtoms.auth.v1.Staff\x12P\n" +
+	"\x0fDeactivateStaff\x12&.avtoms.auth.v1.DeactivateStaffRequest\x1a\x15.avtoms.auth.v1.Staff\x12H\n" +
+	"\vUpdateStaff\x12\".avtoms.auth.v1.UpdateStaffRequest\x1a\x15.avtoms.auth.v1.Staff\x12P\n" +
 	"\tListStaff\x12 .avtoms.auth.v1.ListStaffRequest\x1a!.avtoms.auth.v1.ListStaffResponse\x12V\n" +
 	"\fListAllStaff\x12#.avtoms.auth.v1.ListAllStaffRequest\x1a!.avtoms.auth.v1.ListStaffResponse\x12N\n" +
 	"\x0eSetStaffActive\x12%.avtoms.auth.v1.SetStaffActiveRequest\x1a\x15.avtoms.auth.v1.Staff\x12J\n" +
@@ -947,24 +1032,25 @@ func file_avtoms_auth_v1_auth_proto_rawDescGZIP() []byte {
 }
 
 var file_avtoms_auth_v1_auth_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_avtoms_auth_v1_auth_proto_msgTypes = make([]protoimpl.MessageInfo, 15)
+var file_avtoms_auth_v1_auth_proto_msgTypes = make([]protoimpl.MessageInfo, 16)
 var file_avtoms_auth_v1_auth_proto_goTypes = []any{
 	(Role)(0),                      // 0: avtoms.auth.v1.Role
 	(*ListAllStaffRequest)(nil),    // 1: avtoms.auth.v1.ListAllStaffRequest
 	(*SetStaffActiveRequest)(nil),  // 2: avtoms.auth.v1.SetStaffActiveRequest
 	(*SetStaffRoleRequest)(nil),    // 3: avtoms.auth.v1.SetStaffRoleRequest
 	(*Staff)(nil),                  // 4: avtoms.auth.v1.Staff
-	(*RequestOtpRequest)(nil),      // 5: avtoms.auth.v1.RequestOtpRequest
-	(*RequestOtpResponse)(nil),     // 6: avtoms.auth.v1.RequestOtpResponse
-	(*VerifyOtpRequest)(nil),       // 7: avtoms.auth.v1.VerifyOtpRequest
-	(*RefreshTokenRequest)(nil),    // 8: avtoms.auth.v1.RefreshTokenRequest
-	(*TokenPair)(nil),              // 9: avtoms.auth.v1.TokenPair
-	(*AuthenticateRequest)(nil),    // 10: avtoms.auth.v1.AuthenticateRequest
-	(*AuthenticateResponse)(nil),   // 11: avtoms.auth.v1.AuthenticateResponse
-	(*InviteMechanicRequest)(nil),  // 12: avtoms.auth.v1.InviteMechanicRequest
-	(*DeactivateStaffRequest)(nil), // 13: avtoms.auth.v1.DeactivateStaffRequest
-	(*ListStaffRequest)(nil),       // 14: avtoms.auth.v1.ListStaffRequest
-	(*ListStaffResponse)(nil),      // 15: avtoms.auth.v1.ListStaffResponse
+	(*UpdateStaffRequest)(nil),     // 5: avtoms.auth.v1.UpdateStaffRequest
+	(*RequestOtpRequest)(nil),      // 6: avtoms.auth.v1.RequestOtpRequest
+	(*RequestOtpResponse)(nil),     // 7: avtoms.auth.v1.RequestOtpResponse
+	(*VerifyOtpRequest)(nil),       // 8: avtoms.auth.v1.VerifyOtpRequest
+	(*RefreshTokenRequest)(nil),    // 9: avtoms.auth.v1.RefreshTokenRequest
+	(*TokenPair)(nil),              // 10: avtoms.auth.v1.TokenPair
+	(*AuthenticateRequest)(nil),    // 11: avtoms.auth.v1.AuthenticateRequest
+	(*AuthenticateResponse)(nil),   // 12: avtoms.auth.v1.AuthenticateResponse
+	(*InviteMechanicRequest)(nil),  // 13: avtoms.auth.v1.InviteMechanicRequest
+	(*DeactivateStaffRequest)(nil), // 14: avtoms.auth.v1.DeactivateStaffRequest
+	(*ListStaffRequest)(nil),       // 15: avtoms.auth.v1.ListStaffRequest
+	(*ListStaffResponse)(nil),      // 16: avtoms.auth.v1.ListStaffResponse
 }
 var file_avtoms_auth_v1_auth_proto_depIdxs = []int32{
 	0,  // 0: avtoms.auth.v1.SetStaffRoleRequest.role:type_name -> avtoms.auth.v1.Role
@@ -972,28 +1058,30 @@ var file_avtoms_auth_v1_auth_proto_depIdxs = []int32{
 	4,  // 2: avtoms.auth.v1.TokenPair.staff:type_name -> avtoms.auth.v1.Staff
 	0,  // 3: avtoms.auth.v1.AuthenticateResponse.role:type_name -> avtoms.auth.v1.Role
 	4,  // 4: avtoms.auth.v1.ListStaffResponse.staff:type_name -> avtoms.auth.v1.Staff
-	5,  // 5: avtoms.auth.v1.AuthService.RequestOtp:input_type -> avtoms.auth.v1.RequestOtpRequest
-	7,  // 6: avtoms.auth.v1.AuthService.VerifyOtp:input_type -> avtoms.auth.v1.VerifyOtpRequest
-	8,  // 7: avtoms.auth.v1.AuthService.RefreshToken:input_type -> avtoms.auth.v1.RefreshTokenRequest
-	10, // 8: avtoms.auth.v1.AuthService.Authenticate:input_type -> avtoms.auth.v1.AuthenticateRequest
-	12, // 9: avtoms.auth.v1.AuthService.InviteMechanic:input_type -> avtoms.auth.v1.InviteMechanicRequest
-	13, // 10: avtoms.auth.v1.AuthService.DeactivateStaff:input_type -> avtoms.auth.v1.DeactivateStaffRequest
-	14, // 11: avtoms.auth.v1.AuthService.ListStaff:input_type -> avtoms.auth.v1.ListStaffRequest
-	1,  // 12: avtoms.auth.v1.AuthService.ListAllStaff:input_type -> avtoms.auth.v1.ListAllStaffRequest
-	2,  // 13: avtoms.auth.v1.AuthService.SetStaffActive:input_type -> avtoms.auth.v1.SetStaffActiveRequest
-	3,  // 14: avtoms.auth.v1.AuthService.SetStaffRole:input_type -> avtoms.auth.v1.SetStaffRoleRequest
-	6,  // 15: avtoms.auth.v1.AuthService.RequestOtp:output_type -> avtoms.auth.v1.RequestOtpResponse
-	9,  // 16: avtoms.auth.v1.AuthService.VerifyOtp:output_type -> avtoms.auth.v1.TokenPair
-	9,  // 17: avtoms.auth.v1.AuthService.RefreshToken:output_type -> avtoms.auth.v1.TokenPair
-	11, // 18: avtoms.auth.v1.AuthService.Authenticate:output_type -> avtoms.auth.v1.AuthenticateResponse
-	4,  // 19: avtoms.auth.v1.AuthService.InviteMechanic:output_type -> avtoms.auth.v1.Staff
-	4,  // 20: avtoms.auth.v1.AuthService.DeactivateStaff:output_type -> avtoms.auth.v1.Staff
-	15, // 21: avtoms.auth.v1.AuthService.ListStaff:output_type -> avtoms.auth.v1.ListStaffResponse
-	15, // 22: avtoms.auth.v1.AuthService.ListAllStaff:output_type -> avtoms.auth.v1.ListStaffResponse
-	4,  // 23: avtoms.auth.v1.AuthService.SetStaffActive:output_type -> avtoms.auth.v1.Staff
-	4,  // 24: avtoms.auth.v1.AuthService.SetStaffRole:output_type -> avtoms.auth.v1.Staff
-	15, // [15:25] is the sub-list for method output_type
-	5,  // [5:15] is the sub-list for method input_type
+	6,  // 5: avtoms.auth.v1.AuthService.RequestOtp:input_type -> avtoms.auth.v1.RequestOtpRequest
+	8,  // 6: avtoms.auth.v1.AuthService.VerifyOtp:input_type -> avtoms.auth.v1.VerifyOtpRequest
+	9,  // 7: avtoms.auth.v1.AuthService.RefreshToken:input_type -> avtoms.auth.v1.RefreshTokenRequest
+	11, // 8: avtoms.auth.v1.AuthService.Authenticate:input_type -> avtoms.auth.v1.AuthenticateRequest
+	13, // 9: avtoms.auth.v1.AuthService.InviteMechanic:input_type -> avtoms.auth.v1.InviteMechanicRequest
+	14, // 10: avtoms.auth.v1.AuthService.DeactivateStaff:input_type -> avtoms.auth.v1.DeactivateStaffRequest
+	5,  // 11: avtoms.auth.v1.AuthService.UpdateStaff:input_type -> avtoms.auth.v1.UpdateStaffRequest
+	15, // 12: avtoms.auth.v1.AuthService.ListStaff:input_type -> avtoms.auth.v1.ListStaffRequest
+	1,  // 13: avtoms.auth.v1.AuthService.ListAllStaff:input_type -> avtoms.auth.v1.ListAllStaffRequest
+	2,  // 14: avtoms.auth.v1.AuthService.SetStaffActive:input_type -> avtoms.auth.v1.SetStaffActiveRequest
+	3,  // 15: avtoms.auth.v1.AuthService.SetStaffRole:input_type -> avtoms.auth.v1.SetStaffRoleRequest
+	7,  // 16: avtoms.auth.v1.AuthService.RequestOtp:output_type -> avtoms.auth.v1.RequestOtpResponse
+	10, // 17: avtoms.auth.v1.AuthService.VerifyOtp:output_type -> avtoms.auth.v1.TokenPair
+	10, // 18: avtoms.auth.v1.AuthService.RefreshToken:output_type -> avtoms.auth.v1.TokenPair
+	12, // 19: avtoms.auth.v1.AuthService.Authenticate:output_type -> avtoms.auth.v1.AuthenticateResponse
+	4,  // 20: avtoms.auth.v1.AuthService.InviteMechanic:output_type -> avtoms.auth.v1.Staff
+	4,  // 21: avtoms.auth.v1.AuthService.DeactivateStaff:output_type -> avtoms.auth.v1.Staff
+	4,  // 22: avtoms.auth.v1.AuthService.UpdateStaff:output_type -> avtoms.auth.v1.Staff
+	16, // 23: avtoms.auth.v1.AuthService.ListStaff:output_type -> avtoms.auth.v1.ListStaffResponse
+	16, // 24: avtoms.auth.v1.AuthService.ListAllStaff:output_type -> avtoms.auth.v1.ListStaffResponse
+	4,  // 25: avtoms.auth.v1.AuthService.SetStaffActive:output_type -> avtoms.auth.v1.Staff
+	4,  // 26: avtoms.auth.v1.AuthService.SetStaffRole:output_type -> avtoms.auth.v1.Staff
+	16, // [16:27] is the sub-list for method output_type
+	5,  // [5:16] is the sub-list for method input_type
 	5,  // [5:5] is the sub-list for extension type_name
 	5,  // [5:5] is the sub-list for extension extendee
 	0,  // [0:5] is the sub-list for field type_name
@@ -1010,7 +1098,7 @@ func file_avtoms_auth_v1_auth_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_avtoms_auth_v1_auth_proto_rawDesc), len(file_avtoms_auth_v1_auth_proto_rawDesc)),
 			NumEnums:      1,
-			NumMessages:   15,
+			NumMessages:   16,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

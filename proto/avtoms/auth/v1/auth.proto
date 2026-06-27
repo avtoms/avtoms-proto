@@ -17,6 +17,7 @@ service AuthService {
 
   rpc InviteMechanic(InviteMechanicRequest) returns (Staff);
   rpc DeactivateStaff(DeactivateStaffRequest) returns (Staff);
+  rpc UpdateStaff(UpdateStaffRequest) returns (Staff);
   rpc ListStaff(ListStaffRequest) returns (ListStaffResponse);
 
   // Super-admin user management (admin-only, across all shops).
@@ -50,6 +51,14 @@ message Staff {
   Role role = 5;
   bool active = 6;
   string created_at = 7;
+  string avatar_url = 8; // profile photo URL (object storage), may be empty
+}
+
+message UpdateStaffRequest {
+  string staff_id = 1;
+  string name = 2;
+  string phone = 3;
+  string avatar_url = 4;
 }
 
 message RequestOtpRequest {

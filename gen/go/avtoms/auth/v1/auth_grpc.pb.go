@@ -25,6 +25,7 @@ const (
 	AuthService_Authenticate_FullMethodName    = "/avtoms.auth.v1.AuthService/Authenticate"
 	AuthService_InviteMechanic_FullMethodName  = "/avtoms.auth.v1.AuthService/InviteMechanic"
 	AuthService_DeactivateStaff_FullMethodName = "/avtoms.auth.v1.AuthService/DeactivateStaff"
+	AuthService_UpdateStaff_FullMethodName     = "/avtoms.auth.v1.AuthService/UpdateStaff"
 	AuthService_ListStaff_FullMethodName       = "/avtoms.auth.v1.AuthService/ListStaff"
 	AuthService_ListAllStaff_FullMethodName    = "/avtoms.auth.v1.AuthService/ListAllStaff"
 	AuthService_SetStaffActive_FullMethodName  = "/avtoms.auth.v1.AuthService/SetStaffActive"
@@ -46,6 +47,7 @@ type AuthServiceClient interface {
 	Authenticate(ctx context.Context, in *AuthenticateRequest, opts ...grpc.CallOption) (*AuthenticateResponse, error)
 	InviteMechanic(ctx context.Context, in *InviteMechanicRequest, opts ...grpc.CallOption) (*Staff, error)
 	DeactivateStaff(ctx context.Context, in *DeactivateStaffRequest, opts ...grpc.CallOption) (*Staff, error)
+	UpdateStaff(ctx context.Context, in *UpdateStaffRequest, opts ...grpc.CallOption) (*Staff, error)
 	ListStaff(ctx context.Context, in *ListStaffRequest, opts ...grpc.CallOption) (*ListStaffResponse, error)
 	// Super-admin user management (admin-only, across all shops).
 	ListAllStaff(ctx context.Context, in *ListAllStaffRequest, opts ...grpc.CallOption) (*ListStaffResponse, error)
@@ -121,6 +123,16 @@ func (c *authServiceClient) DeactivateStaff(ctx context.Context, in *DeactivateS
 	return out, nil
 }
 
+func (c *authServiceClient) UpdateStaff(ctx context.Context, in *UpdateStaffRequest, opts ...grpc.CallOption) (*Staff, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Staff)
+	err := c.cc.Invoke(ctx, AuthService_UpdateStaff_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *authServiceClient) ListStaff(ctx context.Context, in *ListStaffRequest, opts ...grpc.CallOption) (*ListStaffResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(ListStaffResponse)
@@ -176,6 +188,7 @@ type AuthServiceServer interface {
 	Authenticate(context.Context, *AuthenticateRequest) (*AuthenticateResponse, error)
 	InviteMechanic(context.Context, *InviteMechanicRequest) (*Staff, error)
 	DeactivateStaff(context.Context, *DeactivateStaffRequest) (*Staff, error)
+	UpdateStaff(context.Context, *UpdateStaffRequest) (*Staff, error)
 	ListStaff(context.Context, *ListStaffRequest) (*ListStaffResponse, error)
 	// Super-admin user management (admin-only, across all shops).
 	ListAllStaff(context.Context, *ListAllStaffRequest) (*ListStaffResponse, error)
@@ -208,6 +221,9 @@ func (UnimplementedAuthServiceServer) InviteMechanic(context.Context, *InviteMec
 }
 func (UnimplementedAuthServiceServer) DeactivateStaff(context.Context, *DeactivateStaffRequest) (*Staff, error) {
 	return nil, status.Error(codes.Unimplemented, "method DeactivateStaff not implemented")
+}
+func (UnimplementedAuthServiceServer) UpdateStaff(context.Context, *UpdateStaffRequest) (*Staff, error) {
+	return nil, status.Error(codes.Unimplemented, "method UpdateStaff not implemented")
 }
 func (UnimplementedAuthServiceServer) ListStaff(context.Context, *ListStaffRequest) (*ListStaffResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method ListStaff not implemented")
@@ -350,6 +366,24 @@ func _AuthService_DeactivateStaff_Handler(srv interface{}, ctx context.Context, 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AuthService_UpdateStaff_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateStaffRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServiceServer).UpdateStaff(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AuthService_UpdateStaff_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServiceServer).UpdateStaff(ctx, req.(*UpdateStaffRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _AuthService_ListStaff_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ListStaffRequest)
 	if err := dec(in); err != nil {
@@ -452,6 +486,10 @@ var AuthService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeactivateStaff",
 			Handler:    _AuthService_DeactivateStaff_Handler,
+		},
+		{
+			MethodName: "UpdateStaff",
+			Handler:    _AuthService_UpdateStaff_Handler,
 		},
 		{
 			MethodName: "ListStaff",
