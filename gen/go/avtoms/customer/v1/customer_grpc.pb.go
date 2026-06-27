@@ -19,18 +19,21 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	CustomerService_CreateCustomer_FullMethodName     = "/avtoms.customer.v1.CustomerService/CreateCustomer"
-	CustomerService_GetCustomer_FullMethodName        = "/avtoms.customer.v1.CustomerService/GetCustomer"
-	CustomerService_CreateVehicle_FullMethodName      = "/avtoms.customer.v1.CustomerService/CreateVehicle"
-	CustomerService_GetVehicle_FullMethodName         = "/avtoms.customer.v1.CustomerService/GetVehicle"
-	CustomerService_ListVehicles_FullMethodName       = "/avtoms.customer.v1.CustomerService/ListVehicles"
-	CustomerService_SearchByPlate_FullMethodName      = "/avtoms.customer.v1.CustomerService/SearchByPlate"
-	CustomerService_SoftDeleteCustomer_FullMethodName = "/avtoms.customer.v1.CustomerService/SoftDeleteCustomer"
-	CustomerService_ListCustomers_FullMethodName      = "/avtoms.customer.v1.CustomerService/ListCustomers"
-	CustomerService_ListCarMakes_FullMethodName       = "/avtoms.customer.v1.CustomerService/ListCarMakes"
-	CustomerService_CreateCarMake_FullMethodName      = "/avtoms.customer.v1.CustomerService/CreateCarMake"
-	CustomerService_ListCarModels_FullMethodName      = "/avtoms.customer.v1.CustomerService/ListCarModels"
-	CustomerService_CreateCarModel_FullMethodName     = "/avtoms.customer.v1.CustomerService/CreateCarModel"
+	CustomerService_CreateCustomer_FullMethodName          = "/avtoms.customer.v1.CustomerService/CreateCustomer"
+	CustomerService_GetCustomer_FullMethodName             = "/avtoms.customer.v1.CustomerService/GetCustomer"
+	CustomerService_CreateVehicle_FullMethodName           = "/avtoms.customer.v1.CustomerService/CreateVehicle"
+	CustomerService_GetVehicle_FullMethodName              = "/avtoms.customer.v1.CustomerService/GetVehicle"
+	CustomerService_ListVehicles_FullMethodName            = "/avtoms.customer.v1.CustomerService/ListVehicles"
+	CustomerService_SearchByPlate_FullMethodName           = "/avtoms.customer.v1.CustomerService/SearchByPlate"
+	CustomerService_SoftDeleteCustomer_FullMethodName      = "/avtoms.customer.v1.CustomerService/SoftDeleteCustomer"
+	CustomerService_ListCustomers_FullMethodName           = "/avtoms.customer.v1.CustomerService/ListCustomers"
+	CustomerService_LinkTelegram_FullMethodName            = "/avtoms.customer.v1.CustomerService/LinkTelegram"
+	CustomerService_GetTelegramLink_FullMethodName         = "/avtoms.customer.v1.CustomerService/GetTelegramLink"
+	CustomerService_ListCustomersByTelegram_FullMethodName = "/avtoms.customer.v1.CustomerService/ListCustomersByTelegram"
+	CustomerService_ListCarMakes_FullMethodName            = "/avtoms.customer.v1.CustomerService/ListCarMakes"
+	CustomerService_CreateCarMake_FullMethodName           = "/avtoms.customer.v1.CustomerService/CreateCarMake"
+	CustomerService_ListCarModels_FullMethodName           = "/avtoms.customer.v1.CustomerService/ListCarModels"
+	CustomerService_CreateCarModel_FullMethodName          = "/avtoms.customer.v1.CustomerService/CreateCarModel"
 )
 
 // CustomerServiceClient is the client API for CustomerService service.
@@ -47,6 +50,11 @@ type CustomerServiceClient interface {
 	SearchByPlate(ctx context.Context, in *SearchByPlateRequest, opts ...grpc.CallOption) (*SearchByPlateResponse, error)
 	SoftDeleteCustomer(ctx context.Context, in *SoftDeleteCustomerRequest, opts ...grpc.CallOption) (*Customer, error)
 	ListCustomers(ctx context.Context, in *ListCustomersRequest, opts ...grpc.CallOption) (*ListCustomersResponse, error)
+	// Client Telegram linking: a customer links their Telegram chat (by sharing their
+	// verified phone) so the bot can show their orders and push notifications.
+	LinkTelegram(ctx context.Context, in *LinkTelegramRequest, opts ...grpc.CallOption) (*TelegramLink, error)
+	GetTelegramLink(ctx context.Context, in *GetTelegramLinkRequest, opts ...grpc.CallOption) (*TelegramLink, error)
+	ListCustomersByTelegram(ctx context.Context, in *ListCustomersByTelegramRequest, opts ...grpc.CallOption) (*ListCustomersResponse, error)
 	// Car reference catalog (global, admin-managed). Read by any role to populate dropdowns.
 	ListCarMakes(ctx context.Context, in *ListCarMakesRequest, opts ...grpc.CallOption) (*ListCarMakesResponse, error)
 	CreateCarMake(ctx context.Context, in *CreateCarMakeRequest, opts ...grpc.CallOption) (*CarMake, error)
@@ -142,6 +150,36 @@ func (c *customerServiceClient) ListCustomers(ctx context.Context, in *ListCusto
 	return out, nil
 }
 
+func (c *customerServiceClient) LinkTelegram(ctx context.Context, in *LinkTelegramRequest, opts ...grpc.CallOption) (*TelegramLink, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(TelegramLink)
+	err := c.cc.Invoke(ctx, CustomerService_LinkTelegram_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *customerServiceClient) GetTelegramLink(ctx context.Context, in *GetTelegramLinkRequest, opts ...grpc.CallOption) (*TelegramLink, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(TelegramLink)
+	err := c.cc.Invoke(ctx, CustomerService_GetTelegramLink_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *customerServiceClient) ListCustomersByTelegram(ctx context.Context, in *ListCustomersByTelegramRequest, opts ...grpc.CallOption) (*ListCustomersResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListCustomersResponse)
+	err := c.cc.Invoke(ctx, CustomerService_ListCustomersByTelegram_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *customerServiceClient) ListCarMakes(ctx context.Context, in *ListCarMakesRequest, opts ...grpc.CallOption) (*ListCarMakesResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(ListCarMakesResponse)
@@ -196,6 +234,11 @@ type CustomerServiceServer interface {
 	SearchByPlate(context.Context, *SearchByPlateRequest) (*SearchByPlateResponse, error)
 	SoftDeleteCustomer(context.Context, *SoftDeleteCustomerRequest) (*Customer, error)
 	ListCustomers(context.Context, *ListCustomersRequest) (*ListCustomersResponse, error)
+	// Client Telegram linking: a customer links their Telegram chat (by sharing their
+	// verified phone) so the bot can show their orders and push notifications.
+	LinkTelegram(context.Context, *LinkTelegramRequest) (*TelegramLink, error)
+	GetTelegramLink(context.Context, *GetTelegramLinkRequest) (*TelegramLink, error)
+	ListCustomersByTelegram(context.Context, *ListCustomersByTelegramRequest) (*ListCustomersResponse, error)
 	// Car reference catalog (global, admin-managed). Read by any role to populate dropdowns.
 	ListCarMakes(context.Context, *ListCarMakesRequest) (*ListCarMakesResponse, error)
 	CreateCarMake(context.Context, *CreateCarMakeRequest) (*CarMake, error)
@@ -234,6 +277,15 @@ func (UnimplementedCustomerServiceServer) SoftDeleteCustomer(context.Context, *S
 }
 func (UnimplementedCustomerServiceServer) ListCustomers(context.Context, *ListCustomersRequest) (*ListCustomersResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method ListCustomers not implemented")
+}
+func (UnimplementedCustomerServiceServer) LinkTelegram(context.Context, *LinkTelegramRequest) (*TelegramLink, error) {
+	return nil, status.Error(codes.Unimplemented, "method LinkTelegram not implemented")
+}
+func (UnimplementedCustomerServiceServer) GetTelegramLink(context.Context, *GetTelegramLinkRequest) (*TelegramLink, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetTelegramLink not implemented")
+}
+func (UnimplementedCustomerServiceServer) ListCustomersByTelegram(context.Context, *ListCustomersByTelegramRequest) (*ListCustomersResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListCustomersByTelegram not implemented")
 }
 func (UnimplementedCustomerServiceServer) ListCarMakes(context.Context, *ListCarMakesRequest) (*ListCarMakesResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method ListCarMakes not implemented")
@@ -412,6 +464,60 @@ func _CustomerService_ListCustomers_Handler(srv interface{}, ctx context.Context
 	return interceptor(ctx, in, info, handler)
 }
 
+func _CustomerService_LinkTelegram_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(LinkTelegramRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CustomerServiceServer).LinkTelegram(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CustomerService_LinkTelegram_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CustomerServiceServer).LinkTelegram(ctx, req.(*LinkTelegramRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _CustomerService_GetTelegramLink_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetTelegramLinkRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CustomerServiceServer).GetTelegramLink(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CustomerService_GetTelegramLink_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CustomerServiceServer).GetTelegramLink(ctx, req.(*GetTelegramLinkRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _CustomerService_ListCustomersByTelegram_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListCustomersByTelegramRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CustomerServiceServer).ListCustomersByTelegram(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CustomerService_ListCustomersByTelegram_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CustomerServiceServer).ListCustomersByTelegram(ctx, req.(*ListCustomersByTelegramRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _CustomerService_ListCarMakes_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ListCarMakesRequest)
 	if err := dec(in); err != nil {
@@ -522,6 +628,18 @@ var CustomerService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ListCustomers",
 			Handler:    _CustomerService_ListCustomers_Handler,
+		},
+		{
+			MethodName: "LinkTelegram",
+			Handler:    _CustomerService_LinkTelegram_Handler,
+		},
+		{
+			MethodName: "GetTelegramLink",
+			Handler:    _CustomerService_GetTelegramLink_Handler,
+		},
+		{
+			MethodName: "ListCustomersByTelegram",
+			Handler:    _CustomerService_ListCustomersByTelegram_Handler,
 		},
 		{
 			MethodName: "ListCarMakes",

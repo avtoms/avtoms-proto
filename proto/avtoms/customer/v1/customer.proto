@@ -17,6 +17,12 @@ service CustomerService {
   rpc SoftDeleteCustomer(SoftDeleteCustomerRequest) returns (Customer);
   rpc ListCustomers(ListCustomersRequest) returns (ListCustomersResponse);
 
+  // Client Telegram linking: a customer links their Telegram chat (by sharing their
+  // verified phone) so the bot can show their orders and push notifications.
+  rpc LinkTelegram(LinkTelegramRequest) returns (TelegramLink);
+  rpc GetTelegramLink(GetTelegramLinkRequest) returns (TelegramLink);
+  rpc ListCustomersByTelegram(ListCustomersByTelegramRequest) returns (ListCustomersResponse);
+
   // Car reference catalog (global, admin-managed). Read by any role to populate dropdowns.
   rpc ListCarMakes(ListCarMakesRequest) returns (ListCarMakesResponse);
   rpc CreateCarMake(CreateCarMakeRequest) returns (CarMake);
@@ -77,6 +83,26 @@ message Customer {
   bool walk_in = 7;
   bool deleted = 8;
   string created_at = 9;
+  string telegram_chat_id = 10; // linked Telegram chat (numeric id), empty until linked
+}
+
+// TelegramLink maps a verified phone to a Telegram chat + preferred language.
+message TelegramLink {
+  string chat_id = 1;
+  string phone = 2;
+  avtoms.common.v1.Language language = 3;
+  bool linked = 4; // false when no link exists for the queried chat
+}
+message LinkTelegramRequest {
+  string chat_id = 1;
+  string phone = 2;
+  avtoms.common.v1.Language language = 3;
+}
+message GetTelegramLinkRequest {
+  string chat_id = 1;
+}
+message ListCustomersByTelegramRequest {
+  string chat_id = 1;
 }
 
 // PlateType is the Uzbek number-plate category, which drives validation and the plate
