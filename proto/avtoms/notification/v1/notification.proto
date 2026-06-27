@@ -17,6 +17,10 @@ service NotificationService {
   rpc ListIntegrations(ListIntegrationsRequest) returns (ListIntegrationsResponse);
   rpc GetIntegration(GetIntegrationRequest) returns (Integration);
   rpc UpdateIntegration(UpdateIntegrationRequest) returns (Integration);
+  // GetIntegrationConfig returns a provider's UNMASKED values. For internal
+  // service-to-service use only (e.g. the gateway reading R2 upload creds);
+  // never expose its result to end clients.
+  rpc GetIntegrationConfig(GetIntegrationRequest) returns (IntegrationConfig);
   // SendTestSms sends a one-off SMS synchronously and returns the gateway's actual
   // result/error, so the super admin can verify the credentials work.
   rpc SendTestSms(SendTestSmsRequest) returns (TestSmsResult);
@@ -47,6 +51,10 @@ message GetIntegrationRequest {
 message UpdateIntegrationRequest {
   string provider = 1;
   map<string, string> values = 2; // empty secret value keeps the stored one
+}
+// IntegrationConfig carries a provider's UNMASKED values for internal use.
+message IntegrationConfig {
+  map<string, string> values = 1;
 }
 
 enum Channel {

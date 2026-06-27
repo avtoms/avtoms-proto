@@ -463,6 +463,51 @@ func (x *UpdateIntegrationRequest) GetValues() map[string]string {
 	return nil
 }
 
+// IntegrationConfig carries a provider's UNMASKED values for internal use.
+type IntegrationConfig struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Values        map[string]string      `protobuf:"bytes,1,rep,name=values,proto3" json:"values,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *IntegrationConfig) Reset() {
+	*x = IntegrationConfig{}
+	mi := &file_avtoms_notification_v1_notification_proto_msgTypes[7]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *IntegrationConfig) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*IntegrationConfig) ProtoMessage() {}
+
+func (x *IntegrationConfig) ProtoReflect() protoreflect.Message {
+	mi := &file_avtoms_notification_v1_notification_proto_msgTypes[7]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use IntegrationConfig.ProtoReflect.Descriptor instead.
+func (*IntegrationConfig) Descriptor() ([]byte, []int) {
+	return file_avtoms_notification_v1_notification_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *IntegrationConfig) GetValues() map[string]string {
+	if x != nil {
+		return x.Values
+	}
+	return nil
+}
+
 type SendResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
@@ -474,7 +519,7 @@ type SendResponse struct {
 
 func (x *SendResponse) Reset() {
 	*x = SendResponse{}
-	mi := &file_avtoms_notification_v1_notification_proto_msgTypes[7]
+	mi := &file_avtoms_notification_v1_notification_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -486,7 +531,7 @@ func (x *SendResponse) String() string {
 func (*SendResponse) ProtoMessage() {}
 
 func (x *SendResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_notification_v1_notification_proto_msgTypes[7]
+	mi := &file_avtoms_notification_v1_notification_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -499,7 +544,7 @@ func (x *SendResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SendResponse.ProtoReflect.Descriptor instead.
 func (*SendResponse) Descriptor() ([]byte, []int) {
-	return file_avtoms_notification_v1_notification_proto_rawDescGZIP(), []int{7}
+	return file_avtoms_notification_v1_notification_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *SendResponse) GetId() string {
@@ -534,7 +579,7 @@ type SendSmsRequest struct {
 
 func (x *SendSmsRequest) Reset() {
 	*x = SendSmsRequest{}
-	mi := &file_avtoms_notification_v1_notification_proto_msgTypes[8]
+	mi := &file_avtoms_notification_v1_notification_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -546,7 +591,7 @@ func (x *SendSmsRequest) String() string {
 func (*SendSmsRequest) ProtoMessage() {}
 
 func (x *SendSmsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_notification_v1_notification_proto_msgTypes[8]
+	mi := &file_avtoms_notification_v1_notification_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -559,7 +604,7 @@ func (x *SendSmsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SendSmsRequest.ProtoReflect.Descriptor instead.
 func (*SendSmsRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_notification_v1_notification_proto_rawDescGZIP(), []int{8}
+	return file_avtoms_notification_v1_notification_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *SendSmsRequest) GetShopId() string {
@@ -594,7 +639,7 @@ type SendTelegramRequest struct {
 
 func (x *SendTelegramRequest) Reset() {
 	*x = SendTelegramRequest{}
-	mi := &file_avtoms_notification_v1_notification_proto_msgTypes[9]
+	mi := &file_avtoms_notification_v1_notification_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -606,7 +651,7 @@ func (x *SendTelegramRequest) String() string {
 func (*SendTelegramRequest) ProtoMessage() {}
 
 func (x *SendTelegramRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_notification_v1_notification_proto_msgTypes[9]
+	mi := &file_avtoms_notification_v1_notification_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -619,7 +664,7 @@ func (x *SendTelegramRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SendTelegramRequest.ProtoReflect.Descriptor instead.
 func (*SendTelegramRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_notification_v1_notification_proto_rawDescGZIP(), []int{9}
+	return file_avtoms_notification_v1_notification_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *SendTelegramRequest) GetShopId() string {
@@ -656,7 +701,7 @@ type NotifyRequest struct {
 
 func (x *NotifyRequest) Reset() {
 	*x = NotifyRequest{}
-	mi := &file_avtoms_notification_v1_notification_proto_msgTypes[10]
+	mi := &file_avtoms_notification_v1_notification_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -668,7 +713,7 @@ func (x *NotifyRequest) String() string {
 func (*NotifyRequest) ProtoMessage() {}
 
 func (x *NotifyRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_notification_v1_notification_proto_msgTypes[10]
+	mi := &file_avtoms_notification_v1_notification_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -681,7 +726,7 @@ func (x *NotifyRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use NotifyRequest.ProtoReflect.Descriptor instead.
 func (*NotifyRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_notification_v1_notification_proto_rawDescGZIP(), []int{10}
+	return file_avtoms_notification_v1_notification_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *NotifyRequest) GetShopId() string {
@@ -748,6 +793,11 @@ const file_avtoms_notification_v1_notification_proto_rawDesc = "" +
 	"\x06values\x18\x02 \x03(\v2<.avtoms.notification.v1.UpdateIntegrationRequest.ValuesEntryR\x06values\x1a9\n" +
 	"\vValuesEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\x9d\x01\n" +
+	"\x11IntegrationConfig\x12M\n" +
+	"\x06values\x18\x01 \x03(\v25.avtoms.notification.v1.IntegrationConfig.ValuesEntryR\x06values\x1a9\n" +
+	"\vValuesEntry\x12\x10\n" +
+	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"w\n" +
 	"\fSendResponse\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x129\n" +
@@ -781,14 +831,15 @@ const file_avtoms_notification_v1_notification_proto_rawDesc = "" +
 	"\x18TEMPLATE_MECHANIC_INVITE\x10\x02\x12\x15\n" +
 	"\x11TEMPLATE_ESTIMATE\x10\x03\x12\x1d\n" +
 	"\x19TEMPLATE_READY_FOR_PICKUP\x10\x04\x12\x14\n" +
-	"\x10TEMPLATE_RECEIPT\x10\x052\xd3\x05\n" +
+	"\x10TEMPLATE_RECEIPT\x10\x052\xc5\x06\n" +
 	"\x13NotificationService\x12W\n" +
 	"\aSendSms\x12&.avtoms.notification.v1.SendSmsRequest\x1a$.avtoms.notification.v1.SendResponse\x12a\n" +
 	"\fSendTelegram\x12+.avtoms.notification.v1.SendTelegramRequest\x1a$.avtoms.notification.v1.SendResponse\x12U\n" +
 	"\x06Notify\x12%.avtoms.notification.v1.NotifyRequest\x1a$.avtoms.notification.v1.SendResponse\x12u\n" +
 	"\x10ListIntegrations\x12/.avtoms.notification.v1.ListIntegrationsRequest\x1a0.avtoms.notification.v1.ListIntegrationsResponse\x12d\n" +
 	"\x0eGetIntegration\x12-.avtoms.notification.v1.GetIntegrationRequest\x1a#.avtoms.notification.v1.Integration\x12j\n" +
-	"\x11UpdateIntegration\x120.avtoms.notification.v1.UpdateIntegrationRequest\x1a#.avtoms.notification.v1.Integration\x12`\n" +
+	"\x11UpdateIntegration\x120.avtoms.notification.v1.UpdateIntegrationRequest\x1a#.avtoms.notification.v1.Integration\x12p\n" +
+	"\x14GetIntegrationConfig\x12-.avtoms.notification.v1.GetIntegrationRequest\x1a).avtoms.notification.v1.IntegrationConfig\x12`\n" +
 	"\vSendTestSms\x12*.avtoms.notification.v1.SendTestSmsRequest\x1a%.avtoms.notification.v1.TestSmsResultBFZDgithub.com/avtoms/proto/gen/go/avtoms/notification/v1;notificationv1b\x06proto3"
 
 var (
@@ -804,7 +855,7 @@ func file_avtoms_notification_v1_notification_proto_rawDescGZIP() []byte {
 }
 
 var file_avtoms_notification_v1_notification_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
-var file_avtoms_notification_v1_notification_proto_msgTypes = make([]protoimpl.MessageInfo, 14)
+var file_avtoms_notification_v1_notification_proto_msgTypes = make([]protoimpl.MessageInfo, 16)
 var file_avtoms_notification_v1_notification_proto_goTypes = []any{
 	(Channel)(0),                     // 0: avtoms.notification.v1.Channel
 	(Template)(0),                    // 1: avtoms.notification.v1.Template
@@ -815,42 +866,47 @@ var file_avtoms_notification_v1_notification_proto_goTypes = []any{
 	(*ListIntegrationsResponse)(nil), // 6: avtoms.notification.v1.ListIntegrationsResponse
 	(*GetIntegrationRequest)(nil),    // 7: avtoms.notification.v1.GetIntegrationRequest
 	(*UpdateIntegrationRequest)(nil), // 8: avtoms.notification.v1.UpdateIntegrationRequest
-	(*SendResponse)(nil),             // 9: avtoms.notification.v1.SendResponse
-	(*SendSmsRequest)(nil),           // 10: avtoms.notification.v1.SendSmsRequest
-	(*SendTelegramRequest)(nil),      // 11: avtoms.notification.v1.SendTelegramRequest
-	(*NotifyRequest)(nil),            // 12: avtoms.notification.v1.NotifyRequest
-	nil,                              // 13: avtoms.notification.v1.Integration.ValuesEntry
-	nil,                              // 14: avtoms.notification.v1.UpdateIntegrationRequest.ValuesEntry
-	nil,                              // 15: avtoms.notification.v1.NotifyRequest.ParamsEntry
-	(v1.Language)(0),                 // 16: avtoms.common.v1.Language
+	(*IntegrationConfig)(nil),        // 9: avtoms.notification.v1.IntegrationConfig
+	(*SendResponse)(nil),             // 10: avtoms.notification.v1.SendResponse
+	(*SendSmsRequest)(nil),           // 11: avtoms.notification.v1.SendSmsRequest
+	(*SendTelegramRequest)(nil),      // 12: avtoms.notification.v1.SendTelegramRequest
+	(*NotifyRequest)(nil),            // 13: avtoms.notification.v1.NotifyRequest
+	nil,                              // 14: avtoms.notification.v1.Integration.ValuesEntry
+	nil,                              // 15: avtoms.notification.v1.UpdateIntegrationRequest.ValuesEntry
+	nil,                              // 16: avtoms.notification.v1.IntegrationConfig.ValuesEntry
+	nil,                              // 17: avtoms.notification.v1.NotifyRequest.ParamsEntry
+	(v1.Language)(0),                 // 18: avtoms.common.v1.Language
 }
 var file_avtoms_notification_v1_notification_proto_depIdxs = []int32{
-	13, // 0: avtoms.notification.v1.Integration.values:type_name -> avtoms.notification.v1.Integration.ValuesEntry
+	14, // 0: avtoms.notification.v1.Integration.values:type_name -> avtoms.notification.v1.Integration.ValuesEntry
 	4,  // 1: avtoms.notification.v1.ListIntegrationsResponse.integrations:type_name -> avtoms.notification.v1.Integration
-	14, // 2: avtoms.notification.v1.UpdateIntegrationRequest.values:type_name -> avtoms.notification.v1.UpdateIntegrationRequest.ValuesEntry
-	0,  // 3: avtoms.notification.v1.SendResponse.channel:type_name -> avtoms.notification.v1.Channel
-	1,  // 4: avtoms.notification.v1.NotifyRequest.template:type_name -> avtoms.notification.v1.Template
-	16, // 5: avtoms.notification.v1.NotifyRequest.language:type_name -> avtoms.common.v1.Language
-	15, // 6: avtoms.notification.v1.NotifyRequest.params:type_name -> avtoms.notification.v1.NotifyRequest.ParamsEntry
-	10, // 7: avtoms.notification.v1.NotificationService.SendSms:input_type -> avtoms.notification.v1.SendSmsRequest
-	11, // 8: avtoms.notification.v1.NotificationService.SendTelegram:input_type -> avtoms.notification.v1.SendTelegramRequest
-	12, // 9: avtoms.notification.v1.NotificationService.Notify:input_type -> avtoms.notification.v1.NotifyRequest
-	5,  // 10: avtoms.notification.v1.NotificationService.ListIntegrations:input_type -> avtoms.notification.v1.ListIntegrationsRequest
-	7,  // 11: avtoms.notification.v1.NotificationService.GetIntegration:input_type -> avtoms.notification.v1.GetIntegrationRequest
-	8,  // 12: avtoms.notification.v1.NotificationService.UpdateIntegration:input_type -> avtoms.notification.v1.UpdateIntegrationRequest
-	2,  // 13: avtoms.notification.v1.NotificationService.SendTestSms:input_type -> avtoms.notification.v1.SendTestSmsRequest
-	9,  // 14: avtoms.notification.v1.NotificationService.SendSms:output_type -> avtoms.notification.v1.SendResponse
-	9,  // 15: avtoms.notification.v1.NotificationService.SendTelegram:output_type -> avtoms.notification.v1.SendResponse
-	9,  // 16: avtoms.notification.v1.NotificationService.Notify:output_type -> avtoms.notification.v1.SendResponse
-	6,  // 17: avtoms.notification.v1.NotificationService.ListIntegrations:output_type -> avtoms.notification.v1.ListIntegrationsResponse
-	4,  // 18: avtoms.notification.v1.NotificationService.GetIntegration:output_type -> avtoms.notification.v1.Integration
-	4,  // 19: avtoms.notification.v1.NotificationService.UpdateIntegration:output_type -> avtoms.notification.v1.Integration
-	3,  // 20: avtoms.notification.v1.NotificationService.SendTestSms:output_type -> avtoms.notification.v1.TestSmsResult
-	14, // [14:21] is the sub-list for method output_type
-	7,  // [7:14] is the sub-list for method input_type
-	7,  // [7:7] is the sub-list for extension type_name
-	7,  // [7:7] is the sub-list for extension extendee
-	0,  // [0:7] is the sub-list for field type_name
+	15, // 2: avtoms.notification.v1.UpdateIntegrationRequest.values:type_name -> avtoms.notification.v1.UpdateIntegrationRequest.ValuesEntry
+	16, // 3: avtoms.notification.v1.IntegrationConfig.values:type_name -> avtoms.notification.v1.IntegrationConfig.ValuesEntry
+	0,  // 4: avtoms.notification.v1.SendResponse.channel:type_name -> avtoms.notification.v1.Channel
+	1,  // 5: avtoms.notification.v1.NotifyRequest.template:type_name -> avtoms.notification.v1.Template
+	18, // 6: avtoms.notification.v1.NotifyRequest.language:type_name -> avtoms.common.v1.Language
+	17, // 7: avtoms.notification.v1.NotifyRequest.params:type_name -> avtoms.notification.v1.NotifyRequest.ParamsEntry
+	11, // 8: avtoms.notification.v1.NotificationService.SendSms:input_type -> avtoms.notification.v1.SendSmsRequest
+	12, // 9: avtoms.notification.v1.NotificationService.SendTelegram:input_type -> avtoms.notification.v1.SendTelegramRequest
+	13, // 10: avtoms.notification.v1.NotificationService.Notify:input_type -> avtoms.notification.v1.NotifyRequest
+	5,  // 11: avtoms.notification.v1.NotificationService.ListIntegrations:input_type -> avtoms.notification.v1.ListIntegrationsRequest
+	7,  // 12: avtoms.notification.v1.NotificationService.GetIntegration:input_type -> avtoms.notification.v1.GetIntegrationRequest
+	8,  // 13: avtoms.notification.v1.NotificationService.UpdateIntegration:input_type -> avtoms.notification.v1.UpdateIntegrationRequest
+	7,  // 14: avtoms.notification.v1.NotificationService.GetIntegrationConfig:input_type -> avtoms.notification.v1.GetIntegrationRequest
+	2,  // 15: avtoms.notification.v1.NotificationService.SendTestSms:input_type -> avtoms.notification.v1.SendTestSmsRequest
+	10, // 16: avtoms.notification.v1.NotificationService.SendSms:output_type -> avtoms.notification.v1.SendResponse
+	10, // 17: avtoms.notification.v1.NotificationService.SendTelegram:output_type -> avtoms.notification.v1.SendResponse
+	10, // 18: avtoms.notification.v1.NotificationService.Notify:output_type -> avtoms.notification.v1.SendResponse
+	6,  // 19: avtoms.notification.v1.NotificationService.ListIntegrations:output_type -> avtoms.notification.v1.ListIntegrationsResponse
+	4,  // 20: avtoms.notification.v1.NotificationService.GetIntegration:output_type -> avtoms.notification.v1.Integration
+	4,  // 21: avtoms.notification.v1.NotificationService.UpdateIntegration:output_type -> avtoms.notification.v1.Integration
+	9,  // 22: avtoms.notification.v1.NotificationService.GetIntegrationConfig:output_type -> avtoms.notification.v1.IntegrationConfig
+	3,  // 23: avtoms.notification.v1.NotificationService.SendTestSms:output_type -> avtoms.notification.v1.TestSmsResult
+	16, // [16:24] is the sub-list for method output_type
+	8,  // [8:16] is the sub-list for method input_type
+	8,  // [8:8] is the sub-list for extension type_name
+	8,  // [8:8] is the sub-list for extension extendee
+	0,  // [0:8] is the sub-list for field type_name
 }
 
 func init() { file_avtoms_notification_v1_notification_proto_init() }
@@ -864,7 +920,7 @@ func file_avtoms_notification_v1_notification_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_avtoms_notification_v1_notification_proto_rawDesc), len(file_avtoms_notification_v1_notification_proto_rawDesc)),
 			NumEnums:      2,
-			NumMessages:   14,
+			NumMessages:   16,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

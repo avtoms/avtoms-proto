@@ -19,13 +19,14 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	NotificationService_SendSms_FullMethodName           = "/avtoms.notification.v1.NotificationService/SendSms"
-	NotificationService_SendTelegram_FullMethodName      = "/avtoms.notification.v1.NotificationService/SendTelegram"
-	NotificationService_Notify_FullMethodName            = "/avtoms.notification.v1.NotificationService/Notify"
-	NotificationService_ListIntegrations_FullMethodName  = "/avtoms.notification.v1.NotificationService/ListIntegrations"
-	NotificationService_GetIntegration_FullMethodName    = "/avtoms.notification.v1.NotificationService/GetIntegration"
-	NotificationService_UpdateIntegration_FullMethodName = "/avtoms.notification.v1.NotificationService/UpdateIntegration"
-	NotificationService_SendTestSms_FullMethodName       = "/avtoms.notification.v1.NotificationService/SendTestSms"
+	NotificationService_SendSms_FullMethodName              = "/avtoms.notification.v1.NotificationService/SendSms"
+	NotificationService_SendTelegram_FullMethodName         = "/avtoms.notification.v1.NotificationService/SendTelegram"
+	NotificationService_Notify_FullMethodName               = "/avtoms.notification.v1.NotificationService/Notify"
+	NotificationService_ListIntegrations_FullMethodName     = "/avtoms.notification.v1.NotificationService/ListIntegrations"
+	NotificationService_GetIntegration_FullMethodName       = "/avtoms.notification.v1.NotificationService/GetIntegration"
+	NotificationService_UpdateIntegration_FullMethodName    = "/avtoms.notification.v1.NotificationService/UpdateIntegration"
+	NotificationService_GetIntegrationConfig_FullMethodName = "/avtoms.notification.v1.NotificationService/GetIntegrationConfig"
+	NotificationService_SendTestSms_FullMethodName          = "/avtoms.notification.v1.NotificationService/SendTestSms"
 )
 
 // NotificationServiceClient is the client API for NotificationService service.
@@ -42,6 +43,10 @@ type NotificationServiceClient interface {
 	ListIntegrations(ctx context.Context, in *ListIntegrationsRequest, opts ...grpc.CallOption) (*ListIntegrationsResponse, error)
 	GetIntegration(ctx context.Context, in *GetIntegrationRequest, opts ...grpc.CallOption) (*Integration, error)
 	UpdateIntegration(ctx context.Context, in *UpdateIntegrationRequest, opts ...grpc.CallOption) (*Integration, error)
+	// GetIntegrationConfig returns a provider's UNMASKED values. For internal
+	// service-to-service use only (e.g. the gateway reading R2 upload creds);
+	// never expose its result to end clients.
+	GetIntegrationConfig(ctx context.Context, in *GetIntegrationRequest, opts ...grpc.CallOption) (*IntegrationConfig, error)
 	// SendTestSms sends a one-off SMS synchronously and returns the gateway's actual
 	// result/error, so the super admin can verify the credentials work.
 	SendTestSms(ctx context.Context, in *SendTestSmsRequest, opts ...grpc.CallOption) (*TestSmsResult, error)
@@ -115,6 +120,16 @@ func (c *notificationServiceClient) UpdateIntegration(ctx context.Context, in *U
 	return out, nil
 }
 
+func (c *notificationServiceClient) GetIntegrationConfig(ctx context.Context, in *GetIntegrationRequest, opts ...grpc.CallOption) (*IntegrationConfig, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(IntegrationConfig)
+	err := c.cc.Invoke(ctx, NotificationService_GetIntegrationConfig_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *notificationServiceClient) SendTestSms(ctx context.Context, in *SendTestSmsRequest, opts ...grpc.CallOption) (*TestSmsResult, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(TestSmsResult)
@@ -139,6 +154,10 @@ type NotificationServiceServer interface {
 	ListIntegrations(context.Context, *ListIntegrationsRequest) (*ListIntegrationsResponse, error)
 	GetIntegration(context.Context, *GetIntegrationRequest) (*Integration, error)
 	UpdateIntegration(context.Context, *UpdateIntegrationRequest) (*Integration, error)
+	// GetIntegrationConfig returns a provider's UNMASKED values. For internal
+	// service-to-service use only (e.g. the gateway reading R2 upload creds);
+	// never expose its result to end clients.
+	GetIntegrationConfig(context.Context, *GetIntegrationRequest) (*IntegrationConfig, error)
 	// SendTestSms sends a one-off SMS synchronously and returns the gateway's actual
 	// result/error, so the super admin can verify the credentials work.
 	SendTestSms(context.Context, *SendTestSmsRequest) (*TestSmsResult, error)
@@ -169,6 +188,9 @@ func (UnimplementedNotificationServiceServer) GetIntegration(context.Context, *G
 }
 func (UnimplementedNotificationServiceServer) UpdateIntegration(context.Context, *UpdateIntegrationRequest) (*Integration, error) {
 	return nil, status.Error(codes.Unimplemented, "method UpdateIntegration not implemented")
+}
+func (UnimplementedNotificationServiceServer) GetIntegrationConfig(context.Context, *GetIntegrationRequest) (*IntegrationConfig, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetIntegrationConfig not implemented")
 }
 func (UnimplementedNotificationServiceServer) SendTestSms(context.Context, *SendTestSmsRequest) (*TestSmsResult, error) {
 	return nil, status.Error(codes.Unimplemented, "method SendTestSms not implemented")
@@ -302,6 +324,24 @@ func _NotificationService_UpdateIntegration_Handler(srv interface{}, ctx context
 	return interceptor(ctx, in, info, handler)
 }
 
+func _NotificationService_GetIntegrationConfig_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetIntegrationRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(NotificationServiceServer).GetIntegrationConfig(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: NotificationService_GetIntegrationConfig_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(NotificationServiceServer).GetIntegrationConfig(ctx, req.(*GetIntegrationRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _NotificationService_SendTestSms_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(SendTestSmsRequest)
 	if err := dec(in); err != nil {
@@ -350,6 +390,10 @@ var NotificationService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "UpdateIntegration",
 			Handler:    _NotificationService_UpdateIntegration_Handler,
+		},
+		{
+			MethodName: "GetIntegrationConfig",
+			Handler:    _NotificationService_GetIntegrationConfig_Handler,
 		},
 		{
 			MethodName: "SendTestSms",
