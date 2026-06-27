@@ -21,6 +21,7 @@ service CustomerService {
   // verified phone) so the bot can show their orders and push notifications.
   rpc LinkTelegram(LinkTelegramRequest) returns (TelegramLink);
   rpc GetTelegramLink(GetTelegramLinkRequest) returns (TelegramLink);
+  rpc GetTelegramLinkByPhone(GetTelegramLinkByPhoneRequest) returns (TelegramLink);
   rpc ListCustomersByTelegram(ListCustomersByTelegramRequest) returns (ListCustomersResponse);
 
   // Car reference catalog (global, admin-managed). Read by any role to populate dropdowns.
@@ -100,6 +101,9 @@ message LinkTelegramRequest {
 }
 message GetTelegramLinkRequest {
   string chat_id = 1;
+}
+message GetTelegramLinkByPhoneRequest {
+  string phone = 1;
 }
 message ListCustomersByTelegramRequest {
   string chat_id = 1;

@@ -43,6 +43,12 @@ service WorkOrderService {
   rpc CreateServiceReminder(CreateServiceReminderRequest) returns (ServiceReminder);
   rpc SetServiceReminderState(SetServiceReminderStateRequest) returns (ServiceReminder);
 
+  // Cross-shop due-queries + dedup, used by the notification scheduler to push reminders.
+  rpc ListDueReminders(ListDueRemindersRequest) returns (ListServiceRemindersResponse);
+  rpc MarkReminderNotified(MarkNotifiedRequest) returns (MarkNotifiedResponse);
+  rpc ListDueAppointments(ListDueAppointmentsRequest) returns (ListAppointmentsResponse);
+  rpc MarkAppointmentReminded(MarkNotifiedRequest) returns (MarkNotifiedResponse);
+
   // Shop overhead expenses + profit-and-loss.
   rpc ListShopExpenses(ListShopExpensesRequest) returns (ListShopExpensesResponse);
   rpc CreateShopExpense(CreateShopExpenseRequest) returns (ShopExpense);
@@ -227,6 +233,19 @@ message CreateServiceReminderRequest {
 message SetServiceReminderStateRequest {
   string id = 1;
   ServiceReminderState state = 2;
+}
+message ListDueRemindersRequest {
+  string now = 1; // RFC3339; pending reminders with due_date <= now and not yet notified
+}
+message ListDueAppointmentsRequest {
+  string from = 1; // RFC3339; scheduled appointments within [from, to] not yet reminded
+  string to = 2;
+}
+message MarkNotifiedRequest {
+  string id = 1;
+}
+message MarkNotifiedResponse {
+  bool ok = 1;
 }
 
 // AuditEntry records one change to a work order.

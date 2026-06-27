@@ -29,6 +29,7 @@ const (
 	CustomerService_ListCustomers_FullMethodName           = "/avtoms.customer.v1.CustomerService/ListCustomers"
 	CustomerService_LinkTelegram_FullMethodName            = "/avtoms.customer.v1.CustomerService/LinkTelegram"
 	CustomerService_GetTelegramLink_FullMethodName         = "/avtoms.customer.v1.CustomerService/GetTelegramLink"
+	CustomerService_GetTelegramLinkByPhone_FullMethodName  = "/avtoms.customer.v1.CustomerService/GetTelegramLinkByPhone"
 	CustomerService_ListCustomersByTelegram_FullMethodName = "/avtoms.customer.v1.CustomerService/ListCustomersByTelegram"
 	CustomerService_ListCarMakes_FullMethodName            = "/avtoms.customer.v1.CustomerService/ListCarMakes"
 	CustomerService_CreateCarMake_FullMethodName           = "/avtoms.customer.v1.CustomerService/CreateCarMake"
@@ -54,6 +55,7 @@ type CustomerServiceClient interface {
 	// verified phone) so the bot can show their orders and push notifications.
 	LinkTelegram(ctx context.Context, in *LinkTelegramRequest, opts ...grpc.CallOption) (*TelegramLink, error)
 	GetTelegramLink(ctx context.Context, in *GetTelegramLinkRequest, opts ...grpc.CallOption) (*TelegramLink, error)
+	GetTelegramLinkByPhone(ctx context.Context, in *GetTelegramLinkByPhoneRequest, opts ...grpc.CallOption) (*TelegramLink, error)
 	ListCustomersByTelegram(ctx context.Context, in *ListCustomersByTelegramRequest, opts ...grpc.CallOption) (*ListCustomersResponse, error)
 	// Car reference catalog (global, admin-managed). Read by any role to populate dropdowns.
 	ListCarMakes(ctx context.Context, in *ListCarMakesRequest, opts ...grpc.CallOption) (*ListCarMakesResponse, error)
@@ -170,6 +172,16 @@ func (c *customerServiceClient) GetTelegramLink(ctx context.Context, in *GetTele
 	return out, nil
 }
 
+func (c *customerServiceClient) GetTelegramLinkByPhone(ctx context.Context, in *GetTelegramLinkByPhoneRequest, opts ...grpc.CallOption) (*TelegramLink, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(TelegramLink)
+	err := c.cc.Invoke(ctx, CustomerService_GetTelegramLinkByPhone_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *customerServiceClient) ListCustomersByTelegram(ctx context.Context, in *ListCustomersByTelegramRequest, opts ...grpc.CallOption) (*ListCustomersResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(ListCustomersResponse)
@@ -238,6 +250,7 @@ type CustomerServiceServer interface {
 	// verified phone) so the bot can show their orders and push notifications.
 	LinkTelegram(context.Context, *LinkTelegramRequest) (*TelegramLink, error)
 	GetTelegramLink(context.Context, *GetTelegramLinkRequest) (*TelegramLink, error)
+	GetTelegramLinkByPhone(context.Context, *GetTelegramLinkByPhoneRequest) (*TelegramLink, error)
 	ListCustomersByTelegram(context.Context, *ListCustomersByTelegramRequest) (*ListCustomersResponse, error)
 	// Car reference catalog (global, admin-managed). Read by any role to populate dropdowns.
 	ListCarMakes(context.Context, *ListCarMakesRequest) (*ListCarMakesResponse, error)
@@ -283,6 +296,9 @@ func (UnimplementedCustomerServiceServer) LinkTelegram(context.Context, *LinkTel
 }
 func (UnimplementedCustomerServiceServer) GetTelegramLink(context.Context, *GetTelegramLinkRequest) (*TelegramLink, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetTelegramLink not implemented")
+}
+func (UnimplementedCustomerServiceServer) GetTelegramLinkByPhone(context.Context, *GetTelegramLinkByPhoneRequest) (*TelegramLink, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetTelegramLinkByPhone not implemented")
 }
 func (UnimplementedCustomerServiceServer) ListCustomersByTelegram(context.Context, *ListCustomersByTelegramRequest) (*ListCustomersResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method ListCustomersByTelegram not implemented")
@@ -500,6 +516,24 @@ func _CustomerService_GetTelegramLink_Handler(srv interface{}, ctx context.Conte
 	return interceptor(ctx, in, info, handler)
 }
 
+func _CustomerService_GetTelegramLinkByPhone_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetTelegramLinkByPhoneRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CustomerServiceServer).GetTelegramLinkByPhone(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CustomerService_GetTelegramLinkByPhone_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CustomerServiceServer).GetTelegramLinkByPhone(ctx, req.(*GetTelegramLinkByPhoneRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _CustomerService_ListCustomersByTelegram_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ListCustomersByTelegramRequest)
 	if err := dec(in); err != nil {
@@ -636,6 +670,10 @@ var CustomerService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetTelegramLink",
 			Handler:    _CustomerService_GetTelegramLink_Handler,
+		},
+		{
+			MethodName: "GetTelegramLinkByPhone",
+			Handler:    _CustomerService_GetTelegramLinkByPhone_Handler,
 		},
 		{
 			MethodName: "ListCustomersByTelegram",

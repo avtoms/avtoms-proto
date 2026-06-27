@@ -42,6 +42,10 @@ const (
 	WorkOrderService_ListServiceReminders_FullMethodName    = "/avtoms.workorder.v1.WorkOrderService/ListServiceReminders"
 	WorkOrderService_CreateServiceReminder_FullMethodName   = "/avtoms.workorder.v1.WorkOrderService/CreateServiceReminder"
 	WorkOrderService_SetServiceReminderState_FullMethodName = "/avtoms.workorder.v1.WorkOrderService/SetServiceReminderState"
+	WorkOrderService_ListDueReminders_FullMethodName        = "/avtoms.workorder.v1.WorkOrderService/ListDueReminders"
+	WorkOrderService_MarkReminderNotified_FullMethodName    = "/avtoms.workorder.v1.WorkOrderService/MarkReminderNotified"
+	WorkOrderService_ListDueAppointments_FullMethodName     = "/avtoms.workorder.v1.WorkOrderService/ListDueAppointments"
+	WorkOrderService_MarkAppointmentReminded_FullMethodName = "/avtoms.workorder.v1.WorkOrderService/MarkAppointmentReminded"
 	WorkOrderService_ListShopExpenses_FullMethodName        = "/avtoms.workorder.v1.WorkOrderService/ListShopExpenses"
 	WorkOrderService_CreateShopExpense_FullMethodName       = "/avtoms.workorder.v1.WorkOrderService/CreateShopExpense"
 	WorkOrderService_DeleteShopExpense_FullMethodName       = "/avtoms.workorder.v1.WorkOrderService/DeleteShopExpense"
@@ -88,6 +92,11 @@ type WorkOrderServiceClient interface {
 	ListServiceReminders(ctx context.Context, in *ListServiceRemindersRequest, opts ...grpc.CallOption) (*ListServiceRemindersResponse, error)
 	CreateServiceReminder(ctx context.Context, in *CreateServiceReminderRequest, opts ...grpc.CallOption) (*ServiceReminder, error)
 	SetServiceReminderState(ctx context.Context, in *SetServiceReminderStateRequest, opts ...grpc.CallOption) (*ServiceReminder, error)
+	// Cross-shop due-queries + dedup, used by the notification scheduler to push reminders.
+	ListDueReminders(ctx context.Context, in *ListDueRemindersRequest, opts ...grpc.CallOption) (*ListServiceRemindersResponse, error)
+	MarkReminderNotified(ctx context.Context, in *MarkNotifiedRequest, opts ...grpc.CallOption) (*MarkNotifiedResponse, error)
+	ListDueAppointments(ctx context.Context, in *ListDueAppointmentsRequest, opts ...grpc.CallOption) (*ListAppointmentsResponse, error)
+	MarkAppointmentReminded(ctx context.Context, in *MarkNotifiedRequest, opts ...grpc.CallOption) (*MarkNotifiedResponse, error)
 	// Shop overhead expenses + profit-and-loss.
 	ListShopExpenses(ctx context.Context, in *ListShopExpensesRequest, opts ...grpc.CallOption) (*ListShopExpensesResponse, error)
 	CreateShopExpense(ctx context.Context, in *CreateShopExpenseRequest, opts ...grpc.CallOption) (*ShopExpense, error)
@@ -341,6 +350,46 @@ func (c *workOrderServiceClient) SetServiceReminderState(ctx context.Context, in
 	return out, nil
 }
 
+func (c *workOrderServiceClient) ListDueReminders(ctx context.Context, in *ListDueRemindersRequest, opts ...grpc.CallOption) (*ListServiceRemindersResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListServiceRemindersResponse)
+	err := c.cc.Invoke(ctx, WorkOrderService_ListDueReminders_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *workOrderServiceClient) MarkReminderNotified(ctx context.Context, in *MarkNotifiedRequest, opts ...grpc.CallOption) (*MarkNotifiedResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(MarkNotifiedResponse)
+	err := c.cc.Invoke(ctx, WorkOrderService_MarkReminderNotified_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *workOrderServiceClient) ListDueAppointments(ctx context.Context, in *ListDueAppointmentsRequest, opts ...grpc.CallOption) (*ListAppointmentsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListAppointmentsResponse)
+	err := c.cc.Invoke(ctx, WorkOrderService_ListDueAppointments_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *workOrderServiceClient) MarkAppointmentReminded(ctx context.Context, in *MarkNotifiedRequest, opts ...grpc.CallOption) (*MarkNotifiedResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(MarkNotifiedResponse)
+	err := c.cc.Invoke(ctx, WorkOrderService_MarkAppointmentReminded_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *workOrderServiceClient) ListShopExpenses(ctx context.Context, in *ListShopExpensesRequest, opts ...grpc.CallOption) (*ListShopExpensesResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(ListShopExpensesResponse)
@@ -475,6 +524,11 @@ type WorkOrderServiceServer interface {
 	ListServiceReminders(context.Context, *ListServiceRemindersRequest) (*ListServiceRemindersResponse, error)
 	CreateServiceReminder(context.Context, *CreateServiceReminderRequest) (*ServiceReminder, error)
 	SetServiceReminderState(context.Context, *SetServiceReminderStateRequest) (*ServiceReminder, error)
+	// Cross-shop due-queries + dedup, used by the notification scheduler to push reminders.
+	ListDueReminders(context.Context, *ListDueRemindersRequest) (*ListServiceRemindersResponse, error)
+	MarkReminderNotified(context.Context, *MarkNotifiedRequest) (*MarkNotifiedResponse, error)
+	ListDueAppointments(context.Context, *ListDueAppointmentsRequest) (*ListAppointmentsResponse, error)
+	MarkAppointmentReminded(context.Context, *MarkNotifiedRequest) (*MarkNotifiedResponse, error)
 	// Shop overhead expenses + profit-and-loss.
 	ListShopExpenses(context.Context, *ListShopExpensesRequest) (*ListShopExpensesResponse, error)
 	CreateShopExpense(context.Context, *CreateShopExpenseRequest) (*ShopExpense, error)
@@ -566,6 +620,18 @@ func (UnimplementedWorkOrderServiceServer) CreateServiceReminder(context.Context
 }
 func (UnimplementedWorkOrderServiceServer) SetServiceReminderState(context.Context, *SetServiceReminderStateRequest) (*ServiceReminder, error) {
 	return nil, status.Error(codes.Unimplemented, "method SetServiceReminderState not implemented")
+}
+func (UnimplementedWorkOrderServiceServer) ListDueReminders(context.Context, *ListDueRemindersRequest) (*ListServiceRemindersResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListDueReminders not implemented")
+}
+func (UnimplementedWorkOrderServiceServer) MarkReminderNotified(context.Context, *MarkNotifiedRequest) (*MarkNotifiedResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method MarkReminderNotified not implemented")
+}
+func (UnimplementedWorkOrderServiceServer) ListDueAppointments(context.Context, *ListDueAppointmentsRequest) (*ListAppointmentsResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListDueAppointments not implemented")
+}
+func (UnimplementedWorkOrderServiceServer) MarkAppointmentReminded(context.Context, *MarkNotifiedRequest) (*MarkNotifiedResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method MarkAppointmentReminded not implemented")
 }
 func (UnimplementedWorkOrderServiceServer) ListShopExpenses(context.Context, *ListShopExpensesRequest) (*ListShopExpensesResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method ListShopExpenses not implemented")
@@ -1032,6 +1098,78 @@ func _WorkOrderService_SetServiceReminderState_Handler(srv interface{}, ctx cont
 	return interceptor(ctx, in, info, handler)
 }
 
+func _WorkOrderService_ListDueReminders_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListDueRemindersRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WorkOrderServiceServer).ListDueReminders(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: WorkOrderService_ListDueReminders_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WorkOrderServiceServer).ListDueReminders(ctx, req.(*ListDueRemindersRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _WorkOrderService_MarkReminderNotified_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MarkNotifiedRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WorkOrderServiceServer).MarkReminderNotified(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: WorkOrderService_MarkReminderNotified_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WorkOrderServiceServer).MarkReminderNotified(ctx, req.(*MarkNotifiedRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _WorkOrderService_ListDueAppointments_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListDueAppointmentsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WorkOrderServiceServer).ListDueAppointments(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: WorkOrderService_ListDueAppointments_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WorkOrderServiceServer).ListDueAppointments(ctx, req.(*ListDueAppointmentsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _WorkOrderService_MarkAppointmentReminded_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MarkNotifiedRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WorkOrderServiceServer).MarkAppointmentReminded(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: WorkOrderService_MarkAppointmentReminded_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WorkOrderServiceServer).MarkAppointmentReminded(ctx, req.(*MarkNotifiedRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _WorkOrderService_ListShopExpenses_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ListShopExpensesRequest)
 	if err := dec(in); err != nil {
@@ -1310,6 +1448,22 @@ var WorkOrderService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "SetServiceReminderState",
 			Handler:    _WorkOrderService_SetServiceReminderState_Handler,
+		},
+		{
+			MethodName: "ListDueReminders",
+			Handler:    _WorkOrderService_ListDueReminders_Handler,
+		},
+		{
+			MethodName: "MarkReminderNotified",
+			Handler:    _WorkOrderService_MarkReminderNotified_Handler,
+		},
+		{
+			MethodName: "ListDueAppointments",
+			Handler:    _WorkOrderService_ListDueAppointments_Handler,
+		},
+		{
+			MethodName: "MarkAppointmentReminded",
+			Handler:    _WorkOrderService_MarkAppointmentReminded_Handler,
 		},
 		{
 			MethodName: "ListShopExpenses",
