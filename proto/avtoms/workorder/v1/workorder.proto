@@ -415,6 +415,9 @@ message WorkOrder {
   int64 total_cost = 17;
   // Gross margin before VAT, in tiyin: subtotal - total_cost.
   int64 total_margin = 18;
+  // Human-friendly per-shop sequential order number (1, 2, 3, …). Shown to users as
+  // "Z-0001"; the UUID id stays the internal/API identifier.
+  int64 order_no = 19;
 }
 
 message TimeEntry {

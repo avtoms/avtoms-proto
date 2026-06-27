@@ -3276,7 +3276,10 @@ type WorkOrder struct {
 	// Sum of cost*quantity across line items, in tiyin: the shop's total expense on this order.
 	TotalCost int64 `protobuf:"varint,17,opt,name=total_cost,json=totalCost,proto3" json:"total_cost,omitempty"`
 	// Gross margin before VAT, in tiyin: subtotal - total_cost.
-	TotalMargin   int64 `protobuf:"varint,18,opt,name=total_margin,json=totalMargin,proto3" json:"total_margin,omitempty"`
+	TotalMargin int64 `protobuf:"varint,18,opt,name=total_margin,json=totalMargin,proto3" json:"total_margin,omitempty"`
+	// Human-friendly per-shop sequential order number (1, 2, 3, …). Shown to users as
+	// "Z-0001"; the UUID id stays the internal/API identifier.
+	OrderNo       int64 `protobuf:"varint,19,opt,name=order_no,json=orderNo,proto3" json:"order_no,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -3433,6 +3436,13 @@ func (x *WorkOrder) GetTotalCost() int64 {
 func (x *WorkOrder) GetTotalMargin() int64 {
 	if x != nil {
 		return x.TotalMargin
+	}
+	return 0
+}
+
+func (x *WorkOrder) GetOrderNo() int64 {
+	if x != nil {
+		return x.OrderNo
 	}
 	return 0
 }
@@ -4589,7 +4599,7 @@ const file_avtoms_workorder_v1_workorder_proto_rawDesc = "" +
 	"\x04cost\x18\x06 \x01(\x03R\x04cost\x12 \n" +
 	"\fmenu_item_id\x18\a \x01(\tR\n" +
 	"menuItemId\x12#\n" +
-	"\rdefault_price\x18\b \x01(\x03R\fdefaultPrice\"\xd5\x04\n" +
+	"\rdefault_price\x18\b \x01(\x03R\fdefaultPrice\"\xf0\x04\n" +
 	"\tWorkOrder\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x17\n" +
 	"\ashop_id\x18\x02 \x01(\tR\x06shopId\x12\x1d\n" +
@@ -4613,7 +4623,8 @@ const file_avtoms_workorder_v1_workorder_proto_rawDesc = "" +
 	"\rcustomer_name\x18\x10 \x01(\tR\fcustomerName\x12\x1d\n" +
 	"\n" +
 	"total_cost\x18\x11 \x01(\x03R\ttotalCost\x12!\n" +
-	"\ftotal_margin\x18\x12 \x01(\x03R\vtotalMargin\"\x9e\x01\n" +
+	"\ftotal_margin\x18\x12 \x01(\x03R\vtotalMargin\x12\x19\n" +
+	"\border_no\x18\x13 \x01(\x03R\aorderNo\"\x9e\x01\n" +
 	"\tTimeEntry\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\"\n" +
 	"\rwork_order_id\x18\x02 \x01(\tR\vworkOrderId\x12\x1f\n" +
