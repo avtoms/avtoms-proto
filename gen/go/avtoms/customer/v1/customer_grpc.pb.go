@@ -21,8 +21,11 @@ const _ = grpc.SupportPackageIsVersion9
 const (
 	CustomerService_CreateCustomer_FullMethodName          = "/avtoms.customer.v1.CustomerService/CreateCustomer"
 	CustomerService_GetCustomer_FullMethodName             = "/avtoms.customer.v1.CustomerService/GetCustomer"
+	CustomerService_UpdateCustomer_FullMethodName          = "/avtoms.customer.v1.CustomerService/UpdateCustomer"
 	CustomerService_CreateVehicle_FullMethodName           = "/avtoms.customer.v1.CustomerService/CreateVehicle"
 	CustomerService_GetVehicle_FullMethodName              = "/avtoms.customer.v1.CustomerService/GetVehicle"
+	CustomerService_UpdateVehicle_FullMethodName           = "/avtoms.customer.v1.CustomerService/UpdateVehicle"
+	CustomerService_DeleteVehicle_FullMethodName           = "/avtoms.customer.v1.CustomerService/DeleteVehicle"
 	CustomerService_ListVehicles_FullMethodName            = "/avtoms.customer.v1.CustomerService/ListVehicles"
 	CustomerService_SearchByPlate_FullMethodName           = "/avtoms.customer.v1.CustomerService/SearchByPlate"
 	CustomerService_SoftDeleteCustomer_FullMethodName      = "/avtoms.customer.v1.CustomerService/SoftDeleteCustomer"
@@ -45,8 +48,11 @@ const (
 type CustomerServiceClient interface {
 	CreateCustomer(ctx context.Context, in *CreateCustomerRequest, opts ...grpc.CallOption) (*Customer, error)
 	GetCustomer(ctx context.Context, in *GetCustomerRequest, opts ...grpc.CallOption) (*Customer, error)
+	UpdateCustomer(ctx context.Context, in *UpdateCustomerRequest, opts ...grpc.CallOption) (*Customer, error)
 	CreateVehicle(ctx context.Context, in *CreateVehicleRequest, opts ...grpc.CallOption) (*Vehicle, error)
 	GetVehicle(ctx context.Context, in *GetVehicleRequest, opts ...grpc.CallOption) (*Vehicle, error)
+	UpdateVehicle(ctx context.Context, in *UpdateVehicleRequest, opts ...grpc.CallOption) (*Vehicle, error)
+	DeleteVehicle(ctx context.Context, in *DeleteVehicleRequest, opts ...grpc.CallOption) (*Vehicle, error)
 	ListVehicles(ctx context.Context, in *ListVehiclesRequest, opts ...grpc.CallOption) (*ListVehiclesResponse, error)
 	SearchByPlate(ctx context.Context, in *SearchByPlateRequest, opts ...grpc.CallOption) (*SearchByPlateResponse, error)
 	SoftDeleteCustomer(ctx context.Context, in *SoftDeleteCustomerRequest, opts ...grpc.CallOption) (*Customer, error)
@@ -92,6 +98,16 @@ func (c *customerServiceClient) GetCustomer(ctx context.Context, in *GetCustomer
 	return out, nil
 }
 
+func (c *customerServiceClient) UpdateCustomer(ctx context.Context, in *UpdateCustomerRequest, opts ...grpc.CallOption) (*Customer, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Customer)
+	err := c.cc.Invoke(ctx, CustomerService_UpdateCustomer_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *customerServiceClient) CreateVehicle(ctx context.Context, in *CreateVehicleRequest, opts ...grpc.CallOption) (*Vehicle, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(Vehicle)
@@ -106,6 +122,26 @@ func (c *customerServiceClient) GetVehicle(ctx context.Context, in *GetVehicleRe
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(Vehicle)
 	err := c.cc.Invoke(ctx, CustomerService_GetVehicle_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *customerServiceClient) UpdateVehicle(ctx context.Context, in *UpdateVehicleRequest, opts ...grpc.CallOption) (*Vehicle, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Vehicle)
+	err := c.cc.Invoke(ctx, CustomerService_UpdateVehicle_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *customerServiceClient) DeleteVehicle(ctx context.Context, in *DeleteVehicleRequest, opts ...grpc.CallOption) (*Vehicle, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Vehicle)
+	err := c.cc.Invoke(ctx, CustomerService_DeleteVehicle_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -240,8 +276,11 @@ func (c *customerServiceClient) CreateCarModel(ctx context.Context, in *CreateCa
 type CustomerServiceServer interface {
 	CreateCustomer(context.Context, *CreateCustomerRequest) (*Customer, error)
 	GetCustomer(context.Context, *GetCustomerRequest) (*Customer, error)
+	UpdateCustomer(context.Context, *UpdateCustomerRequest) (*Customer, error)
 	CreateVehicle(context.Context, *CreateVehicleRequest) (*Vehicle, error)
 	GetVehicle(context.Context, *GetVehicleRequest) (*Vehicle, error)
+	UpdateVehicle(context.Context, *UpdateVehicleRequest) (*Vehicle, error)
+	DeleteVehicle(context.Context, *DeleteVehicleRequest) (*Vehicle, error)
 	ListVehicles(context.Context, *ListVehiclesRequest) (*ListVehiclesResponse, error)
 	SearchByPlate(context.Context, *SearchByPlateRequest) (*SearchByPlateResponse, error)
 	SoftDeleteCustomer(context.Context, *SoftDeleteCustomerRequest) (*Customer, error)
@@ -273,11 +312,20 @@ func (UnimplementedCustomerServiceServer) CreateCustomer(context.Context, *Creat
 func (UnimplementedCustomerServiceServer) GetCustomer(context.Context, *GetCustomerRequest) (*Customer, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetCustomer not implemented")
 }
+func (UnimplementedCustomerServiceServer) UpdateCustomer(context.Context, *UpdateCustomerRequest) (*Customer, error) {
+	return nil, status.Error(codes.Unimplemented, "method UpdateCustomer not implemented")
+}
 func (UnimplementedCustomerServiceServer) CreateVehicle(context.Context, *CreateVehicleRequest) (*Vehicle, error) {
 	return nil, status.Error(codes.Unimplemented, "method CreateVehicle not implemented")
 }
 func (UnimplementedCustomerServiceServer) GetVehicle(context.Context, *GetVehicleRequest) (*Vehicle, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetVehicle not implemented")
+}
+func (UnimplementedCustomerServiceServer) UpdateVehicle(context.Context, *UpdateVehicleRequest) (*Vehicle, error) {
+	return nil, status.Error(codes.Unimplemented, "method UpdateVehicle not implemented")
+}
+func (UnimplementedCustomerServiceServer) DeleteVehicle(context.Context, *DeleteVehicleRequest) (*Vehicle, error) {
+	return nil, status.Error(codes.Unimplemented, "method DeleteVehicle not implemented")
 }
 func (UnimplementedCustomerServiceServer) ListVehicles(context.Context, *ListVehiclesRequest) (*ListVehiclesResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method ListVehicles not implemented")
@@ -372,6 +420,24 @@ func _CustomerService_GetCustomer_Handler(srv interface{}, ctx context.Context, 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _CustomerService_UpdateCustomer_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateCustomerRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CustomerServiceServer).UpdateCustomer(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CustomerService_UpdateCustomer_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CustomerServiceServer).UpdateCustomer(ctx, req.(*UpdateCustomerRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _CustomerService_CreateVehicle_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(CreateVehicleRequest)
 	if err := dec(in); err != nil {
@@ -404,6 +470,42 @@ func _CustomerService_GetVehicle_Handler(srv interface{}, ctx context.Context, d
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(CustomerServiceServer).GetVehicle(ctx, req.(*GetVehicleRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _CustomerService_UpdateVehicle_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateVehicleRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CustomerServiceServer).UpdateVehicle(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CustomerService_UpdateVehicle_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CustomerServiceServer).UpdateVehicle(ctx, req.(*UpdateVehicleRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _CustomerService_DeleteVehicle_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteVehicleRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CustomerServiceServer).DeleteVehicle(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CustomerService_DeleteVehicle_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CustomerServiceServer).DeleteVehicle(ctx, req.(*DeleteVehicleRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -640,12 +742,24 @@ var CustomerService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _CustomerService_GetCustomer_Handler,
 		},
 		{
+			MethodName: "UpdateCustomer",
+			Handler:    _CustomerService_UpdateCustomer_Handler,
+		},
+		{
 			MethodName: "CreateVehicle",
 			Handler:    _CustomerService_CreateVehicle_Handler,
 		},
 		{
 			MethodName: "GetVehicle",
 			Handler:    _CustomerService_GetVehicle_Handler,
+		},
+		{
+			MethodName: "UpdateVehicle",
+			Handler:    _CustomerService_UpdateVehicle_Handler,
+		},
+		{
+			MethodName: "DeleteVehicle",
+			Handler:    _CustomerService_DeleteVehicle_Handler,
 		},
 		{
 			MethodName: "ListVehicles",

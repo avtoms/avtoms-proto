@@ -597,6 +597,10 @@ type Customer struct {
 	Deleted        bool                   `protobuf:"varint,8,opt,name=deleted,proto3" json:"deleted,omitempty"`
 	CreatedAt      string                 `protobuf:"bytes,9,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
 	TelegramChatId string                 `protobuf:"bytes,10,opt,name=telegram_chat_id,json=telegramChatId,proto3" json:"telegram_chat_id,omitempty"` // linked Telegram chat (numeric id), empty until linked
+	Notes          string                 `protobuf:"bytes,11,opt,name=notes,proto3" json:"notes,omitempty"`
+	Email          string                 `protobuf:"bytes,12,opt,name=email,proto3" json:"email,omitempty"`
+	Address        string                 `protobuf:"bytes,13,opt,name=address,proto3" json:"address,omitempty"`
+	Birthday       string                 `protobuf:"bytes,14,opt,name=birthday,proto3" json:"birthday,omitempty"` // YYYY-MM-DD (optional)
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
 }
@@ -697,6 +701,34 @@ func (x *Customer) GetCreatedAt() string {
 func (x *Customer) GetTelegramChatId() string {
 	if x != nil {
 		return x.TelegramChatId
+	}
+	return ""
+}
+
+func (x *Customer) GetNotes() string {
+	if x != nil {
+		return x.Notes
+	}
+	return ""
+}
+
+func (x *Customer) GetEmail() string {
+	if x != nil {
+		return x.Email
+	}
+	return ""
+}
+
+func (x *Customer) GetAddress() string {
+	if x != nil {
+		return x.Address
+	}
+	return ""
+}
+
+func (x *Customer) GetBirthday() string {
+	if x != nil {
+		return x.Birthday
 	}
 	return ""
 }
@@ -974,6 +1006,10 @@ type Vehicle struct {
 	Mileage       int64                  `protobuf:"varint,8,opt,name=mileage,proto3" json:"mileage,omitempty"`
 	Deleted       bool                   `protobuf:"varint,9,opt,name=deleted,proto3" json:"deleted,omitempty"`
 	PlateType     PlateType              `protobuf:"varint,10,opt,name=plate_type,json=plateType,proto3,enum=avtoms.customer.v1.PlateType" json:"plate_type,omitempty"`
+	Color         string                 `protobuf:"bytes,11,opt,name=color,proto3" json:"color,omitempty"`
+	Engine        string                 `protobuf:"bytes,12,opt,name=engine,proto3" json:"engine,omitempty"`
+	Transmission  string                 `protobuf:"bytes,13,opt,name=transmission,proto3" json:"transmission,omitempty"`
+	Notes         string                 `protobuf:"bytes,14,opt,name=notes,proto3" json:"notes,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1076,6 +1112,34 @@ func (x *Vehicle) GetPlateType() PlateType {
 		return x.PlateType
 	}
 	return PlateType_PLATE_TYPE_UNSPECIFIED
+}
+
+func (x *Vehicle) GetColor() string {
+	if x != nil {
+		return x.Color
+	}
+	return ""
+}
+
+func (x *Vehicle) GetEngine() string {
+	if x != nil {
+		return x.Engine
+	}
+	return ""
+}
+
+func (x *Vehicle) GetTransmission() string {
+	if x != nil {
+		return x.Transmission
+	}
+	return ""
+}
+
+func (x *Vehicle) GetNotes() string {
+	if x != nil {
+		return x.Notes
+	}
+	return ""
 }
 
 type CreateCustomerRequest struct {
@@ -1206,6 +1270,114 @@ func (x *GetCustomerRequest) GetId() string {
 	return ""
 }
 
+type UpdateCustomerRequest struct {
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	Id             string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Name           string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	Phone          string                 `protobuf:"bytes,3,opt,name=phone,proto3" json:"phone,omitempty"`
+	Language       v1.Language            `protobuf:"varint,4,opt,name=language,proto3,enum=avtoms.common.v1.Language" json:"language,omitempty"`
+	TelegramHandle string                 `protobuf:"bytes,5,opt,name=telegram_handle,json=telegramHandle,proto3" json:"telegram_handle,omitempty"`
+	Notes          string                 `protobuf:"bytes,6,opt,name=notes,proto3" json:"notes,omitempty"`
+	Email          string                 `protobuf:"bytes,7,opt,name=email,proto3" json:"email,omitempty"`
+	Address        string                 `protobuf:"bytes,8,opt,name=address,proto3" json:"address,omitempty"`
+	Birthday       string                 `protobuf:"bytes,9,opt,name=birthday,proto3" json:"birthday,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
+}
+
+func (x *UpdateCustomerRequest) Reset() {
+	*x = UpdateCustomerRequest{}
+	mi := &file_avtoms_customer_v1_customer_proto_msgTypes[19]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateCustomerRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateCustomerRequest) ProtoMessage() {}
+
+func (x *UpdateCustomerRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_avtoms_customer_v1_customer_proto_msgTypes[19]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateCustomerRequest.ProtoReflect.Descriptor instead.
+func (*UpdateCustomerRequest) Descriptor() ([]byte, []int) {
+	return file_avtoms_customer_v1_customer_proto_rawDescGZIP(), []int{19}
+}
+
+func (x *UpdateCustomerRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *UpdateCustomerRequest) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *UpdateCustomerRequest) GetPhone() string {
+	if x != nil {
+		return x.Phone
+	}
+	return ""
+}
+
+func (x *UpdateCustomerRequest) GetLanguage() v1.Language {
+	if x != nil {
+		return x.Language
+	}
+	return v1.Language(0)
+}
+
+func (x *UpdateCustomerRequest) GetTelegramHandle() string {
+	if x != nil {
+		return x.TelegramHandle
+	}
+	return ""
+}
+
+func (x *UpdateCustomerRequest) GetNotes() string {
+	if x != nil {
+		return x.Notes
+	}
+	return ""
+}
+
+func (x *UpdateCustomerRequest) GetEmail() string {
+	if x != nil {
+		return x.Email
+	}
+	return ""
+}
+
+func (x *UpdateCustomerRequest) GetAddress() string {
+	if x != nil {
+		return x.Address
+	}
+	return ""
+}
+
+func (x *UpdateCustomerRequest) GetBirthday() string {
+	if x != nil {
+		return x.Birthday
+	}
+	return ""
+}
+
 type CreateVehicleRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	CustomerId    string                 `protobuf:"bytes,1,opt,name=customer_id,json=customerId,proto3" json:"customer_id,omitempty"`
@@ -1222,7 +1394,7 @@ type CreateVehicleRequest struct {
 
 func (x *CreateVehicleRequest) Reset() {
 	*x = CreateVehicleRequest{}
-	mi := &file_avtoms_customer_v1_customer_proto_msgTypes[19]
+	mi := &file_avtoms_customer_v1_customer_proto_msgTypes[20]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1234,7 +1406,7 @@ func (x *CreateVehicleRequest) String() string {
 func (*CreateVehicleRequest) ProtoMessage() {}
 
 func (x *CreateVehicleRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_customer_v1_customer_proto_msgTypes[19]
+	mi := &file_avtoms_customer_v1_customer_proto_msgTypes[20]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1247,7 +1419,7 @@ func (x *CreateVehicleRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateVehicleRequest.ProtoReflect.Descriptor instead.
 func (*CreateVehicleRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_customer_v1_customer_proto_rawDescGZIP(), []int{19}
+	return file_avtoms_customer_v1_customer_proto_rawDescGZIP(), []int{20}
 }
 
 func (x *CreateVehicleRequest) GetCustomerId() string {
@@ -1315,7 +1487,7 @@ type GetVehicleRequest struct {
 
 func (x *GetVehicleRequest) Reset() {
 	*x = GetVehicleRequest{}
-	mi := &file_avtoms_customer_v1_customer_proto_msgTypes[20]
+	mi := &file_avtoms_customer_v1_customer_proto_msgTypes[21]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1327,7 +1499,7 @@ func (x *GetVehicleRequest) String() string {
 func (*GetVehicleRequest) ProtoMessage() {}
 
 func (x *GetVehicleRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_customer_v1_customer_proto_msgTypes[20]
+	mi := &file_avtoms_customer_v1_customer_proto_msgTypes[21]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1340,10 +1512,186 @@ func (x *GetVehicleRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetVehicleRequest.ProtoReflect.Descriptor instead.
 func (*GetVehicleRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_customer_v1_customer_proto_rawDescGZIP(), []int{20}
+	return file_avtoms_customer_v1_customer_proto_rawDescGZIP(), []int{21}
 }
 
 func (x *GetVehicleRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+type UpdateVehicleRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Plate         string                 `protobuf:"bytes,2,opt,name=plate,proto3" json:"plate,omitempty"`
+	Vin           string                 `protobuf:"bytes,3,opt,name=vin,proto3" json:"vin,omitempty"`
+	Make          string                 `protobuf:"bytes,4,opt,name=make,proto3" json:"make,omitempty"`
+	Model         string                 `protobuf:"bytes,5,opt,name=model,proto3" json:"model,omitempty"`
+	Year          int32                  `protobuf:"varint,6,opt,name=year,proto3" json:"year,omitempty"`
+	Mileage       int64                  `protobuf:"varint,7,opt,name=mileage,proto3" json:"mileage,omitempty"`
+	PlateType     PlateType              `protobuf:"varint,8,opt,name=plate_type,json=plateType,proto3,enum=avtoms.customer.v1.PlateType" json:"plate_type,omitempty"`
+	Color         string                 `protobuf:"bytes,9,opt,name=color,proto3" json:"color,omitempty"`
+	Engine        string                 `protobuf:"bytes,10,opt,name=engine,proto3" json:"engine,omitempty"`
+	Transmission  string                 `protobuf:"bytes,11,opt,name=transmission,proto3" json:"transmission,omitempty"`
+	Notes         string                 `protobuf:"bytes,12,opt,name=notes,proto3" json:"notes,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdateVehicleRequest) Reset() {
+	*x = UpdateVehicleRequest{}
+	mi := &file_avtoms_customer_v1_customer_proto_msgTypes[22]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateVehicleRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateVehicleRequest) ProtoMessage() {}
+
+func (x *UpdateVehicleRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_avtoms_customer_v1_customer_proto_msgTypes[22]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateVehicleRequest.ProtoReflect.Descriptor instead.
+func (*UpdateVehicleRequest) Descriptor() ([]byte, []int) {
+	return file_avtoms_customer_v1_customer_proto_rawDescGZIP(), []int{22}
+}
+
+func (x *UpdateVehicleRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *UpdateVehicleRequest) GetPlate() string {
+	if x != nil {
+		return x.Plate
+	}
+	return ""
+}
+
+func (x *UpdateVehicleRequest) GetVin() string {
+	if x != nil {
+		return x.Vin
+	}
+	return ""
+}
+
+func (x *UpdateVehicleRequest) GetMake() string {
+	if x != nil {
+		return x.Make
+	}
+	return ""
+}
+
+func (x *UpdateVehicleRequest) GetModel() string {
+	if x != nil {
+		return x.Model
+	}
+	return ""
+}
+
+func (x *UpdateVehicleRequest) GetYear() int32 {
+	if x != nil {
+		return x.Year
+	}
+	return 0
+}
+
+func (x *UpdateVehicleRequest) GetMileage() int64 {
+	if x != nil {
+		return x.Mileage
+	}
+	return 0
+}
+
+func (x *UpdateVehicleRequest) GetPlateType() PlateType {
+	if x != nil {
+		return x.PlateType
+	}
+	return PlateType_PLATE_TYPE_UNSPECIFIED
+}
+
+func (x *UpdateVehicleRequest) GetColor() string {
+	if x != nil {
+		return x.Color
+	}
+	return ""
+}
+
+func (x *UpdateVehicleRequest) GetEngine() string {
+	if x != nil {
+		return x.Engine
+	}
+	return ""
+}
+
+func (x *UpdateVehicleRequest) GetTransmission() string {
+	if x != nil {
+		return x.Transmission
+	}
+	return ""
+}
+
+func (x *UpdateVehicleRequest) GetNotes() string {
+	if x != nil {
+		return x.Notes
+	}
+	return ""
+}
+
+type DeleteVehicleRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DeleteVehicleRequest) Reset() {
+	*x = DeleteVehicleRequest{}
+	mi := &file_avtoms_customer_v1_customer_proto_msgTypes[23]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeleteVehicleRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteVehicleRequest) ProtoMessage() {}
+
+func (x *DeleteVehicleRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_avtoms_customer_v1_customer_proto_msgTypes[23]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteVehicleRequest.ProtoReflect.Descriptor instead.
+func (*DeleteVehicleRequest) Descriptor() ([]byte, []int) {
+	return file_avtoms_customer_v1_customer_proto_rawDescGZIP(), []int{23}
+}
+
+func (x *DeleteVehicleRequest) GetId() string {
 	if x != nil {
 		return x.Id
 	}
@@ -1359,7 +1707,7 @@ type ListVehiclesRequest struct {
 
 func (x *ListVehiclesRequest) Reset() {
 	*x = ListVehiclesRequest{}
-	mi := &file_avtoms_customer_v1_customer_proto_msgTypes[21]
+	mi := &file_avtoms_customer_v1_customer_proto_msgTypes[24]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1371,7 +1719,7 @@ func (x *ListVehiclesRequest) String() string {
 func (*ListVehiclesRequest) ProtoMessage() {}
 
 func (x *ListVehiclesRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_customer_v1_customer_proto_msgTypes[21]
+	mi := &file_avtoms_customer_v1_customer_proto_msgTypes[24]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1384,7 +1732,7 @@ func (x *ListVehiclesRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListVehiclesRequest.ProtoReflect.Descriptor instead.
 func (*ListVehiclesRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_customer_v1_customer_proto_rawDescGZIP(), []int{21}
+	return file_avtoms_customer_v1_customer_proto_rawDescGZIP(), []int{24}
 }
 
 func (x *ListVehiclesRequest) GetCustomerId() string {
@@ -1403,7 +1751,7 @@ type ListVehiclesResponse struct {
 
 func (x *ListVehiclesResponse) Reset() {
 	*x = ListVehiclesResponse{}
-	mi := &file_avtoms_customer_v1_customer_proto_msgTypes[22]
+	mi := &file_avtoms_customer_v1_customer_proto_msgTypes[25]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1415,7 +1763,7 @@ func (x *ListVehiclesResponse) String() string {
 func (*ListVehiclesResponse) ProtoMessage() {}
 
 func (x *ListVehiclesResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_customer_v1_customer_proto_msgTypes[22]
+	mi := &file_avtoms_customer_v1_customer_proto_msgTypes[25]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1428,7 +1776,7 @@ func (x *ListVehiclesResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListVehiclesResponse.ProtoReflect.Descriptor instead.
 func (*ListVehiclesResponse) Descriptor() ([]byte, []int) {
-	return file_avtoms_customer_v1_customer_proto_rawDescGZIP(), []int{22}
+	return file_avtoms_customer_v1_customer_proto_rawDescGZIP(), []int{25}
 }
 
 func (x *ListVehiclesResponse) GetVehicles() []*Vehicle {
@@ -1448,7 +1796,7 @@ type SearchByPlateRequest struct {
 
 func (x *SearchByPlateRequest) Reset() {
 	*x = SearchByPlateRequest{}
-	mi := &file_avtoms_customer_v1_customer_proto_msgTypes[23]
+	mi := &file_avtoms_customer_v1_customer_proto_msgTypes[26]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1460,7 +1808,7 @@ func (x *SearchByPlateRequest) String() string {
 func (*SearchByPlateRequest) ProtoMessage() {}
 
 func (x *SearchByPlateRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_customer_v1_customer_proto_msgTypes[23]
+	mi := &file_avtoms_customer_v1_customer_proto_msgTypes[26]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1473,7 +1821,7 @@ func (x *SearchByPlateRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SearchByPlateRequest.ProtoReflect.Descriptor instead.
 func (*SearchByPlateRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_customer_v1_customer_proto_rawDescGZIP(), []int{23}
+	return file_avtoms_customer_v1_customer_proto_rawDescGZIP(), []int{26}
 }
 
 func (x *SearchByPlateRequest) GetShopId() string {
@@ -1499,7 +1847,7 @@ type SearchByPlateResponse struct {
 
 func (x *SearchByPlateResponse) Reset() {
 	*x = SearchByPlateResponse{}
-	mi := &file_avtoms_customer_v1_customer_proto_msgTypes[24]
+	mi := &file_avtoms_customer_v1_customer_proto_msgTypes[27]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1511,7 +1859,7 @@ func (x *SearchByPlateResponse) String() string {
 func (*SearchByPlateResponse) ProtoMessage() {}
 
 func (x *SearchByPlateResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_customer_v1_customer_proto_msgTypes[24]
+	mi := &file_avtoms_customer_v1_customer_proto_msgTypes[27]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1524,7 +1872,7 @@ func (x *SearchByPlateResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SearchByPlateResponse.ProtoReflect.Descriptor instead.
 func (*SearchByPlateResponse) Descriptor() ([]byte, []int) {
-	return file_avtoms_customer_v1_customer_proto_rawDescGZIP(), []int{24}
+	return file_avtoms_customer_v1_customer_proto_rawDescGZIP(), []int{27}
 }
 
 func (x *SearchByPlateResponse) GetVehicles() []*Vehicle {
@@ -1543,7 +1891,7 @@ type SoftDeleteCustomerRequest struct {
 
 func (x *SoftDeleteCustomerRequest) Reset() {
 	*x = SoftDeleteCustomerRequest{}
-	mi := &file_avtoms_customer_v1_customer_proto_msgTypes[25]
+	mi := &file_avtoms_customer_v1_customer_proto_msgTypes[28]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1555,7 +1903,7 @@ func (x *SoftDeleteCustomerRequest) String() string {
 func (*SoftDeleteCustomerRequest) ProtoMessage() {}
 
 func (x *SoftDeleteCustomerRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_customer_v1_customer_proto_msgTypes[25]
+	mi := &file_avtoms_customer_v1_customer_proto_msgTypes[28]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1568,7 +1916,7 @@ func (x *SoftDeleteCustomerRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SoftDeleteCustomerRequest.ProtoReflect.Descriptor instead.
 func (*SoftDeleteCustomerRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_customer_v1_customer_proto_rawDescGZIP(), []int{25}
+	return file_avtoms_customer_v1_customer_proto_rawDescGZIP(), []int{28}
 }
 
 func (x *SoftDeleteCustomerRequest) GetId() string {
@@ -1610,7 +1958,7 @@ const file_avtoms_customer_v1_customer_proto_rawDesc = "" +
 	"\ashop_id\x18\x01 \x01(\tR\x06shopId\x12\x14\n" +
 	"\x05query\x18\x02 \x01(\tR\x05query\"S\n" +
 	"\x15ListCustomersResponse\x12:\n" +
-	"\tcustomers\x18\x01 \x03(\v2\x1c.avtoms.customer.v1.CustomerR\tcustomers\"\xba\x02\n" +
+	"\tcustomers\x18\x01 \x03(\v2\x1c.avtoms.customer.v1.CustomerR\tcustomers\"\x9c\x03\n" +
 	"\bCustomer\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x17\n" +
 	"\ashop_id\x18\x02 \x01(\tR\x06shopId\x12\x14\n" +
@@ -1623,7 +1971,11 @@ const file_avtoms_customer_v1_customer_proto_rawDesc = "" +
 	"\n" +
 	"created_at\x18\t \x01(\tR\tcreatedAt\x12(\n" +
 	"\x10telegram_chat_id\x18\n" +
-	" \x01(\tR\x0etelegramChatId\"\x8d\x01\n" +
+	" \x01(\tR\x0etelegramChatId\x12\x14\n" +
+	"\x05notes\x18\v \x01(\tR\x05notes\x12\x14\n" +
+	"\x05email\x18\f \x01(\tR\x05email\x12\x18\n" +
+	"\aaddress\x18\r \x01(\tR\aaddress\x12\x1a\n" +
+	"\bbirthday\x18\x0e \x01(\tR\bbirthday\"\x8d\x01\n" +
 	"\fTelegramLink\x12\x17\n" +
 	"\achat_id\x18\x01 \x01(\tR\x06chatId\x12\x14\n" +
 	"\x05phone\x18\x02 \x01(\tR\x05phone\x126\n" +
@@ -1638,7 +1990,7 @@ const file_avtoms_customer_v1_customer_proto_rawDesc = "" +
 	"\x1dGetTelegramLinkByPhoneRequest\x12\x14\n" +
 	"\x05phone\x18\x01 \x01(\tR\x05phone\"9\n" +
 	"\x1eListCustomersByTelegramRequest\x12\x17\n" +
-	"\achat_id\x18\x01 \x01(\tR\x06chatId\"\x92\x02\n" +
+	"\achat_id\x18\x01 \x01(\tR\x06chatId\"\xfa\x02\n" +
 	"\aVehicle\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1f\n" +
 	"\vcustomer_id\x18\x02 \x01(\tR\n" +
@@ -1652,7 +2004,11 @@ const file_avtoms_customer_v1_customer_proto_rawDesc = "" +
 	"\adeleted\x18\t \x01(\bR\adeleted\x12<\n" +
 	"\n" +
 	"plate_type\x18\n" +
-	" \x01(\x0e2\x1d.avtoms.customer.v1.PlateTypeR\tplateType\"\xd4\x01\n" +
+	" \x01(\x0e2\x1d.avtoms.customer.v1.PlateTypeR\tplateType\x12\x14\n" +
+	"\x05color\x18\v \x01(\tR\x05color\x12\x16\n" +
+	"\x06engine\x18\f \x01(\tR\x06engine\x12\"\n" +
+	"\ftransmission\x18\r \x01(\tR\ftransmission\x12\x14\n" +
+	"\x05notes\x18\x0e \x01(\tR\x05notes\"\xd4\x01\n" +
 	"\x15CreateCustomerRequest\x12\x17\n" +
 	"\ashop_id\x18\x01 \x01(\tR\x06shopId\x12\x14\n" +
 	"\x05phone\x18\x02 \x01(\tR\x05phone\x12\x12\n" +
@@ -1661,7 +2017,17 @@ const file_avtoms_customer_v1_customer_proto_rawDesc = "" +
 	"\x0ftelegram_handle\x18\x05 \x01(\tR\x0etelegramHandle\x12\x17\n" +
 	"\awalk_in\x18\x06 \x01(\bR\x06walkIn\"$\n" +
 	"\x12GetCustomerRequest\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\"\xf5\x01\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\"\x94\x02\n" +
+	"\x15UpdateCustomerRequest\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
+	"\x04name\x18\x02 \x01(\tR\x04name\x12\x14\n" +
+	"\x05phone\x18\x03 \x01(\tR\x05phone\x126\n" +
+	"\blanguage\x18\x04 \x01(\x0e2\x1a.avtoms.common.v1.LanguageR\blanguage\x12'\n" +
+	"\x0ftelegram_handle\x18\x05 \x01(\tR\x0etelegramHandle\x12\x14\n" +
+	"\x05notes\x18\x06 \x01(\tR\x05notes\x12\x14\n" +
+	"\x05email\x18\a \x01(\tR\x05email\x12\x18\n" +
+	"\aaddress\x18\b \x01(\tR\aaddress\x12\x1a\n" +
+	"\bbirthday\x18\t \x01(\tR\bbirthday\"\xf5\x01\n" +
 	"\x14CreateVehicleRequest\x12\x1f\n" +
 	"\vcustomer_id\x18\x01 \x01(\tR\n" +
 	"customerId\x12\x14\n" +
@@ -1674,6 +2040,23 @@ const file_avtoms_customer_v1_customer_proto_rawDesc = "" +
 	"\n" +
 	"plate_type\x18\b \x01(\x0e2\x1d.avtoms.customer.v1.PlateTypeR\tplateType\"#\n" +
 	"\x11GetVehicleRequest\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\"\xcc\x02\n" +
+	"\x14UpdateVehicleRequest\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x14\n" +
+	"\x05plate\x18\x02 \x01(\tR\x05plate\x12\x10\n" +
+	"\x03vin\x18\x03 \x01(\tR\x03vin\x12\x12\n" +
+	"\x04make\x18\x04 \x01(\tR\x04make\x12\x14\n" +
+	"\x05model\x18\x05 \x01(\tR\x05model\x12\x12\n" +
+	"\x04year\x18\x06 \x01(\x05R\x04year\x12\x18\n" +
+	"\amileage\x18\a \x01(\x03R\amileage\x12<\n" +
+	"\n" +
+	"plate_type\x18\b \x01(\x0e2\x1d.avtoms.customer.v1.PlateTypeR\tplateType\x12\x14\n" +
+	"\x05color\x18\t \x01(\tR\x05color\x12\x16\n" +
+	"\x06engine\x18\n" +
+	" \x01(\tR\x06engine\x12\"\n" +
+	"\ftransmission\x18\v \x01(\tR\ftransmission\x12\x14\n" +
+	"\x05notes\x18\f \x01(\tR\x05notes\"&\n" +
+	"\x14DeleteVehicleRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\"6\n" +
 	"\x13ListVehiclesRequest\x12\x1f\n" +
 	"\vcustomer_id\x18\x01 \x01(\tR\n" +
@@ -1692,13 +2075,16 @@ const file_avtoms_customer_v1_customer_proto_rawDesc = "" +
 	"\x13PLATE_TYPE_STANDARD\x10\x01\x12\x17\n" +
 	"\x13PLATE_TYPE_ELECTRIC\x10\x02\x12\x16\n" +
 	"\x12PLATE_TYPE_FOREIGN\x10\x03\x12\x14\n" +
-	"\x10PLATE_TYPE_MOPED\x10\x042\x9e\f\n" +
+	"\x10PLATE_TYPE_MOPED\x10\x042\xa9\x0e\n" +
 	"\x0fCustomerService\x12Y\n" +
 	"\x0eCreateCustomer\x12).avtoms.customer.v1.CreateCustomerRequest\x1a\x1c.avtoms.customer.v1.Customer\x12S\n" +
-	"\vGetCustomer\x12&.avtoms.customer.v1.GetCustomerRequest\x1a\x1c.avtoms.customer.v1.Customer\x12V\n" +
+	"\vGetCustomer\x12&.avtoms.customer.v1.GetCustomerRequest\x1a\x1c.avtoms.customer.v1.Customer\x12Y\n" +
+	"\x0eUpdateCustomer\x12).avtoms.customer.v1.UpdateCustomerRequest\x1a\x1c.avtoms.customer.v1.Customer\x12V\n" +
 	"\rCreateVehicle\x12(.avtoms.customer.v1.CreateVehicleRequest\x1a\x1b.avtoms.customer.v1.Vehicle\x12P\n" +
 	"\n" +
-	"GetVehicle\x12%.avtoms.customer.v1.GetVehicleRequest\x1a\x1b.avtoms.customer.v1.Vehicle\x12a\n" +
+	"GetVehicle\x12%.avtoms.customer.v1.GetVehicleRequest\x1a\x1b.avtoms.customer.v1.Vehicle\x12V\n" +
+	"\rUpdateVehicle\x12(.avtoms.customer.v1.UpdateVehicleRequest\x1a\x1b.avtoms.customer.v1.Vehicle\x12V\n" +
+	"\rDeleteVehicle\x12(.avtoms.customer.v1.DeleteVehicleRequest\x1a\x1b.avtoms.customer.v1.Vehicle\x12a\n" +
 	"\fListVehicles\x12'.avtoms.customer.v1.ListVehiclesRequest\x1a(.avtoms.customer.v1.ListVehiclesResponse\x12d\n" +
 	"\rSearchByPlate\x12(.avtoms.customer.v1.SearchByPlateRequest\x1a).avtoms.customer.v1.SearchByPlateResponse\x12a\n" +
 	"\x12SoftDeleteCustomer\x12-.avtoms.customer.v1.SoftDeleteCustomerRequest\x1a\x1c.avtoms.customer.v1.Customer\x12d\n" +
@@ -1725,7 +2111,7 @@ func file_avtoms_customer_v1_customer_proto_rawDescGZIP() []byte {
 }
 
 var file_avtoms_customer_v1_customer_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_avtoms_customer_v1_customer_proto_msgTypes = make([]protoimpl.MessageInfo, 26)
+var file_avtoms_customer_v1_customer_proto_msgTypes = make([]protoimpl.MessageInfo, 29)
 var file_avtoms_customer_v1_customer_proto_goTypes = []any{
 	(PlateType)(0),                         // 0: avtoms.customer.v1.PlateType
 	(*CarMake)(nil),                        // 1: avtoms.customer.v1.CarMake
@@ -1747,64 +2133,75 @@ var file_avtoms_customer_v1_customer_proto_goTypes = []any{
 	(*Vehicle)(nil),                        // 17: avtoms.customer.v1.Vehicle
 	(*CreateCustomerRequest)(nil),          // 18: avtoms.customer.v1.CreateCustomerRequest
 	(*GetCustomerRequest)(nil),             // 19: avtoms.customer.v1.GetCustomerRequest
-	(*CreateVehicleRequest)(nil),           // 20: avtoms.customer.v1.CreateVehicleRequest
-	(*GetVehicleRequest)(nil),              // 21: avtoms.customer.v1.GetVehicleRequest
-	(*ListVehiclesRequest)(nil),            // 22: avtoms.customer.v1.ListVehiclesRequest
-	(*ListVehiclesResponse)(nil),           // 23: avtoms.customer.v1.ListVehiclesResponse
-	(*SearchByPlateRequest)(nil),           // 24: avtoms.customer.v1.SearchByPlateRequest
-	(*SearchByPlateResponse)(nil),          // 25: avtoms.customer.v1.SearchByPlateResponse
-	(*SoftDeleteCustomerRequest)(nil),      // 26: avtoms.customer.v1.SoftDeleteCustomerRequest
-	(v1.Language)(0),                       // 27: avtoms.common.v1.Language
+	(*UpdateCustomerRequest)(nil),          // 20: avtoms.customer.v1.UpdateCustomerRequest
+	(*CreateVehicleRequest)(nil),           // 21: avtoms.customer.v1.CreateVehicleRequest
+	(*GetVehicleRequest)(nil),              // 22: avtoms.customer.v1.GetVehicleRequest
+	(*UpdateVehicleRequest)(nil),           // 23: avtoms.customer.v1.UpdateVehicleRequest
+	(*DeleteVehicleRequest)(nil),           // 24: avtoms.customer.v1.DeleteVehicleRequest
+	(*ListVehiclesRequest)(nil),            // 25: avtoms.customer.v1.ListVehiclesRequest
+	(*ListVehiclesResponse)(nil),           // 26: avtoms.customer.v1.ListVehiclesResponse
+	(*SearchByPlateRequest)(nil),           // 27: avtoms.customer.v1.SearchByPlateRequest
+	(*SearchByPlateResponse)(nil),          // 28: avtoms.customer.v1.SearchByPlateResponse
+	(*SoftDeleteCustomerRequest)(nil),      // 29: avtoms.customer.v1.SoftDeleteCustomerRequest
+	(v1.Language)(0),                       // 30: avtoms.common.v1.Language
 }
 var file_avtoms_customer_v1_customer_proto_depIdxs = []int32{
 	1,  // 0: avtoms.customer.v1.ListCarMakesResponse.makes:type_name -> avtoms.customer.v1.CarMake
 	2,  // 1: avtoms.customer.v1.ListCarModelsResponse.models:type_name -> avtoms.customer.v1.CarModel
 	11, // 2: avtoms.customer.v1.ListCustomersResponse.customers:type_name -> avtoms.customer.v1.Customer
-	27, // 3: avtoms.customer.v1.Customer.language:type_name -> avtoms.common.v1.Language
-	27, // 4: avtoms.customer.v1.TelegramLink.language:type_name -> avtoms.common.v1.Language
-	27, // 5: avtoms.customer.v1.LinkTelegramRequest.language:type_name -> avtoms.common.v1.Language
+	30, // 3: avtoms.customer.v1.Customer.language:type_name -> avtoms.common.v1.Language
+	30, // 4: avtoms.customer.v1.TelegramLink.language:type_name -> avtoms.common.v1.Language
+	30, // 5: avtoms.customer.v1.LinkTelegramRequest.language:type_name -> avtoms.common.v1.Language
 	0,  // 6: avtoms.customer.v1.Vehicle.plate_type:type_name -> avtoms.customer.v1.PlateType
-	27, // 7: avtoms.customer.v1.CreateCustomerRequest.language:type_name -> avtoms.common.v1.Language
-	0,  // 8: avtoms.customer.v1.CreateVehicleRequest.plate_type:type_name -> avtoms.customer.v1.PlateType
-	17, // 9: avtoms.customer.v1.ListVehiclesResponse.vehicles:type_name -> avtoms.customer.v1.Vehicle
-	17, // 10: avtoms.customer.v1.SearchByPlateResponse.vehicles:type_name -> avtoms.customer.v1.Vehicle
-	18, // 11: avtoms.customer.v1.CustomerService.CreateCustomer:input_type -> avtoms.customer.v1.CreateCustomerRequest
-	19, // 12: avtoms.customer.v1.CustomerService.GetCustomer:input_type -> avtoms.customer.v1.GetCustomerRequest
-	20, // 13: avtoms.customer.v1.CustomerService.CreateVehicle:input_type -> avtoms.customer.v1.CreateVehicleRequest
-	21, // 14: avtoms.customer.v1.CustomerService.GetVehicle:input_type -> avtoms.customer.v1.GetVehicleRequest
-	22, // 15: avtoms.customer.v1.CustomerService.ListVehicles:input_type -> avtoms.customer.v1.ListVehiclesRequest
-	24, // 16: avtoms.customer.v1.CustomerService.SearchByPlate:input_type -> avtoms.customer.v1.SearchByPlateRequest
-	26, // 17: avtoms.customer.v1.CustomerService.SoftDeleteCustomer:input_type -> avtoms.customer.v1.SoftDeleteCustomerRequest
-	9,  // 18: avtoms.customer.v1.CustomerService.ListCustomers:input_type -> avtoms.customer.v1.ListCustomersRequest
-	13, // 19: avtoms.customer.v1.CustomerService.LinkTelegram:input_type -> avtoms.customer.v1.LinkTelegramRequest
-	14, // 20: avtoms.customer.v1.CustomerService.GetTelegramLink:input_type -> avtoms.customer.v1.GetTelegramLinkRequest
-	15, // 21: avtoms.customer.v1.CustomerService.GetTelegramLinkByPhone:input_type -> avtoms.customer.v1.GetTelegramLinkByPhoneRequest
-	16, // 22: avtoms.customer.v1.CustomerService.ListCustomersByTelegram:input_type -> avtoms.customer.v1.ListCustomersByTelegramRequest
-	3,  // 23: avtoms.customer.v1.CustomerService.ListCarMakes:input_type -> avtoms.customer.v1.ListCarMakesRequest
-	5,  // 24: avtoms.customer.v1.CustomerService.CreateCarMake:input_type -> avtoms.customer.v1.CreateCarMakeRequest
-	6,  // 25: avtoms.customer.v1.CustomerService.ListCarModels:input_type -> avtoms.customer.v1.ListCarModelsRequest
-	8,  // 26: avtoms.customer.v1.CustomerService.CreateCarModel:input_type -> avtoms.customer.v1.CreateCarModelRequest
-	11, // 27: avtoms.customer.v1.CustomerService.CreateCustomer:output_type -> avtoms.customer.v1.Customer
-	11, // 28: avtoms.customer.v1.CustomerService.GetCustomer:output_type -> avtoms.customer.v1.Customer
-	17, // 29: avtoms.customer.v1.CustomerService.CreateVehicle:output_type -> avtoms.customer.v1.Vehicle
-	17, // 30: avtoms.customer.v1.CustomerService.GetVehicle:output_type -> avtoms.customer.v1.Vehicle
-	23, // 31: avtoms.customer.v1.CustomerService.ListVehicles:output_type -> avtoms.customer.v1.ListVehiclesResponse
-	25, // 32: avtoms.customer.v1.CustomerService.SearchByPlate:output_type -> avtoms.customer.v1.SearchByPlateResponse
-	11, // 33: avtoms.customer.v1.CustomerService.SoftDeleteCustomer:output_type -> avtoms.customer.v1.Customer
-	10, // 34: avtoms.customer.v1.CustomerService.ListCustomers:output_type -> avtoms.customer.v1.ListCustomersResponse
-	12, // 35: avtoms.customer.v1.CustomerService.LinkTelegram:output_type -> avtoms.customer.v1.TelegramLink
-	12, // 36: avtoms.customer.v1.CustomerService.GetTelegramLink:output_type -> avtoms.customer.v1.TelegramLink
-	12, // 37: avtoms.customer.v1.CustomerService.GetTelegramLinkByPhone:output_type -> avtoms.customer.v1.TelegramLink
-	10, // 38: avtoms.customer.v1.CustomerService.ListCustomersByTelegram:output_type -> avtoms.customer.v1.ListCustomersResponse
-	4,  // 39: avtoms.customer.v1.CustomerService.ListCarMakes:output_type -> avtoms.customer.v1.ListCarMakesResponse
-	1,  // 40: avtoms.customer.v1.CustomerService.CreateCarMake:output_type -> avtoms.customer.v1.CarMake
-	7,  // 41: avtoms.customer.v1.CustomerService.ListCarModels:output_type -> avtoms.customer.v1.ListCarModelsResponse
-	2,  // 42: avtoms.customer.v1.CustomerService.CreateCarModel:output_type -> avtoms.customer.v1.CarModel
-	27, // [27:43] is the sub-list for method output_type
-	11, // [11:27] is the sub-list for method input_type
-	11, // [11:11] is the sub-list for extension type_name
-	11, // [11:11] is the sub-list for extension extendee
-	0,  // [0:11] is the sub-list for field type_name
+	30, // 7: avtoms.customer.v1.CreateCustomerRequest.language:type_name -> avtoms.common.v1.Language
+	30, // 8: avtoms.customer.v1.UpdateCustomerRequest.language:type_name -> avtoms.common.v1.Language
+	0,  // 9: avtoms.customer.v1.CreateVehicleRequest.plate_type:type_name -> avtoms.customer.v1.PlateType
+	0,  // 10: avtoms.customer.v1.UpdateVehicleRequest.plate_type:type_name -> avtoms.customer.v1.PlateType
+	17, // 11: avtoms.customer.v1.ListVehiclesResponse.vehicles:type_name -> avtoms.customer.v1.Vehicle
+	17, // 12: avtoms.customer.v1.SearchByPlateResponse.vehicles:type_name -> avtoms.customer.v1.Vehicle
+	18, // 13: avtoms.customer.v1.CustomerService.CreateCustomer:input_type -> avtoms.customer.v1.CreateCustomerRequest
+	19, // 14: avtoms.customer.v1.CustomerService.GetCustomer:input_type -> avtoms.customer.v1.GetCustomerRequest
+	20, // 15: avtoms.customer.v1.CustomerService.UpdateCustomer:input_type -> avtoms.customer.v1.UpdateCustomerRequest
+	21, // 16: avtoms.customer.v1.CustomerService.CreateVehicle:input_type -> avtoms.customer.v1.CreateVehicleRequest
+	22, // 17: avtoms.customer.v1.CustomerService.GetVehicle:input_type -> avtoms.customer.v1.GetVehicleRequest
+	23, // 18: avtoms.customer.v1.CustomerService.UpdateVehicle:input_type -> avtoms.customer.v1.UpdateVehicleRequest
+	24, // 19: avtoms.customer.v1.CustomerService.DeleteVehicle:input_type -> avtoms.customer.v1.DeleteVehicleRequest
+	25, // 20: avtoms.customer.v1.CustomerService.ListVehicles:input_type -> avtoms.customer.v1.ListVehiclesRequest
+	27, // 21: avtoms.customer.v1.CustomerService.SearchByPlate:input_type -> avtoms.customer.v1.SearchByPlateRequest
+	29, // 22: avtoms.customer.v1.CustomerService.SoftDeleteCustomer:input_type -> avtoms.customer.v1.SoftDeleteCustomerRequest
+	9,  // 23: avtoms.customer.v1.CustomerService.ListCustomers:input_type -> avtoms.customer.v1.ListCustomersRequest
+	13, // 24: avtoms.customer.v1.CustomerService.LinkTelegram:input_type -> avtoms.customer.v1.LinkTelegramRequest
+	14, // 25: avtoms.customer.v1.CustomerService.GetTelegramLink:input_type -> avtoms.customer.v1.GetTelegramLinkRequest
+	15, // 26: avtoms.customer.v1.CustomerService.GetTelegramLinkByPhone:input_type -> avtoms.customer.v1.GetTelegramLinkByPhoneRequest
+	16, // 27: avtoms.customer.v1.CustomerService.ListCustomersByTelegram:input_type -> avtoms.customer.v1.ListCustomersByTelegramRequest
+	3,  // 28: avtoms.customer.v1.CustomerService.ListCarMakes:input_type -> avtoms.customer.v1.ListCarMakesRequest
+	5,  // 29: avtoms.customer.v1.CustomerService.CreateCarMake:input_type -> avtoms.customer.v1.CreateCarMakeRequest
+	6,  // 30: avtoms.customer.v1.CustomerService.ListCarModels:input_type -> avtoms.customer.v1.ListCarModelsRequest
+	8,  // 31: avtoms.customer.v1.CustomerService.CreateCarModel:input_type -> avtoms.customer.v1.CreateCarModelRequest
+	11, // 32: avtoms.customer.v1.CustomerService.CreateCustomer:output_type -> avtoms.customer.v1.Customer
+	11, // 33: avtoms.customer.v1.CustomerService.GetCustomer:output_type -> avtoms.customer.v1.Customer
+	11, // 34: avtoms.customer.v1.CustomerService.UpdateCustomer:output_type -> avtoms.customer.v1.Customer
+	17, // 35: avtoms.customer.v1.CustomerService.CreateVehicle:output_type -> avtoms.customer.v1.Vehicle
+	17, // 36: avtoms.customer.v1.CustomerService.GetVehicle:output_type -> avtoms.customer.v1.Vehicle
+	17, // 37: avtoms.customer.v1.CustomerService.UpdateVehicle:output_type -> avtoms.customer.v1.Vehicle
+	17, // 38: avtoms.customer.v1.CustomerService.DeleteVehicle:output_type -> avtoms.customer.v1.Vehicle
+	26, // 39: avtoms.customer.v1.CustomerService.ListVehicles:output_type -> avtoms.customer.v1.ListVehiclesResponse
+	28, // 40: avtoms.customer.v1.CustomerService.SearchByPlate:output_type -> avtoms.customer.v1.SearchByPlateResponse
+	11, // 41: avtoms.customer.v1.CustomerService.SoftDeleteCustomer:output_type -> avtoms.customer.v1.Customer
+	10, // 42: avtoms.customer.v1.CustomerService.ListCustomers:output_type -> avtoms.customer.v1.ListCustomersResponse
+	12, // 43: avtoms.customer.v1.CustomerService.LinkTelegram:output_type -> avtoms.customer.v1.TelegramLink
+	12, // 44: avtoms.customer.v1.CustomerService.GetTelegramLink:output_type -> avtoms.customer.v1.TelegramLink
+	12, // 45: avtoms.customer.v1.CustomerService.GetTelegramLinkByPhone:output_type -> avtoms.customer.v1.TelegramLink
+	10, // 46: avtoms.customer.v1.CustomerService.ListCustomersByTelegram:output_type -> avtoms.customer.v1.ListCustomersResponse
+	4,  // 47: avtoms.customer.v1.CustomerService.ListCarMakes:output_type -> avtoms.customer.v1.ListCarMakesResponse
+	1,  // 48: avtoms.customer.v1.CustomerService.CreateCarMake:output_type -> avtoms.customer.v1.CarMake
+	7,  // 49: avtoms.customer.v1.CustomerService.ListCarModels:output_type -> avtoms.customer.v1.ListCarModelsResponse
+	2,  // 50: avtoms.customer.v1.CustomerService.CreateCarModel:output_type -> avtoms.customer.v1.CarModel
+	32, // [32:51] is the sub-list for method output_type
+	13, // [13:32] is the sub-list for method input_type
+	13, // [13:13] is the sub-list for extension type_name
+	13, // [13:13] is the sub-list for extension extendee
+	0,  // [0:13] is the sub-list for field type_name
 }
 
 func init() { file_avtoms_customer_v1_customer_proto_init() }
@@ -1818,7 +2215,7 @@ func file_avtoms_customer_v1_customer_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_avtoms_customer_v1_customer_proto_rawDesc), len(file_avtoms_customer_v1_customer_proto_rawDesc)),
 			NumEnums:      1,
-			NumMessages:   26,
+			NumMessages:   29,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
