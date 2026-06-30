@@ -37,6 +37,7 @@ const (
 	CustomerService_ListCustomersByTelegram_FullMethodName = "/avtoms.customer.v1.CustomerService/ListCustomersByTelegram"
 	CustomerService_ListCarMakes_FullMethodName            = "/avtoms.customer.v1.CustomerService/ListCarMakes"
 	CustomerService_CreateCarMake_FullMethodName           = "/avtoms.customer.v1.CustomerService/CreateCarMake"
+	CustomerService_UpdateCarMake_FullMethodName           = "/avtoms.customer.v1.CustomerService/UpdateCarMake"
 	CustomerService_ListCarModels_FullMethodName           = "/avtoms.customer.v1.CustomerService/ListCarModels"
 	CustomerService_CreateCarModel_FullMethodName          = "/avtoms.customer.v1.CustomerService/CreateCarModel"
 )
@@ -68,6 +69,7 @@ type CustomerServiceClient interface {
 	// Car reference catalog (global, admin-managed). Read by any role to populate dropdowns.
 	ListCarMakes(ctx context.Context, in *ListCarMakesRequest, opts ...grpc.CallOption) (*ListCarMakesResponse, error)
 	CreateCarMake(ctx context.Context, in *CreateCarMakeRequest, opts ...grpc.CallOption) (*CarMake, error)
+	UpdateCarMake(ctx context.Context, in *UpdateCarMakeRequest, opts ...grpc.CallOption) (*CarMake, error)
 	ListCarModels(ctx context.Context, in *ListCarModelsRequest, opts ...grpc.CallOption) (*ListCarModelsResponse, error)
 	CreateCarModel(ctx context.Context, in *CreateCarModelRequest, opts ...grpc.CallOption) (*CarModel, error)
 }
@@ -260,6 +262,16 @@ func (c *customerServiceClient) CreateCarMake(ctx context.Context, in *CreateCar
 	return out, nil
 }
 
+func (c *customerServiceClient) UpdateCarMake(ctx context.Context, in *UpdateCarMakeRequest, opts ...grpc.CallOption) (*CarMake, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CarMake)
+	err := c.cc.Invoke(ctx, CustomerService_UpdateCarMake_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *customerServiceClient) ListCarModels(ctx context.Context, in *ListCarModelsRequest, opts ...grpc.CallOption) (*ListCarModelsResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(ListCarModelsResponse)
@@ -307,6 +319,7 @@ type CustomerServiceServer interface {
 	// Car reference catalog (global, admin-managed). Read by any role to populate dropdowns.
 	ListCarMakes(context.Context, *ListCarMakesRequest) (*ListCarMakesResponse, error)
 	CreateCarMake(context.Context, *CreateCarMakeRequest) (*CarMake, error)
+	UpdateCarMake(context.Context, *UpdateCarMakeRequest) (*CarMake, error)
 	ListCarModels(context.Context, *ListCarModelsRequest) (*ListCarModelsResponse, error)
 	CreateCarModel(context.Context, *CreateCarModelRequest) (*CarModel, error)
 	mustEmbedUnimplementedCustomerServiceServer()
@@ -372,6 +385,9 @@ func (UnimplementedCustomerServiceServer) ListCarMakes(context.Context, *ListCar
 }
 func (UnimplementedCustomerServiceServer) CreateCarMake(context.Context, *CreateCarMakeRequest) (*CarMake, error) {
 	return nil, status.Error(codes.Unimplemented, "method CreateCarMake not implemented")
+}
+func (UnimplementedCustomerServiceServer) UpdateCarMake(context.Context, *UpdateCarMakeRequest) (*CarMake, error) {
+	return nil, status.Error(codes.Unimplemented, "method UpdateCarMake not implemented")
 }
 func (UnimplementedCustomerServiceServer) ListCarModels(context.Context, *ListCarModelsRequest) (*ListCarModelsResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method ListCarModels not implemented")
@@ -724,6 +740,24 @@ func _CustomerService_CreateCarMake_Handler(srv interface{}, ctx context.Context
 	return interceptor(ctx, in, info, handler)
 }
 
+func _CustomerService_UpdateCarMake_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateCarMakeRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CustomerServiceServer).UpdateCarMake(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CustomerService_UpdateCarMake_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CustomerServiceServer).UpdateCarMake(ctx, req.(*UpdateCarMakeRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _CustomerService_ListCarModels_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ListCarModelsRequest)
 	if err := dec(in); err != nil {
@@ -838,6 +872,10 @@ var CustomerService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CreateCarMake",
 			Handler:    _CustomerService_CreateCarMake_Handler,
+		},
+		{
+			MethodName: "UpdateCarMake",
+			Handler:    _CustomerService_UpdateCarMake_Handler,
 		},
 		{
 			MethodName: "ListCarModels",

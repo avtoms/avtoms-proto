@@ -31,6 +31,7 @@ service CustomerService {
   // Car reference catalog (global, admin-managed). Read by any role to populate dropdowns.
   rpc ListCarMakes(ListCarMakesRequest) returns (ListCarMakesResponse);
   rpc CreateCarMake(CreateCarMakeRequest) returns (CarMake);
+  rpc UpdateCarMake(UpdateCarMakeRequest) returns (CarMake);
   rpc ListCarModels(ListCarModelsRequest) returns (ListCarModelsResponse);
   rpc CreateCarModel(CreateCarModelRequest) returns (CarModel);
 }
@@ -40,6 +41,7 @@ message CarMake {
   string id = 1;
   string name = 2;
   string country = 3;
+  string logo_url = 4; // brand emblem uploaded by the super admin, shown across the app
 }
 
 // CarModel belongs to a make (e.g. Cobalt) with an optional body type.
@@ -57,6 +59,12 @@ message ListCarMakesResponse {
 message CreateCarMakeRequest {
   string name = 1;
   string country = 2;
+}
+message UpdateCarMakeRequest {
+  string id = 1;
+  string name = 2;
+  string country = 3;
+  string logo_url = 4;
 }
 message ListCarModelsRequest {
   string make_id = 1; // optional; empty returns all models
