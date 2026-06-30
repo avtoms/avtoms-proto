@@ -24,6 +24,41 @@ service NotificationService {
   // SendTestSms sends a one-off SMS synchronously and returns the gateway's actual
   // result/error, so the super admin can verify the credentials work.
   rpc SendTestSms(SendTestSmsRequest) returns (TestSmsResult);
+
+  // Demo/sales lead capture from the public marketing landing page. CreateDemoRequest is
+  // public (no auth); List/SetStatus are super-admin only.
+  rpc CreateDemoRequest(CreateDemoRequestRequest) returns (DemoRequest);
+  rpc ListDemoRequests(ListDemoRequestsRequest) returns (ListDemoRequestsResponse);
+  rpc SetDemoRequestStatus(SetDemoRequestStatusRequest) returns (DemoRequest);
+}
+
+// DemoRequest is a sales lead submitted from the public landing page.
+message DemoRequest {
+  string id = 1;
+  string name = 2;
+  string shop = 3;
+  string phone = 4;
+  string city = 5;
+  string message = 6;
+  string lang = 7;       // uz | ru | en
+  string status = 8;     // new | contacted | closed
+  string created_at = 9; // RFC3339
+}
+message CreateDemoRequestRequest {
+  string name = 1;
+  string shop = 2;
+  string phone = 3;
+  string city = 4;
+  string message = 5;
+  string lang = 6;
+}
+message ListDemoRequestsRequest {}
+message ListDemoRequestsResponse {
+  repeated DemoRequest requests = 1;
+}
+message SetDemoRequestStatusRequest {
+  string id = 1;
+  string status = 2;
 }
 
 message SendTestSmsRequest {

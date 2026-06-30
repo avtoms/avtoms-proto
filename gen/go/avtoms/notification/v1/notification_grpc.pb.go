@@ -27,6 +27,9 @@ const (
 	NotificationService_UpdateIntegration_FullMethodName    = "/avtoms.notification.v1.NotificationService/UpdateIntegration"
 	NotificationService_GetIntegrationConfig_FullMethodName = "/avtoms.notification.v1.NotificationService/GetIntegrationConfig"
 	NotificationService_SendTestSms_FullMethodName          = "/avtoms.notification.v1.NotificationService/SendTestSms"
+	NotificationService_CreateDemoRequest_FullMethodName    = "/avtoms.notification.v1.NotificationService/CreateDemoRequest"
+	NotificationService_ListDemoRequests_FullMethodName     = "/avtoms.notification.v1.NotificationService/ListDemoRequests"
+	NotificationService_SetDemoRequestStatus_FullMethodName = "/avtoms.notification.v1.NotificationService/SetDemoRequestStatus"
 )
 
 // NotificationServiceClient is the client API for NotificationService service.
@@ -50,6 +53,11 @@ type NotificationServiceClient interface {
 	// SendTestSms sends a one-off SMS synchronously and returns the gateway's actual
 	// result/error, so the super admin can verify the credentials work.
 	SendTestSms(ctx context.Context, in *SendTestSmsRequest, opts ...grpc.CallOption) (*TestSmsResult, error)
+	// Demo/sales lead capture from the public marketing landing page. CreateDemoRequest is
+	// public (no auth); List/SetStatus are super-admin only.
+	CreateDemoRequest(ctx context.Context, in *CreateDemoRequestRequest, opts ...grpc.CallOption) (*DemoRequest, error)
+	ListDemoRequests(ctx context.Context, in *ListDemoRequestsRequest, opts ...grpc.CallOption) (*ListDemoRequestsResponse, error)
+	SetDemoRequestStatus(ctx context.Context, in *SetDemoRequestStatusRequest, opts ...grpc.CallOption) (*DemoRequest, error)
 }
 
 type notificationServiceClient struct {
@@ -140,6 +148,36 @@ func (c *notificationServiceClient) SendTestSms(ctx context.Context, in *SendTes
 	return out, nil
 }
 
+func (c *notificationServiceClient) CreateDemoRequest(ctx context.Context, in *CreateDemoRequestRequest, opts ...grpc.CallOption) (*DemoRequest, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(DemoRequest)
+	err := c.cc.Invoke(ctx, NotificationService_CreateDemoRequest_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *notificationServiceClient) ListDemoRequests(ctx context.Context, in *ListDemoRequestsRequest, opts ...grpc.CallOption) (*ListDemoRequestsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListDemoRequestsResponse)
+	err := c.cc.Invoke(ctx, NotificationService_ListDemoRequests_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *notificationServiceClient) SetDemoRequestStatus(ctx context.Context, in *SetDemoRequestStatusRequest, opts ...grpc.CallOption) (*DemoRequest, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(DemoRequest)
+	err := c.cc.Invoke(ctx, NotificationService_SetDemoRequestStatus_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // NotificationServiceServer is the server API for NotificationService service.
 // All implementations must embed UnimplementedNotificationServiceServer
 // for forward compatibility.
@@ -161,6 +199,11 @@ type NotificationServiceServer interface {
 	// SendTestSms sends a one-off SMS synchronously and returns the gateway's actual
 	// result/error, so the super admin can verify the credentials work.
 	SendTestSms(context.Context, *SendTestSmsRequest) (*TestSmsResult, error)
+	// Demo/sales lead capture from the public marketing landing page. CreateDemoRequest is
+	// public (no auth); List/SetStatus are super-admin only.
+	CreateDemoRequest(context.Context, *CreateDemoRequestRequest) (*DemoRequest, error)
+	ListDemoRequests(context.Context, *ListDemoRequestsRequest) (*ListDemoRequestsResponse, error)
+	SetDemoRequestStatus(context.Context, *SetDemoRequestStatusRequest) (*DemoRequest, error)
 	mustEmbedUnimplementedNotificationServiceServer()
 }
 
@@ -194,6 +237,15 @@ func (UnimplementedNotificationServiceServer) GetIntegrationConfig(context.Conte
 }
 func (UnimplementedNotificationServiceServer) SendTestSms(context.Context, *SendTestSmsRequest) (*TestSmsResult, error) {
 	return nil, status.Error(codes.Unimplemented, "method SendTestSms not implemented")
+}
+func (UnimplementedNotificationServiceServer) CreateDemoRequest(context.Context, *CreateDemoRequestRequest) (*DemoRequest, error) {
+	return nil, status.Error(codes.Unimplemented, "method CreateDemoRequest not implemented")
+}
+func (UnimplementedNotificationServiceServer) ListDemoRequests(context.Context, *ListDemoRequestsRequest) (*ListDemoRequestsResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListDemoRequests not implemented")
+}
+func (UnimplementedNotificationServiceServer) SetDemoRequestStatus(context.Context, *SetDemoRequestStatusRequest) (*DemoRequest, error) {
+	return nil, status.Error(codes.Unimplemented, "method SetDemoRequestStatus not implemented")
 }
 func (UnimplementedNotificationServiceServer) mustEmbedUnimplementedNotificationServiceServer() {}
 func (UnimplementedNotificationServiceServer) testEmbeddedByValue()                             {}
@@ -360,6 +412,60 @@ func _NotificationService_SendTestSms_Handler(srv interface{}, ctx context.Conte
 	return interceptor(ctx, in, info, handler)
 }
 
+func _NotificationService_CreateDemoRequest_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateDemoRequestRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(NotificationServiceServer).CreateDemoRequest(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: NotificationService_CreateDemoRequest_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(NotificationServiceServer).CreateDemoRequest(ctx, req.(*CreateDemoRequestRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _NotificationService_ListDemoRequests_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListDemoRequestsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(NotificationServiceServer).ListDemoRequests(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: NotificationService_ListDemoRequests_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(NotificationServiceServer).ListDemoRequests(ctx, req.(*ListDemoRequestsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _NotificationService_SetDemoRequestStatus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SetDemoRequestStatusRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(NotificationServiceServer).SetDemoRequestStatus(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: NotificationService_SetDemoRequestStatus_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(NotificationServiceServer).SetDemoRequestStatus(ctx, req.(*SetDemoRequestStatusRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // NotificationService_ServiceDesc is the grpc.ServiceDesc for NotificationService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -398,6 +504,18 @@ var NotificationService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "SendTestSms",
 			Handler:    _NotificationService_SendTestSms_Handler,
+		},
+		{
+			MethodName: "CreateDemoRequest",
+			Handler:    _NotificationService_CreateDemoRequest_Handler,
+		},
+		{
+			MethodName: "ListDemoRequests",
+			Handler:    _NotificationService_ListDemoRequests_Handler,
+		},
+		{
+			MethodName: "SetDemoRequestStatus",
+			Handler:    _NotificationService_SetDemoRequestStatus_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
