@@ -24,6 +24,7 @@ service CustomerService {
   // Client Telegram linking: a customer links their Telegram chat (by sharing their
   // verified phone) so the bot can show their orders and push notifications.
   rpc LinkTelegram(LinkTelegramRequest) returns (TelegramLink);
+  rpc UnlinkTelegram(UnlinkTelegramRequest) returns (TelegramLink); // log out: drop the chat↔phone link
   rpc GetTelegramLink(GetTelegramLinkRequest) returns (TelegramLink);
   rpc GetTelegramLinkByPhone(GetTelegramLinkByPhoneRequest) returns (TelegramLink);
   rpc ListCustomersByTelegram(ListCustomersByTelegramRequest) returns (ListCustomersResponse);
@@ -116,6 +117,9 @@ message LinkTelegramRequest {
   avtoms.common.v1.Language language = 3;
 }
 message GetTelegramLinkRequest {
+  string chat_id = 1;
+}
+message UnlinkTelegramRequest {
   string chat_id = 1;
 }
 message GetTelegramLinkByPhoneRequest {
