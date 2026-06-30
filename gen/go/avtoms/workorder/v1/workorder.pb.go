@@ -953,6 +953,7 @@ type ShopExpense struct {
 	IncurredOn    string                 `protobuf:"bytes,5,opt,name=incurred_on,json=incurredOn,proto3" json:"incurred_on,omitempty"` // RFC3339 date the cost was incurred
 	Note          string                 `protobuf:"bytes,6,opt,name=note,proto3" json:"note,omitempty"`
 	CreatedAt     string                 `protobuf:"bytes,7,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	StaffId       string                 `protobuf:"bytes,8,opt,name=staff_id,json=staffId,proto3" json:"staff_id,omitempty"` // optional: the worker this cost is for (e.g. whose salary)
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1032,6 +1033,13 @@ func (x *ShopExpense) GetNote() string {
 func (x *ShopExpense) GetCreatedAt() string {
 	if x != nil {
 		return x.CreatedAt
+	}
+	return ""
+}
+
+func (x *ShopExpense) GetStaffId() string {
+	if x != nil {
+		return x.StaffId
 	}
 	return ""
 }
@@ -1147,6 +1155,7 @@ type CreateShopExpenseRequest struct {
 	Amount        int64                  `protobuf:"varint,3,opt,name=amount,proto3" json:"amount,omitempty"`
 	IncurredOn    string                 `protobuf:"bytes,4,opt,name=incurred_on,json=incurredOn,proto3" json:"incurred_on,omitempty"`
 	Note          string                 `protobuf:"bytes,5,opt,name=note,proto3" json:"note,omitempty"`
+	StaffId       string                 `protobuf:"bytes,6,opt,name=staff_id,json=staffId,proto3" json:"staff_id,omitempty"` // optional: worker this expense is for
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1212,6 +1221,13 @@ func (x *CreateShopExpenseRequest) GetIncurredOn() string {
 func (x *CreateShopExpenseRequest) GetNote() string {
 	if x != nil {
 		return x.Note
+	}
+	return ""
+}
+
+func (x *CreateShopExpenseRequest) GetStaffId() string {
+	if x != nil {
+		return x.StaffId
 	}
 	return ""
 }
@@ -4584,7 +4600,7 @@ const file_avtoms_workorder_v1_workorder_proto_rawDesc = "" +
 	"\tstarts_on\x18\a \x01(\tR\bstartsOn\x12\x12\n" +
 	"\x04note\x18\b \x01(\tR\x04note\"%\n" +
 	"\x13VoidWarrantyRequest\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\"\xbe\x01\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\"\xd9\x01\n" +
 	"\vShopExpense\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x17\n" +
 	"\ashop_id\x18\x02 \x01(\tR\x06shopId\x12\x1a\n" +
@@ -4594,20 +4610,22 @@ const file_avtoms_workorder_v1_workorder_proto_rawDesc = "" +
 	"incurredOn\x12\x12\n" +
 	"\x04note\x18\x06 \x01(\tR\x04note\x12\x1d\n" +
 	"\n" +
-	"created_at\x18\a \x01(\tR\tcreatedAt\"V\n" +
+	"created_at\x18\a \x01(\tR\tcreatedAt\x12\x19\n" +
+	"\bstaff_id\x18\b \x01(\tR\astaffId\"V\n" +
 	"\x17ListShopExpensesRequest\x12\x17\n" +
 	"\ashop_id\x18\x01 \x01(\tR\x06shopId\x12\x12\n" +
 	"\x04from\x18\x02 \x01(\tR\x04from\x12\x0e\n" +
 	"\x02to\x18\x03 \x01(\tR\x02to\"X\n" +
 	"\x18ListShopExpensesResponse\x12<\n" +
-	"\bexpenses\x18\x01 \x03(\v2 .avtoms.workorder.v1.ShopExpenseR\bexpenses\"\x9c\x01\n" +
+	"\bexpenses\x18\x01 \x03(\v2 .avtoms.workorder.v1.ShopExpenseR\bexpenses\"\xb7\x01\n" +
 	"\x18CreateShopExpenseRequest\x12\x17\n" +
 	"\ashop_id\x18\x01 \x01(\tR\x06shopId\x12\x1a\n" +
 	"\bcategory\x18\x02 \x01(\tR\bcategory\x12\x16\n" +
 	"\x06amount\x18\x03 \x01(\x03R\x06amount\x12\x1f\n" +
 	"\vincurred_on\x18\x04 \x01(\tR\n" +
 	"incurredOn\x12\x12\n" +
-	"\x04note\x18\x05 \x01(\tR\x04note\"*\n" +
+	"\x04note\x18\x05 \x01(\tR\x04note\x12\x19\n" +
+	"\bstaff_id\x18\x06 \x01(\tR\astaffId\"*\n" +
 	"\x18DeleteShopExpenseRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\"5\n" +
 	"\x19DeleteShopExpenseResponse\x12\x18\n" +
