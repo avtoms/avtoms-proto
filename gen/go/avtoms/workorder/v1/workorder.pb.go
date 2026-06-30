@@ -954,6 +954,8 @@ type ShopExpense struct {
 	Note          string                 `protobuf:"bytes,6,opt,name=note,proto3" json:"note,omitempty"`
 	CreatedAt     string                 `protobuf:"bytes,7,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
 	StaffId       string                 `protobuf:"bytes,8,opt,name=staff_id,json=staffId,proto3" json:"staff_id,omitempty"` // optional: the worker this cost is for (e.g. whose salary)
+	Payee         string                 `protobuf:"bytes,9,opt,name=payee,proto3" json:"payee,omitempty"`                    // optional: receiver/recipient of the payment (e.g. landlord, vendor)
+	PaidBy        string                 `protobuf:"bytes,10,opt,name=paid_by,json=paidBy,proto3" json:"paid_by,omitempty"`   // optional: staff id of the person who made the payment
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1040,6 +1042,20 @@ func (x *ShopExpense) GetCreatedAt() string {
 func (x *ShopExpense) GetStaffId() string {
 	if x != nil {
 		return x.StaffId
+	}
+	return ""
+}
+
+func (x *ShopExpense) GetPayee() string {
+	if x != nil {
+		return x.Payee
+	}
+	return ""
+}
+
+func (x *ShopExpense) GetPaidBy() string {
+	if x != nil {
+		return x.PaidBy
 	}
 	return ""
 }
@@ -1156,6 +1172,8 @@ type CreateShopExpenseRequest struct {
 	IncurredOn    string                 `protobuf:"bytes,4,opt,name=incurred_on,json=incurredOn,proto3" json:"incurred_on,omitempty"`
 	Note          string                 `protobuf:"bytes,5,opt,name=note,proto3" json:"note,omitempty"`
 	StaffId       string                 `protobuf:"bytes,6,opt,name=staff_id,json=staffId,proto3" json:"staff_id,omitempty"` // optional: worker this expense is for
+	Payee         string                 `protobuf:"bytes,7,opt,name=payee,proto3" json:"payee,omitempty"`                    // optional: receiver/recipient
+	PaidBy        string                 `protobuf:"bytes,8,opt,name=paid_by,json=paidBy,proto3" json:"paid_by,omitempty"`    // optional: staff id of the paying person
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1228,6 +1246,20 @@ func (x *CreateShopExpenseRequest) GetNote() string {
 func (x *CreateShopExpenseRequest) GetStaffId() string {
 	if x != nil {
 		return x.StaffId
+	}
+	return ""
+}
+
+func (x *CreateShopExpenseRequest) GetPayee() string {
+	if x != nil {
+		return x.Payee
+	}
+	return ""
+}
+
+func (x *CreateShopExpenseRequest) GetPaidBy() string {
+	if x != nil {
+		return x.PaidBy
 	}
 	return ""
 }
@@ -4900,7 +4932,7 @@ const file_avtoms_workorder_v1_workorder_proto_rawDesc = "" +
 	"\tstarts_on\x18\a \x01(\tR\bstartsOn\x12\x12\n" +
 	"\x04note\x18\b \x01(\tR\x04note\"%\n" +
 	"\x13VoidWarrantyRequest\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\"\xd9\x01\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\"\x88\x02\n" +
 	"\vShopExpense\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x17\n" +
 	"\ashop_id\x18\x02 \x01(\tR\x06shopId\x12\x1a\n" +
@@ -4911,13 +4943,16 @@ const file_avtoms_workorder_v1_workorder_proto_rawDesc = "" +
 	"\x04note\x18\x06 \x01(\tR\x04note\x12\x1d\n" +
 	"\n" +
 	"created_at\x18\a \x01(\tR\tcreatedAt\x12\x19\n" +
-	"\bstaff_id\x18\b \x01(\tR\astaffId\"V\n" +
+	"\bstaff_id\x18\b \x01(\tR\astaffId\x12\x14\n" +
+	"\x05payee\x18\t \x01(\tR\x05payee\x12\x17\n" +
+	"\apaid_by\x18\n" +
+	" \x01(\tR\x06paidBy\"V\n" +
 	"\x17ListShopExpensesRequest\x12\x17\n" +
 	"\ashop_id\x18\x01 \x01(\tR\x06shopId\x12\x12\n" +
 	"\x04from\x18\x02 \x01(\tR\x04from\x12\x0e\n" +
 	"\x02to\x18\x03 \x01(\tR\x02to\"X\n" +
 	"\x18ListShopExpensesResponse\x12<\n" +
-	"\bexpenses\x18\x01 \x03(\v2 .avtoms.workorder.v1.ShopExpenseR\bexpenses\"\xb7\x01\n" +
+	"\bexpenses\x18\x01 \x03(\v2 .avtoms.workorder.v1.ShopExpenseR\bexpenses\"\xe6\x01\n" +
 	"\x18CreateShopExpenseRequest\x12\x17\n" +
 	"\ashop_id\x18\x01 \x01(\tR\x06shopId\x12\x1a\n" +
 	"\bcategory\x18\x02 \x01(\tR\bcategory\x12\x16\n" +
@@ -4925,7 +4960,9 @@ const file_avtoms_workorder_v1_workorder_proto_rawDesc = "" +
 	"\vincurred_on\x18\x04 \x01(\tR\n" +
 	"incurredOn\x12\x12\n" +
 	"\x04note\x18\x05 \x01(\tR\x04note\x12\x19\n" +
-	"\bstaff_id\x18\x06 \x01(\tR\astaffId\"*\n" +
+	"\bstaff_id\x18\x06 \x01(\tR\astaffId\x12\x14\n" +
+	"\x05payee\x18\a \x01(\tR\x05payee\x12\x17\n" +
+	"\apaid_by\x18\b \x01(\tR\x06paidBy\"*\n" +
 	"\x18DeleteShopExpenseRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\"5\n" +
 	"\x19DeleteShopExpenseResponse\x12\x18\n" +

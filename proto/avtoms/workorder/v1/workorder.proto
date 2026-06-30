@@ -145,6 +145,8 @@ message ShopExpense {
   string note = 6;
   string created_at = 7;
   string staff_id = 8;    // optional: the worker this cost is for (e.g. whose salary)
+  string payee = 9;       // optional: receiver/recipient of the payment (e.g. landlord, vendor)
+  string paid_by = 10;    // optional: staff id of the person who made the payment
 }
 message ListShopExpensesRequest {
   string shop_id = 1;
@@ -161,6 +163,8 @@ message CreateShopExpenseRequest {
   string incurred_on = 4;
   string note = 5;
   string staff_id = 6; // optional: worker this expense is for
+  string payee = 7;    // optional: receiver/recipient
+  string paid_by = 8;  // optional: staff id of the paying person
 }
 message DeleteShopExpenseRequest {
   string id = 1;
