@@ -29,6 +29,8 @@ const (
 	WorkOrderService_StopTimer_FullMethodName               = "/avtoms.workorder.v1.WorkOrderService/StopTimer"
 	WorkOrderService_ListMenuItems_FullMethodName           = "/avtoms.workorder.v1.WorkOrderService/ListMenuItems"
 	WorkOrderService_CreateMenuItem_FullMethodName          = "/avtoms.workorder.v1.WorkOrderService/CreateMenuItem"
+	WorkOrderService_UpdateMenuItem_FullMethodName          = "/avtoms.workorder.v1.WorkOrderService/UpdateMenuItem"
+	WorkOrderService_ListMenuPriceHistory_FullMethodName    = "/avtoms.workorder.v1.WorkOrderService/ListMenuPriceHistory"
 	WorkOrderService_ListWorkOrders_FullMethodName          = "/avtoms.workorder.v1.WorkOrderService/ListWorkOrders"
 	WorkOrderService_GetShopSettings_FullMethodName         = "/avtoms.workorder.v1.WorkOrderService/GetShopSettings"
 	WorkOrderService_UpdateShopSettings_FullMethodName      = "/avtoms.workorder.v1.WorkOrderService/UpdateShopSettings"
@@ -74,6 +76,8 @@ type WorkOrderServiceClient interface {
 	StopTimer(ctx context.Context, in *StopTimerRequest, opts ...grpc.CallOption) (*TimeEntry, error)
 	ListMenuItems(ctx context.Context, in *ListMenuItemsRequest, opts ...grpc.CallOption) (*ListMenuItemsResponse, error)
 	CreateMenuItem(ctx context.Context, in *CreateMenuItemRequest, opts ...grpc.CallOption) (*MenuItem, error)
+	UpdateMenuItem(ctx context.Context, in *UpdateMenuItemRequest, opts ...grpc.CallOption) (*MenuItem, error)
+	ListMenuPriceHistory(ctx context.Context, in *ListMenuPriceHistoryRequest, opts ...grpc.CallOption) (*ListMenuPriceHistoryResponse, error)
 	ListWorkOrders(ctx context.Context, in *ListWorkOrdersRequest, opts ...grpc.CallOption) (*ListWorkOrdersResponse, error)
 	// Per-shop pricing policy (currently the negotiated-discount cap).
 	GetShopSettings(ctx context.Context, in *GetShopSettingsRequest, opts ...grpc.CallOption) (*ShopSettings, error)
@@ -214,6 +218,26 @@ func (c *workOrderServiceClient) CreateMenuItem(ctx context.Context, in *CreateM
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(MenuItem)
 	err := c.cc.Invoke(ctx, WorkOrderService_CreateMenuItem_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *workOrderServiceClient) UpdateMenuItem(ctx context.Context, in *UpdateMenuItemRequest, opts ...grpc.CallOption) (*MenuItem, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(MenuItem)
+	err := c.cc.Invoke(ctx, WorkOrderService_UpdateMenuItem_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *workOrderServiceClient) ListMenuPriceHistory(ctx context.Context, in *ListMenuPriceHistoryRequest, opts ...grpc.CallOption) (*ListMenuPriceHistoryResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListMenuPriceHistoryResponse)
+	err := c.cc.Invoke(ctx, WorkOrderService_ListMenuPriceHistory_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -506,6 +530,8 @@ type WorkOrderServiceServer interface {
 	StopTimer(context.Context, *StopTimerRequest) (*TimeEntry, error)
 	ListMenuItems(context.Context, *ListMenuItemsRequest) (*ListMenuItemsResponse, error)
 	CreateMenuItem(context.Context, *CreateMenuItemRequest) (*MenuItem, error)
+	UpdateMenuItem(context.Context, *UpdateMenuItemRequest) (*MenuItem, error)
+	ListMenuPriceHistory(context.Context, *ListMenuPriceHistoryRequest) (*ListMenuPriceHistoryResponse, error)
 	ListWorkOrders(context.Context, *ListWorkOrdersRequest) (*ListWorkOrdersResponse, error)
 	// Per-shop pricing policy (currently the negotiated-discount cap).
 	GetShopSettings(context.Context, *GetShopSettingsRequest) (*ShopSettings, error)
@@ -581,6 +607,12 @@ func (UnimplementedWorkOrderServiceServer) ListMenuItems(context.Context, *ListM
 }
 func (UnimplementedWorkOrderServiceServer) CreateMenuItem(context.Context, *CreateMenuItemRequest) (*MenuItem, error) {
 	return nil, status.Error(codes.Unimplemented, "method CreateMenuItem not implemented")
+}
+func (UnimplementedWorkOrderServiceServer) UpdateMenuItem(context.Context, *UpdateMenuItemRequest) (*MenuItem, error) {
+	return nil, status.Error(codes.Unimplemented, "method UpdateMenuItem not implemented")
+}
+func (UnimplementedWorkOrderServiceServer) ListMenuPriceHistory(context.Context, *ListMenuPriceHistoryRequest) (*ListMenuPriceHistoryResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListMenuPriceHistory not implemented")
 }
 func (UnimplementedWorkOrderServiceServer) ListWorkOrders(context.Context, *ListWorkOrdersRequest) (*ListWorkOrdersResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method ListWorkOrders not implemented")
@@ -860,6 +892,42 @@ func _WorkOrderService_CreateMenuItem_Handler(srv interface{}, ctx context.Conte
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(WorkOrderServiceServer).CreateMenuItem(ctx, req.(*CreateMenuItemRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _WorkOrderService_UpdateMenuItem_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateMenuItemRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WorkOrderServiceServer).UpdateMenuItem(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: WorkOrderService_UpdateMenuItem_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WorkOrderServiceServer).UpdateMenuItem(ctx, req.(*UpdateMenuItemRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _WorkOrderService_ListMenuPriceHistory_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListMenuPriceHistoryRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WorkOrderServiceServer).ListMenuPriceHistory(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: WorkOrderService_ListMenuPriceHistory_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WorkOrderServiceServer).ListMenuPriceHistory(ctx, req.(*ListMenuPriceHistoryRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -1396,6 +1464,14 @@ var WorkOrderService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CreateMenuItem",
 			Handler:    _WorkOrderService_CreateMenuItem_Handler,
+		},
+		{
+			MethodName: "UpdateMenuItem",
+			Handler:    _WorkOrderService_UpdateMenuItem_Handler,
+		},
+		{
+			MethodName: "ListMenuPriceHistory",
+			Handler:    _WorkOrderService_ListMenuPriceHistory_Handler,
 		},
 		{
 			MethodName: "ListWorkOrders",

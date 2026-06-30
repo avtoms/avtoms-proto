@@ -18,6 +18,8 @@ service WorkOrderService {
 
   rpc ListMenuItems(ListMenuItemsRequest) returns (ListMenuItemsResponse);
   rpc CreateMenuItem(CreateMenuItemRequest) returns (MenuItem);
+  rpc UpdateMenuItem(UpdateMenuItemRequest) returns (MenuItem);
+  rpc ListMenuPriceHistory(ListMenuPriceHistoryRequest) returns (ListMenuPriceHistoryResponse);
 
   rpc ListWorkOrders(ListWorkOrdersRequest) returns (ListWorkOrdersResponse);
 
@@ -527,4 +529,37 @@ message CreateMenuItemRequest {
   string category = 7;
   int32 estimated_minutes = 8;
   repeated MenuMaterial materials = 9; // materials this service is expected to need
+}
+
+// UpdateMenuItem edits an existing price-list item. A price or cost change is recorded in
+// the menu item's price history; existing work orders are unaffected (their line items keep
+// the price snapshot taken when they were added).
+message UpdateMenuItemRequest {
+  string id = 1;
+  string name_uz_latn = 2;
+  string name_uz_cyrl = 3;
+  string name_ru = 4;
+  int64 default_price = 5;
+  int64 default_cost = 6;
+  string category = 7;
+  int32 estimated_minutes = 8;
+  bool active = 9;
+  repeated MenuMaterial materials = 10;
+}
+
+// MenuPriceChange is one entry in a menu item's price/cost change log.
+message MenuPriceChange {
+  string id = 1;
+  string menu_item_id = 2;
+  int64 old_price = 3;
+  int64 new_price = 4;
+  int64 old_cost = 5;
+  int64 new_cost = 6;
+  string changed_at = 7; // RFC3339
+}
+message ListMenuPriceHistoryRequest {
+  string menu_item_id = 1;
+}
+message ListMenuPriceHistoryResponse {
+  repeated MenuPriceChange changes = 1;
 }
