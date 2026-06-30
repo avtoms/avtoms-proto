@@ -16,6 +16,7 @@ service CustomerService {
   rpc UpdateVehicle(UpdateVehicleRequest) returns (Vehicle);
   rpc DeleteVehicle(DeleteVehicleRequest) returns (Vehicle);
   rpc ListVehicles(ListVehiclesRequest) returns (ListVehiclesResponse);
+  rpc ListVehiclesByShop(ListVehiclesByShopRequest) returns (ListVehiclesResponse);
   rpc SearchByPlate(SearchByPlateRequest) returns (SearchByPlateResponse);
   rpc SoftDeleteCustomer(SoftDeleteCustomerRequest) returns (Customer);
   rpc ListCustomers(ListCustomersRequest) returns (ListCustomersResponse);
@@ -204,6 +205,10 @@ message ListVehiclesRequest {
 }
 message ListVehiclesResponse {
   repeated Vehicle vehicles = 1;
+}
+
+message ListVehiclesByShopRequest {
+  string shop_id = 1;
 }
 
 message SearchByPlateRequest {
