@@ -3501,10 +3501,11 @@ type WorkOrder struct {
 	// Set when a timer is currently running on this work order (the open time entry's start).
 	ActiveTimerStartedAt string `protobuf:"bytes,12,opt,name=active_timer_started_at,json=activeTimerStartedAt,proto3" json:"active_timer_started_at,omitempty"`
 	// Denormalized vehicle + customer info, filled by the gateway for display (read-only).
-	Plate        string `protobuf:"bytes,13,opt,name=plate,proto3" json:"plate,omitempty"`
-	Make         string `protobuf:"bytes,14,opt,name=make,proto3" json:"make,omitempty"`
-	Model        string `protobuf:"bytes,15,opt,name=model,proto3" json:"model,omitempty"`
-	CustomerName string `protobuf:"bytes,16,opt,name=customer_name,json=customerName,proto3" json:"customer_name,omitempty"`
+	Plate           string `protobuf:"bytes,13,opt,name=plate,proto3" json:"plate,omitempty"`
+	Make            string `protobuf:"bytes,14,opt,name=make,proto3" json:"make,omitempty"`
+	Model           string `protobuf:"bytes,15,opt,name=model,proto3" json:"model,omitempty"`
+	CustomerName    string `protobuf:"bytes,16,opt,name=customer_name,json=customerName,proto3" json:"customer_name,omitempty"`
+	VehicleImageUrl string `protobuf:"bytes,20,opt,name=vehicle_image_url,json=vehicleImageUrl,proto3" json:"vehicle_image_url,omitempty"` // denormalized car photo url, filled by the gateway
 	// Sum of cost*quantity across line items, in tiyin: the shop's total expense on this order.
 	TotalCost int64 `protobuf:"varint,17,opt,name=total_cost,json=totalCost,proto3" json:"total_cost,omitempty"`
 	// Gross margin before VAT, in tiyin: subtotal - total_cost.
@@ -3654,6 +3655,13 @@ func (x *WorkOrder) GetModel() string {
 func (x *WorkOrder) GetCustomerName() string {
 	if x != nil {
 		return x.CustomerName
+	}
+	return ""
+}
+
+func (x *WorkOrder) GetVehicleImageUrl() string {
+	if x != nil {
+		return x.VehicleImageUrl
 	}
 	return ""
 }
@@ -5147,7 +5155,7 @@ const file_avtoms_workorder_v1_workorder_proto_rawDesc = "" +
 	"\x04cost\x18\x06 \x01(\x03R\x04cost\x12 \n" +
 	"\fmenu_item_id\x18\a \x01(\tR\n" +
 	"menuItemId\x12#\n" +
-	"\rdefault_price\x18\b \x01(\x03R\fdefaultPrice\"\xf0\x04\n" +
+	"\rdefault_price\x18\b \x01(\x03R\fdefaultPrice\"\x9c\x05\n" +
 	"\tWorkOrder\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x17\n" +
 	"\ashop_id\x18\x02 \x01(\tR\x06shopId\x12\x1d\n" +
@@ -5168,7 +5176,8 @@ const file_avtoms_workorder_v1_workorder_proto_rawDesc = "" +
 	"\x05plate\x18\r \x01(\tR\x05plate\x12\x12\n" +
 	"\x04make\x18\x0e \x01(\tR\x04make\x12\x14\n" +
 	"\x05model\x18\x0f \x01(\tR\x05model\x12#\n" +
-	"\rcustomer_name\x18\x10 \x01(\tR\fcustomerName\x12\x1d\n" +
+	"\rcustomer_name\x18\x10 \x01(\tR\fcustomerName\x12*\n" +
+	"\x11vehicle_image_url\x18\x14 \x01(\tR\x0fvehicleImageUrl\x12\x1d\n" +
 	"\n" +
 	"total_cost\x18\x11 \x01(\x03R\ttotalCost\x12!\n" +
 	"\ftotal_margin\x18\x12 \x01(\x03R\vtotalMargin\x12\x19\n" +

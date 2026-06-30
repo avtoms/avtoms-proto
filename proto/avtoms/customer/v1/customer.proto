@@ -142,6 +142,7 @@ message Vehicle {
   string engine = 12;
   string transmission = 13;
   string notes = 14;
+  string image_url = 15; // optional uploaded photo of this car
 }
 
 message CreateCustomerRequest {
@@ -177,6 +178,7 @@ message CreateVehicleRequest {
   int32 year = 6;
   int64 mileage = 7;
   PlateType plate_type = 8;
+  string image_url = 9;
 }
 
 message GetVehicleRequest {
@@ -195,6 +197,7 @@ message UpdateVehicleRequest {
   string engine = 10;
   string transmission = 11;
   string notes = 12;
+  string image_url = 13;
 }
 message DeleteVehicleRequest {
   string id = 1;

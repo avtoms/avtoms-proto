@@ -438,6 +438,7 @@ message WorkOrder {
   string make = 14;
   string model = 15;
   string customer_name = 16;
+  string vehicle_image_url = 20; // denormalized car photo url, filled by the gateway
   // Sum of cost*quantity across line items, in tiyin: the shop's total expense on this order.
   int64 total_cost = 17;
   // Gross margin before VAT, in tiyin: subtotal - total_cost.

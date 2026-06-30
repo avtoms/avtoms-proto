@@ -1010,6 +1010,7 @@ type Vehicle struct {
 	Engine        string                 `protobuf:"bytes,12,opt,name=engine,proto3" json:"engine,omitempty"`
 	Transmission  string                 `protobuf:"bytes,13,opt,name=transmission,proto3" json:"transmission,omitempty"`
 	Notes         string                 `protobuf:"bytes,14,opt,name=notes,proto3" json:"notes,omitempty"`
+	ImageUrl      string                 `protobuf:"bytes,15,opt,name=image_url,json=imageUrl,proto3" json:"image_url,omitempty"` // optional uploaded photo of this car
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1138,6 +1139,13 @@ func (x *Vehicle) GetTransmission() string {
 func (x *Vehicle) GetNotes() string {
 	if x != nil {
 		return x.Notes
+	}
+	return ""
+}
+
+func (x *Vehicle) GetImageUrl() string {
+	if x != nil {
+		return x.ImageUrl
 	}
 	return ""
 }
@@ -1388,6 +1396,7 @@ type CreateVehicleRequest struct {
 	Year          int32                  `protobuf:"varint,6,opt,name=year,proto3" json:"year,omitempty"`
 	Mileage       int64                  `protobuf:"varint,7,opt,name=mileage,proto3" json:"mileage,omitempty"`
 	PlateType     PlateType              `protobuf:"varint,8,opt,name=plate_type,json=plateType,proto3,enum=avtoms.customer.v1.PlateType" json:"plate_type,omitempty"`
+	ImageUrl      string                 `protobuf:"bytes,9,opt,name=image_url,json=imageUrl,proto3" json:"image_url,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1478,6 +1487,13 @@ func (x *CreateVehicleRequest) GetPlateType() PlateType {
 	return PlateType_PLATE_TYPE_UNSPECIFIED
 }
 
+func (x *CreateVehicleRequest) GetImageUrl() string {
+	if x != nil {
+		return x.ImageUrl
+	}
+	return ""
+}
+
 type GetVehicleRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
@@ -1536,6 +1552,7 @@ type UpdateVehicleRequest struct {
 	Engine        string                 `protobuf:"bytes,10,opt,name=engine,proto3" json:"engine,omitempty"`
 	Transmission  string                 `protobuf:"bytes,11,opt,name=transmission,proto3" json:"transmission,omitempty"`
 	Notes         string                 `protobuf:"bytes,12,opt,name=notes,proto3" json:"notes,omitempty"`
+	ImageUrl      string                 `protobuf:"bytes,13,opt,name=image_url,json=imageUrl,proto3" json:"image_url,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1650,6 +1667,13 @@ func (x *UpdateVehicleRequest) GetTransmission() string {
 func (x *UpdateVehicleRequest) GetNotes() string {
 	if x != nil {
 		return x.Notes
+	}
+	return ""
+}
+
+func (x *UpdateVehicleRequest) GetImageUrl() string {
+	if x != nil {
+		return x.ImageUrl
 	}
 	return ""
 }
@@ -2034,7 +2058,7 @@ const file_avtoms_customer_v1_customer_proto_rawDesc = "" +
 	"\x1dGetTelegramLinkByPhoneRequest\x12\x14\n" +
 	"\x05phone\x18\x01 \x01(\tR\x05phone\"9\n" +
 	"\x1eListCustomersByTelegramRequest\x12\x17\n" +
-	"\achat_id\x18\x01 \x01(\tR\x06chatId\"\xfa\x02\n" +
+	"\achat_id\x18\x01 \x01(\tR\x06chatId\"\x97\x03\n" +
 	"\aVehicle\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1f\n" +
 	"\vcustomer_id\x18\x02 \x01(\tR\n" +
@@ -2052,7 +2076,8 @@ const file_avtoms_customer_v1_customer_proto_rawDesc = "" +
 	"\x05color\x18\v \x01(\tR\x05color\x12\x16\n" +
 	"\x06engine\x18\f \x01(\tR\x06engine\x12\"\n" +
 	"\ftransmission\x18\r \x01(\tR\ftransmission\x12\x14\n" +
-	"\x05notes\x18\x0e \x01(\tR\x05notes\"\xd4\x01\n" +
+	"\x05notes\x18\x0e \x01(\tR\x05notes\x12\x1b\n" +
+	"\timage_url\x18\x0f \x01(\tR\bimageUrl\"\xd4\x01\n" +
 	"\x15CreateCustomerRequest\x12\x17\n" +
 	"\ashop_id\x18\x01 \x01(\tR\x06shopId\x12\x14\n" +
 	"\x05phone\x18\x02 \x01(\tR\x05phone\x12\x12\n" +
@@ -2071,7 +2096,7 @@ const file_avtoms_customer_v1_customer_proto_rawDesc = "" +
 	"\x05notes\x18\x06 \x01(\tR\x05notes\x12\x14\n" +
 	"\x05email\x18\a \x01(\tR\x05email\x12\x18\n" +
 	"\aaddress\x18\b \x01(\tR\aaddress\x12\x1a\n" +
-	"\bbirthday\x18\t \x01(\tR\bbirthday\"\xf5\x01\n" +
+	"\bbirthday\x18\t \x01(\tR\bbirthday\"\x92\x02\n" +
 	"\x14CreateVehicleRequest\x12\x1f\n" +
 	"\vcustomer_id\x18\x01 \x01(\tR\n" +
 	"customerId\x12\x14\n" +
@@ -2082,9 +2107,10 @@ const file_avtoms_customer_v1_customer_proto_rawDesc = "" +
 	"\x04year\x18\x06 \x01(\x05R\x04year\x12\x18\n" +
 	"\amileage\x18\a \x01(\x03R\amileage\x12<\n" +
 	"\n" +
-	"plate_type\x18\b \x01(\x0e2\x1d.avtoms.customer.v1.PlateTypeR\tplateType\"#\n" +
+	"plate_type\x18\b \x01(\x0e2\x1d.avtoms.customer.v1.PlateTypeR\tplateType\x12\x1b\n" +
+	"\timage_url\x18\t \x01(\tR\bimageUrl\"#\n" +
 	"\x11GetVehicleRequest\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\"\xcc\x02\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\"\xe9\x02\n" +
 	"\x14UpdateVehicleRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x14\n" +
 	"\x05plate\x18\x02 \x01(\tR\x05plate\x12\x10\n" +
@@ -2099,7 +2125,8 @@ const file_avtoms_customer_v1_customer_proto_rawDesc = "" +
 	"\x06engine\x18\n" +
 	" \x01(\tR\x06engine\x12\"\n" +
 	"\ftransmission\x18\v \x01(\tR\ftransmission\x12\x14\n" +
-	"\x05notes\x18\f \x01(\tR\x05notes\"&\n" +
+	"\x05notes\x18\f \x01(\tR\x05notes\x12\x1b\n" +
+	"\timage_url\x18\r \x01(\tR\bimageUrl\"&\n" +
 	"\x14DeleteVehicleRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\"6\n" +
 	"\x13ListVehiclesRequest\x12\x1f\n" +
