@@ -12,6 +12,7 @@ service WorkOrderService {
   rpc RemoveLineItem(RemoveLineItemRequest) returns (WorkOrder);
   rpc TransitionState(TransitionStateRequest) returns (WorkOrder);
   rpc AssignMechanic(AssignMechanicRequest) returns (WorkOrder);
+  rpc AssignLineItem(AssignLineItemRequest) returns (WorkOrder);
 
   rpc StartTimer(StartTimerRequest) returns (TimeEntry);
   rpc StopTimer(StopTimerRequest) returns (TimeEntry);
@@ -417,6 +418,9 @@ message LineItem {
   // Snapshot of the menu item's default_price when the line was added, in tiyin.
   // Enables a negotiation/discount audit: discount = (default_price - unit_price) * quantity.
   int64 default_price = 8;
+  // Mechanic assigned to this specific service line (empty = unassigned). Lets one order be
+  // split across mechanics (e.g. polishing → A, engine → B), independent of the order lead.
+  string assigned_mechanic_id = 9;
 }
 
 message WorkOrder {
@@ -509,6 +513,11 @@ message TransitionStateRequest {
 message AssignMechanicRequest {
   string work_order_id = 1;
   string mechanic_id = 2;
+}
+message AssignLineItemRequest {
+  string work_order_id = 1;
+  string line_item_id = 2;
+  string mechanic_id = 3; // empty clears the assignment
 }
 message StartTimerRequest {
   string work_order_id = 1;
