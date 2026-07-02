@@ -19,17 +19,19 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	AuthService_RequestOtp_FullMethodName      = "/avtoms.auth.v1.AuthService/RequestOtp"
-	AuthService_VerifyOtp_FullMethodName       = "/avtoms.auth.v1.AuthService/VerifyOtp"
-	AuthService_RefreshToken_FullMethodName    = "/avtoms.auth.v1.AuthService/RefreshToken"
-	AuthService_Authenticate_FullMethodName    = "/avtoms.auth.v1.AuthService/Authenticate"
-	AuthService_InviteMechanic_FullMethodName  = "/avtoms.auth.v1.AuthService/InviteMechanic"
-	AuthService_DeactivateStaff_FullMethodName = "/avtoms.auth.v1.AuthService/DeactivateStaff"
-	AuthService_UpdateStaff_FullMethodName     = "/avtoms.auth.v1.AuthService/UpdateStaff"
-	AuthService_ListStaff_FullMethodName       = "/avtoms.auth.v1.AuthService/ListStaff"
-	AuthService_ListAllStaff_FullMethodName    = "/avtoms.auth.v1.AuthService/ListAllStaff"
-	AuthService_SetStaffActive_FullMethodName  = "/avtoms.auth.v1.AuthService/SetStaffActive"
-	AuthService_SetStaffRole_FullMethodName    = "/avtoms.auth.v1.AuthService/SetStaffRole"
+	AuthService_RequestOtp_FullMethodName          = "/avtoms.auth.v1.AuthService/RequestOtp"
+	AuthService_VerifyOtp_FullMethodName           = "/avtoms.auth.v1.AuthService/VerifyOtp"
+	AuthService_RefreshToken_FullMethodName        = "/avtoms.auth.v1.AuthService/RefreshToken"
+	AuthService_Authenticate_FullMethodName        = "/avtoms.auth.v1.AuthService/Authenticate"
+	AuthService_InviteMechanic_FullMethodName      = "/avtoms.auth.v1.AuthService/InviteMechanic"
+	AuthService_DeactivateStaff_FullMethodName     = "/avtoms.auth.v1.AuthService/DeactivateStaff"
+	AuthService_UpdateStaff_FullMethodName         = "/avtoms.auth.v1.AuthService/UpdateStaff"
+	AuthService_ListStaff_FullMethodName           = "/avtoms.auth.v1.AuthService/ListStaff"
+	AuthService_GetMe_FullMethodName               = "/avtoms.auth.v1.AuthService/GetMe"
+	AuthService_SetStaffPermissions_FullMethodName = "/avtoms.auth.v1.AuthService/SetStaffPermissions"
+	AuthService_ListAllStaff_FullMethodName        = "/avtoms.auth.v1.AuthService/ListAllStaff"
+	AuthService_SetStaffActive_FullMethodName      = "/avtoms.auth.v1.AuthService/SetStaffActive"
+	AuthService_SetStaffRole_FullMethodName        = "/avtoms.auth.v1.AuthService/SetStaffRole"
 )
 
 // AuthServiceClient is the client API for AuthService service.
@@ -49,6 +51,12 @@ type AuthServiceClient interface {
 	DeactivateStaff(ctx context.Context, in *DeactivateStaffRequest, opts ...grpc.CallOption) (*Staff, error)
 	UpdateStaff(ctx context.Context, in *UpdateStaffRequest, opts ...grpc.CallOption) (*Staff, error)
 	ListStaff(ctx context.Context, in *ListStaffRequest, opts ...grpc.CallOption) (*ListStaffResponse, error)
+	// GetMe returns the caller's own live staff record (used by the mechanic app to pick up
+	// owner-granted permissions without re-logging in). staff_id is injected by the gateway.
+	GetMe(ctx context.Context, in *GetMeRequest, opts ...grpc.CallOption) (*Staff, error)
+	// SetStaffPermissions lets an owner grant/revoke a worker's extra capabilities
+	// (e.g. creating work orders). Owner-scoped at the gateway.
+	SetStaffPermissions(ctx context.Context, in *SetStaffPermissionsRequest, opts ...grpc.CallOption) (*Staff, error)
 	// Super-admin user management (admin-only, across all shops).
 	ListAllStaff(ctx context.Context, in *ListAllStaffRequest, opts ...grpc.CallOption) (*ListStaffResponse, error)
 	SetStaffActive(ctx context.Context, in *SetStaffActiveRequest, opts ...grpc.CallOption) (*Staff, error)
@@ -143,6 +151,26 @@ func (c *authServiceClient) ListStaff(ctx context.Context, in *ListStaffRequest,
 	return out, nil
 }
 
+func (c *authServiceClient) GetMe(ctx context.Context, in *GetMeRequest, opts ...grpc.CallOption) (*Staff, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Staff)
+	err := c.cc.Invoke(ctx, AuthService_GetMe_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *authServiceClient) SetStaffPermissions(ctx context.Context, in *SetStaffPermissionsRequest, opts ...grpc.CallOption) (*Staff, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Staff)
+	err := c.cc.Invoke(ctx, AuthService_SetStaffPermissions_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *authServiceClient) ListAllStaff(ctx context.Context, in *ListAllStaffRequest, opts ...grpc.CallOption) (*ListStaffResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(ListStaffResponse)
@@ -190,6 +218,12 @@ type AuthServiceServer interface {
 	DeactivateStaff(context.Context, *DeactivateStaffRequest) (*Staff, error)
 	UpdateStaff(context.Context, *UpdateStaffRequest) (*Staff, error)
 	ListStaff(context.Context, *ListStaffRequest) (*ListStaffResponse, error)
+	// GetMe returns the caller's own live staff record (used by the mechanic app to pick up
+	// owner-granted permissions without re-logging in). staff_id is injected by the gateway.
+	GetMe(context.Context, *GetMeRequest) (*Staff, error)
+	// SetStaffPermissions lets an owner grant/revoke a worker's extra capabilities
+	// (e.g. creating work orders). Owner-scoped at the gateway.
+	SetStaffPermissions(context.Context, *SetStaffPermissionsRequest) (*Staff, error)
 	// Super-admin user management (admin-only, across all shops).
 	ListAllStaff(context.Context, *ListAllStaffRequest) (*ListStaffResponse, error)
 	SetStaffActive(context.Context, *SetStaffActiveRequest) (*Staff, error)
@@ -227,6 +261,12 @@ func (UnimplementedAuthServiceServer) UpdateStaff(context.Context, *UpdateStaffR
 }
 func (UnimplementedAuthServiceServer) ListStaff(context.Context, *ListStaffRequest) (*ListStaffResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method ListStaff not implemented")
+}
+func (UnimplementedAuthServiceServer) GetMe(context.Context, *GetMeRequest) (*Staff, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetMe not implemented")
+}
+func (UnimplementedAuthServiceServer) SetStaffPermissions(context.Context, *SetStaffPermissionsRequest) (*Staff, error) {
+	return nil, status.Error(codes.Unimplemented, "method SetStaffPermissions not implemented")
 }
 func (UnimplementedAuthServiceServer) ListAllStaff(context.Context, *ListAllStaffRequest) (*ListStaffResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method ListAllStaff not implemented")
@@ -402,6 +442,42 @@ func _AuthService_ListStaff_Handler(srv interface{}, ctx context.Context, dec fu
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AuthService_GetMe_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetMeRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServiceServer).GetMe(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AuthService_GetMe_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServiceServer).GetMe(ctx, req.(*GetMeRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AuthService_SetStaffPermissions_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SetStaffPermissionsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServiceServer).SetStaffPermissions(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AuthService_SetStaffPermissions_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServiceServer).SetStaffPermissions(ctx, req.(*SetStaffPermissionsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _AuthService_ListAllStaff_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ListAllStaffRequest)
 	if err := dec(in); err != nil {
@@ -494,6 +570,14 @@ var AuthService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ListStaff",
 			Handler:    _AuthService_ListStaff_Handler,
+		},
+		{
+			MethodName: "GetMe",
+			Handler:    _AuthService_GetMe_Handler,
+		},
+		{
+			MethodName: "SetStaffPermissions",
+			Handler:    _AuthService_SetStaffPermissions_Handler,
 		},
 		{
 			MethodName: "ListAllStaff",

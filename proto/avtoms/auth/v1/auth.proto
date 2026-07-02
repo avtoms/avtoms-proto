@@ -20,6 +20,13 @@ service AuthService {
   rpc UpdateStaff(UpdateStaffRequest) returns (Staff);
   rpc ListStaff(ListStaffRequest) returns (ListStaffResponse);
 
+  // GetMe returns the caller's own live staff record (used by the mechanic app to pick up
+  // owner-granted permissions without re-logging in). staff_id is injected by the gateway.
+  rpc GetMe(GetMeRequest) returns (Staff);
+  // SetStaffPermissions lets an owner grant/revoke a worker's extra capabilities
+  // (e.g. creating work orders). Owner-scoped at the gateway.
+  rpc SetStaffPermissions(SetStaffPermissionsRequest) returns (Staff);
+
   // Super-admin user management (admin-only, across all shops).
   rpc ListAllStaff(ListAllStaffRequest) returns (ListStaffResponse);
   rpc SetStaffActive(SetStaffActiveRequest) returns (Staff);
@@ -52,6 +59,8 @@ message Staff {
   bool active = 6;
   string created_at = 7;
   string avatar_url = 8; // profile photo URL (object storage), may be empty
+  // Extra capability granted by the owner: a mechanic with this set may create work orders.
+  bool can_create_orders = 9;
 }
 
 message UpdateStaffRequest {
@@ -59,6 +68,15 @@ message UpdateStaffRequest {
   string name = 2;
   string phone = 3;
   string avatar_url = 4;
+}
+
+message GetMeRequest {
+  string staff_id = 1; // injected by the gateway from the authenticated context
+}
+
+message SetStaffPermissionsRequest {
+  string staff_id = 1;
+  bool can_create_orders = 2;
 }
 
 message RequestOtpRequest {
@@ -92,6 +110,9 @@ message AuthenticateResponse {
   string staff_id = 1;
   string shop_id = 2;
   Role role = 3;
+  // Live capability flag so the gateway can authorize actions (e.g. creating work orders)
+  // immediately after an owner grants them, without waiting for the token to be re-issued.
+  bool can_create_orders = 4;
 }
 
 message InviteMechanicRequest {
