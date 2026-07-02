@@ -30,6 +30,10 @@ const (
 	NotificationService_CreateDemoRequest_FullMethodName    = "/avtoms.notification.v1.NotificationService/CreateDemoRequest"
 	NotificationService_ListDemoRequests_FullMethodName     = "/avtoms.notification.v1.NotificationService/ListDemoRequests"
 	NotificationService_SetDemoRequestStatus_FullMethodName = "/avtoms.notification.v1.NotificationService/SetDemoRequestStatus"
+	NotificationService_CreateLead_FullMethodName           = "/avtoms.notification.v1.NotificationService/CreateLead"
+	NotificationService_ListLeads_FullMethodName            = "/avtoms.notification.v1.NotificationService/ListLeads"
+	NotificationService_UpdateLead_FullMethodName           = "/avtoms.notification.v1.NotificationService/UpdateLead"
+	NotificationService_DeleteLead_FullMethodName           = "/avtoms.notification.v1.NotificationService/DeleteLead"
 )
 
 // NotificationServiceClient is the client API for NotificationService service.
@@ -58,6 +62,12 @@ type NotificationServiceClient interface {
 	CreateDemoRequest(ctx context.Context, in *CreateDemoRequestRequest, opts ...grpc.CallOption) (*DemoRequest, error)
 	ListDemoRequests(ctx context.Context, in *ListDemoRequestsRequest, opts ...grpc.CallOption) (*ListDemoRequestsResponse, error)
 	SetDemoRequestStatus(ctx context.Context, in *SetDemoRequestStatusRequest, opts ...grpc.CallOption) (*DemoRequest, error)
+	// Sales CRM leads (potential customers the super-admin manages by hand): full contact +
+	// deal details, edited through the pipeline. Super-admin only at the gateway.
+	CreateLead(ctx context.Context, in *CreateLeadRequest, opts ...grpc.CallOption) (*Lead, error)
+	ListLeads(ctx context.Context, in *ListLeadsRequest, opts ...grpc.CallOption) (*ListLeadsResponse, error)
+	UpdateLead(ctx context.Context, in *UpdateLeadRequest, opts ...grpc.CallOption) (*Lead, error)
+	DeleteLead(ctx context.Context, in *DeleteLeadRequest, opts ...grpc.CallOption) (*DeleteLeadResponse, error)
 }
 
 type notificationServiceClient struct {
@@ -178,6 +188,46 @@ func (c *notificationServiceClient) SetDemoRequestStatus(ctx context.Context, in
 	return out, nil
 }
 
+func (c *notificationServiceClient) CreateLead(ctx context.Context, in *CreateLeadRequest, opts ...grpc.CallOption) (*Lead, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Lead)
+	err := c.cc.Invoke(ctx, NotificationService_CreateLead_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *notificationServiceClient) ListLeads(ctx context.Context, in *ListLeadsRequest, opts ...grpc.CallOption) (*ListLeadsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListLeadsResponse)
+	err := c.cc.Invoke(ctx, NotificationService_ListLeads_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *notificationServiceClient) UpdateLead(ctx context.Context, in *UpdateLeadRequest, opts ...grpc.CallOption) (*Lead, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Lead)
+	err := c.cc.Invoke(ctx, NotificationService_UpdateLead_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *notificationServiceClient) DeleteLead(ctx context.Context, in *DeleteLeadRequest, opts ...grpc.CallOption) (*DeleteLeadResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(DeleteLeadResponse)
+	err := c.cc.Invoke(ctx, NotificationService_DeleteLead_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // NotificationServiceServer is the server API for NotificationService service.
 // All implementations must embed UnimplementedNotificationServiceServer
 // for forward compatibility.
@@ -204,6 +254,12 @@ type NotificationServiceServer interface {
 	CreateDemoRequest(context.Context, *CreateDemoRequestRequest) (*DemoRequest, error)
 	ListDemoRequests(context.Context, *ListDemoRequestsRequest) (*ListDemoRequestsResponse, error)
 	SetDemoRequestStatus(context.Context, *SetDemoRequestStatusRequest) (*DemoRequest, error)
+	// Sales CRM leads (potential customers the super-admin manages by hand): full contact +
+	// deal details, edited through the pipeline. Super-admin only at the gateway.
+	CreateLead(context.Context, *CreateLeadRequest) (*Lead, error)
+	ListLeads(context.Context, *ListLeadsRequest) (*ListLeadsResponse, error)
+	UpdateLead(context.Context, *UpdateLeadRequest) (*Lead, error)
+	DeleteLead(context.Context, *DeleteLeadRequest) (*DeleteLeadResponse, error)
 	mustEmbedUnimplementedNotificationServiceServer()
 }
 
@@ -246,6 +302,18 @@ func (UnimplementedNotificationServiceServer) ListDemoRequests(context.Context, 
 }
 func (UnimplementedNotificationServiceServer) SetDemoRequestStatus(context.Context, *SetDemoRequestStatusRequest) (*DemoRequest, error) {
 	return nil, status.Error(codes.Unimplemented, "method SetDemoRequestStatus not implemented")
+}
+func (UnimplementedNotificationServiceServer) CreateLead(context.Context, *CreateLeadRequest) (*Lead, error) {
+	return nil, status.Error(codes.Unimplemented, "method CreateLead not implemented")
+}
+func (UnimplementedNotificationServiceServer) ListLeads(context.Context, *ListLeadsRequest) (*ListLeadsResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListLeads not implemented")
+}
+func (UnimplementedNotificationServiceServer) UpdateLead(context.Context, *UpdateLeadRequest) (*Lead, error) {
+	return nil, status.Error(codes.Unimplemented, "method UpdateLead not implemented")
+}
+func (UnimplementedNotificationServiceServer) DeleteLead(context.Context, *DeleteLeadRequest) (*DeleteLeadResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method DeleteLead not implemented")
 }
 func (UnimplementedNotificationServiceServer) mustEmbedUnimplementedNotificationServiceServer() {}
 func (UnimplementedNotificationServiceServer) testEmbeddedByValue()                             {}
@@ -466,6 +534,78 @@ func _NotificationService_SetDemoRequestStatus_Handler(srv interface{}, ctx cont
 	return interceptor(ctx, in, info, handler)
 }
 
+func _NotificationService_CreateLead_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateLeadRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(NotificationServiceServer).CreateLead(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: NotificationService_CreateLead_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(NotificationServiceServer).CreateLead(ctx, req.(*CreateLeadRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _NotificationService_ListLeads_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListLeadsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(NotificationServiceServer).ListLeads(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: NotificationService_ListLeads_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(NotificationServiceServer).ListLeads(ctx, req.(*ListLeadsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _NotificationService_UpdateLead_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateLeadRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(NotificationServiceServer).UpdateLead(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: NotificationService_UpdateLead_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(NotificationServiceServer).UpdateLead(ctx, req.(*UpdateLeadRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _NotificationService_DeleteLead_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteLeadRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(NotificationServiceServer).DeleteLead(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: NotificationService_DeleteLead_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(NotificationServiceServer).DeleteLead(ctx, req.(*DeleteLeadRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // NotificationService_ServiceDesc is the grpc.ServiceDesc for NotificationService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -516,6 +656,22 @@ var NotificationService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "SetDemoRequestStatus",
 			Handler:    _NotificationService_SetDemoRequestStatus_Handler,
+		},
+		{
+			MethodName: "CreateLead",
+			Handler:    _NotificationService_CreateLead_Handler,
+		},
+		{
+			MethodName: "ListLeads",
+			Handler:    _NotificationService_ListLeads_Handler,
+		},
+		{
+			MethodName: "UpdateLead",
+			Handler:    _NotificationService_UpdateLead_Handler,
+		},
+		{
+			MethodName: "DeleteLead",
+			Handler:    _NotificationService_DeleteLead_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

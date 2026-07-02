@@ -30,6 +30,69 @@ service NotificationService {
   rpc CreateDemoRequest(CreateDemoRequestRequest) returns (DemoRequest);
   rpc ListDemoRequests(ListDemoRequestsRequest) returns (ListDemoRequestsResponse);
   rpc SetDemoRequestStatus(SetDemoRequestStatusRequest) returns (DemoRequest);
+
+  // Sales CRM leads (potential customers the super-admin manages by hand): full contact +
+  // deal details, edited through the pipeline. Super-admin only at the gateway.
+  rpc CreateLead(CreateLeadRequest) returns (Lead);
+  rpc ListLeads(ListLeadsRequest) returns (ListLeadsResponse);
+  rpc UpdateLead(UpdateLeadRequest) returns (Lead);
+  rpc DeleteLead(DeleteLeadRequest) returns (DeleteLeadResponse);
+}
+
+// Lead is a potential customer tracked in the sales CRM: everything a lead can carry, from
+// contact details and a photo to the deal price actually negotiated and its pipeline status.
+message Lead {
+  string id = 1;
+  string name = 2;
+  string phone = 3;
+  string email = 4;
+  string company = 5;    // garage / business name
+  string image_url = 6;  // photo or logo (object storage URL)
+  string city = 7;
+  string address = 8;
+  string source = 9;     // landing | referral | cold | telegram | instagram | walk_in | other
+  string status = 10;    // new | contacted | qualified | negotiating | won | lost
+  int64 deal_price = 11; // negotiated deal price in soum (0 until agreed)
+  string notes = 12;
+  string created_at = 13;
+  string updated_at = 14;
+}
+message CreateLeadRequest {
+  string name = 1;
+  string phone = 2;
+  string email = 3;
+  string company = 4;
+  string image_url = 5;
+  string city = 6;
+  string address = 7;
+  string source = 8;
+  string status = 9;
+  int64 deal_price = 10;
+  string notes = 11;
+}
+message ListLeadsRequest {}
+message ListLeadsResponse {
+  repeated Lead leads = 1;
+}
+message UpdateLeadRequest {
+  string id = 1;
+  string name = 2;
+  string phone = 3;
+  string email = 4;
+  string company = 5;
+  string image_url = 6;
+  string city = 7;
+  string address = 8;
+  string source = 9;
+  string status = 10;
+  int64 deal_price = 11;
+  string notes = 12;
+}
+message DeleteLeadRequest {
+  string id = 1;
+}
+message DeleteLeadResponse {
+  bool ok = 1;
 }
 
 // DemoRequest is a sales lead submitted from the public landing page.
