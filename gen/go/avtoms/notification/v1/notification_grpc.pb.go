@@ -34,6 +34,10 @@ const (
 	NotificationService_ListLeads_FullMethodName            = "/avtoms.notification.v1.NotificationService/ListLeads"
 	NotificationService_UpdateLead_FullMethodName           = "/avtoms.notification.v1.NotificationService/UpdateLead"
 	NotificationService_DeleteLead_FullMethodName           = "/avtoms.notification.v1.NotificationService/DeleteLead"
+	NotificationService_ListAiConversations_FullMethodName  = "/avtoms.notification.v1.NotificationService/ListAiConversations"
+	NotificationService_GetAiConversation_FullMethodName    = "/avtoms.notification.v1.NotificationService/GetAiConversation"
+	NotificationService_AppendAiMessages_FullMethodName     = "/avtoms.notification.v1.NotificationService/AppendAiMessages"
+	NotificationService_DeleteAiConversation_FullMethodName = "/avtoms.notification.v1.NotificationService/DeleteAiConversation"
 )
 
 // NotificationServiceClient is the client API for NotificationService service.
@@ -68,6 +72,12 @@ type NotificationServiceClient interface {
 	ListLeads(ctx context.Context, in *ListLeadsRequest, opts ...grpc.CallOption) (*ListLeadsResponse, error)
 	UpdateLead(ctx context.Context, in *UpdateLeadRequest, opts ...grpc.CallOption) (*Lead, error)
 	DeleteLead(ctx context.Context, in *DeleteLeadRequest, opts ...grpc.CallOption) (*DeleteLeadResponse, error)
+	// Persisted AI-assistant conversations (owner / super-admin chat history), scoped
+	// to the staff member who owns them so threads follow the user across devices.
+	ListAiConversations(ctx context.Context, in *ListAiConversationsRequest, opts ...grpc.CallOption) (*ListAiConversationsResponse, error)
+	GetAiConversation(ctx context.Context, in *GetAiConversationRequest, opts ...grpc.CallOption) (*GetAiConversationResponse, error)
+	AppendAiMessages(ctx context.Context, in *AppendAiMessagesRequest, opts ...grpc.CallOption) (*AppendAiMessagesResponse, error)
+	DeleteAiConversation(ctx context.Context, in *DeleteAiConversationRequest, opts ...grpc.CallOption) (*DeleteAiConversationResponse, error)
 }
 
 type notificationServiceClient struct {
@@ -228,6 +238,46 @@ func (c *notificationServiceClient) DeleteLead(ctx context.Context, in *DeleteLe
 	return out, nil
 }
 
+func (c *notificationServiceClient) ListAiConversations(ctx context.Context, in *ListAiConversationsRequest, opts ...grpc.CallOption) (*ListAiConversationsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListAiConversationsResponse)
+	err := c.cc.Invoke(ctx, NotificationService_ListAiConversations_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *notificationServiceClient) GetAiConversation(ctx context.Context, in *GetAiConversationRequest, opts ...grpc.CallOption) (*GetAiConversationResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetAiConversationResponse)
+	err := c.cc.Invoke(ctx, NotificationService_GetAiConversation_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *notificationServiceClient) AppendAiMessages(ctx context.Context, in *AppendAiMessagesRequest, opts ...grpc.CallOption) (*AppendAiMessagesResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(AppendAiMessagesResponse)
+	err := c.cc.Invoke(ctx, NotificationService_AppendAiMessages_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *notificationServiceClient) DeleteAiConversation(ctx context.Context, in *DeleteAiConversationRequest, opts ...grpc.CallOption) (*DeleteAiConversationResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(DeleteAiConversationResponse)
+	err := c.cc.Invoke(ctx, NotificationService_DeleteAiConversation_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // NotificationServiceServer is the server API for NotificationService service.
 // All implementations must embed UnimplementedNotificationServiceServer
 // for forward compatibility.
@@ -260,6 +310,12 @@ type NotificationServiceServer interface {
 	ListLeads(context.Context, *ListLeadsRequest) (*ListLeadsResponse, error)
 	UpdateLead(context.Context, *UpdateLeadRequest) (*Lead, error)
 	DeleteLead(context.Context, *DeleteLeadRequest) (*DeleteLeadResponse, error)
+	// Persisted AI-assistant conversations (owner / super-admin chat history), scoped
+	// to the staff member who owns them so threads follow the user across devices.
+	ListAiConversations(context.Context, *ListAiConversationsRequest) (*ListAiConversationsResponse, error)
+	GetAiConversation(context.Context, *GetAiConversationRequest) (*GetAiConversationResponse, error)
+	AppendAiMessages(context.Context, *AppendAiMessagesRequest) (*AppendAiMessagesResponse, error)
+	DeleteAiConversation(context.Context, *DeleteAiConversationRequest) (*DeleteAiConversationResponse, error)
 	mustEmbedUnimplementedNotificationServiceServer()
 }
 
@@ -314,6 +370,18 @@ func (UnimplementedNotificationServiceServer) UpdateLead(context.Context, *Updat
 }
 func (UnimplementedNotificationServiceServer) DeleteLead(context.Context, *DeleteLeadRequest) (*DeleteLeadResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method DeleteLead not implemented")
+}
+func (UnimplementedNotificationServiceServer) ListAiConversations(context.Context, *ListAiConversationsRequest) (*ListAiConversationsResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListAiConversations not implemented")
+}
+func (UnimplementedNotificationServiceServer) GetAiConversation(context.Context, *GetAiConversationRequest) (*GetAiConversationResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetAiConversation not implemented")
+}
+func (UnimplementedNotificationServiceServer) AppendAiMessages(context.Context, *AppendAiMessagesRequest) (*AppendAiMessagesResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method AppendAiMessages not implemented")
+}
+func (UnimplementedNotificationServiceServer) DeleteAiConversation(context.Context, *DeleteAiConversationRequest) (*DeleteAiConversationResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method DeleteAiConversation not implemented")
 }
 func (UnimplementedNotificationServiceServer) mustEmbedUnimplementedNotificationServiceServer() {}
 func (UnimplementedNotificationServiceServer) testEmbeddedByValue()                             {}
@@ -606,6 +674,78 @@ func _NotificationService_DeleteLead_Handler(srv interface{}, ctx context.Contex
 	return interceptor(ctx, in, info, handler)
 }
 
+func _NotificationService_ListAiConversations_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListAiConversationsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(NotificationServiceServer).ListAiConversations(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: NotificationService_ListAiConversations_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(NotificationServiceServer).ListAiConversations(ctx, req.(*ListAiConversationsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _NotificationService_GetAiConversation_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetAiConversationRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(NotificationServiceServer).GetAiConversation(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: NotificationService_GetAiConversation_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(NotificationServiceServer).GetAiConversation(ctx, req.(*GetAiConversationRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _NotificationService_AppendAiMessages_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AppendAiMessagesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(NotificationServiceServer).AppendAiMessages(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: NotificationService_AppendAiMessages_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(NotificationServiceServer).AppendAiMessages(ctx, req.(*AppendAiMessagesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _NotificationService_DeleteAiConversation_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteAiConversationRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(NotificationServiceServer).DeleteAiConversation(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: NotificationService_DeleteAiConversation_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(NotificationServiceServer).DeleteAiConversation(ctx, req.(*DeleteAiConversationRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // NotificationService_ServiceDesc is the grpc.ServiceDesc for NotificationService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -672,6 +812,22 @@ var NotificationService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteLead",
 			Handler:    _NotificationService_DeleteLead_Handler,
+		},
+		{
+			MethodName: "ListAiConversations",
+			Handler:    _NotificationService_ListAiConversations_Handler,
+		},
+		{
+			MethodName: "GetAiConversation",
+			Handler:    _NotificationService_GetAiConversation_Handler,
+		},
+		{
+			MethodName: "AppendAiMessages",
+			Handler:    _NotificationService_AppendAiMessages_Handler,
+		},
+		{
+			MethodName: "DeleteAiConversation",
+			Handler:    _NotificationService_DeleteAiConversation_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

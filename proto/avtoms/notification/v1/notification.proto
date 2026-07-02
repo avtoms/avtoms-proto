@@ -37,6 +37,13 @@ service NotificationService {
   rpc ListLeads(ListLeadsRequest) returns (ListLeadsResponse);
   rpc UpdateLead(UpdateLeadRequest) returns (Lead);
   rpc DeleteLead(DeleteLeadRequest) returns (DeleteLeadResponse);
+
+  // Persisted AI-assistant conversations (owner / super-admin chat history), scoped
+  // to the staff member who owns them so threads follow the user across devices.
+  rpc ListAiConversations(ListAiConversationsRequest) returns (ListAiConversationsResponse);
+  rpc GetAiConversation(GetAiConversationRequest) returns (GetAiConversationResponse);
+  rpc AppendAiMessages(AppendAiMessagesRequest) returns (AppendAiMessagesResponse);
+  rpc DeleteAiConversation(DeleteAiConversationRequest) returns (DeleteAiConversationResponse);
 }
 
 // Lead is a potential customer tracked in the sales CRM: everything a lead can carry, from
@@ -92,6 +99,55 @@ message DeleteLeadRequest {
   string id = 1;
 }
 message DeleteLeadResponse {
+  bool ok = 1;
+}
+
+// AiConversation is one saved assistant chat thread belonging to a staff member.
+message AiConversation {
+  string id = 1;
+  string staff_id = 2;
+  string shop_id = 3;
+  string title = 4;       // short label derived from the first user message
+  string created_at = 5;
+  string updated_at = 6;
+}
+// AiChatMessage is one turn within a conversation.
+message AiChatMessage {
+  string id = 1;
+  string conversation_id = 2;
+  string role = 3;    // user | assistant
+  string content = 4; // user text, or the assistant's HTML reply
+  string created_at = 5;
+}
+message ListAiConversationsRequest {
+  string staff_id = 1;
+}
+message ListAiConversationsResponse {
+  repeated AiConversation conversations = 1;
+}
+message GetAiConversationRequest {
+  string id = 1;
+  string staff_id = 2; // ownership check: only the owner may read the thread
+}
+message GetAiConversationResponse {
+  AiConversation conversation = 1;
+  repeated AiChatMessage messages = 2;
+}
+message AppendAiMessagesRequest {
+  string conversation_id = 1; // empty → create a new conversation
+  string staff_id = 2;
+  string shop_id = 3;
+  string title = 4;                    // used when creating a new conversation
+  repeated AiChatMessage messages = 5; // turns to append (e.g. the user turn + assistant reply)
+}
+message AppendAiMessagesResponse {
+  AiConversation conversation = 1;
+}
+message DeleteAiConversationRequest {
+  string id = 1;
+  string staff_id = 2;
+}
+message DeleteAiConversationResponse {
   bool ok = 1;
 }
 

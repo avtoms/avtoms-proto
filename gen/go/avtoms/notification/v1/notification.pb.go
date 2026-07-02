@@ -703,6 +703,576 @@ func (x *DeleteLeadResponse) GetOk() bool {
 	return false
 }
 
+// AiConversation is one saved assistant chat thread belonging to a staff member.
+type AiConversation struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	StaffId       string                 `protobuf:"bytes,2,opt,name=staff_id,json=staffId,proto3" json:"staff_id,omitempty"`
+	ShopId        string                 `protobuf:"bytes,3,opt,name=shop_id,json=shopId,proto3" json:"shop_id,omitempty"`
+	Title         string                 `protobuf:"bytes,4,opt,name=title,proto3" json:"title,omitempty"` // short label derived from the first user message
+	CreatedAt     string                 `protobuf:"bytes,5,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	UpdatedAt     string                 `protobuf:"bytes,6,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *AiConversation) Reset() {
+	*x = AiConversation{}
+	mi := &file_avtoms_notification_v1_notification_proto_msgTypes[7]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AiConversation) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AiConversation) ProtoMessage() {}
+
+func (x *AiConversation) ProtoReflect() protoreflect.Message {
+	mi := &file_avtoms_notification_v1_notification_proto_msgTypes[7]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AiConversation.ProtoReflect.Descriptor instead.
+func (*AiConversation) Descriptor() ([]byte, []int) {
+	return file_avtoms_notification_v1_notification_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *AiConversation) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *AiConversation) GetStaffId() string {
+	if x != nil {
+		return x.StaffId
+	}
+	return ""
+}
+
+func (x *AiConversation) GetShopId() string {
+	if x != nil {
+		return x.ShopId
+	}
+	return ""
+}
+
+func (x *AiConversation) GetTitle() string {
+	if x != nil {
+		return x.Title
+	}
+	return ""
+}
+
+func (x *AiConversation) GetCreatedAt() string {
+	if x != nil {
+		return x.CreatedAt
+	}
+	return ""
+}
+
+func (x *AiConversation) GetUpdatedAt() string {
+	if x != nil {
+		return x.UpdatedAt
+	}
+	return ""
+}
+
+// AiChatMessage is one turn within a conversation.
+type AiChatMessage struct {
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	Id             string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	ConversationId string                 `protobuf:"bytes,2,opt,name=conversation_id,json=conversationId,proto3" json:"conversation_id,omitempty"`
+	Role           string                 `protobuf:"bytes,3,opt,name=role,proto3" json:"role,omitempty"`       // user | assistant
+	Content        string                 `protobuf:"bytes,4,opt,name=content,proto3" json:"content,omitempty"` // user text, or the assistant's HTML reply
+	CreatedAt      string                 `protobuf:"bytes,5,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
+}
+
+func (x *AiChatMessage) Reset() {
+	*x = AiChatMessage{}
+	mi := &file_avtoms_notification_v1_notification_proto_msgTypes[8]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AiChatMessage) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AiChatMessage) ProtoMessage() {}
+
+func (x *AiChatMessage) ProtoReflect() protoreflect.Message {
+	mi := &file_avtoms_notification_v1_notification_proto_msgTypes[8]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AiChatMessage.ProtoReflect.Descriptor instead.
+func (*AiChatMessage) Descriptor() ([]byte, []int) {
+	return file_avtoms_notification_v1_notification_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *AiChatMessage) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *AiChatMessage) GetConversationId() string {
+	if x != nil {
+		return x.ConversationId
+	}
+	return ""
+}
+
+func (x *AiChatMessage) GetRole() string {
+	if x != nil {
+		return x.Role
+	}
+	return ""
+}
+
+func (x *AiChatMessage) GetContent() string {
+	if x != nil {
+		return x.Content
+	}
+	return ""
+}
+
+func (x *AiChatMessage) GetCreatedAt() string {
+	if x != nil {
+		return x.CreatedAt
+	}
+	return ""
+}
+
+type ListAiConversationsRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	StaffId       string                 `protobuf:"bytes,1,opt,name=staff_id,json=staffId,proto3" json:"staff_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListAiConversationsRequest) Reset() {
+	*x = ListAiConversationsRequest{}
+	mi := &file_avtoms_notification_v1_notification_proto_msgTypes[9]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListAiConversationsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListAiConversationsRequest) ProtoMessage() {}
+
+func (x *ListAiConversationsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_avtoms_notification_v1_notification_proto_msgTypes[9]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListAiConversationsRequest.ProtoReflect.Descriptor instead.
+func (*ListAiConversationsRequest) Descriptor() ([]byte, []int) {
+	return file_avtoms_notification_v1_notification_proto_rawDescGZIP(), []int{9}
+}
+
+func (x *ListAiConversationsRequest) GetStaffId() string {
+	if x != nil {
+		return x.StaffId
+	}
+	return ""
+}
+
+type ListAiConversationsResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Conversations []*AiConversation      `protobuf:"bytes,1,rep,name=conversations,proto3" json:"conversations,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListAiConversationsResponse) Reset() {
+	*x = ListAiConversationsResponse{}
+	mi := &file_avtoms_notification_v1_notification_proto_msgTypes[10]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListAiConversationsResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListAiConversationsResponse) ProtoMessage() {}
+
+func (x *ListAiConversationsResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_avtoms_notification_v1_notification_proto_msgTypes[10]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListAiConversationsResponse.ProtoReflect.Descriptor instead.
+func (*ListAiConversationsResponse) Descriptor() ([]byte, []int) {
+	return file_avtoms_notification_v1_notification_proto_rawDescGZIP(), []int{10}
+}
+
+func (x *ListAiConversationsResponse) GetConversations() []*AiConversation {
+	if x != nil {
+		return x.Conversations
+	}
+	return nil
+}
+
+type GetAiConversationRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	StaffId       string                 `protobuf:"bytes,2,opt,name=staff_id,json=staffId,proto3" json:"staff_id,omitempty"` // ownership check: only the owner may read the thread
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetAiConversationRequest) Reset() {
+	*x = GetAiConversationRequest{}
+	mi := &file_avtoms_notification_v1_notification_proto_msgTypes[11]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetAiConversationRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetAiConversationRequest) ProtoMessage() {}
+
+func (x *GetAiConversationRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_avtoms_notification_v1_notification_proto_msgTypes[11]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetAiConversationRequest.ProtoReflect.Descriptor instead.
+func (*GetAiConversationRequest) Descriptor() ([]byte, []int) {
+	return file_avtoms_notification_v1_notification_proto_rawDescGZIP(), []int{11}
+}
+
+func (x *GetAiConversationRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *GetAiConversationRequest) GetStaffId() string {
+	if x != nil {
+		return x.StaffId
+	}
+	return ""
+}
+
+type GetAiConversationResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Conversation  *AiConversation        `protobuf:"bytes,1,opt,name=conversation,proto3" json:"conversation,omitempty"`
+	Messages      []*AiChatMessage       `protobuf:"bytes,2,rep,name=messages,proto3" json:"messages,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetAiConversationResponse) Reset() {
+	*x = GetAiConversationResponse{}
+	mi := &file_avtoms_notification_v1_notification_proto_msgTypes[12]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetAiConversationResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetAiConversationResponse) ProtoMessage() {}
+
+func (x *GetAiConversationResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_avtoms_notification_v1_notification_proto_msgTypes[12]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetAiConversationResponse.ProtoReflect.Descriptor instead.
+func (*GetAiConversationResponse) Descriptor() ([]byte, []int) {
+	return file_avtoms_notification_v1_notification_proto_rawDescGZIP(), []int{12}
+}
+
+func (x *GetAiConversationResponse) GetConversation() *AiConversation {
+	if x != nil {
+		return x.Conversation
+	}
+	return nil
+}
+
+func (x *GetAiConversationResponse) GetMessages() []*AiChatMessage {
+	if x != nil {
+		return x.Messages
+	}
+	return nil
+}
+
+type AppendAiMessagesRequest struct {
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	ConversationId string                 `protobuf:"bytes,1,opt,name=conversation_id,json=conversationId,proto3" json:"conversation_id,omitempty"` // empty → create a new conversation
+	StaffId        string                 `protobuf:"bytes,2,opt,name=staff_id,json=staffId,proto3" json:"staff_id,omitempty"`
+	ShopId         string                 `protobuf:"bytes,3,opt,name=shop_id,json=shopId,proto3" json:"shop_id,omitempty"`
+	Title          string                 `protobuf:"bytes,4,opt,name=title,proto3" json:"title,omitempty"`       // used when creating a new conversation
+	Messages       []*AiChatMessage       `protobuf:"bytes,5,rep,name=messages,proto3" json:"messages,omitempty"` // turns to append (e.g. the user turn + assistant reply)
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
+}
+
+func (x *AppendAiMessagesRequest) Reset() {
+	*x = AppendAiMessagesRequest{}
+	mi := &file_avtoms_notification_v1_notification_proto_msgTypes[13]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AppendAiMessagesRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AppendAiMessagesRequest) ProtoMessage() {}
+
+func (x *AppendAiMessagesRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_avtoms_notification_v1_notification_proto_msgTypes[13]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AppendAiMessagesRequest.ProtoReflect.Descriptor instead.
+func (*AppendAiMessagesRequest) Descriptor() ([]byte, []int) {
+	return file_avtoms_notification_v1_notification_proto_rawDescGZIP(), []int{13}
+}
+
+func (x *AppendAiMessagesRequest) GetConversationId() string {
+	if x != nil {
+		return x.ConversationId
+	}
+	return ""
+}
+
+func (x *AppendAiMessagesRequest) GetStaffId() string {
+	if x != nil {
+		return x.StaffId
+	}
+	return ""
+}
+
+func (x *AppendAiMessagesRequest) GetShopId() string {
+	if x != nil {
+		return x.ShopId
+	}
+	return ""
+}
+
+func (x *AppendAiMessagesRequest) GetTitle() string {
+	if x != nil {
+		return x.Title
+	}
+	return ""
+}
+
+func (x *AppendAiMessagesRequest) GetMessages() []*AiChatMessage {
+	if x != nil {
+		return x.Messages
+	}
+	return nil
+}
+
+type AppendAiMessagesResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Conversation  *AiConversation        `protobuf:"bytes,1,opt,name=conversation,proto3" json:"conversation,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *AppendAiMessagesResponse) Reset() {
+	*x = AppendAiMessagesResponse{}
+	mi := &file_avtoms_notification_v1_notification_proto_msgTypes[14]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AppendAiMessagesResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AppendAiMessagesResponse) ProtoMessage() {}
+
+func (x *AppendAiMessagesResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_avtoms_notification_v1_notification_proto_msgTypes[14]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AppendAiMessagesResponse.ProtoReflect.Descriptor instead.
+func (*AppendAiMessagesResponse) Descriptor() ([]byte, []int) {
+	return file_avtoms_notification_v1_notification_proto_rawDescGZIP(), []int{14}
+}
+
+func (x *AppendAiMessagesResponse) GetConversation() *AiConversation {
+	if x != nil {
+		return x.Conversation
+	}
+	return nil
+}
+
+type DeleteAiConversationRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	StaffId       string                 `protobuf:"bytes,2,opt,name=staff_id,json=staffId,proto3" json:"staff_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DeleteAiConversationRequest) Reset() {
+	*x = DeleteAiConversationRequest{}
+	mi := &file_avtoms_notification_v1_notification_proto_msgTypes[15]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeleteAiConversationRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteAiConversationRequest) ProtoMessage() {}
+
+func (x *DeleteAiConversationRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_avtoms_notification_v1_notification_proto_msgTypes[15]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteAiConversationRequest.ProtoReflect.Descriptor instead.
+func (*DeleteAiConversationRequest) Descriptor() ([]byte, []int) {
+	return file_avtoms_notification_v1_notification_proto_rawDescGZIP(), []int{15}
+}
+
+func (x *DeleteAiConversationRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *DeleteAiConversationRequest) GetStaffId() string {
+	if x != nil {
+		return x.StaffId
+	}
+	return ""
+}
+
+type DeleteAiConversationResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Ok            bool                   `protobuf:"varint,1,opt,name=ok,proto3" json:"ok,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DeleteAiConversationResponse) Reset() {
+	*x = DeleteAiConversationResponse{}
+	mi := &file_avtoms_notification_v1_notification_proto_msgTypes[16]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeleteAiConversationResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteAiConversationResponse) ProtoMessage() {}
+
+func (x *DeleteAiConversationResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_avtoms_notification_v1_notification_proto_msgTypes[16]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteAiConversationResponse.ProtoReflect.Descriptor instead.
+func (*DeleteAiConversationResponse) Descriptor() ([]byte, []int) {
+	return file_avtoms_notification_v1_notification_proto_rawDescGZIP(), []int{16}
+}
+
+func (x *DeleteAiConversationResponse) GetOk() bool {
+	if x != nil {
+		return x.Ok
+	}
+	return false
+}
+
 // DemoRequest is a sales lead submitted from the public landing page.
 type DemoRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
@@ -721,7 +1291,7 @@ type DemoRequest struct {
 
 func (x *DemoRequest) Reset() {
 	*x = DemoRequest{}
-	mi := &file_avtoms_notification_v1_notification_proto_msgTypes[7]
+	mi := &file_avtoms_notification_v1_notification_proto_msgTypes[17]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -733,7 +1303,7 @@ func (x *DemoRequest) String() string {
 func (*DemoRequest) ProtoMessage() {}
 
 func (x *DemoRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_notification_v1_notification_proto_msgTypes[7]
+	mi := &file_avtoms_notification_v1_notification_proto_msgTypes[17]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -746,7 +1316,7 @@ func (x *DemoRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DemoRequest.ProtoReflect.Descriptor instead.
 func (*DemoRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_notification_v1_notification_proto_rawDescGZIP(), []int{7}
+	return file_avtoms_notification_v1_notification_proto_rawDescGZIP(), []int{17}
 }
 
 func (x *DemoRequest) GetId() string {
@@ -826,7 +1396,7 @@ type CreateDemoRequestRequest struct {
 
 func (x *CreateDemoRequestRequest) Reset() {
 	*x = CreateDemoRequestRequest{}
-	mi := &file_avtoms_notification_v1_notification_proto_msgTypes[8]
+	mi := &file_avtoms_notification_v1_notification_proto_msgTypes[18]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -838,7 +1408,7 @@ func (x *CreateDemoRequestRequest) String() string {
 func (*CreateDemoRequestRequest) ProtoMessage() {}
 
 func (x *CreateDemoRequestRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_notification_v1_notification_proto_msgTypes[8]
+	mi := &file_avtoms_notification_v1_notification_proto_msgTypes[18]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -851,7 +1421,7 @@ func (x *CreateDemoRequestRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateDemoRequestRequest.ProtoReflect.Descriptor instead.
 func (*CreateDemoRequestRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_notification_v1_notification_proto_rawDescGZIP(), []int{8}
+	return file_avtoms_notification_v1_notification_proto_rawDescGZIP(), []int{18}
 }
 
 func (x *CreateDemoRequestRequest) GetName() string {
@@ -904,7 +1474,7 @@ type ListDemoRequestsRequest struct {
 
 func (x *ListDemoRequestsRequest) Reset() {
 	*x = ListDemoRequestsRequest{}
-	mi := &file_avtoms_notification_v1_notification_proto_msgTypes[9]
+	mi := &file_avtoms_notification_v1_notification_proto_msgTypes[19]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -916,7 +1486,7 @@ func (x *ListDemoRequestsRequest) String() string {
 func (*ListDemoRequestsRequest) ProtoMessage() {}
 
 func (x *ListDemoRequestsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_notification_v1_notification_proto_msgTypes[9]
+	mi := &file_avtoms_notification_v1_notification_proto_msgTypes[19]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -929,7 +1499,7 @@ func (x *ListDemoRequestsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListDemoRequestsRequest.ProtoReflect.Descriptor instead.
 func (*ListDemoRequestsRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_notification_v1_notification_proto_rawDescGZIP(), []int{9}
+	return file_avtoms_notification_v1_notification_proto_rawDescGZIP(), []int{19}
 }
 
 type ListDemoRequestsResponse struct {
@@ -941,7 +1511,7 @@ type ListDemoRequestsResponse struct {
 
 func (x *ListDemoRequestsResponse) Reset() {
 	*x = ListDemoRequestsResponse{}
-	mi := &file_avtoms_notification_v1_notification_proto_msgTypes[10]
+	mi := &file_avtoms_notification_v1_notification_proto_msgTypes[20]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -953,7 +1523,7 @@ func (x *ListDemoRequestsResponse) String() string {
 func (*ListDemoRequestsResponse) ProtoMessage() {}
 
 func (x *ListDemoRequestsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_notification_v1_notification_proto_msgTypes[10]
+	mi := &file_avtoms_notification_v1_notification_proto_msgTypes[20]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -966,7 +1536,7 @@ func (x *ListDemoRequestsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListDemoRequestsResponse.ProtoReflect.Descriptor instead.
 func (*ListDemoRequestsResponse) Descriptor() ([]byte, []int) {
-	return file_avtoms_notification_v1_notification_proto_rawDescGZIP(), []int{10}
+	return file_avtoms_notification_v1_notification_proto_rawDescGZIP(), []int{20}
 }
 
 func (x *ListDemoRequestsResponse) GetRequests() []*DemoRequest {
@@ -986,7 +1556,7 @@ type SetDemoRequestStatusRequest struct {
 
 func (x *SetDemoRequestStatusRequest) Reset() {
 	*x = SetDemoRequestStatusRequest{}
-	mi := &file_avtoms_notification_v1_notification_proto_msgTypes[11]
+	mi := &file_avtoms_notification_v1_notification_proto_msgTypes[21]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -998,7 +1568,7 @@ func (x *SetDemoRequestStatusRequest) String() string {
 func (*SetDemoRequestStatusRequest) ProtoMessage() {}
 
 func (x *SetDemoRequestStatusRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_notification_v1_notification_proto_msgTypes[11]
+	mi := &file_avtoms_notification_v1_notification_proto_msgTypes[21]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1011,7 +1581,7 @@ func (x *SetDemoRequestStatusRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SetDemoRequestStatusRequest.ProtoReflect.Descriptor instead.
 func (*SetDemoRequestStatusRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_notification_v1_notification_proto_rawDescGZIP(), []int{11}
+	return file_avtoms_notification_v1_notification_proto_rawDescGZIP(), []int{21}
 }
 
 func (x *SetDemoRequestStatusRequest) GetId() string {
@@ -1037,7 +1607,7 @@ type SendTestSmsRequest struct {
 
 func (x *SendTestSmsRequest) Reset() {
 	*x = SendTestSmsRequest{}
-	mi := &file_avtoms_notification_v1_notification_proto_msgTypes[12]
+	mi := &file_avtoms_notification_v1_notification_proto_msgTypes[22]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1049,7 +1619,7 @@ func (x *SendTestSmsRequest) String() string {
 func (*SendTestSmsRequest) ProtoMessage() {}
 
 func (x *SendTestSmsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_notification_v1_notification_proto_msgTypes[12]
+	mi := &file_avtoms_notification_v1_notification_proto_msgTypes[22]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1062,7 +1632,7 @@ func (x *SendTestSmsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SendTestSmsRequest.ProtoReflect.Descriptor instead.
 func (*SendTestSmsRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_notification_v1_notification_proto_rawDescGZIP(), []int{12}
+	return file_avtoms_notification_v1_notification_proto_rawDescGZIP(), []int{22}
 }
 
 func (x *SendTestSmsRequest) GetPhone() string {
@@ -1082,7 +1652,7 @@ type TestSmsResult struct {
 
 func (x *TestSmsResult) Reset() {
 	*x = TestSmsResult{}
-	mi := &file_avtoms_notification_v1_notification_proto_msgTypes[13]
+	mi := &file_avtoms_notification_v1_notification_proto_msgTypes[23]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1094,7 +1664,7 @@ func (x *TestSmsResult) String() string {
 func (*TestSmsResult) ProtoMessage() {}
 
 func (x *TestSmsResult) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_notification_v1_notification_proto_msgTypes[13]
+	mi := &file_avtoms_notification_v1_notification_proto_msgTypes[23]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1107,7 +1677,7 @@ func (x *TestSmsResult) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TestSmsResult.ProtoReflect.Descriptor instead.
 func (*TestSmsResult) Descriptor() ([]byte, []int) {
-	return file_avtoms_notification_v1_notification_proto_rawDescGZIP(), []int{13}
+	return file_avtoms_notification_v1_notification_proto_rawDescGZIP(), []int{23}
 }
 
 func (x *TestSmsResult) GetDelivered() bool {
@@ -1137,7 +1707,7 @@ type Integration struct {
 
 func (x *Integration) Reset() {
 	*x = Integration{}
-	mi := &file_avtoms_notification_v1_notification_proto_msgTypes[14]
+	mi := &file_avtoms_notification_v1_notification_proto_msgTypes[24]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1149,7 +1719,7 @@ func (x *Integration) String() string {
 func (*Integration) ProtoMessage() {}
 
 func (x *Integration) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_notification_v1_notification_proto_msgTypes[14]
+	mi := &file_avtoms_notification_v1_notification_proto_msgTypes[24]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1162,7 +1732,7 @@ func (x *Integration) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Integration.ProtoReflect.Descriptor instead.
 func (*Integration) Descriptor() ([]byte, []int) {
-	return file_avtoms_notification_v1_notification_proto_rawDescGZIP(), []int{14}
+	return file_avtoms_notification_v1_notification_proto_rawDescGZIP(), []int{24}
 }
 
 func (x *Integration) GetProvider() string {
@@ -1194,7 +1764,7 @@ type ListIntegrationsRequest struct {
 
 func (x *ListIntegrationsRequest) Reset() {
 	*x = ListIntegrationsRequest{}
-	mi := &file_avtoms_notification_v1_notification_proto_msgTypes[15]
+	mi := &file_avtoms_notification_v1_notification_proto_msgTypes[25]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1206,7 +1776,7 @@ func (x *ListIntegrationsRequest) String() string {
 func (*ListIntegrationsRequest) ProtoMessage() {}
 
 func (x *ListIntegrationsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_notification_v1_notification_proto_msgTypes[15]
+	mi := &file_avtoms_notification_v1_notification_proto_msgTypes[25]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1219,7 +1789,7 @@ func (x *ListIntegrationsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListIntegrationsRequest.ProtoReflect.Descriptor instead.
 func (*ListIntegrationsRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_notification_v1_notification_proto_rawDescGZIP(), []int{15}
+	return file_avtoms_notification_v1_notification_proto_rawDescGZIP(), []int{25}
 }
 
 type ListIntegrationsResponse struct {
@@ -1231,7 +1801,7 @@ type ListIntegrationsResponse struct {
 
 func (x *ListIntegrationsResponse) Reset() {
 	*x = ListIntegrationsResponse{}
-	mi := &file_avtoms_notification_v1_notification_proto_msgTypes[16]
+	mi := &file_avtoms_notification_v1_notification_proto_msgTypes[26]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1243,7 +1813,7 @@ func (x *ListIntegrationsResponse) String() string {
 func (*ListIntegrationsResponse) ProtoMessage() {}
 
 func (x *ListIntegrationsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_notification_v1_notification_proto_msgTypes[16]
+	mi := &file_avtoms_notification_v1_notification_proto_msgTypes[26]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1256,7 +1826,7 @@ func (x *ListIntegrationsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListIntegrationsResponse.ProtoReflect.Descriptor instead.
 func (*ListIntegrationsResponse) Descriptor() ([]byte, []int) {
-	return file_avtoms_notification_v1_notification_proto_rawDescGZIP(), []int{16}
+	return file_avtoms_notification_v1_notification_proto_rawDescGZIP(), []int{26}
 }
 
 func (x *ListIntegrationsResponse) GetIntegrations() []*Integration {
@@ -1275,7 +1845,7 @@ type GetIntegrationRequest struct {
 
 func (x *GetIntegrationRequest) Reset() {
 	*x = GetIntegrationRequest{}
-	mi := &file_avtoms_notification_v1_notification_proto_msgTypes[17]
+	mi := &file_avtoms_notification_v1_notification_proto_msgTypes[27]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1287,7 +1857,7 @@ func (x *GetIntegrationRequest) String() string {
 func (*GetIntegrationRequest) ProtoMessage() {}
 
 func (x *GetIntegrationRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_notification_v1_notification_proto_msgTypes[17]
+	mi := &file_avtoms_notification_v1_notification_proto_msgTypes[27]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1300,7 +1870,7 @@ func (x *GetIntegrationRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetIntegrationRequest.ProtoReflect.Descriptor instead.
 func (*GetIntegrationRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_notification_v1_notification_proto_rawDescGZIP(), []int{17}
+	return file_avtoms_notification_v1_notification_proto_rawDescGZIP(), []int{27}
 }
 
 func (x *GetIntegrationRequest) GetProvider() string {
@@ -1320,7 +1890,7 @@ type UpdateIntegrationRequest struct {
 
 func (x *UpdateIntegrationRequest) Reset() {
 	*x = UpdateIntegrationRequest{}
-	mi := &file_avtoms_notification_v1_notification_proto_msgTypes[18]
+	mi := &file_avtoms_notification_v1_notification_proto_msgTypes[28]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1332,7 +1902,7 @@ func (x *UpdateIntegrationRequest) String() string {
 func (*UpdateIntegrationRequest) ProtoMessage() {}
 
 func (x *UpdateIntegrationRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_notification_v1_notification_proto_msgTypes[18]
+	mi := &file_avtoms_notification_v1_notification_proto_msgTypes[28]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1345,7 +1915,7 @@ func (x *UpdateIntegrationRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateIntegrationRequest.ProtoReflect.Descriptor instead.
 func (*UpdateIntegrationRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_notification_v1_notification_proto_rawDescGZIP(), []int{18}
+	return file_avtoms_notification_v1_notification_proto_rawDescGZIP(), []int{28}
 }
 
 func (x *UpdateIntegrationRequest) GetProvider() string {
@@ -1372,7 +1942,7 @@ type IntegrationConfig struct {
 
 func (x *IntegrationConfig) Reset() {
 	*x = IntegrationConfig{}
-	mi := &file_avtoms_notification_v1_notification_proto_msgTypes[19]
+	mi := &file_avtoms_notification_v1_notification_proto_msgTypes[29]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1384,7 +1954,7 @@ func (x *IntegrationConfig) String() string {
 func (*IntegrationConfig) ProtoMessage() {}
 
 func (x *IntegrationConfig) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_notification_v1_notification_proto_msgTypes[19]
+	mi := &file_avtoms_notification_v1_notification_proto_msgTypes[29]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1397,7 +1967,7 @@ func (x *IntegrationConfig) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use IntegrationConfig.ProtoReflect.Descriptor instead.
 func (*IntegrationConfig) Descriptor() ([]byte, []int) {
-	return file_avtoms_notification_v1_notification_proto_rawDescGZIP(), []int{19}
+	return file_avtoms_notification_v1_notification_proto_rawDescGZIP(), []int{29}
 }
 
 func (x *IntegrationConfig) GetValues() map[string]string {
@@ -1418,7 +1988,7 @@ type SendResponse struct {
 
 func (x *SendResponse) Reset() {
 	*x = SendResponse{}
-	mi := &file_avtoms_notification_v1_notification_proto_msgTypes[20]
+	mi := &file_avtoms_notification_v1_notification_proto_msgTypes[30]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1430,7 +2000,7 @@ func (x *SendResponse) String() string {
 func (*SendResponse) ProtoMessage() {}
 
 func (x *SendResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_notification_v1_notification_proto_msgTypes[20]
+	mi := &file_avtoms_notification_v1_notification_proto_msgTypes[30]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1443,7 +2013,7 @@ func (x *SendResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SendResponse.ProtoReflect.Descriptor instead.
 func (*SendResponse) Descriptor() ([]byte, []int) {
-	return file_avtoms_notification_v1_notification_proto_rawDescGZIP(), []int{20}
+	return file_avtoms_notification_v1_notification_proto_rawDescGZIP(), []int{30}
 }
 
 func (x *SendResponse) GetId() string {
@@ -1478,7 +2048,7 @@ type SendSmsRequest struct {
 
 func (x *SendSmsRequest) Reset() {
 	*x = SendSmsRequest{}
-	mi := &file_avtoms_notification_v1_notification_proto_msgTypes[21]
+	mi := &file_avtoms_notification_v1_notification_proto_msgTypes[31]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1490,7 +2060,7 @@ func (x *SendSmsRequest) String() string {
 func (*SendSmsRequest) ProtoMessage() {}
 
 func (x *SendSmsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_notification_v1_notification_proto_msgTypes[21]
+	mi := &file_avtoms_notification_v1_notification_proto_msgTypes[31]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1503,7 +2073,7 @@ func (x *SendSmsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SendSmsRequest.ProtoReflect.Descriptor instead.
 func (*SendSmsRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_notification_v1_notification_proto_rawDescGZIP(), []int{21}
+	return file_avtoms_notification_v1_notification_proto_rawDescGZIP(), []int{31}
 }
 
 func (x *SendSmsRequest) GetShopId() string {
@@ -1538,7 +2108,7 @@ type SendTelegramRequest struct {
 
 func (x *SendTelegramRequest) Reset() {
 	*x = SendTelegramRequest{}
-	mi := &file_avtoms_notification_v1_notification_proto_msgTypes[22]
+	mi := &file_avtoms_notification_v1_notification_proto_msgTypes[32]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1550,7 +2120,7 @@ func (x *SendTelegramRequest) String() string {
 func (*SendTelegramRequest) ProtoMessage() {}
 
 func (x *SendTelegramRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_notification_v1_notification_proto_msgTypes[22]
+	mi := &file_avtoms_notification_v1_notification_proto_msgTypes[32]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1563,7 +2133,7 @@ func (x *SendTelegramRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SendTelegramRequest.ProtoReflect.Descriptor instead.
 func (*SendTelegramRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_notification_v1_notification_proto_rawDescGZIP(), []int{22}
+	return file_avtoms_notification_v1_notification_proto_rawDescGZIP(), []int{32}
 }
 
 func (x *SendTelegramRequest) GetShopId() string {
@@ -1600,7 +2170,7 @@ type NotifyRequest struct {
 
 func (x *NotifyRequest) Reset() {
 	*x = NotifyRequest{}
-	mi := &file_avtoms_notification_v1_notification_proto_msgTypes[23]
+	mi := &file_avtoms_notification_v1_notification_proto_msgTypes[33]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1612,7 +2182,7 @@ func (x *NotifyRequest) String() string {
 func (*NotifyRequest) ProtoMessage() {}
 
 func (x *NotifyRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_notification_v1_notification_proto_msgTypes[23]
+	mi := &file_avtoms_notification_v1_notification_proto_msgTypes[33]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1625,7 +2195,7 @@ func (x *NotifyRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use NotifyRequest.ProtoReflect.Descriptor instead.
 func (*NotifyRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_notification_v1_notification_proto_rawDescGZIP(), []int{23}
+	return file_avtoms_notification_v1_notification_proto_rawDescGZIP(), []int{33}
 }
 
 func (x *NotifyRequest) GetShopId() string {
@@ -1722,6 +2292,45 @@ const file_avtoms_notification_v1_notification_proto_rawDesc = "" +
 	"\x11DeleteLeadRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\"$\n" +
 	"\x12DeleteLeadResponse\x12\x0e\n" +
+	"\x02ok\x18\x01 \x01(\bR\x02ok\"\xa8\x01\n" +
+	"\x0eAiConversation\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x19\n" +
+	"\bstaff_id\x18\x02 \x01(\tR\astaffId\x12\x17\n" +
+	"\ashop_id\x18\x03 \x01(\tR\x06shopId\x12\x14\n" +
+	"\x05title\x18\x04 \x01(\tR\x05title\x12\x1d\n" +
+	"\n" +
+	"created_at\x18\x05 \x01(\tR\tcreatedAt\x12\x1d\n" +
+	"\n" +
+	"updated_at\x18\x06 \x01(\tR\tupdatedAt\"\x95\x01\n" +
+	"\rAiChatMessage\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12'\n" +
+	"\x0fconversation_id\x18\x02 \x01(\tR\x0econversationId\x12\x12\n" +
+	"\x04role\x18\x03 \x01(\tR\x04role\x12\x18\n" +
+	"\acontent\x18\x04 \x01(\tR\acontent\x12\x1d\n" +
+	"\n" +
+	"created_at\x18\x05 \x01(\tR\tcreatedAt\"7\n" +
+	"\x1aListAiConversationsRequest\x12\x19\n" +
+	"\bstaff_id\x18\x01 \x01(\tR\astaffId\"k\n" +
+	"\x1bListAiConversationsResponse\x12L\n" +
+	"\rconversations\x18\x01 \x03(\v2&.avtoms.notification.v1.AiConversationR\rconversations\"E\n" +
+	"\x18GetAiConversationRequest\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x19\n" +
+	"\bstaff_id\x18\x02 \x01(\tR\astaffId\"\xaa\x01\n" +
+	"\x19GetAiConversationResponse\x12J\n" +
+	"\fconversation\x18\x01 \x01(\v2&.avtoms.notification.v1.AiConversationR\fconversation\x12A\n" +
+	"\bmessages\x18\x02 \x03(\v2%.avtoms.notification.v1.AiChatMessageR\bmessages\"\xcf\x01\n" +
+	"\x17AppendAiMessagesRequest\x12'\n" +
+	"\x0fconversation_id\x18\x01 \x01(\tR\x0econversationId\x12\x19\n" +
+	"\bstaff_id\x18\x02 \x01(\tR\astaffId\x12\x17\n" +
+	"\ashop_id\x18\x03 \x01(\tR\x06shopId\x12\x14\n" +
+	"\x05title\x18\x04 \x01(\tR\x05title\x12A\n" +
+	"\bmessages\x18\x05 \x03(\v2%.avtoms.notification.v1.AiChatMessageR\bmessages\"f\n" +
+	"\x18AppendAiMessagesResponse\x12J\n" +
+	"\fconversation\x18\x01 \x01(\v2&.avtoms.notification.v1.AiConversationR\fconversation\"H\n" +
+	"\x1bDeleteAiConversationRequest\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x19\n" +
+	"\bstaff_id\x18\x02 \x01(\tR\astaffId\".\n" +
+	"\x1cDeleteAiConversationResponse\x12\x0e\n" +
 	"\x02ok\x18\x01 \x01(\bR\x02ok\"\xd4\x01\n" +
 	"\vDemoRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
@@ -1809,7 +2418,7 @@ const file_avtoms_notification_v1_notification_proto_rawDesc = "" +
 	"\x18TEMPLATE_MECHANIC_INVITE\x10\x02\x12\x15\n" +
 	"\x11TEMPLATE_ESTIMATE\x10\x03\x12\x1d\n" +
 	"\x19TEMPLATE_READY_FOR_PICKUP\x10\x04\x12\x14\n" +
-	"\x10TEMPLATE_RECEIPT\x10\x052\x8f\f\n" +
+	"\x10TEMPLATE_RECEIPT\x10\x052\x84\x10\n" +
 	"\x13NotificationService\x12W\n" +
 	"\aSendSms\x12&.avtoms.notification.v1.SendSmsRequest\x1a$.avtoms.notification.v1.SendResponse\x12a\n" +
 	"\fSendTelegram\x12+.avtoms.notification.v1.SendTelegramRequest\x1a$.avtoms.notification.v1.SendResponse\x12U\n" +
@@ -1828,7 +2437,11 @@ const file_avtoms_notification_v1_notification_proto_rawDesc = "" +
 	"\n" +
 	"UpdateLead\x12).avtoms.notification.v1.UpdateLeadRequest\x1a\x1c.avtoms.notification.v1.Lead\x12c\n" +
 	"\n" +
-	"DeleteLead\x12).avtoms.notification.v1.DeleteLeadRequest\x1a*.avtoms.notification.v1.DeleteLeadResponseBFZDgithub.com/avtoms/proto/gen/go/avtoms/notification/v1;notificationv1b\x06proto3"
+	"DeleteLead\x12).avtoms.notification.v1.DeleteLeadRequest\x1a*.avtoms.notification.v1.DeleteLeadResponse\x12~\n" +
+	"\x13ListAiConversations\x122.avtoms.notification.v1.ListAiConversationsRequest\x1a3.avtoms.notification.v1.ListAiConversationsResponse\x12x\n" +
+	"\x11GetAiConversation\x120.avtoms.notification.v1.GetAiConversationRequest\x1a1.avtoms.notification.v1.GetAiConversationResponse\x12u\n" +
+	"\x10AppendAiMessages\x12/.avtoms.notification.v1.AppendAiMessagesRequest\x1a0.avtoms.notification.v1.AppendAiMessagesResponse\x12\x81\x01\n" +
+	"\x14DeleteAiConversation\x123.avtoms.notification.v1.DeleteAiConversationRequest\x1a4.avtoms.notification.v1.DeleteAiConversationResponseBFZDgithub.com/avtoms/proto/gen/go/avtoms/notification/v1;notificationv1b\x06proto3"
 
 var (
 	file_avtoms_notification_v1_notification_proto_rawDescOnce sync.Once
@@ -1843,86 +2456,109 @@ func file_avtoms_notification_v1_notification_proto_rawDescGZIP() []byte {
 }
 
 var file_avtoms_notification_v1_notification_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
-var file_avtoms_notification_v1_notification_proto_msgTypes = make([]protoimpl.MessageInfo, 28)
+var file_avtoms_notification_v1_notification_proto_msgTypes = make([]protoimpl.MessageInfo, 38)
 var file_avtoms_notification_v1_notification_proto_goTypes = []any{
-	(Channel)(0),                        // 0: avtoms.notification.v1.Channel
-	(Template)(0),                       // 1: avtoms.notification.v1.Template
-	(*Lead)(nil),                        // 2: avtoms.notification.v1.Lead
-	(*CreateLeadRequest)(nil),           // 3: avtoms.notification.v1.CreateLeadRequest
-	(*ListLeadsRequest)(nil),            // 4: avtoms.notification.v1.ListLeadsRequest
-	(*ListLeadsResponse)(nil),           // 5: avtoms.notification.v1.ListLeadsResponse
-	(*UpdateLeadRequest)(nil),           // 6: avtoms.notification.v1.UpdateLeadRequest
-	(*DeleteLeadRequest)(nil),           // 7: avtoms.notification.v1.DeleteLeadRequest
-	(*DeleteLeadResponse)(nil),          // 8: avtoms.notification.v1.DeleteLeadResponse
-	(*DemoRequest)(nil),                 // 9: avtoms.notification.v1.DemoRequest
-	(*CreateDemoRequestRequest)(nil),    // 10: avtoms.notification.v1.CreateDemoRequestRequest
-	(*ListDemoRequestsRequest)(nil),     // 11: avtoms.notification.v1.ListDemoRequestsRequest
-	(*ListDemoRequestsResponse)(nil),    // 12: avtoms.notification.v1.ListDemoRequestsResponse
-	(*SetDemoRequestStatusRequest)(nil), // 13: avtoms.notification.v1.SetDemoRequestStatusRequest
-	(*SendTestSmsRequest)(nil),          // 14: avtoms.notification.v1.SendTestSmsRequest
-	(*TestSmsResult)(nil),               // 15: avtoms.notification.v1.TestSmsResult
-	(*Integration)(nil),                 // 16: avtoms.notification.v1.Integration
-	(*ListIntegrationsRequest)(nil),     // 17: avtoms.notification.v1.ListIntegrationsRequest
-	(*ListIntegrationsResponse)(nil),    // 18: avtoms.notification.v1.ListIntegrationsResponse
-	(*GetIntegrationRequest)(nil),       // 19: avtoms.notification.v1.GetIntegrationRequest
-	(*UpdateIntegrationRequest)(nil),    // 20: avtoms.notification.v1.UpdateIntegrationRequest
-	(*IntegrationConfig)(nil),           // 21: avtoms.notification.v1.IntegrationConfig
-	(*SendResponse)(nil),                // 22: avtoms.notification.v1.SendResponse
-	(*SendSmsRequest)(nil),              // 23: avtoms.notification.v1.SendSmsRequest
-	(*SendTelegramRequest)(nil),         // 24: avtoms.notification.v1.SendTelegramRequest
-	(*NotifyRequest)(nil),               // 25: avtoms.notification.v1.NotifyRequest
-	nil,                                 // 26: avtoms.notification.v1.Integration.ValuesEntry
-	nil,                                 // 27: avtoms.notification.v1.UpdateIntegrationRequest.ValuesEntry
-	nil,                                 // 28: avtoms.notification.v1.IntegrationConfig.ValuesEntry
-	nil,                                 // 29: avtoms.notification.v1.NotifyRequest.ParamsEntry
-	(v1.Language)(0),                    // 30: avtoms.common.v1.Language
+	(Channel)(0),                         // 0: avtoms.notification.v1.Channel
+	(Template)(0),                        // 1: avtoms.notification.v1.Template
+	(*Lead)(nil),                         // 2: avtoms.notification.v1.Lead
+	(*CreateLeadRequest)(nil),            // 3: avtoms.notification.v1.CreateLeadRequest
+	(*ListLeadsRequest)(nil),             // 4: avtoms.notification.v1.ListLeadsRequest
+	(*ListLeadsResponse)(nil),            // 5: avtoms.notification.v1.ListLeadsResponse
+	(*UpdateLeadRequest)(nil),            // 6: avtoms.notification.v1.UpdateLeadRequest
+	(*DeleteLeadRequest)(nil),            // 7: avtoms.notification.v1.DeleteLeadRequest
+	(*DeleteLeadResponse)(nil),           // 8: avtoms.notification.v1.DeleteLeadResponse
+	(*AiConversation)(nil),               // 9: avtoms.notification.v1.AiConversation
+	(*AiChatMessage)(nil),                // 10: avtoms.notification.v1.AiChatMessage
+	(*ListAiConversationsRequest)(nil),   // 11: avtoms.notification.v1.ListAiConversationsRequest
+	(*ListAiConversationsResponse)(nil),  // 12: avtoms.notification.v1.ListAiConversationsResponse
+	(*GetAiConversationRequest)(nil),     // 13: avtoms.notification.v1.GetAiConversationRequest
+	(*GetAiConversationResponse)(nil),    // 14: avtoms.notification.v1.GetAiConversationResponse
+	(*AppendAiMessagesRequest)(nil),      // 15: avtoms.notification.v1.AppendAiMessagesRequest
+	(*AppendAiMessagesResponse)(nil),     // 16: avtoms.notification.v1.AppendAiMessagesResponse
+	(*DeleteAiConversationRequest)(nil),  // 17: avtoms.notification.v1.DeleteAiConversationRequest
+	(*DeleteAiConversationResponse)(nil), // 18: avtoms.notification.v1.DeleteAiConversationResponse
+	(*DemoRequest)(nil),                  // 19: avtoms.notification.v1.DemoRequest
+	(*CreateDemoRequestRequest)(nil),     // 20: avtoms.notification.v1.CreateDemoRequestRequest
+	(*ListDemoRequestsRequest)(nil),      // 21: avtoms.notification.v1.ListDemoRequestsRequest
+	(*ListDemoRequestsResponse)(nil),     // 22: avtoms.notification.v1.ListDemoRequestsResponse
+	(*SetDemoRequestStatusRequest)(nil),  // 23: avtoms.notification.v1.SetDemoRequestStatusRequest
+	(*SendTestSmsRequest)(nil),           // 24: avtoms.notification.v1.SendTestSmsRequest
+	(*TestSmsResult)(nil),                // 25: avtoms.notification.v1.TestSmsResult
+	(*Integration)(nil),                  // 26: avtoms.notification.v1.Integration
+	(*ListIntegrationsRequest)(nil),      // 27: avtoms.notification.v1.ListIntegrationsRequest
+	(*ListIntegrationsResponse)(nil),     // 28: avtoms.notification.v1.ListIntegrationsResponse
+	(*GetIntegrationRequest)(nil),        // 29: avtoms.notification.v1.GetIntegrationRequest
+	(*UpdateIntegrationRequest)(nil),     // 30: avtoms.notification.v1.UpdateIntegrationRequest
+	(*IntegrationConfig)(nil),            // 31: avtoms.notification.v1.IntegrationConfig
+	(*SendResponse)(nil),                 // 32: avtoms.notification.v1.SendResponse
+	(*SendSmsRequest)(nil),               // 33: avtoms.notification.v1.SendSmsRequest
+	(*SendTelegramRequest)(nil),          // 34: avtoms.notification.v1.SendTelegramRequest
+	(*NotifyRequest)(nil),                // 35: avtoms.notification.v1.NotifyRequest
+	nil,                                  // 36: avtoms.notification.v1.Integration.ValuesEntry
+	nil,                                  // 37: avtoms.notification.v1.UpdateIntegrationRequest.ValuesEntry
+	nil,                                  // 38: avtoms.notification.v1.IntegrationConfig.ValuesEntry
+	nil,                                  // 39: avtoms.notification.v1.NotifyRequest.ParamsEntry
+	(v1.Language)(0),                     // 40: avtoms.common.v1.Language
 }
 var file_avtoms_notification_v1_notification_proto_depIdxs = []int32{
 	2,  // 0: avtoms.notification.v1.ListLeadsResponse.leads:type_name -> avtoms.notification.v1.Lead
-	9,  // 1: avtoms.notification.v1.ListDemoRequestsResponse.requests:type_name -> avtoms.notification.v1.DemoRequest
-	26, // 2: avtoms.notification.v1.Integration.values:type_name -> avtoms.notification.v1.Integration.ValuesEntry
-	16, // 3: avtoms.notification.v1.ListIntegrationsResponse.integrations:type_name -> avtoms.notification.v1.Integration
-	27, // 4: avtoms.notification.v1.UpdateIntegrationRequest.values:type_name -> avtoms.notification.v1.UpdateIntegrationRequest.ValuesEntry
-	28, // 5: avtoms.notification.v1.IntegrationConfig.values:type_name -> avtoms.notification.v1.IntegrationConfig.ValuesEntry
-	0,  // 6: avtoms.notification.v1.SendResponse.channel:type_name -> avtoms.notification.v1.Channel
-	1,  // 7: avtoms.notification.v1.NotifyRequest.template:type_name -> avtoms.notification.v1.Template
-	30, // 8: avtoms.notification.v1.NotifyRequest.language:type_name -> avtoms.common.v1.Language
-	29, // 9: avtoms.notification.v1.NotifyRequest.params:type_name -> avtoms.notification.v1.NotifyRequest.ParamsEntry
-	23, // 10: avtoms.notification.v1.NotificationService.SendSms:input_type -> avtoms.notification.v1.SendSmsRequest
-	24, // 11: avtoms.notification.v1.NotificationService.SendTelegram:input_type -> avtoms.notification.v1.SendTelegramRequest
-	25, // 12: avtoms.notification.v1.NotificationService.Notify:input_type -> avtoms.notification.v1.NotifyRequest
-	17, // 13: avtoms.notification.v1.NotificationService.ListIntegrations:input_type -> avtoms.notification.v1.ListIntegrationsRequest
-	19, // 14: avtoms.notification.v1.NotificationService.GetIntegration:input_type -> avtoms.notification.v1.GetIntegrationRequest
-	20, // 15: avtoms.notification.v1.NotificationService.UpdateIntegration:input_type -> avtoms.notification.v1.UpdateIntegrationRequest
-	19, // 16: avtoms.notification.v1.NotificationService.GetIntegrationConfig:input_type -> avtoms.notification.v1.GetIntegrationRequest
-	14, // 17: avtoms.notification.v1.NotificationService.SendTestSms:input_type -> avtoms.notification.v1.SendTestSmsRequest
-	10, // 18: avtoms.notification.v1.NotificationService.CreateDemoRequest:input_type -> avtoms.notification.v1.CreateDemoRequestRequest
-	11, // 19: avtoms.notification.v1.NotificationService.ListDemoRequests:input_type -> avtoms.notification.v1.ListDemoRequestsRequest
-	13, // 20: avtoms.notification.v1.NotificationService.SetDemoRequestStatus:input_type -> avtoms.notification.v1.SetDemoRequestStatusRequest
-	3,  // 21: avtoms.notification.v1.NotificationService.CreateLead:input_type -> avtoms.notification.v1.CreateLeadRequest
-	4,  // 22: avtoms.notification.v1.NotificationService.ListLeads:input_type -> avtoms.notification.v1.ListLeadsRequest
-	6,  // 23: avtoms.notification.v1.NotificationService.UpdateLead:input_type -> avtoms.notification.v1.UpdateLeadRequest
-	7,  // 24: avtoms.notification.v1.NotificationService.DeleteLead:input_type -> avtoms.notification.v1.DeleteLeadRequest
-	22, // 25: avtoms.notification.v1.NotificationService.SendSms:output_type -> avtoms.notification.v1.SendResponse
-	22, // 26: avtoms.notification.v1.NotificationService.SendTelegram:output_type -> avtoms.notification.v1.SendResponse
-	22, // 27: avtoms.notification.v1.NotificationService.Notify:output_type -> avtoms.notification.v1.SendResponse
-	18, // 28: avtoms.notification.v1.NotificationService.ListIntegrations:output_type -> avtoms.notification.v1.ListIntegrationsResponse
-	16, // 29: avtoms.notification.v1.NotificationService.GetIntegration:output_type -> avtoms.notification.v1.Integration
-	16, // 30: avtoms.notification.v1.NotificationService.UpdateIntegration:output_type -> avtoms.notification.v1.Integration
-	21, // 31: avtoms.notification.v1.NotificationService.GetIntegrationConfig:output_type -> avtoms.notification.v1.IntegrationConfig
-	15, // 32: avtoms.notification.v1.NotificationService.SendTestSms:output_type -> avtoms.notification.v1.TestSmsResult
-	9,  // 33: avtoms.notification.v1.NotificationService.CreateDemoRequest:output_type -> avtoms.notification.v1.DemoRequest
-	12, // 34: avtoms.notification.v1.NotificationService.ListDemoRequests:output_type -> avtoms.notification.v1.ListDemoRequestsResponse
-	9,  // 35: avtoms.notification.v1.NotificationService.SetDemoRequestStatus:output_type -> avtoms.notification.v1.DemoRequest
-	2,  // 36: avtoms.notification.v1.NotificationService.CreateLead:output_type -> avtoms.notification.v1.Lead
-	5,  // 37: avtoms.notification.v1.NotificationService.ListLeads:output_type -> avtoms.notification.v1.ListLeadsResponse
-	2,  // 38: avtoms.notification.v1.NotificationService.UpdateLead:output_type -> avtoms.notification.v1.Lead
-	8,  // 39: avtoms.notification.v1.NotificationService.DeleteLead:output_type -> avtoms.notification.v1.DeleteLeadResponse
-	25, // [25:40] is the sub-list for method output_type
-	10, // [10:25] is the sub-list for method input_type
-	10, // [10:10] is the sub-list for extension type_name
-	10, // [10:10] is the sub-list for extension extendee
-	0,  // [0:10] is the sub-list for field type_name
+	9,  // 1: avtoms.notification.v1.ListAiConversationsResponse.conversations:type_name -> avtoms.notification.v1.AiConversation
+	9,  // 2: avtoms.notification.v1.GetAiConversationResponse.conversation:type_name -> avtoms.notification.v1.AiConversation
+	10, // 3: avtoms.notification.v1.GetAiConversationResponse.messages:type_name -> avtoms.notification.v1.AiChatMessage
+	10, // 4: avtoms.notification.v1.AppendAiMessagesRequest.messages:type_name -> avtoms.notification.v1.AiChatMessage
+	9,  // 5: avtoms.notification.v1.AppendAiMessagesResponse.conversation:type_name -> avtoms.notification.v1.AiConversation
+	19, // 6: avtoms.notification.v1.ListDemoRequestsResponse.requests:type_name -> avtoms.notification.v1.DemoRequest
+	36, // 7: avtoms.notification.v1.Integration.values:type_name -> avtoms.notification.v1.Integration.ValuesEntry
+	26, // 8: avtoms.notification.v1.ListIntegrationsResponse.integrations:type_name -> avtoms.notification.v1.Integration
+	37, // 9: avtoms.notification.v1.UpdateIntegrationRequest.values:type_name -> avtoms.notification.v1.UpdateIntegrationRequest.ValuesEntry
+	38, // 10: avtoms.notification.v1.IntegrationConfig.values:type_name -> avtoms.notification.v1.IntegrationConfig.ValuesEntry
+	0,  // 11: avtoms.notification.v1.SendResponse.channel:type_name -> avtoms.notification.v1.Channel
+	1,  // 12: avtoms.notification.v1.NotifyRequest.template:type_name -> avtoms.notification.v1.Template
+	40, // 13: avtoms.notification.v1.NotifyRequest.language:type_name -> avtoms.common.v1.Language
+	39, // 14: avtoms.notification.v1.NotifyRequest.params:type_name -> avtoms.notification.v1.NotifyRequest.ParamsEntry
+	33, // 15: avtoms.notification.v1.NotificationService.SendSms:input_type -> avtoms.notification.v1.SendSmsRequest
+	34, // 16: avtoms.notification.v1.NotificationService.SendTelegram:input_type -> avtoms.notification.v1.SendTelegramRequest
+	35, // 17: avtoms.notification.v1.NotificationService.Notify:input_type -> avtoms.notification.v1.NotifyRequest
+	27, // 18: avtoms.notification.v1.NotificationService.ListIntegrations:input_type -> avtoms.notification.v1.ListIntegrationsRequest
+	29, // 19: avtoms.notification.v1.NotificationService.GetIntegration:input_type -> avtoms.notification.v1.GetIntegrationRequest
+	30, // 20: avtoms.notification.v1.NotificationService.UpdateIntegration:input_type -> avtoms.notification.v1.UpdateIntegrationRequest
+	29, // 21: avtoms.notification.v1.NotificationService.GetIntegrationConfig:input_type -> avtoms.notification.v1.GetIntegrationRequest
+	24, // 22: avtoms.notification.v1.NotificationService.SendTestSms:input_type -> avtoms.notification.v1.SendTestSmsRequest
+	20, // 23: avtoms.notification.v1.NotificationService.CreateDemoRequest:input_type -> avtoms.notification.v1.CreateDemoRequestRequest
+	21, // 24: avtoms.notification.v1.NotificationService.ListDemoRequests:input_type -> avtoms.notification.v1.ListDemoRequestsRequest
+	23, // 25: avtoms.notification.v1.NotificationService.SetDemoRequestStatus:input_type -> avtoms.notification.v1.SetDemoRequestStatusRequest
+	3,  // 26: avtoms.notification.v1.NotificationService.CreateLead:input_type -> avtoms.notification.v1.CreateLeadRequest
+	4,  // 27: avtoms.notification.v1.NotificationService.ListLeads:input_type -> avtoms.notification.v1.ListLeadsRequest
+	6,  // 28: avtoms.notification.v1.NotificationService.UpdateLead:input_type -> avtoms.notification.v1.UpdateLeadRequest
+	7,  // 29: avtoms.notification.v1.NotificationService.DeleteLead:input_type -> avtoms.notification.v1.DeleteLeadRequest
+	11, // 30: avtoms.notification.v1.NotificationService.ListAiConversations:input_type -> avtoms.notification.v1.ListAiConversationsRequest
+	13, // 31: avtoms.notification.v1.NotificationService.GetAiConversation:input_type -> avtoms.notification.v1.GetAiConversationRequest
+	15, // 32: avtoms.notification.v1.NotificationService.AppendAiMessages:input_type -> avtoms.notification.v1.AppendAiMessagesRequest
+	17, // 33: avtoms.notification.v1.NotificationService.DeleteAiConversation:input_type -> avtoms.notification.v1.DeleteAiConversationRequest
+	32, // 34: avtoms.notification.v1.NotificationService.SendSms:output_type -> avtoms.notification.v1.SendResponse
+	32, // 35: avtoms.notification.v1.NotificationService.SendTelegram:output_type -> avtoms.notification.v1.SendResponse
+	32, // 36: avtoms.notification.v1.NotificationService.Notify:output_type -> avtoms.notification.v1.SendResponse
+	28, // 37: avtoms.notification.v1.NotificationService.ListIntegrations:output_type -> avtoms.notification.v1.ListIntegrationsResponse
+	26, // 38: avtoms.notification.v1.NotificationService.GetIntegration:output_type -> avtoms.notification.v1.Integration
+	26, // 39: avtoms.notification.v1.NotificationService.UpdateIntegration:output_type -> avtoms.notification.v1.Integration
+	31, // 40: avtoms.notification.v1.NotificationService.GetIntegrationConfig:output_type -> avtoms.notification.v1.IntegrationConfig
+	25, // 41: avtoms.notification.v1.NotificationService.SendTestSms:output_type -> avtoms.notification.v1.TestSmsResult
+	19, // 42: avtoms.notification.v1.NotificationService.CreateDemoRequest:output_type -> avtoms.notification.v1.DemoRequest
+	22, // 43: avtoms.notification.v1.NotificationService.ListDemoRequests:output_type -> avtoms.notification.v1.ListDemoRequestsResponse
+	19, // 44: avtoms.notification.v1.NotificationService.SetDemoRequestStatus:output_type -> avtoms.notification.v1.DemoRequest
+	2,  // 45: avtoms.notification.v1.NotificationService.CreateLead:output_type -> avtoms.notification.v1.Lead
+	5,  // 46: avtoms.notification.v1.NotificationService.ListLeads:output_type -> avtoms.notification.v1.ListLeadsResponse
+	2,  // 47: avtoms.notification.v1.NotificationService.UpdateLead:output_type -> avtoms.notification.v1.Lead
+	8,  // 48: avtoms.notification.v1.NotificationService.DeleteLead:output_type -> avtoms.notification.v1.DeleteLeadResponse
+	12, // 49: avtoms.notification.v1.NotificationService.ListAiConversations:output_type -> avtoms.notification.v1.ListAiConversationsResponse
+	14, // 50: avtoms.notification.v1.NotificationService.GetAiConversation:output_type -> avtoms.notification.v1.GetAiConversationResponse
+	16, // 51: avtoms.notification.v1.NotificationService.AppendAiMessages:output_type -> avtoms.notification.v1.AppendAiMessagesResponse
+	18, // 52: avtoms.notification.v1.NotificationService.DeleteAiConversation:output_type -> avtoms.notification.v1.DeleteAiConversationResponse
+	34, // [34:53] is the sub-list for method output_type
+	15, // [15:34] is the sub-list for method input_type
+	15, // [15:15] is the sub-list for extension type_name
+	15, // [15:15] is the sub-list for extension extendee
+	0,  // [0:15] is the sub-list for field type_name
 }
 
 func init() { file_avtoms_notification_v1_notification_proto_init() }
@@ -1936,7 +2572,7 @@ func file_avtoms_notification_v1_notification_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_avtoms_notification_v1_notification_proto_rawDesc), len(file_avtoms_notification_v1_notification_proto_rawDesc)),
 			NumEnums:      2,
-			NumMessages:   28,
+			NumMessages:   38,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
