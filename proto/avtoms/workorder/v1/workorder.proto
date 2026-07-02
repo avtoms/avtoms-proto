@@ -221,6 +221,12 @@ message ServiceReminder {
   string notes = 10;
   ServiceReminderState state = 11;
   string created_at = 12;
+  // Optional recurrence: when the reminder is completed, the next occurrence is created
+  // automatically, advanced by repeat_months (calendar) and/or repeat_km (odometer).
+  // 0 for both = one-off. series_id groups all occurrences of the same recurring reminder.
+  int32 repeat_months = 13;
+  int64 repeat_km = 14;
+  string series_id = 15;
 }
 message ListServiceRemindersRequest {
   string shop_id = 1;
@@ -239,6 +245,8 @@ message CreateServiceReminderRequest {
   string due_date = 7;
   int64 due_mileage = 8;
   string notes = 9;
+  int32 repeat_months = 10; // optional recurrence (calendar months); 0 = one-off
+  int64 repeat_km = 11;     // optional recurrence (odometer km); 0 = none
 }
 message SetServiceReminderStateRequest {
   string id = 1;

@@ -1639,19 +1639,25 @@ func (x *GetProfitAndLossRequest) GetTo() string {
 // ServiceReminder is a future maintenance reminder for a vehicle (oil change,
 // technical inspection, timing-belt, insurance renewal, ...).
 type ServiceReminder struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	ShopId        string                 `protobuf:"bytes,2,opt,name=shop_id,json=shopId,proto3" json:"shop_id,omitempty"`
-	VehicleId     string                 `protobuf:"bytes,3,opt,name=vehicle_id,json=vehicleId,proto3" json:"vehicle_id,omitempty"`          // optional link to a vehicle
-	CustomerName  string                 `protobuf:"bytes,4,opt,name=customer_name,json=customerName,proto3" json:"customer_name,omitempty"` // denormalized for display / SMS
-	Phone         string                 `protobuf:"bytes,5,opt,name=phone,proto3" json:"phone,omitempty"`                                   // denormalized for SMS
-	Plate         string                 `protobuf:"bytes,6,opt,name=plate,proto3" json:"plate,omitempty"`                                   // free-text plate for quick display
-	Title         string                 `protobuf:"bytes,7,opt,name=title,proto3" json:"title,omitempty"`                                   // e.g. "Oil change", "Technical inspection"
-	DueDate       string                 `protobuf:"bytes,8,opt,name=due_date,json=dueDate,proto3" json:"due_date,omitempty"`                // RFC3339 date the service is due (optional)
-	DueMileage    int64                  `protobuf:"varint,9,opt,name=due_mileage,json=dueMileage,proto3" json:"due_mileage,omitempty"`      // odometer target in km (optional, 0 = none)
-	Notes         string                 `protobuf:"bytes,10,opt,name=notes,proto3" json:"notes,omitempty"`
-	State         ServiceReminderState   `protobuf:"varint,11,opt,name=state,proto3,enum=avtoms.workorder.v1.ServiceReminderState" json:"state,omitempty"`
-	CreatedAt     string                 `protobuf:"bytes,12,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	state        protoimpl.MessageState `protogen:"open.v1"`
+	Id           string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	ShopId       string                 `protobuf:"bytes,2,opt,name=shop_id,json=shopId,proto3" json:"shop_id,omitempty"`
+	VehicleId    string                 `protobuf:"bytes,3,opt,name=vehicle_id,json=vehicleId,proto3" json:"vehicle_id,omitempty"`          // optional link to a vehicle
+	CustomerName string                 `protobuf:"bytes,4,opt,name=customer_name,json=customerName,proto3" json:"customer_name,omitempty"` // denormalized for display / SMS
+	Phone        string                 `protobuf:"bytes,5,opt,name=phone,proto3" json:"phone,omitempty"`                                   // denormalized for SMS
+	Plate        string                 `protobuf:"bytes,6,opt,name=plate,proto3" json:"plate,omitempty"`                                   // free-text plate for quick display
+	Title        string                 `protobuf:"bytes,7,opt,name=title,proto3" json:"title,omitempty"`                                   // e.g. "Oil change", "Technical inspection"
+	DueDate      string                 `protobuf:"bytes,8,opt,name=due_date,json=dueDate,proto3" json:"due_date,omitempty"`                // RFC3339 date the service is due (optional)
+	DueMileage   int64                  `protobuf:"varint,9,opt,name=due_mileage,json=dueMileage,proto3" json:"due_mileage,omitempty"`      // odometer target in km (optional, 0 = none)
+	Notes        string                 `protobuf:"bytes,10,opt,name=notes,proto3" json:"notes,omitempty"`
+	State        ServiceReminderState   `protobuf:"varint,11,opt,name=state,proto3,enum=avtoms.workorder.v1.ServiceReminderState" json:"state,omitempty"`
+	CreatedAt    string                 `protobuf:"bytes,12,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	// Optional recurrence: when the reminder is completed, the next occurrence is created
+	// automatically, advanced by repeat_months (calendar) and/or repeat_km (odometer).
+	// 0 for both = one-off. series_id groups all occurrences of the same recurring reminder.
+	RepeatMonths  int32  `protobuf:"varint,13,opt,name=repeat_months,json=repeatMonths,proto3" json:"repeat_months,omitempty"`
+	RepeatKm      int64  `protobuf:"varint,14,opt,name=repeat_km,json=repeatKm,proto3" json:"repeat_km,omitempty"`
+	SeriesId      string `protobuf:"bytes,15,opt,name=series_id,json=seriesId,proto3" json:"series_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1770,6 +1776,27 @@ func (x *ServiceReminder) GetCreatedAt() string {
 	return ""
 }
 
+func (x *ServiceReminder) GetRepeatMonths() int32 {
+	if x != nil {
+		return x.RepeatMonths
+	}
+	return 0
+}
+
+func (x *ServiceReminder) GetRepeatKm() int64 {
+	if x != nil {
+		return x.RepeatKm
+	}
+	return 0
+}
+
+func (x *ServiceReminder) GetSeriesId() string {
+	if x != nil {
+		return x.SeriesId
+	}
+	return ""
+}
+
 type ListServiceRemindersRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	ShopId        string                 `protobuf:"bytes,1,opt,name=shop_id,json=shopId,proto3" json:"shop_id,omitempty"`
@@ -1877,6 +1904,8 @@ type CreateServiceReminderRequest struct {
 	DueDate       string                 `protobuf:"bytes,7,opt,name=due_date,json=dueDate,proto3" json:"due_date,omitempty"`
 	DueMileage    int64                  `protobuf:"varint,8,opt,name=due_mileage,json=dueMileage,proto3" json:"due_mileage,omitempty"`
 	Notes         string                 `protobuf:"bytes,9,opt,name=notes,proto3" json:"notes,omitempty"`
+	RepeatMonths  int32                  `protobuf:"varint,10,opt,name=repeat_months,json=repeatMonths,proto3" json:"repeat_months,omitempty"` // optional recurrence (calendar months); 0 = one-off
+	RepeatKm      int64                  `protobuf:"varint,11,opt,name=repeat_km,json=repeatKm,proto3" json:"repeat_km,omitempty"`             // optional recurrence (odometer km); 0 = none
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1972,6 +2001,20 @@ func (x *CreateServiceReminderRequest) GetNotes() string {
 		return x.Notes
 	}
 	return ""
+}
+
+func (x *CreateServiceReminderRequest) GetRepeatMonths() int32 {
+	if x != nil {
+		return x.RepeatMonths
+	}
+	return 0
+}
+
+func (x *CreateServiceReminderRequest) GetRepeatKm() int64 {
+	if x != nil {
+		return x.RepeatKm
+	}
+	return 0
 }
 
 type SetServiceReminderStateRequest struct {
@@ -5188,7 +5231,7 @@ const file_avtoms_workorder_v1_workorder_proto_rawDesc = "" +
 	"\x17GetProfitAndLossRequest\x12\x17\n" +
 	"\ashop_id\x18\x01 \x01(\tR\x06shopId\x12\x12\n" +
 	"\x04from\x18\x02 \x01(\tR\x04from\x12\x0e\n" +
-	"\x02to\x18\x03 \x01(\tR\x02to\"\xf2\x02\n" +
+	"\x02to\x18\x03 \x01(\tR\x02to\"\xd1\x03\n" +
 	"\x0fServiceReminder\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x17\n" +
 	"\ashop_id\x18\x02 \x01(\tR\x06shopId\x12\x1d\n" +
@@ -5205,13 +5248,16 @@ const file_avtoms_workorder_v1_workorder_proto_rawDesc = "" +
 	" \x01(\tR\x05notes\x12?\n" +
 	"\x05state\x18\v \x01(\x0e2).avtoms.workorder.v1.ServiceReminderStateR\x05state\x12\x1d\n" +
 	"\n" +
-	"created_at\x18\f \x01(\tR\tcreatedAt\"U\n" +
+	"created_at\x18\f \x01(\tR\tcreatedAt\x12#\n" +
+	"\rrepeat_months\x18\r \x01(\x05R\frepeatMonths\x12\x1b\n" +
+	"\trepeat_km\x18\x0e \x01(\x03R\brepeatKm\x12\x1b\n" +
+	"\tseries_id\x18\x0f \x01(\tR\bseriesId\"U\n" +
 	"\x1bListServiceRemindersRequest\x12\x17\n" +
 	"\ashop_id\x18\x01 \x01(\tR\x06shopId\x12\x1d\n" +
 	"\n" +
 	"vehicle_id\x18\x02 \x01(\tR\tvehicleId\"b\n" +
 	"\x1cListServiceRemindersResponse\x12B\n" +
-	"\treminders\x18\x01 \x03(\v2$.avtoms.workorder.v1.ServiceReminderR\treminders\"\x8f\x02\n" +
+	"\treminders\x18\x01 \x03(\v2$.avtoms.workorder.v1.ServiceReminderR\treminders\"\xd1\x02\n" +
 	"\x1cCreateServiceReminderRequest\x12\x17\n" +
 	"\ashop_id\x18\x01 \x01(\tR\x06shopId\x12\x1d\n" +
 	"\n" +
@@ -5223,7 +5269,10 @@ const file_avtoms_workorder_v1_workorder_proto_rawDesc = "" +
 	"\bdue_date\x18\a \x01(\tR\adueDate\x12\x1f\n" +
 	"\vdue_mileage\x18\b \x01(\x03R\n" +
 	"dueMileage\x12\x14\n" +
-	"\x05notes\x18\t \x01(\tR\x05notes\"q\n" +
+	"\x05notes\x18\t \x01(\tR\x05notes\x12#\n" +
+	"\rrepeat_months\x18\n" +
+	" \x01(\x05R\frepeatMonths\x12\x1b\n" +
+	"\trepeat_km\x18\v \x01(\x03R\brepeatKm\"q\n" +
 	"\x1eSetServiceReminderStateRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12?\n" +
 	"\x05state\x18\x02 \x01(\x0e2).avtoms.workorder.v1.ServiceReminderStateR\x05state\"+\n" +
