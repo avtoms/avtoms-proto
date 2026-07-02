@@ -31,6 +31,9 @@ const (
 	ReportKind_REPORT_KIND_SERVICE_MENU_PERFORMANCE ReportKind = 4
 	ReportKind_REPORT_KIND_FISCAL_COMPLIANCE        ReportKind = 5
 	ReportKind_REPORT_KIND_CUSTOMER_RETENTION       ReportKind = 6
+	// Platform-wide (cross-shop) service performance for the super-admin: aggregates
+	// line-item sales across every shop, ignoring shop_id. Not for tenant use.
+	ReportKind_REPORT_KIND_PLATFORM_SERVICE_PERFORMANCE ReportKind = 7
 )
 
 // Enum value maps for ReportKind.
@@ -43,15 +46,17 @@ var (
 		4: "REPORT_KIND_SERVICE_MENU_PERFORMANCE",
 		5: "REPORT_KIND_FISCAL_COMPLIANCE",
 		6: "REPORT_KIND_CUSTOMER_RETENTION",
+		7: "REPORT_KIND_PLATFORM_SERVICE_PERFORMANCE",
 	}
 	ReportKind_value = map[string]int32{
-		"REPORT_KIND_UNSPECIFIED":              0,
-		"REPORT_KIND_DAILY_REVENUE":            1,
-		"REPORT_KIND_WEEKLY_WORK_ORDERS":       2,
-		"REPORT_KIND_MECHANIC_ACTIVITY":        3,
-		"REPORT_KIND_SERVICE_MENU_PERFORMANCE": 4,
-		"REPORT_KIND_FISCAL_COMPLIANCE":        5,
-		"REPORT_KIND_CUSTOMER_RETENTION":       6,
+		"REPORT_KIND_UNSPECIFIED":                  0,
+		"REPORT_KIND_DAILY_REVENUE":                1,
+		"REPORT_KIND_WEEKLY_WORK_ORDERS":           2,
+		"REPORT_KIND_MECHANIC_ACTIVITY":            3,
+		"REPORT_KIND_SERVICE_MENU_PERFORMANCE":     4,
+		"REPORT_KIND_FISCAL_COMPLIANCE":            5,
+		"REPORT_KIND_CUSTOMER_RETENTION":           6,
+		"REPORT_KIND_PLATFORM_SERVICE_PERFORMANCE": 7,
 	}
 )
 
@@ -401,7 +406,7 @@ const file_avtoms_reporting_v1_reporting_proto_rawDesc = "" +
 	"\ashop_id\x18\x01 \x01(\tR\x06shopId\x123\n" +
 	"\x04kind\x18\x02 \x01(\x0e2\x1f.avtoms.reporting.v1.ReportKindR\x04kind\x12\x12\n" +
 	"\x04from\x18\x03 \x01(\tR\x04from\x12\x0e\n" +
-	"\x02to\x18\x04 \x01(\tR\x02to*\x80\x02\n" +
+	"\x02to\x18\x04 \x01(\tR\x02to*\xae\x02\n" +
 	"\n" +
 	"ReportKind\x12\x1b\n" +
 	"\x17REPORT_KIND_UNSPECIFIED\x10\x00\x12\x1d\n" +
@@ -410,7 +415,8 @@ const file_avtoms_reporting_v1_reporting_proto_rawDesc = "" +
 	"\x1dREPORT_KIND_MECHANIC_ACTIVITY\x10\x03\x12(\n" +
 	"$REPORT_KIND_SERVICE_MENU_PERFORMANCE\x10\x04\x12!\n" +
 	"\x1dREPORT_KIND_FISCAL_COMPLIANCE\x10\x05\x12\"\n" +
-	"\x1eREPORT_KIND_CUSTOMER_RETENTION\x10\x062\xbd\x01\n" +
+	"\x1eREPORT_KIND_CUSTOMER_RETENTION\x10\x06\x12,\n" +
+	"(REPORT_KIND_PLATFORM_SERVICE_PERFORMANCE\x10\a2\xbd\x01\n" +
 	"\x10ReportingService\x12X\n" +
 	"\fGetDashboard\x12(.avtoms.reporting.v1.GetDashboardRequest\x1a\x1e.avtoms.reporting.v1.Dashboard\x12O\n" +
 	"\tGetReport\x12%.avtoms.reporting.v1.GetReportRequest\x1a\x1b.avtoms.reporting.v1.ReportB@Z>github.com/avtoms/proto/gen/go/avtoms/reporting/v1;reportingv1b\x06proto3"

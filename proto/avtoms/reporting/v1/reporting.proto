@@ -18,6 +18,9 @@ enum ReportKind {
   REPORT_KIND_SERVICE_MENU_PERFORMANCE = 4;
   REPORT_KIND_FISCAL_COMPLIANCE = 5;
   REPORT_KIND_CUSTOMER_RETENTION = 6;
+  // Platform-wide (cross-shop) service performance for the super-admin: aggregates
+  // line-item sales across every shop, ignoring shop_id. Not for tenant use.
+  REPORT_KIND_PLATFORM_SERVICE_PERFORMANCE = 7;
 }
 
 message Dashboard {
