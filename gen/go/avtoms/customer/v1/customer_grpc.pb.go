@@ -31,6 +31,7 @@ const (
 	CustomerService_SearchByPlate_FullMethodName           = "/avtoms.customer.v1.CustomerService/SearchByPlate"
 	CustomerService_SoftDeleteCustomer_FullMethodName      = "/avtoms.customer.v1.CustomerService/SoftDeleteCustomer"
 	CustomerService_ListCustomers_FullMethodName           = "/avtoms.customer.v1.CustomerService/ListCustomers"
+	CustomerService_ListCustomersByPhone_FullMethodName    = "/avtoms.customer.v1.CustomerService/ListCustomersByPhone"
 	CustomerService_LinkTelegram_FullMethodName            = "/avtoms.customer.v1.CustomerService/LinkTelegram"
 	CustomerService_UnlinkTelegram_FullMethodName          = "/avtoms.customer.v1.CustomerService/UnlinkTelegram"
 	CustomerService_GetTelegramLink_FullMethodName         = "/avtoms.customer.v1.CustomerService/GetTelegramLink"
@@ -61,6 +62,9 @@ type CustomerServiceClient interface {
 	SearchByPlate(ctx context.Context, in *SearchByPlateRequest, opts ...grpc.CallOption) (*SearchByPlateResponse, error)
 	SoftDeleteCustomer(ctx context.Context, in *SoftDeleteCustomerRequest, opts ...grpc.CallOption) (*Customer, error)
 	ListCustomers(ctx context.Context, in *ListCustomersRequest, opts ...grpc.CallOption) (*ListCustomersResponse, error)
+	// ListCustomersByPhone finds a customer's records across ALL shops by phone (no shop
+	// scope). Used by the client mobile app so a customer sees their cars at any Auto-Garaj.
+	ListCustomersByPhone(ctx context.Context, in *ListCustomersByPhoneRequest, opts ...grpc.CallOption) (*ListCustomersResponse, error)
 	// Client Telegram linking: a customer links their Telegram chat (by sharing their
 	// verified phone) so the bot can show their orders and push notifications.
 	LinkTelegram(ctx context.Context, in *LinkTelegramRequest, opts ...grpc.CallOption) (*TelegramLink, error)
@@ -204,6 +208,16 @@ func (c *customerServiceClient) ListCustomers(ctx context.Context, in *ListCusto
 	return out, nil
 }
 
+func (c *customerServiceClient) ListCustomersByPhone(ctx context.Context, in *ListCustomersByPhoneRequest, opts ...grpc.CallOption) (*ListCustomersResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListCustomersResponse)
+	err := c.cc.Invoke(ctx, CustomerService_ListCustomersByPhone_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *customerServiceClient) LinkTelegram(ctx context.Context, in *LinkTelegramRequest, opts ...grpc.CallOption) (*TelegramLink, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(TelegramLink)
@@ -322,6 +336,9 @@ type CustomerServiceServer interface {
 	SearchByPlate(context.Context, *SearchByPlateRequest) (*SearchByPlateResponse, error)
 	SoftDeleteCustomer(context.Context, *SoftDeleteCustomerRequest) (*Customer, error)
 	ListCustomers(context.Context, *ListCustomersRequest) (*ListCustomersResponse, error)
+	// ListCustomersByPhone finds a customer's records across ALL shops by phone (no shop
+	// scope). Used by the client mobile app so a customer sees their cars at any Auto-Garaj.
+	ListCustomersByPhone(context.Context, *ListCustomersByPhoneRequest) (*ListCustomersResponse, error)
 	// Client Telegram linking: a customer links their Telegram chat (by sharing their
 	// verified phone) so the bot can show their orders and push notifications.
 	LinkTelegram(context.Context, *LinkTelegramRequest) (*TelegramLink, error)
@@ -380,6 +397,9 @@ func (UnimplementedCustomerServiceServer) SoftDeleteCustomer(context.Context, *S
 }
 func (UnimplementedCustomerServiceServer) ListCustomers(context.Context, *ListCustomersRequest) (*ListCustomersResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method ListCustomers not implemented")
+}
+func (UnimplementedCustomerServiceServer) ListCustomersByPhone(context.Context, *ListCustomersByPhoneRequest) (*ListCustomersResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListCustomersByPhone not implemented")
 }
 func (UnimplementedCustomerServiceServer) LinkTelegram(context.Context, *LinkTelegramRequest) (*TelegramLink, error) {
 	return nil, status.Error(codes.Unimplemented, "method LinkTelegram not implemented")
@@ -648,6 +668,24 @@ func _CustomerService_ListCustomers_Handler(srv interface{}, ctx context.Context
 	return interceptor(ctx, in, info, handler)
 }
 
+func _CustomerService_ListCustomersByPhone_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListCustomersByPhoneRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CustomerServiceServer).ListCustomersByPhone(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CustomerService_ListCustomersByPhone_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CustomerServiceServer).ListCustomersByPhone(ctx, req.(*ListCustomersByPhoneRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _CustomerService_LinkTelegram_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(LinkTelegramRequest)
 	if err := dec(in); err != nil {
@@ -882,6 +920,10 @@ var CustomerService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ListCustomers",
 			Handler:    _CustomerService_ListCustomers_Handler,
+		},
+		{
+			MethodName: "ListCustomersByPhone",
+			Handler:    _CustomerService_ListCustomersByPhone_Handler,
 		},
 		{
 			MethodName: "LinkTelegram",

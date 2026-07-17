@@ -22,6 +22,7 @@ const (
 	AuthService_RequestOtp_FullMethodName          = "/avtoms.auth.v1.AuthService/RequestOtp"
 	AuthService_VerifyOtp_FullMethodName           = "/avtoms.auth.v1.AuthService/VerifyOtp"
 	AuthService_RefreshToken_FullMethodName        = "/avtoms.auth.v1.AuthService/RefreshToken"
+	AuthService_VerifyClientOtp_FullMethodName     = "/avtoms.auth.v1.AuthService/VerifyClientOtp"
 	AuthService_Authenticate_FullMethodName        = "/avtoms.auth.v1.AuthService/Authenticate"
 	AuthService_InviteMechanic_FullMethodName      = "/avtoms.auth.v1.AuthService/InviteMechanic"
 	AuthService_DeactivateStaff_FullMethodName     = "/avtoms.auth.v1.AuthService/DeactivateStaff"
@@ -45,6 +46,10 @@ type AuthServiceClient interface {
 	RequestOtp(ctx context.Context, in *RequestOtpRequest, opts ...grpc.CallOption) (*RequestOtpResponse, error)
 	VerifyOtp(ctx context.Context, in *VerifyOtpRequest, opts ...grpc.CallOption) (*TokenPair, error)
 	RefreshToken(ctx context.Context, in *RefreshTokenRequest, opts ...grpc.CallOption) (*TokenPair, error)
+	// VerifyClientOtp verifies an OTP for a CUSTOMER (not staff) and returns a long-lived
+	// ROLE_CLIENT token (subject = phone, no shop). Unlike VerifyOtp it never creates a staff
+	// record. Used by the customer mobile app; OTP is requested via the normal RequestOtp.
+	VerifyClientOtp(ctx context.Context, in *VerifyClientOtpRequest, opts ...grpc.CallOption) (*TokenPair, error)
 	// Authenticate validates an access token; used by the gateway middleware.
 	Authenticate(ctx context.Context, in *AuthenticateRequest, opts ...grpc.CallOption) (*AuthenticateResponse, error)
 	InviteMechanic(ctx context.Context, in *InviteMechanicRequest, opts ...grpc.CallOption) (*Staff, error)
@@ -95,6 +100,16 @@ func (c *authServiceClient) RefreshToken(ctx context.Context, in *RefreshTokenRe
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(TokenPair)
 	err := c.cc.Invoke(ctx, AuthService_RefreshToken_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *authServiceClient) VerifyClientOtp(ctx context.Context, in *VerifyClientOtpRequest, opts ...grpc.CallOption) (*TokenPair, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(TokenPair)
+	err := c.cc.Invoke(ctx, AuthService_VerifyClientOtp_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -212,6 +227,10 @@ type AuthServiceServer interface {
 	RequestOtp(context.Context, *RequestOtpRequest) (*RequestOtpResponse, error)
 	VerifyOtp(context.Context, *VerifyOtpRequest) (*TokenPair, error)
 	RefreshToken(context.Context, *RefreshTokenRequest) (*TokenPair, error)
+	// VerifyClientOtp verifies an OTP for a CUSTOMER (not staff) and returns a long-lived
+	// ROLE_CLIENT token (subject = phone, no shop). Unlike VerifyOtp it never creates a staff
+	// record. Used by the customer mobile app; OTP is requested via the normal RequestOtp.
+	VerifyClientOtp(context.Context, *VerifyClientOtpRequest) (*TokenPair, error)
 	// Authenticate validates an access token; used by the gateway middleware.
 	Authenticate(context.Context, *AuthenticateRequest) (*AuthenticateResponse, error)
 	InviteMechanic(context.Context, *InviteMechanicRequest) (*Staff, error)
@@ -246,6 +265,9 @@ func (UnimplementedAuthServiceServer) VerifyOtp(context.Context, *VerifyOtpReque
 }
 func (UnimplementedAuthServiceServer) RefreshToken(context.Context, *RefreshTokenRequest) (*TokenPair, error) {
 	return nil, status.Error(codes.Unimplemented, "method RefreshToken not implemented")
+}
+func (UnimplementedAuthServiceServer) VerifyClientOtp(context.Context, *VerifyClientOtpRequest) (*TokenPair, error) {
+	return nil, status.Error(codes.Unimplemented, "method VerifyClientOtp not implemented")
 }
 func (UnimplementedAuthServiceServer) Authenticate(context.Context, *AuthenticateRequest) (*AuthenticateResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method Authenticate not implemented")
@@ -348,6 +370,24 @@ func _AuthService_RefreshToken_Handler(srv interface{}, ctx context.Context, dec
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(AuthServiceServer).RefreshToken(ctx, req.(*RefreshTokenRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AuthService_VerifyClientOtp_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(VerifyClientOtpRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServiceServer).VerifyClientOtp(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AuthService_VerifyClientOtp_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServiceServer).VerifyClientOtp(ctx, req.(*VerifyClientOtpRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -550,6 +590,10 @@ var AuthService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "RefreshToken",
 			Handler:    _AuthService_RefreshToken_Handler,
+		},
+		{
+			MethodName: "VerifyClientOtp",
+			Handler:    _AuthService_VerifyClientOtp_Handler,
 		},
 		{
 			MethodName: "Authenticate",

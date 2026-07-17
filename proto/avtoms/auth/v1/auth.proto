@@ -12,6 +12,11 @@ service AuthService {
   rpc VerifyOtp(VerifyOtpRequest) returns (TokenPair);
   rpc RefreshToken(RefreshTokenRequest) returns (TokenPair);
 
+  // VerifyClientOtp verifies an OTP for a CUSTOMER (not staff) and returns a long-lived
+  // ROLE_CLIENT token (subject = phone, no shop). Unlike VerifyOtp it never creates a staff
+  // record. Used by the customer mobile app; OTP is requested via the normal RequestOtp.
+  rpc VerifyClientOtp(VerifyClientOtpRequest) returns (TokenPair);
+
   // Authenticate validates an access token; used by the gateway middleware.
   rpc Authenticate(AuthenticateRequest) returns (AuthenticateResponse);
 
@@ -48,6 +53,7 @@ enum Role {
   ROLE_OWNER = 1;
   ROLE_MECHANIC = 2;
   ROLE_ADMIN = 3;
+  ROLE_CLIENT = 4; // a customer signed in to the client mobile app (no shop, no staff record)
 }
 
 message Staff {
@@ -88,6 +94,11 @@ message RequestOtpResponse {
 }
 
 message VerifyOtpRequest {
+  string challenge_id = 1;
+  string code = 2;
+}
+
+message VerifyClientOtpRequest {
   string challenge_id = 1;
   string code = 2;
 }

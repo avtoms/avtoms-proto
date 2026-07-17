@@ -20,6 +20,9 @@ service CustomerService {
   rpc SearchByPlate(SearchByPlateRequest) returns (SearchByPlateResponse);
   rpc SoftDeleteCustomer(SoftDeleteCustomerRequest) returns (Customer);
   rpc ListCustomers(ListCustomersRequest) returns (ListCustomersResponse);
+  // ListCustomersByPhone finds a customer's records across ALL shops by phone (no shop
+  // scope). Used by the client mobile app so a customer sees their cars at any Auto-Garaj.
+  rpc ListCustomersByPhone(ListCustomersByPhoneRequest) returns (ListCustomersResponse);
 
   // Client Telegram linking: a customer links their Telegram chat (by sharing their
   // verified phone) so the bot can show their orders and push notifications.
@@ -82,6 +85,9 @@ message CreateCarModelRequest {
 message ListCustomersRequest {
   string shop_id = 1;
   string query = 2; // optional name/phone filter
+}
+message ListCustomersByPhoneRequest {
+  string phone = 1;
 }
 message ListCustomersResponse {
   repeated Customer customers = 1;
