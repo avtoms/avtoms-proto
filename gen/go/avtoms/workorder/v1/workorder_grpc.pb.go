@@ -19,49 +19,53 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	WorkOrderService_CreateWorkOrder_FullMethodName         = "/avtoms.workorder.v1.WorkOrderService/CreateWorkOrder"
-	WorkOrderService_GetWorkOrder_FullMethodName            = "/avtoms.workorder.v1.WorkOrderService/GetWorkOrder"
-	WorkOrderService_AddLineItem_FullMethodName             = "/avtoms.workorder.v1.WorkOrderService/AddLineItem"
-	WorkOrderService_RemoveLineItem_FullMethodName          = "/avtoms.workorder.v1.WorkOrderService/RemoveLineItem"
-	WorkOrderService_TransitionState_FullMethodName         = "/avtoms.workorder.v1.WorkOrderService/TransitionState"
-	WorkOrderService_AssignMechanic_FullMethodName          = "/avtoms.workorder.v1.WorkOrderService/AssignMechanic"
-	WorkOrderService_AssignLineItem_FullMethodName          = "/avtoms.workorder.v1.WorkOrderService/AssignLineItem"
-	WorkOrderService_SetLineItemStatus_FullMethodName       = "/avtoms.workorder.v1.WorkOrderService/SetLineItemStatus"
-	WorkOrderService_StartTimer_FullMethodName              = "/avtoms.workorder.v1.WorkOrderService/StartTimer"
-	WorkOrderService_StopTimer_FullMethodName               = "/avtoms.workorder.v1.WorkOrderService/StopTimer"
-	WorkOrderService_ListMenuItems_FullMethodName           = "/avtoms.workorder.v1.WorkOrderService/ListMenuItems"
-	WorkOrderService_CreateMenuItem_FullMethodName          = "/avtoms.workorder.v1.WorkOrderService/CreateMenuItem"
-	WorkOrderService_UpdateMenuItem_FullMethodName          = "/avtoms.workorder.v1.WorkOrderService/UpdateMenuItem"
-	WorkOrderService_ListMenuPriceHistory_FullMethodName    = "/avtoms.workorder.v1.WorkOrderService/ListMenuPriceHistory"
-	WorkOrderService_ListWorkOrders_FullMethodName          = "/avtoms.workorder.v1.WorkOrderService/ListWorkOrders"
-	WorkOrderService_GetShopSettings_FullMethodName         = "/avtoms.workorder.v1.WorkOrderService/GetShopSettings"
-	WorkOrderService_UpdateShopSettings_FullMethodName      = "/avtoms.workorder.v1.WorkOrderService/UpdateShopSettings"
-	WorkOrderService_ListProducts_FullMethodName            = "/avtoms.workorder.v1.WorkOrderService/ListProducts"
-	WorkOrderService_GetProduct_FullMethodName              = "/avtoms.workorder.v1.WorkOrderService/GetProduct"
-	WorkOrderService_CreateProduct_FullMethodName           = "/avtoms.workorder.v1.WorkOrderService/CreateProduct"
-	WorkOrderService_UpdateProduct_FullMethodName           = "/avtoms.workorder.v1.WorkOrderService/UpdateProduct"
-	WorkOrderService_AdjustVariantStock_FullMethodName      = "/avtoms.workorder.v1.WorkOrderService/AdjustVariantStock"
-	WorkOrderService_ListAppointments_FullMethodName        = "/avtoms.workorder.v1.WorkOrderService/ListAppointments"
-	WorkOrderService_CreateAppointment_FullMethodName       = "/avtoms.workorder.v1.WorkOrderService/CreateAppointment"
-	WorkOrderService_SetAppointmentState_FullMethodName     = "/avtoms.workorder.v1.WorkOrderService/SetAppointmentState"
-	WorkOrderService_GetAuditLog_FullMethodName             = "/avtoms.workorder.v1.WorkOrderService/GetAuditLog"
-	WorkOrderService_ListServiceReminders_FullMethodName    = "/avtoms.workorder.v1.WorkOrderService/ListServiceReminders"
-	WorkOrderService_CreateServiceReminder_FullMethodName   = "/avtoms.workorder.v1.WorkOrderService/CreateServiceReminder"
-	WorkOrderService_SetServiceReminderState_FullMethodName = "/avtoms.workorder.v1.WorkOrderService/SetServiceReminderState"
-	WorkOrderService_ListDueReminders_FullMethodName        = "/avtoms.workorder.v1.WorkOrderService/ListDueReminders"
-	WorkOrderService_MarkReminderNotified_FullMethodName    = "/avtoms.workorder.v1.WorkOrderService/MarkReminderNotified"
-	WorkOrderService_ListDueAppointments_FullMethodName     = "/avtoms.workorder.v1.WorkOrderService/ListDueAppointments"
-	WorkOrderService_MarkAppointmentReminded_FullMethodName = "/avtoms.workorder.v1.WorkOrderService/MarkAppointmentReminded"
-	WorkOrderService_ListShopExpenses_FullMethodName        = "/avtoms.workorder.v1.WorkOrderService/ListShopExpenses"
-	WorkOrderService_CreateShopExpense_FullMethodName       = "/avtoms.workorder.v1.WorkOrderService/CreateShopExpense"
-	WorkOrderService_DeleteShopExpense_FullMethodName       = "/avtoms.workorder.v1.WorkOrderService/DeleteShopExpense"
-	WorkOrderService_GetProfitAndLoss_FullMethodName        = "/avtoms.workorder.v1.WorkOrderService/GetProfitAndLoss"
-	WorkOrderService_ListWarranties_FullMethodName          = "/avtoms.workorder.v1.WorkOrderService/ListWarranties"
-	WorkOrderService_CreateWarranty_FullMethodName          = "/avtoms.workorder.v1.WorkOrderService/CreateWarranty"
-	WorkOrderService_VoidWarranty_FullMethodName            = "/avtoms.workorder.v1.WorkOrderService/VoidWarranty"
-	WorkOrderService_CreateApprovalLink_FullMethodName      = "/avtoms.workorder.v1.WorkOrderService/CreateApprovalLink"
-	WorkOrderService_ResolveApproval_FullMethodName         = "/avtoms.workorder.v1.WorkOrderService/ResolveApproval"
-	WorkOrderService_DecideApproval_FullMethodName          = "/avtoms.workorder.v1.WorkOrderService/DecideApproval"
+	WorkOrderService_CreateWorkOrder_FullMethodName          = "/avtoms.workorder.v1.WorkOrderService/CreateWorkOrder"
+	WorkOrderService_GetWorkOrder_FullMethodName             = "/avtoms.workorder.v1.WorkOrderService/GetWorkOrder"
+	WorkOrderService_AddLineItem_FullMethodName              = "/avtoms.workorder.v1.WorkOrderService/AddLineItem"
+	WorkOrderService_RemoveLineItem_FullMethodName           = "/avtoms.workorder.v1.WorkOrderService/RemoveLineItem"
+	WorkOrderService_TransitionState_FullMethodName          = "/avtoms.workorder.v1.WorkOrderService/TransitionState"
+	WorkOrderService_AssignMechanic_FullMethodName           = "/avtoms.workorder.v1.WorkOrderService/AssignMechanic"
+	WorkOrderService_AssignLineItem_FullMethodName           = "/avtoms.workorder.v1.WorkOrderService/AssignLineItem"
+	WorkOrderService_SetLineItemStatus_FullMethodName        = "/avtoms.workorder.v1.WorkOrderService/SetLineItemStatus"
+	WorkOrderService_StartTimer_FullMethodName               = "/avtoms.workorder.v1.WorkOrderService/StartTimer"
+	WorkOrderService_StopTimer_FullMethodName                = "/avtoms.workorder.v1.WorkOrderService/StopTimer"
+	WorkOrderService_ListMenuItems_FullMethodName            = "/avtoms.workorder.v1.WorkOrderService/ListMenuItems"
+	WorkOrderService_CreateMenuItem_FullMethodName           = "/avtoms.workorder.v1.WorkOrderService/CreateMenuItem"
+	WorkOrderService_UpdateMenuItem_FullMethodName           = "/avtoms.workorder.v1.WorkOrderService/UpdateMenuItem"
+	WorkOrderService_ListMenuPriceHistory_FullMethodName     = "/avtoms.workorder.v1.WorkOrderService/ListMenuPriceHistory"
+	WorkOrderService_ListWorkOrders_FullMethodName           = "/avtoms.workorder.v1.WorkOrderService/ListWorkOrders"
+	WorkOrderService_GetShopSettings_FullMethodName          = "/avtoms.workorder.v1.WorkOrderService/GetShopSettings"
+	WorkOrderService_UpdateShopSettings_FullMethodName       = "/avtoms.workorder.v1.WorkOrderService/UpdateShopSettings"
+	WorkOrderService_ListProducts_FullMethodName             = "/avtoms.workorder.v1.WorkOrderService/ListProducts"
+	WorkOrderService_GetProduct_FullMethodName               = "/avtoms.workorder.v1.WorkOrderService/GetProduct"
+	WorkOrderService_CreateProduct_FullMethodName            = "/avtoms.workorder.v1.WorkOrderService/CreateProduct"
+	WorkOrderService_UpdateProduct_FullMethodName            = "/avtoms.workorder.v1.WorkOrderService/UpdateProduct"
+	WorkOrderService_AdjustVariantStock_FullMethodName       = "/avtoms.workorder.v1.WorkOrderService/AdjustVariantStock"
+	WorkOrderService_ListPropertyDefinitions_FullMethodName  = "/avtoms.workorder.v1.WorkOrderService/ListPropertyDefinitions"
+	WorkOrderService_CreatePropertyDefinition_FullMethodName = "/avtoms.workorder.v1.WorkOrderService/CreatePropertyDefinition"
+	WorkOrderService_UpdatePropertyDefinition_FullMethodName = "/avtoms.workorder.v1.WorkOrderService/UpdatePropertyDefinition"
+	WorkOrderService_DeletePropertyDefinition_FullMethodName = "/avtoms.workorder.v1.WorkOrderService/DeletePropertyDefinition"
+	WorkOrderService_ListAppointments_FullMethodName         = "/avtoms.workorder.v1.WorkOrderService/ListAppointments"
+	WorkOrderService_CreateAppointment_FullMethodName        = "/avtoms.workorder.v1.WorkOrderService/CreateAppointment"
+	WorkOrderService_SetAppointmentState_FullMethodName      = "/avtoms.workorder.v1.WorkOrderService/SetAppointmentState"
+	WorkOrderService_GetAuditLog_FullMethodName              = "/avtoms.workorder.v1.WorkOrderService/GetAuditLog"
+	WorkOrderService_ListServiceReminders_FullMethodName     = "/avtoms.workorder.v1.WorkOrderService/ListServiceReminders"
+	WorkOrderService_CreateServiceReminder_FullMethodName    = "/avtoms.workorder.v1.WorkOrderService/CreateServiceReminder"
+	WorkOrderService_SetServiceReminderState_FullMethodName  = "/avtoms.workorder.v1.WorkOrderService/SetServiceReminderState"
+	WorkOrderService_ListDueReminders_FullMethodName         = "/avtoms.workorder.v1.WorkOrderService/ListDueReminders"
+	WorkOrderService_MarkReminderNotified_FullMethodName     = "/avtoms.workorder.v1.WorkOrderService/MarkReminderNotified"
+	WorkOrderService_ListDueAppointments_FullMethodName      = "/avtoms.workorder.v1.WorkOrderService/ListDueAppointments"
+	WorkOrderService_MarkAppointmentReminded_FullMethodName  = "/avtoms.workorder.v1.WorkOrderService/MarkAppointmentReminded"
+	WorkOrderService_ListShopExpenses_FullMethodName         = "/avtoms.workorder.v1.WorkOrderService/ListShopExpenses"
+	WorkOrderService_CreateShopExpense_FullMethodName        = "/avtoms.workorder.v1.WorkOrderService/CreateShopExpense"
+	WorkOrderService_DeleteShopExpense_FullMethodName        = "/avtoms.workorder.v1.WorkOrderService/DeleteShopExpense"
+	WorkOrderService_GetProfitAndLoss_FullMethodName         = "/avtoms.workorder.v1.WorkOrderService/GetProfitAndLoss"
+	WorkOrderService_ListWarranties_FullMethodName           = "/avtoms.workorder.v1.WorkOrderService/ListWarranties"
+	WorkOrderService_CreateWarranty_FullMethodName           = "/avtoms.workorder.v1.WorkOrderService/CreateWarranty"
+	WorkOrderService_VoidWarranty_FullMethodName             = "/avtoms.workorder.v1.WorkOrderService/VoidWarranty"
+	WorkOrderService_CreateApprovalLink_FullMethodName       = "/avtoms.workorder.v1.WorkOrderService/CreateApprovalLink"
+	WorkOrderService_ResolveApproval_FullMethodName          = "/avtoms.workorder.v1.WorkOrderService/ResolveApproval"
+	WorkOrderService_DecideApproval_FullMethodName           = "/avtoms.workorder.v1.WorkOrderService/DecideApproval"
 )
 
 // WorkOrderServiceClient is the client API for WorkOrderService service.
@@ -96,6 +100,12 @@ type WorkOrderServiceClient interface {
 	CreateProduct(ctx context.Context, in *CreateProductRequest, opts ...grpc.CallOption) (*Product, error)
 	UpdateProduct(ctx context.Context, in *UpdateProductRequest, opts ...grpc.CallOption) (*Product, error)
 	AdjustVariantStock(ctx context.Context, in *AdjustVariantStockRequest, opts ...grpc.CallOption) (*ProductVariant, error)
+	// Predefined product-property catalog (global, admin-managed). Any authenticated
+	// user may list them to populate the product form; only admins mutate them.
+	ListPropertyDefinitions(ctx context.Context, in *ListPropertyDefinitionsRequest, opts ...grpc.CallOption) (*ListPropertyDefinitionsResponse, error)
+	CreatePropertyDefinition(ctx context.Context, in *CreatePropertyDefinitionRequest, opts ...grpc.CallOption) (*PropertyDefinition, error)
+	UpdatePropertyDefinition(ctx context.Context, in *UpdatePropertyDefinitionRequest, opts ...grpc.CallOption) (*PropertyDefinition, error)
+	DeletePropertyDefinition(ctx context.Context, in *DeletePropertyDefinitionRequest, opts ...grpc.CallOption) (*DeletePropertyDefinitionResponse, error)
 	// Appointments / scheduling.
 	ListAppointments(ctx context.Context, in *ListAppointmentsRequest, opts ...grpc.CallOption) (*ListAppointmentsResponse, error)
 	CreateAppointment(ctx context.Context, in *CreateAppointmentRequest, opts ...grpc.CallOption) (*Appointment, error)
@@ -354,6 +364,46 @@ func (c *workOrderServiceClient) AdjustVariantStock(ctx context.Context, in *Adj
 	return out, nil
 }
 
+func (c *workOrderServiceClient) ListPropertyDefinitions(ctx context.Context, in *ListPropertyDefinitionsRequest, opts ...grpc.CallOption) (*ListPropertyDefinitionsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListPropertyDefinitionsResponse)
+	err := c.cc.Invoke(ctx, WorkOrderService_ListPropertyDefinitions_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *workOrderServiceClient) CreatePropertyDefinition(ctx context.Context, in *CreatePropertyDefinitionRequest, opts ...grpc.CallOption) (*PropertyDefinition, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(PropertyDefinition)
+	err := c.cc.Invoke(ctx, WorkOrderService_CreatePropertyDefinition_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *workOrderServiceClient) UpdatePropertyDefinition(ctx context.Context, in *UpdatePropertyDefinitionRequest, opts ...grpc.CallOption) (*PropertyDefinition, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(PropertyDefinition)
+	err := c.cc.Invoke(ctx, WorkOrderService_UpdatePropertyDefinition_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *workOrderServiceClient) DeletePropertyDefinition(ctx context.Context, in *DeletePropertyDefinitionRequest, opts ...grpc.CallOption) (*DeletePropertyDefinitionResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(DeletePropertyDefinitionResponse)
+	err := c.cc.Invoke(ctx, WorkOrderService_DeletePropertyDefinition_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *workOrderServiceClient) ListAppointments(ctx context.Context, in *ListAppointmentsRequest, opts ...grpc.CallOption) (*ListAppointmentsResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(ListAppointmentsResponse)
@@ -596,6 +646,12 @@ type WorkOrderServiceServer interface {
 	CreateProduct(context.Context, *CreateProductRequest) (*Product, error)
 	UpdateProduct(context.Context, *UpdateProductRequest) (*Product, error)
 	AdjustVariantStock(context.Context, *AdjustVariantStockRequest) (*ProductVariant, error)
+	// Predefined product-property catalog (global, admin-managed). Any authenticated
+	// user may list them to populate the product form; only admins mutate them.
+	ListPropertyDefinitions(context.Context, *ListPropertyDefinitionsRequest) (*ListPropertyDefinitionsResponse, error)
+	CreatePropertyDefinition(context.Context, *CreatePropertyDefinitionRequest) (*PropertyDefinition, error)
+	UpdatePropertyDefinition(context.Context, *UpdatePropertyDefinitionRequest) (*PropertyDefinition, error)
+	DeletePropertyDefinition(context.Context, *DeletePropertyDefinitionRequest) (*DeletePropertyDefinitionResponse, error)
 	// Appointments / scheduling.
 	ListAppointments(context.Context, *ListAppointmentsRequest) (*ListAppointmentsResponse, error)
 	CreateAppointment(context.Context, *CreateAppointmentRequest) (*Appointment, error)
@@ -699,6 +755,18 @@ func (UnimplementedWorkOrderServiceServer) UpdateProduct(context.Context, *Updat
 }
 func (UnimplementedWorkOrderServiceServer) AdjustVariantStock(context.Context, *AdjustVariantStockRequest) (*ProductVariant, error) {
 	return nil, status.Error(codes.Unimplemented, "method AdjustVariantStock not implemented")
+}
+func (UnimplementedWorkOrderServiceServer) ListPropertyDefinitions(context.Context, *ListPropertyDefinitionsRequest) (*ListPropertyDefinitionsResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListPropertyDefinitions not implemented")
+}
+func (UnimplementedWorkOrderServiceServer) CreatePropertyDefinition(context.Context, *CreatePropertyDefinitionRequest) (*PropertyDefinition, error) {
+	return nil, status.Error(codes.Unimplemented, "method CreatePropertyDefinition not implemented")
+}
+func (UnimplementedWorkOrderServiceServer) UpdatePropertyDefinition(context.Context, *UpdatePropertyDefinitionRequest) (*PropertyDefinition, error) {
+	return nil, status.Error(codes.Unimplemented, "method UpdatePropertyDefinition not implemented")
+}
+func (UnimplementedWorkOrderServiceServer) DeletePropertyDefinition(context.Context, *DeletePropertyDefinitionRequest) (*DeletePropertyDefinitionResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method DeletePropertyDefinition not implemented")
 }
 func (UnimplementedWorkOrderServiceServer) ListAppointments(context.Context, *ListAppointmentsRequest) (*ListAppointmentsResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method ListAppointments not implemented")
@@ -1180,6 +1248,78 @@ func _WorkOrderService_AdjustVariantStock_Handler(srv interface{}, ctx context.C
 	return interceptor(ctx, in, info, handler)
 }
 
+func _WorkOrderService_ListPropertyDefinitions_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListPropertyDefinitionsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WorkOrderServiceServer).ListPropertyDefinitions(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: WorkOrderService_ListPropertyDefinitions_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WorkOrderServiceServer).ListPropertyDefinitions(ctx, req.(*ListPropertyDefinitionsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _WorkOrderService_CreatePropertyDefinition_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreatePropertyDefinitionRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WorkOrderServiceServer).CreatePropertyDefinition(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: WorkOrderService_CreatePropertyDefinition_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WorkOrderServiceServer).CreatePropertyDefinition(ctx, req.(*CreatePropertyDefinitionRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _WorkOrderService_UpdatePropertyDefinition_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdatePropertyDefinitionRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WorkOrderServiceServer).UpdatePropertyDefinition(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: WorkOrderService_UpdatePropertyDefinition_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WorkOrderServiceServer).UpdatePropertyDefinition(ctx, req.(*UpdatePropertyDefinitionRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _WorkOrderService_DeletePropertyDefinition_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeletePropertyDefinitionRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WorkOrderServiceServer).DeletePropertyDefinition(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: WorkOrderService_DeletePropertyDefinition_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WorkOrderServiceServer).DeletePropertyDefinition(ctx, req.(*DeletePropertyDefinitionRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _WorkOrderService_ListAppointments_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ListAppointmentsRequest)
 	if err := dec(in); err != nil {
@@ -1652,6 +1792,22 @@ var WorkOrderService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "AdjustVariantStock",
 			Handler:    _WorkOrderService_AdjustVariantStock_Handler,
+		},
+		{
+			MethodName: "ListPropertyDefinitions",
+			Handler:    _WorkOrderService_ListPropertyDefinitions_Handler,
+		},
+		{
+			MethodName: "CreatePropertyDefinition",
+			Handler:    _WorkOrderService_CreatePropertyDefinition_Handler,
+		},
+		{
+			MethodName: "UpdatePropertyDefinition",
+			Handler:    _WorkOrderService_UpdatePropertyDefinition_Handler,
+		},
+		{
+			MethodName: "DeletePropertyDefinition",
+			Handler:    _WorkOrderService_DeletePropertyDefinition_Handler,
 		},
 		{
 			MethodName: "ListAppointments",

@@ -38,6 +38,13 @@ service WorkOrderService {
   rpc UpdateProduct(UpdateProductRequest) returns (Product);
   rpc AdjustVariantStock(AdjustVariantStockRequest) returns (ProductVariant);
 
+  // Predefined product-property catalog (global, admin-managed). Any authenticated
+  // user may list them to populate the product form; only admins mutate them.
+  rpc ListPropertyDefinitions(ListPropertyDefinitionsRequest) returns (ListPropertyDefinitionsResponse);
+  rpc CreatePropertyDefinition(CreatePropertyDefinitionRequest) returns (PropertyDefinition);
+  rpc UpdatePropertyDefinition(UpdatePropertyDefinitionRequest) returns (PropertyDefinition);
+  rpc DeletePropertyDefinition(DeletePropertyDefinitionRequest) returns (DeletePropertyDefinitionResponse);
+
   // Appointments / scheduling.
   rpc ListAppointments(ListAppointmentsRequest) returns (ListAppointmentsResponse);
   rpc CreateAppointment(CreateAppointmentRequest) returns (Appointment);
@@ -410,6 +417,55 @@ message AdjustVariantStockRequest {
   string variant_id = 1;
   double delta = 2;    // positive = receive stock, negative = consume/correct
   string reason = 3;   // free-text note (e.g. "received", "used", "stocktake")
+}
+
+// PropertyDefinition is a predefined, admin-managed property a product can use
+// (e.g. "Color", "Viscosity", "Volume"). Its kind drives how the product form
+// captures values: number = free numeric entry (with unit); select/color = pick
+// from the predefined values below; text = free text.
+message PropertyDefinition {
+  string id = 1;
+  string name = 2;
+  string kind = 3;            // "text" | "number" | "select" | "color"
+  string unit = 4;            // for number kind, e.g. "L", "mm", "kg", "Ah"
+  int32 position = 5;
+  bool active = 6;
+  repeated PropertyDefinitionValue values = 7; // for select/color kinds
+}
+
+// PropertyDefinitionValue is one predefined value in a select/color property.
+message PropertyDefinitionValue {
+  string id = 1;
+  string value = 2;           // label, e.g. "Red", "5W-30"
+  string color_hex = 3;       // for color kind, e.g. "#E11D48"
+  int32 position = 4;
+}
+
+message ListPropertyDefinitionsRequest {
+  bool include_inactive = 1;  // admin panel passes true; the product form omits it
+}
+message ListPropertyDefinitionsResponse {
+  repeated PropertyDefinition definitions = 1;
+}
+message CreatePropertyDefinitionRequest {
+  string name = 1;
+  string kind = 2;
+  string unit = 3;
+  repeated PropertyDefinitionValue values = 4;
+}
+message UpdatePropertyDefinitionRequest {
+  string id = 1;
+  string name = 2;
+  string kind = 3;
+  string unit = 4;
+  bool active = 5;
+  repeated PropertyDefinitionValue values = 6;
+}
+message DeletePropertyDefinitionRequest {
+  string id = 1;
+}
+message DeletePropertyDefinitionResponse {
+  bool ok = 1;
 }
 
 // ShopSettings holds per-shop pricing policy.
