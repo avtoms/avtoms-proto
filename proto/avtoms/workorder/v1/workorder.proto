@@ -29,10 +29,14 @@ service WorkOrderService {
   rpc GetShopSettings(GetShopSettingsRequest) returns (ShopSettings);
   rpc UpdateShopSettings(UpdateShopSettingsRequest) returns (ShopSettings);
 
-  // Parts inventory.
-  rpc ListParts(ListPartsRequest) returns (ListPartsResponse);
-  rpc CreatePart(CreatePartRequest) returns (Part);
-  rpc AdjustStock(AdjustStockRequest) returns (Part);
+  // Warehouse products (with properties and variants). A product carries shared
+  // catalog info plus named properties (Size, Color); each variant is a combination
+  // of property values with its own SKU, cost, price and stock.
+  rpc ListProducts(ListProductsRequest) returns (ListProductsResponse);
+  rpc GetProduct(GetProductRequest) returns (Product);
+  rpc CreateProduct(CreateProductRequest) returns (Product);
+  rpc UpdateProduct(UpdateProductRequest) returns (Product);
+  rpc AdjustVariantStock(AdjustVariantStockRequest) returns (ProductVariant);
 
   // Appointments / scheduling.
   rpc ListAppointments(ListAppointmentsRequest) returns (ListAppointmentsResponse);
@@ -329,39 +333,81 @@ message SetAppointmentStateRequest {
   AppointmentState state = 2;
 }
 
-// Part is an inventory item the shop stocks (a real, counted part/material).
-message Part {
+// Product is a warehouse catalog entity. It carries shared info (name, unit,
+// supplier, ...) plus a set of named properties whose value combinations define
+// the variants that are actually counted and priced.
+message Product {
   string id = 1;
   string shop_id = 2;
   string name = 3;
-  string sku = 4;             // optional stock-keeping unit / article number
-  string unit = 5;            // unit of measure: dona, litr, kg, ...
-  double quantity_on_hand = 6;
-  double reorder_level = 7;   // low-stock threshold; below this it's flagged
-  int64 unit_cost = 8;        // buy price per unit (tiyin)
-  int64 unit_price = 9;       // sell price per unit (tiyin)
-  string supplier = 10;       // optional supplier/vendor name
-  bool active = 11;
+  string description = 4;
+  string category = 5;
+  string unit = 6;            // unit of measure: dona, litr, kg, ...
+  string supplier = 7;        // optional supplier/vendor name
+  bool active = 8;
+  repeated ProductProperty properties = 9;  // e.g. Size -> [S, M, L]
+  repeated ProductVariant variants = 10;    // each combination, own price/stock
 }
-message ListPartsRequest {
+
+// ProductProperty is a named option that defines variants, with its allowed values.
+message ProductProperty {
+  string id = 1;
+  string name = 2;            // e.g. "Size"
+  repeated string values = 3; // allowed values, e.g. ["S", "M", "L"]
+}
+
+// ProductVariant is the countable, priced stock unit: one combination of property
+// values, with its own SKU, cost, price, on-hand quantity and reorder threshold.
+message ProductVariant {
+  string id = 1;
+  string product_id = 2;
+  string sku = 3;             // optional stock-keeping unit / article number
+  double quantity_on_hand = 4;
+  double reorder_level = 5;   // low-stock threshold; below this it's flagged
+  int64 unit_cost = 6;        // buy price per unit (tiyin)
+  int64 unit_price = 7;       // sell price per unit (tiyin)
+  bool active = 8;
+  repeated VariantAttribute attributes = 9; // {property:"Size", value:"M"}
+}
+
+// VariantAttribute records which value a variant has for one property.
+message VariantAttribute {
+  string property = 1;
+  string value = 2;
+}
+
+message ListProductsRequest {
   string shop_id = 1;
 }
-message ListPartsResponse {
-  repeated Part parts = 1;
+message ListProductsResponse {
+  repeated Product products = 1;
 }
-message CreatePartRequest {
+message GetProductRequest {
+  string id = 1;
+}
+message CreateProductRequest {
   string shop_id = 1;
   string name = 2;
-  string sku = 3;
-  string unit = 4;
-  double quantity_on_hand = 5;
-  double reorder_level = 6;
-  int64 unit_cost = 7;
-  int64 unit_price = 8;
-  string supplier = 9;
+  string description = 3;
+  string category = 4;
+  string unit = 5;
+  string supplier = 6;
+  repeated ProductProperty properties = 7;
+  repeated ProductVariant variants = 8;
 }
-message AdjustStockRequest {
-  string part_id = 1;
+message UpdateProductRequest {
+  string id = 1;
+  string name = 2;
+  string description = 3;
+  string category = 4;
+  string unit = 5;
+  string supplier = 6;
+  bool active = 7;
+  repeated ProductProperty properties = 8;
+  repeated ProductVariant variants = 9;
+}
+message AdjustVariantStockRequest {
+  string variant_id = 1;
   double delta = 2;    // positive = receive stock, negative = consume/correct
   string reason = 3;   // free-text note (e.g. "received", "used", "stocktake")
 }
