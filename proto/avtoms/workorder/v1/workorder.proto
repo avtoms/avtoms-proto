@@ -605,6 +605,10 @@ message LineItem {
   // Warehouse variant this material was drawn from (empty for non-stock lines). When set on a
   // MATERIAL line, adding the line decrements that variant's stock and removing it restores it.
   string variant_id = 11;
+  // Exact amount drawn from stock for this material line, in the variant's unit — may be
+  // fractional (e.g. 4.5 litres) and is independent of the billing `quantity`. This is what
+  // adding the line deducts (and removing restores). 0 when the line consumes no stock.
+  double consumed_qty = 12;
 }
 
 message WorkOrder {
