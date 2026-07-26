@@ -561,6 +561,9 @@ message LineItem {
   string assigned_mechanic_id = 9;
   // Per-service progress the assigned mechanic drives; all SERVICE lines DONE → order READY.
   LineItemStatus status = 10;
+  // Warehouse variant this material was drawn from (empty for non-stock lines). When set on a
+  // MATERIAL line, adding the line decrements that variant's stock and removing it restores it.
+  string variant_id = 11;
 }
 
 message WorkOrder {

@@ -4524,7 +4524,10 @@ type LineItem struct {
 	// split across mechanics (e.g. polishing → A, engine → B), independent of the order lead.
 	AssignedMechanicId string `protobuf:"bytes,9,opt,name=assigned_mechanic_id,json=assignedMechanicId,proto3" json:"assigned_mechanic_id,omitempty"`
 	// Per-service progress the assigned mechanic drives; all SERVICE lines DONE → order READY.
-	Status        LineItemStatus `protobuf:"varint,10,opt,name=status,proto3,enum=avtoms.workorder.v1.LineItemStatus" json:"status,omitempty"`
+	Status LineItemStatus `protobuf:"varint,10,opt,name=status,proto3,enum=avtoms.workorder.v1.LineItemStatus" json:"status,omitempty"`
+	// Warehouse variant this material was drawn from (empty for non-stock lines). When set on a
+	// MATERIAL line, adding the line decrements that variant's stock and removing it restores it.
+	VariantId     string `protobuf:"bytes,11,opt,name=variant_id,json=variantId,proto3" json:"variant_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -4627,6 +4630,13 @@ func (x *LineItem) GetStatus() LineItemStatus {
 		return x.Status
 	}
 	return LineItemStatus_LINE_ITEM_STATUS_UNSPECIFIED
+}
+
+func (x *LineItem) GetVariantId() string {
+	if x != nil {
+		return x.VariantId
+	}
+	return ""
 }
 
 type WorkOrder struct {
@@ -6497,7 +6507,7 @@ const file_avtoms_workorder_v1_workorder_proto_rawDesc = "" +
 	"vehicle_id\x18\x04 \x01(\tR\tvehicleId\"Y\n" +
 	"\x16ListWorkOrdersResponse\x12?\n" +
 	"\vwork_orders\x18\x01 \x03(\v2\x1e.avtoms.workorder.v1.WorkOrderR\n" +
-	"workOrders\"\xf8\x02\n" +
+	"workOrders\"\x97\x03\n" +
 	"\bLineItem\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x125\n" +
 	"\x04kind\x18\x02 \x01(\x0e2!.avtoms.workorder.v1.LineItemKindR\x04kind\x12 \n" +
@@ -6511,7 +6521,9 @@ const file_avtoms_workorder_v1_workorder_proto_rawDesc = "" +
 	"\rdefault_price\x18\b \x01(\x03R\fdefaultPrice\x120\n" +
 	"\x14assigned_mechanic_id\x18\t \x01(\tR\x12assignedMechanicId\x12;\n" +
 	"\x06status\x18\n" +
-	" \x01(\x0e2#.avtoms.workorder.v1.LineItemStatusR\x06status\"\x9c\x05\n" +
+	" \x01(\x0e2#.avtoms.workorder.v1.LineItemStatusR\x06status\x12\x1d\n" +
+	"\n" +
+	"variant_id\x18\v \x01(\tR\tvariantId\"\x9c\x05\n" +
 	"\tWorkOrder\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x17\n" +
 	"\ashop_id\x18\x02 \x01(\tR\x06shopId\x12\x1d\n" +
