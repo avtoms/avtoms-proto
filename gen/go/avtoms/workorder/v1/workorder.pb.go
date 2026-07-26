@@ -2846,6 +2846,7 @@ type Product struct {
 	Active        bool                   `protobuf:"varint,8,opt,name=active,proto3" json:"active,omitempty"`
 	Properties    []*ProductProperty     `protobuf:"bytes,9,rep,name=properties,proto3" json:"properties,omitempty"` // e.g. Size -> [S, M, L]
 	Variants      []*ProductVariant      `protobuf:"bytes,10,rep,name=variants,proto3" json:"variants,omitempty"`    // each combination, own price/stock
+	Brand         string                 `protobuf:"bytes,11,opt,name=brand,proto3" json:"brand,omitempty"`          // brand this product belongs to (e.g. "Bosch", "Shell")
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -2948,6 +2949,13 @@ func (x *Product) GetVariants() []*ProductVariant {
 		return x.Variants
 	}
 	return nil
+}
+
+func (x *Product) GetBrand() string {
+	if x != nil {
+		return x.Brand
+	}
+	return ""
 }
 
 // ProductProperty is a named option that defines variants, with its allowed values.
@@ -3316,6 +3324,7 @@ type CreateProductRequest struct {
 	Supplier      string                 `protobuf:"bytes,6,opt,name=supplier,proto3" json:"supplier,omitempty"`
 	Properties    []*ProductProperty     `protobuf:"bytes,7,rep,name=properties,proto3" json:"properties,omitempty"`
 	Variants      []*ProductVariant      `protobuf:"bytes,8,rep,name=variants,proto3" json:"variants,omitempty"`
+	Brand         string                 `protobuf:"bytes,9,opt,name=brand,proto3" json:"brand,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -3406,6 +3415,13 @@ func (x *CreateProductRequest) GetVariants() []*ProductVariant {
 	return nil
 }
 
+func (x *CreateProductRequest) GetBrand() string {
+	if x != nil {
+		return x.Brand
+	}
+	return ""
+}
+
 type UpdateProductRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
@@ -3417,6 +3433,7 @@ type UpdateProductRequest struct {
 	Active        bool                   `protobuf:"varint,7,opt,name=active,proto3" json:"active,omitempty"`
 	Properties    []*ProductProperty     `protobuf:"bytes,8,rep,name=properties,proto3" json:"properties,omitempty"`
 	Variants      []*ProductVariant      `protobuf:"bytes,9,rep,name=variants,proto3" json:"variants,omitempty"`
+	Brand         string                 `protobuf:"bytes,10,opt,name=brand,proto3" json:"brand,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -3512,6 +3529,13 @@ func (x *UpdateProductRequest) GetVariants() []*ProductVariant {
 		return x.Variants
 	}
 	return nil
+}
+
+func (x *UpdateProductRequest) GetBrand() string {
+	if x != nil {
+		return x.Brand
+	}
+	return ""
 }
 
 type AdjustVariantStockRequest struct {
@@ -6374,7 +6398,7 @@ const file_avtoms_workorder_v1_workorder_proto_rawDesc = "" +
 	" \x01(\tR\x05notes\"i\n" +
 	"\x1aSetAppointmentStateRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12;\n" +
-	"\x05state\x18\x02 \x01(\x0e2%.avtoms.workorder.v1.AppointmentStateR\x05state\"\xd3\x02\n" +
+	"\x05state\x18\x02 \x01(\x0e2%.avtoms.workorder.v1.AppointmentStateR\x05state\"\xe9\x02\n" +
 	"\aProduct\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x17\n" +
 	"\ashop_id\x18\x02 \x01(\tR\x06shopId\x12\x12\n" +
@@ -6388,7 +6412,8 @@ const file_avtoms_workorder_v1_workorder_proto_rawDesc = "" +
 	"properties\x18\t \x03(\v2$.avtoms.workorder.v1.ProductPropertyR\n" +
 	"properties\x12?\n" +
 	"\bvariants\x18\n" +
-	" \x03(\v2#.avtoms.workorder.v1.ProductVariantR\bvariants\"M\n" +
+	" \x03(\v2#.avtoms.workorder.v1.ProductVariantR\bvariants\x12\x14\n" +
+	"\x05brand\x18\v \x01(\tR\x05brand\"M\n" +
 	"\x0fProductProperty\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x16\n" +
@@ -6415,7 +6440,7 @@ const file_avtoms_workorder_v1_workorder_proto_rawDesc = "" +
 	"\x14ListProductsResponse\x128\n" +
 	"\bproducts\x18\x01 \x03(\v2\x1c.avtoms.workorder.v1.ProductR\bproducts\"#\n" +
 	"\x11GetProductRequest\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\"\xb8\x02\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\"\xce\x02\n" +
 	"\x14CreateProductRequest\x12\x17\n" +
 	"\ashop_id\x18\x01 \x01(\tR\x06shopId\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12 \n" +
@@ -6426,7 +6451,8 @@ const file_avtoms_workorder_v1_workorder_proto_rawDesc = "" +
 	"\n" +
 	"properties\x18\a \x03(\v2$.avtoms.workorder.v1.ProductPropertyR\n" +
 	"properties\x12?\n" +
-	"\bvariants\x18\b \x03(\v2#.avtoms.workorder.v1.ProductVariantR\bvariants\"\xc7\x02\n" +
+	"\bvariants\x18\b \x03(\v2#.avtoms.workorder.v1.ProductVariantR\bvariants\x12\x14\n" +
+	"\x05brand\x18\t \x01(\tR\x05brand\"\xdd\x02\n" +
 	"\x14UpdateProductRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12 \n" +
@@ -6438,7 +6464,9 @@ const file_avtoms_workorder_v1_workorder_proto_rawDesc = "" +
 	"\n" +
 	"properties\x18\b \x03(\v2$.avtoms.workorder.v1.ProductPropertyR\n" +
 	"properties\x12?\n" +
-	"\bvariants\x18\t \x03(\v2#.avtoms.workorder.v1.ProductVariantR\bvariants\"h\n" +
+	"\bvariants\x18\t \x03(\v2#.avtoms.workorder.v1.ProductVariantR\bvariants\x12\x14\n" +
+	"\x05brand\x18\n" +
+	" \x01(\tR\x05brand\"h\n" +
 	"\x19AdjustVariantStockRequest\x12\x1d\n" +
 	"\n" +
 	"variant_id\x18\x01 \x01(\tR\tvariantId\x12\x14\n" +

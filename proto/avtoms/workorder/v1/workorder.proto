@@ -356,6 +356,7 @@ message Product {
   bool active = 8;
   repeated ProductProperty properties = 9;  // e.g. Size -> [S, M, L]
   repeated ProductVariant variants = 10;    // each combination, own price/stock
+  string brand = 11;          // brand this product belongs to (e.g. "Bosch", "Shell")
 }
 
 // ProductProperty is a named option that defines variants, with its allowed values.
@@ -403,6 +404,7 @@ message CreateProductRequest {
   string supplier = 6;
   repeated ProductProperty properties = 7;
   repeated ProductVariant variants = 8;
+  string brand = 9;
 }
 message UpdateProductRequest {
   string id = 1;
@@ -414,6 +416,7 @@ message UpdateProductRequest {
   bool active = 7;
   repeated ProductProperty properties = 8;
   repeated ProductVariant variants = 9;
+  string brand = 10;
 }
 message AdjustVariantStockRequest {
   string variant_id = 1;
