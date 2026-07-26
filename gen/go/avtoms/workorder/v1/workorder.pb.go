@@ -5324,6 +5324,7 @@ type MenuMaterial struct {
 	UnitCost      int64                  `protobuf:"varint,3,opt,name=unit_cost,json=unitCost,proto3" json:"unit_cost,omitempty"`    // shop expense per unit, in tiyin
 	UnitPrice     int64                  `protobuf:"varint,4,opt,name=unit_price,json=unitPrice,proto3" json:"unit_price,omitempty"` // optional retail price per unit, in tiyin
 	Unit          string                 `protobuf:"bytes,5,opt,name=unit,proto3" json:"unit,omitempty"`                             // free-text unit of measure: litr, kg, dona, metr, ...
+	VariantId     string                 `protobuf:"bytes,6,opt,name=variant_id,json=variantId,proto3" json:"variant_id,omitempty"`  // warehouse variant this material is drawn from (empty for ad-hoc)
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -5389,6 +5390,13 @@ func (x *MenuMaterial) GetUnitPrice() int64 {
 func (x *MenuMaterial) GetUnit() string {
 	if x != nil {
 		return x.Unit
+	}
+	return ""
+}
+
+func (x *MenuMaterial) GetVariantId() string {
+	if x != nil {
+		return x.VariantId
 	}
 	return ""
 }
@@ -6982,14 +6990,16 @@ const file_avtoms_workorder_v1_workorder_proto_rawDesc = "" +
 	"\n" +
 	"started_at\x18\x04 \x01(\tR\tstartedAt\x12\x1d\n" +
 	"\n" +
-	"stopped_at\x18\x05 \x01(\tR\tstoppedAt\"\x8e\x01\n" +
+	"stopped_at\x18\x05 \x01(\tR\tstoppedAt\"\xad\x01\n" +
 	"\fMenuMaterial\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12\x1a\n" +
 	"\bquantity\x18\x02 \x01(\x01R\bquantity\x12\x1b\n" +
 	"\tunit_cost\x18\x03 \x01(\x03R\bunitCost\x12\x1d\n" +
 	"\n" +
 	"unit_price\x18\x04 \x01(\x03R\tunitPrice\x12\x12\n" +
-	"\x04unit\x18\x05 \x01(\tR\x04unit\"\xfa\x02\n" +
+	"\x04unit\x18\x05 \x01(\tR\x04unit\x12\x1d\n" +
+	"\n" +
+	"variant_id\x18\x06 \x01(\tR\tvariantId\"\xfa\x02\n" +
 	"\bMenuItem\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x17\n" +
 	"\ashop_id\x18\x02 \x01(\tR\x06shopId\x12 \n" +

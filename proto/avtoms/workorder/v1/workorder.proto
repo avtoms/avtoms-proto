@@ -652,6 +652,7 @@ message MenuMaterial {
   int64 unit_cost = 3;  // shop expense per unit, in tiyin
   int64 unit_price = 4; // optional retail price per unit, in tiyin
   string unit = 5;      // free-text unit of measure: litr, kg, dona, metr, ...
+  string variant_id = 6; // warehouse variant this material is drawn from (empty for ad-hoc)
 }
 
 message MenuItem {
