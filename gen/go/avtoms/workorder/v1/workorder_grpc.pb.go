@@ -46,6 +46,10 @@ const (
 	WorkOrderService_CreatePropertyDefinition_FullMethodName = "/avtoms.workorder.v1.WorkOrderService/CreatePropertyDefinition"
 	WorkOrderService_UpdatePropertyDefinition_FullMethodName = "/avtoms.workorder.v1.WorkOrderService/UpdatePropertyDefinition"
 	WorkOrderService_DeletePropertyDefinition_FullMethodName = "/avtoms.workorder.v1.WorkOrderService/DeletePropertyDefinition"
+	WorkOrderService_ListCatalogTerms_FullMethodName         = "/avtoms.workorder.v1.WorkOrderService/ListCatalogTerms"
+	WorkOrderService_CreateCatalogTerm_FullMethodName        = "/avtoms.workorder.v1.WorkOrderService/CreateCatalogTerm"
+	WorkOrderService_UpdateCatalogTerm_FullMethodName        = "/avtoms.workorder.v1.WorkOrderService/UpdateCatalogTerm"
+	WorkOrderService_DeleteCatalogTerm_FullMethodName        = "/avtoms.workorder.v1.WorkOrderService/DeleteCatalogTerm"
 	WorkOrderService_ListAppointments_FullMethodName         = "/avtoms.workorder.v1.WorkOrderService/ListAppointments"
 	WorkOrderService_CreateAppointment_FullMethodName        = "/avtoms.workorder.v1.WorkOrderService/CreateAppointment"
 	WorkOrderService_SetAppointmentState_FullMethodName      = "/avtoms.workorder.v1.WorkOrderService/SetAppointmentState"
@@ -109,6 +113,11 @@ type WorkOrderServiceClient interface {
 	CreatePropertyDefinition(ctx context.Context, in *CreatePropertyDefinitionRequest, opts ...grpc.CallOption) (*PropertyDefinition, error)
 	UpdatePropertyDefinition(ctx context.Context, in *UpdatePropertyDefinitionRequest, opts ...grpc.CallOption) (*PropertyDefinition, error)
 	DeletePropertyDefinition(ctx context.Context, in *DeletePropertyDefinitionRequest, opts ...grpc.CallOption) (*DeletePropertyDefinitionResponse, error)
+	// Simple admin-managed term lists (brands, product categories) used as dropdowns.
+	ListCatalogTerms(ctx context.Context, in *ListCatalogTermsRequest, opts ...grpc.CallOption) (*ListCatalogTermsResponse, error)
+	CreateCatalogTerm(ctx context.Context, in *CreateCatalogTermRequest, opts ...grpc.CallOption) (*CatalogTerm, error)
+	UpdateCatalogTerm(ctx context.Context, in *UpdateCatalogTermRequest, opts ...grpc.CallOption) (*CatalogTerm, error)
+	DeleteCatalogTerm(ctx context.Context, in *DeleteCatalogTermRequest, opts ...grpc.CallOption) (*DeleteCatalogTermResponse, error)
 	// Appointments / scheduling.
 	ListAppointments(ctx context.Context, in *ListAppointmentsRequest, opts ...grpc.CallOption) (*ListAppointmentsResponse, error)
 	CreateAppointment(ctx context.Context, in *CreateAppointmentRequest, opts ...grpc.CallOption) (*Appointment, error)
@@ -417,6 +426,46 @@ func (c *workOrderServiceClient) DeletePropertyDefinition(ctx context.Context, i
 	return out, nil
 }
 
+func (c *workOrderServiceClient) ListCatalogTerms(ctx context.Context, in *ListCatalogTermsRequest, opts ...grpc.CallOption) (*ListCatalogTermsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListCatalogTermsResponse)
+	err := c.cc.Invoke(ctx, WorkOrderService_ListCatalogTerms_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *workOrderServiceClient) CreateCatalogTerm(ctx context.Context, in *CreateCatalogTermRequest, opts ...grpc.CallOption) (*CatalogTerm, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CatalogTerm)
+	err := c.cc.Invoke(ctx, WorkOrderService_CreateCatalogTerm_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *workOrderServiceClient) UpdateCatalogTerm(ctx context.Context, in *UpdateCatalogTermRequest, opts ...grpc.CallOption) (*CatalogTerm, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CatalogTerm)
+	err := c.cc.Invoke(ctx, WorkOrderService_UpdateCatalogTerm_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *workOrderServiceClient) DeleteCatalogTerm(ctx context.Context, in *DeleteCatalogTermRequest, opts ...grpc.CallOption) (*DeleteCatalogTermResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(DeleteCatalogTermResponse)
+	err := c.cc.Invoke(ctx, WorkOrderService_DeleteCatalogTerm_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *workOrderServiceClient) ListAppointments(ctx context.Context, in *ListAppointmentsRequest, opts ...grpc.CallOption) (*ListAppointmentsResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(ListAppointmentsResponse)
@@ -667,6 +716,11 @@ type WorkOrderServiceServer interface {
 	CreatePropertyDefinition(context.Context, *CreatePropertyDefinitionRequest) (*PropertyDefinition, error)
 	UpdatePropertyDefinition(context.Context, *UpdatePropertyDefinitionRequest) (*PropertyDefinition, error)
 	DeletePropertyDefinition(context.Context, *DeletePropertyDefinitionRequest) (*DeletePropertyDefinitionResponse, error)
+	// Simple admin-managed term lists (brands, product categories) used as dropdowns.
+	ListCatalogTerms(context.Context, *ListCatalogTermsRequest) (*ListCatalogTermsResponse, error)
+	CreateCatalogTerm(context.Context, *CreateCatalogTermRequest) (*CatalogTerm, error)
+	UpdateCatalogTerm(context.Context, *UpdateCatalogTermRequest) (*CatalogTerm, error)
+	DeleteCatalogTerm(context.Context, *DeleteCatalogTermRequest) (*DeleteCatalogTermResponse, error)
 	// Appointments / scheduling.
 	ListAppointments(context.Context, *ListAppointmentsRequest) (*ListAppointmentsResponse, error)
 	CreateAppointment(context.Context, *CreateAppointmentRequest) (*Appointment, error)
@@ -785,6 +839,18 @@ func (UnimplementedWorkOrderServiceServer) UpdatePropertyDefinition(context.Cont
 }
 func (UnimplementedWorkOrderServiceServer) DeletePropertyDefinition(context.Context, *DeletePropertyDefinitionRequest) (*DeletePropertyDefinitionResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method DeletePropertyDefinition not implemented")
+}
+func (UnimplementedWorkOrderServiceServer) ListCatalogTerms(context.Context, *ListCatalogTermsRequest) (*ListCatalogTermsResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListCatalogTerms not implemented")
+}
+func (UnimplementedWorkOrderServiceServer) CreateCatalogTerm(context.Context, *CreateCatalogTermRequest) (*CatalogTerm, error) {
+	return nil, status.Error(codes.Unimplemented, "method CreateCatalogTerm not implemented")
+}
+func (UnimplementedWorkOrderServiceServer) UpdateCatalogTerm(context.Context, *UpdateCatalogTermRequest) (*CatalogTerm, error) {
+	return nil, status.Error(codes.Unimplemented, "method UpdateCatalogTerm not implemented")
+}
+func (UnimplementedWorkOrderServiceServer) DeleteCatalogTerm(context.Context, *DeleteCatalogTermRequest) (*DeleteCatalogTermResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method DeleteCatalogTerm not implemented")
 }
 func (UnimplementedWorkOrderServiceServer) ListAppointments(context.Context, *ListAppointmentsRequest) (*ListAppointmentsResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method ListAppointments not implemented")
@@ -1356,6 +1422,78 @@ func _WorkOrderService_DeletePropertyDefinition_Handler(srv interface{}, ctx con
 	return interceptor(ctx, in, info, handler)
 }
 
+func _WorkOrderService_ListCatalogTerms_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListCatalogTermsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WorkOrderServiceServer).ListCatalogTerms(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: WorkOrderService_ListCatalogTerms_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WorkOrderServiceServer).ListCatalogTerms(ctx, req.(*ListCatalogTermsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _WorkOrderService_CreateCatalogTerm_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateCatalogTermRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WorkOrderServiceServer).CreateCatalogTerm(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: WorkOrderService_CreateCatalogTerm_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WorkOrderServiceServer).CreateCatalogTerm(ctx, req.(*CreateCatalogTermRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _WorkOrderService_UpdateCatalogTerm_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateCatalogTermRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WorkOrderServiceServer).UpdateCatalogTerm(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: WorkOrderService_UpdateCatalogTerm_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WorkOrderServiceServer).UpdateCatalogTerm(ctx, req.(*UpdateCatalogTermRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _WorkOrderService_DeleteCatalogTerm_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteCatalogTermRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WorkOrderServiceServer).DeleteCatalogTerm(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: WorkOrderService_DeleteCatalogTerm_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WorkOrderServiceServer).DeleteCatalogTerm(ctx, req.(*DeleteCatalogTermRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _WorkOrderService_ListAppointments_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ListAppointmentsRequest)
 	if err := dec(in); err != nil {
@@ -1848,6 +1986,22 @@ var WorkOrderService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeletePropertyDefinition",
 			Handler:    _WorkOrderService_DeletePropertyDefinition_Handler,
+		},
+		{
+			MethodName: "ListCatalogTerms",
+			Handler:    _WorkOrderService_ListCatalogTerms_Handler,
+		},
+		{
+			MethodName: "CreateCatalogTerm",
+			Handler:    _WorkOrderService_CreateCatalogTerm_Handler,
+		},
+		{
+			MethodName: "UpdateCatalogTerm",
+			Handler:    _WorkOrderService_UpdateCatalogTerm_Handler,
+		},
+		{
+			MethodName: "DeleteCatalogTerm",
+			Handler:    _WorkOrderService_DeleteCatalogTerm_Handler,
 		},
 		{
 			MethodName: "ListAppointments",

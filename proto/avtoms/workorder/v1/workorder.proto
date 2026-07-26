@@ -47,6 +47,12 @@ service WorkOrderService {
   rpc UpdatePropertyDefinition(UpdatePropertyDefinitionRequest) returns (PropertyDefinition);
   rpc DeletePropertyDefinition(DeletePropertyDefinitionRequest) returns (DeletePropertyDefinitionResponse);
 
+  // Simple admin-managed term lists (brands, product categories) used as dropdowns.
+  rpc ListCatalogTerms(ListCatalogTermsRequest) returns (ListCatalogTermsResponse);
+  rpc CreateCatalogTerm(CreateCatalogTermRequest) returns (CatalogTerm);
+  rpc UpdateCatalogTerm(UpdateCatalogTermRequest) returns (CatalogTerm);
+  rpc DeleteCatalogTerm(DeleteCatalogTermRequest) returns (DeleteCatalogTermResponse);
+
   // Appointments / scheduling.
   rpc ListAppointments(ListAppointmentsRequest) returns (ListAppointmentsResponse);
   rpc CreateAppointment(CreateAppointmentRequest) returns (Appointment);
@@ -486,6 +492,38 @@ message DeletePropertyDefinitionRequest {
   string id = 1;
 }
 message DeletePropertyDefinitionResponse {
+  bool ok = 1;
+}
+
+// CatalogTerm is one entry in an admin-managed term list (e.g. a brand or a
+// product category). type groups the list ("brand", "category").
+message CatalogTerm {
+  string id = 1;
+  string type = 2;   // "brand" | "category"
+  string name = 3;
+  int32 position = 4;
+  bool active = 5;
+}
+message ListCatalogTermsRequest {
+  string type = 1;             // required: which list to return
+  bool include_inactive = 2;   // admin panel passes true; the product form omits it
+}
+message ListCatalogTermsResponse {
+  repeated CatalogTerm terms = 1;
+}
+message CreateCatalogTermRequest {
+  string type = 1;
+  string name = 2;
+}
+message UpdateCatalogTermRequest {
+  string id = 1;
+  string name = 2;
+  bool active = 3;
+}
+message DeleteCatalogTermRequest {
+  string id = 1;
+}
+message DeleteCatalogTermResponse {
   bool ok = 1;
 }
 
