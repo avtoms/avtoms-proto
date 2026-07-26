@@ -9,6 +9,7 @@ service WorkOrderService {
   rpc CreateWorkOrder(CreateWorkOrderRequest) returns (WorkOrder);
   rpc GetWorkOrder(GetWorkOrderRequest) returns (WorkOrder);
   rpc AddLineItem(AddLineItemRequest) returns (WorkOrder);
+  rpc UpdateLineItem(UpdateLineItemRequest) returns (WorkOrder);
   rpc RemoveLineItem(RemoveLineItemRequest) returns (WorkOrder);
   rpc TransitionState(TransitionStateRequest) returns (WorkOrder);
   rpc AssignMechanic(AssignMechanicRequest) returns (WorkOrder);
@@ -690,6 +691,19 @@ message AddLineItemRequest {
   // Set by the gateway from the caller's role (owner/admin) to bypass the per-shop
   // discount cap. Not set by end clients.
   bool allow_discount_override = 3;
+}
+message UpdateLineItemRequest {
+  string work_order_id = 1;
+  string line_item_id = 2;
+  string description = 3;
+  int64 unit_price = 4; // agreed/negotiated sell price per unit (tiyin)
+  int32 quantity = 5;
+  int64 cost = 6;       // shop expense per unit (tiyin)
+  // Exact stock amount this material line draws (may be fractional). Changing it re-adjusts the
+  // linked variant's stock by the difference. Ignored for non-stock lines.
+  double consumed_qty = 7;
+  // Set by the gateway from the caller's role; lets owners/admins edit past the discount cap.
+  bool allow_discount_override = 8;
 }
 message RemoveLineItemRequest {
   string work_order_id = 1;
