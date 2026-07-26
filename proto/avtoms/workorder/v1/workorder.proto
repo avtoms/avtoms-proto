@@ -37,6 +37,8 @@ service WorkOrderService {
   rpc CreateProduct(CreateProductRequest) returns (Product);
   rpc UpdateProduct(UpdateProductRequest) returns (Product);
   rpc AdjustVariantStock(AdjustVariantStockRequest) returns (ProductVariant);
+  // Stock ledger (income/outcome) for one variant, newest first.
+  rpc ListStockMovements(ListStockMovementsRequest) returns (ListStockMovementsResponse);
 
   // Predefined product-property catalog (global, admin-managed). Any authenticated
   // user may list them to populate the product form; only admins mutate them.
@@ -417,6 +419,22 @@ message AdjustVariantStockRequest {
   string variant_id = 1;
   double delta = 2;    // positive = receive stock, negative = consume/correct
   string reason = 3;   // free-text note (e.g. "received", "used", "stocktake")
+}
+
+// StockMovement is one entry in a variant's income/outcome ledger.
+message StockMovement {
+  string id = 1;
+  string variant_id = 2;
+  double delta = 3;          // positive = income (received), negative = outcome (consumed)
+  string reason = 4;
+  double balance_after = 5;  // on-hand quantity right after this movement
+  string created_at = 6;     // RFC3339
+}
+message ListStockMovementsRequest {
+  string variant_id = 1;
+}
+message ListStockMovementsResponse {
+  repeated StockMovement movements = 1;
 }
 
 // PropertyDefinition is a predefined, admin-managed property a product can use

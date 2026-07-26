@@ -41,6 +41,7 @@ const (
 	WorkOrderService_CreateProduct_FullMethodName            = "/avtoms.workorder.v1.WorkOrderService/CreateProduct"
 	WorkOrderService_UpdateProduct_FullMethodName            = "/avtoms.workorder.v1.WorkOrderService/UpdateProduct"
 	WorkOrderService_AdjustVariantStock_FullMethodName       = "/avtoms.workorder.v1.WorkOrderService/AdjustVariantStock"
+	WorkOrderService_ListStockMovements_FullMethodName       = "/avtoms.workorder.v1.WorkOrderService/ListStockMovements"
 	WorkOrderService_ListPropertyDefinitions_FullMethodName  = "/avtoms.workorder.v1.WorkOrderService/ListPropertyDefinitions"
 	WorkOrderService_CreatePropertyDefinition_FullMethodName = "/avtoms.workorder.v1.WorkOrderService/CreatePropertyDefinition"
 	WorkOrderService_UpdatePropertyDefinition_FullMethodName = "/avtoms.workorder.v1.WorkOrderService/UpdatePropertyDefinition"
@@ -100,6 +101,8 @@ type WorkOrderServiceClient interface {
 	CreateProduct(ctx context.Context, in *CreateProductRequest, opts ...grpc.CallOption) (*Product, error)
 	UpdateProduct(ctx context.Context, in *UpdateProductRequest, opts ...grpc.CallOption) (*Product, error)
 	AdjustVariantStock(ctx context.Context, in *AdjustVariantStockRequest, opts ...grpc.CallOption) (*ProductVariant, error)
+	// Stock ledger (income/outcome) for one variant, newest first.
+	ListStockMovements(ctx context.Context, in *ListStockMovementsRequest, opts ...grpc.CallOption) (*ListStockMovementsResponse, error)
 	// Predefined product-property catalog (global, admin-managed). Any authenticated
 	// user may list them to populate the product form; only admins mutate them.
 	ListPropertyDefinitions(ctx context.Context, in *ListPropertyDefinitionsRequest, opts ...grpc.CallOption) (*ListPropertyDefinitionsResponse, error)
@@ -358,6 +361,16 @@ func (c *workOrderServiceClient) AdjustVariantStock(ctx context.Context, in *Adj
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(ProductVariant)
 	err := c.cc.Invoke(ctx, WorkOrderService_AdjustVariantStock_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *workOrderServiceClient) ListStockMovements(ctx context.Context, in *ListStockMovementsRequest, opts ...grpc.CallOption) (*ListStockMovementsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListStockMovementsResponse)
+	err := c.cc.Invoke(ctx, WorkOrderService_ListStockMovements_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -646,6 +659,8 @@ type WorkOrderServiceServer interface {
 	CreateProduct(context.Context, *CreateProductRequest) (*Product, error)
 	UpdateProduct(context.Context, *UpdateProductRequest) (*Product, error)
 	AdjustVariantStock(context.Context, *AdjustVariantStockRequest) (*ProductVariant, error)
+	// Stock ledger (income/outcome) for one variant, newest first.
+	ListStockMovements(context.Context, *ListStockMovementsRequest) (*ListStockMovementsResponse, error)
 	// Predefined product-property catalog (global, admin-managed). Any authenticated
 	// user may list them to populate the product form; only admins mutate them.
 	ListPropertyDefinitions(context.Context, *ListPropertyDefinitionsRequest) (*ListPropertyDefinitionsResponse, error)
@@ -755,6 +770,9 @@ func (UnimplementedWorkOrderServiceServer) UpdateProduct(context.Context, *Updat
 }
 func (UnimplementedWorkOrderServiceServer) AdjustVariantStock(context.Context, *AdjustVariantStockRequest) (*ProductVariant, error) {
 	return nil, status.Error(codes.Unimplemented, "method AdjustVariantStock not implemented")
+}
+func (UnimplementedWorkOrderServiceServer) ListStockMovements(context.Context, *ListStockMovementsRequest) (*ListStockMovementsResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListStockMovements not implemented")
 }
 func (UnimplementedWorkOrderServiceServer) ListPropertyDefinitions(context.Context, *ListPropertyDefinitionsRequest) (*ListPropertyDefinitionsResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method ListPropertyDefinitions not implemented")
@@ -1244,6 +1262,24 @@ func _WorkOrderService_AdjustVariantStock_Handler(srv interface{}, ctx context.C
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(WorkOrderServiceServer).AdjustVariantStock(ctx, req.(*AdjustVariantStockRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _WorkOrderService_ListStockMovements_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListStockMovementsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WorkOrderServiceServer).ListStockMovements(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: WorkOrderService_ListStockMovements_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WorkOrderServiceServer).ListStockMovements(ctx, req.(*ListStockMovementsRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -1792,6 +1828,10 @@ var WorkOrderService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "AdjustVariantStock",
 			Handler:    _WorkOrderService_AdjustVariantStock_Handler,
+		},
+		{
+			MethodName: "ListStockMovements",
+			Handler:    _WorkOrderService_ListStockMovements_Handler,
 		},
 		{
 			MethodName: "ListPropertyDefinitions",
