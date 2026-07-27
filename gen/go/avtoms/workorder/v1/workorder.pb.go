@@ -4746,6 +4746,7 @@ type Contragent struct {
 	Address       string                 `protobuf:"bytes,5,opt,name=address,proto3" json:"address,omitempty"`
 	Notes         string                 `protobuf:"bytes,6,opt,name=notes,proto3" json:"notes,omitempty"`
 	Active        bool                   `protobuf:"varint,7,opt,name=active,proto3" json:"active,omitempty"`
+	Brand         string                 `protobuf:"bytes,8,opt,name=brand,proto3" json:"brand,omitempty"` // optional brand this supplier is tied to (matches Product.brand by name)
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -4827,6 +4828,13 @@ func (x *Contragent) GetActive() bool {
 		return x.Active
 	}
 	return false
+}
+
+func (x *Contragent) GetBrand() string {
+	if x != nil {
+		return x.Brand
+	}
+	return ""
 }
 
 type ListContragentsRequest struct {
@@ -4932,6 +4940,7 @@ type CreateContragentRequest struct {
 	Phone         string                 `protobuf:"bytes,3,opt,name=phone,proto3" json:"phone,omitempty"`
 	Address       string                 `protobuf:"bytes,4,opt,name=address,proto3" json:"address,omitempty"`
 	Notes         string                 `protobuf:"bytes,5,opt,name=notes,proto3" json:"notes,omitempty"`
+	Brand         string                 `protobuf:"bytes,6,opt,name=brand,proto3" json:"brand,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -5001,6 +5010,13 @@ func (x *CreateContragentRequest) GetNotes() string {
 	return ""
 }
 
+func (x *CreateContragentRequest) GetBrand() string {
+	if x != nil {
+		return x.Brand
+	}
+	return ""
+}
+
 type UpdateContragentRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
@@ -5009,6 +5025,7 @@ type UpdateContragentRequest struct {
 	Address       string                 `protobuf:"bytes,4,opt,name=address,proto3" json:"address,omitempty"`
 	Notes         string                 `protobuf:"bytes,5,opt,name=notes,proto3" json:"notes,omitempty"`
 	Active        bool                   `protobuf:"varint,6,opt,name=active,proto3" json:"active,omitempty"`
+	Brand         string                 `protobuf:"bytes,7,opt,name=brand,proto3" json:"brand,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -5083,6 +5100,13 @@ func (x *UpdateContragentRequest) GetActive() bool {
 		return x.Active
 	}
 	return false
+}
+
+func (x *UpdateContragentRequest) GetBrand() string {
+	if x != nil {
+		return x.Brand
+	}
+	return ""
 }
 
 type DeleteContragentRequest struct {
@@ -7587,7 +7611,7 @@ const file_avtoms_workorder_v1_workorder_proto_rawDesc = "" +
 	"\x18DeleteCatalogTermRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\"+\n" +
 	"\x19DeleteCatalogTermResponse\x12\x0e\n" +
-	"\x02ok\x18\x01 \x01(\bR\x02ok\"\xa7\x01\n" +
+	"\x02ok\x18\x01 \x01(\bR\x02ok\"\xbd\x01\n" +
 	"\n" +
 	"Contragent\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x17\n" +
@@ -7596,25 +7620,28 @@ const file_avtoms_workorder_v1_workorder_proto_rawDesc = "" +
 	"\x05phone\x18\x04 \x01(\tR\x05phone\x12\x18\n" +
 	"\aaddress\x18\x05 \x01(\tR\aaddress\x12\x14\n" +
 	"\x05notes\x18\x06 \x01(\tR\x05notes\x12\x16\n" +
-	"\x06active\x18\a \x01(\bR\x06active\"\\\n" +
+	"\x06active\x18\a \x01(\bR\x06active\x12\x14\n" +
+	"\x05brand\x18\b \x01(\tR\x05brand\"\\\n" +
 	"\x16ListContragentsRequest\x12\x17\n" +
 	"\ashop_id\x18\x01 \x01(\tR\x06shopId\x12)\n" +
 	"\x10include_inactive\x18\x02 \x01(\bR\x0fincludeInactive\"\\\n" +
 	"\x17ListContragentsResponse\x12A\n" +
-	"\vcontragents\x18\x01 \x03(\v2\x1f.avtoms.workorder.v1.ContragentR\vcontragents\"\x8c\x01\n" +
+	"\vcontragents\x18\x01 \x03(\v2\x1f.avtoms.workorder.v1.ContragentR\vcontragents\"\xa2\x01\n" +
 	"\x17CreateContragentRequest\x12\x17\n" +
 	"\ashop_id\x18\x01 \x01(\tR\x06shopId\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x14\n" +
 	"\x05phone\x18\x03 \x01(\tR\x05phone\x12\x18\n" +
 	"\aaddress\x18\x04 \x01(\tR\aaddress\x12\x14\n" +
-	"\x05notes\x18\x05 \x01(\tR\x05notes\"\x9b\x01\n" +
+	"\x05notes\x18\x05 \x01(\tR\x05notes\x12\x14\n" +
+	"\x05brand\x18\x06 \x01(\tR\x05brand\"\xb1\x01\n" +
 	"\x17UpdateContragentRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x14\n" +
 	"\x05phone\x18\x03 \x01(\tR\x05phone\x12\x18\n" +
 	"\aaddress\x18\x04 \x01(\tR\aaddress\x12\x14\n" +
 	"\x05notes\x18\x05 \x01(\tR\x05notes\x12\x16\n" +
-	"\x06active\x18\x06 \x01(\bR\x06active\")\n" +
+	"\x06active\x18\x06 \x01(\bR\x06active\x12\x14\n" +
+	"\x05brand\x18\a \x01(\tR\x05brand\")\n" +
 	"\x17DeleteContragentRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\"*\n" +
 	"\x18DeleteContragentResponse\x12\x0e\n" +

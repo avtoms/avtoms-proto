@@ -559,6 +559,7 @@ message Contragent {
   string address = 5;
   string notes = 6;
   bool active = 7;
+  string brand = 8;  // optional brand this supplier is tied to (matches Product.brand by name)
 }
 message ListContragentsRequest {
   string shop_id = 1;
@@ -573,6 +574,7 @@ message CreateContragentRequest {
   string phone = 3;
   string address = 4;
   string notes = 5;
+  string brand = 6;
 }
 message UpdateContragentRequest {
   string id = 1;
@@ -581,6 +583,7 @@ message UpdateContragentRequest {
   string address = 4;
   string notes = 5;
   bool active = 6;
+  string brand = 7;
 }
 message DeleteContragentRequest {
   string id = 1;
