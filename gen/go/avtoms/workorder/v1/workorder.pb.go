@@ -3565,8 +3565,11 @@ func (x *UpdateProductRequest) GetSupplierId() string {
 type AdjustVariantStockRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	VariantId     string                 `protobuf:"bytes,1,opt,name=variant_id,json=variantId,proto3" json:"variant_id,omitempty"`
-	Delta         float64                `protobuf:"fixed64,2,opt,name=delta,proto3" json:"delta,omitempty"` // positive = receive stock, negative = consume/correct
-	Reason        string                 `protobuf:"bytes,3,opt,name=reason,proto3" json:"reason,omitempty"` // free-text note (e.g. "received", "used", "stocktake")
+	Delta         float64                `protobuf:"fixed64,2,opt,name=delta,proto3" json:"delta,omitempty"`                                 // positive = receive stock, negative = consume/correct
+	Reason        string                 `protobuf:"bytes,3,opt,name=reason,proto3" json:"reason,omitempty"`                                 // free-text note (e.g. "received", "used", "stocktake")
+	StaffId       string                 `protobuf:"bytes,4,opt,name=staff_id,json=staffId,proto3" json:"staff_id,omitempty"`                // who recorded this movement (from JWT); empty for system moves
+	ContragentId  string                 `protobuf:"bytes,5,opt,name=contragent_id,json=contragentId,proto3" json:"contragent_id,omitempty"` // supplier who delivered (income only); optional
+	UnitCost      int64                  `protobuf:"varint,6,opt,name=unit_cost,json=unitCost,proto3" json:"unit_cost,omitempty"`            // purchase price per unit for this receipt, tiyin (income only)
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -3622,6 +3625,27 @@ func (x *AdjustVariantStockRequest) GetReason() string {
 	return ""
 }
 
+func (x *AdjustVariantStockRequest) GetStaffId() string {
+	if x != nil {
+		return x.StaffId
+	}
+	return ""
+}
+
+func (x *AdjustVariantStockRequest) GetContragentId() string {
+	if x != nil {
+		return x.ContragentId
+	}
+	return ""
+}
+
+func (x *AdjustVariantStockRequest) GetUnitCost() int64 {
+	if x != nil {
+		return x.UnitCost
+	}
+	return 0
+}
+
 // StockMovement is one entry in a variant's income/outcome ledger.
 type StockMovement struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
@@ -3631,6 +3655,9 @@ type StockMovement struct {
 	Reason        string                 `protobuf:"bytes,4,opt,name=reason,proto3" json:"reason,omitempty"`
 	BalanceAfter  float64                `protobuf:"fixed64,5,opt,name=balance_after,json=balanceAfter,proto3" json:"balance_after,omitempty"` // on-hand quantity right after this movement
 	CreatedAt     string                 `protobuf:"bytes,6,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`            // RFC3339
+	StaffId       string                 `protobuf:"bytes,7,opt,name=staff_id,json=staffId,proto3" json:"staff_id,omitempty"`                  // who recorded it (resolve name from the staff list)
+	ContragentId  string                 `protobuf:"bytes,8,opt,name=contragent_id,json=contragentId,proto3" json:"contragent_id,omitempty"`   // supplier who delivered (income); resolve name from contragents
+	UnitCost      int64                  `protobuf:"varint,9,opt,name=unit_cost,json=unitCost,proto3" json:"unit_cost,omitempty"`              // purchase price per unit for this receipt, tiyin
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -3705,6 +3732,27 @@ func (x *StockMovement) GetCreatedAt() string {
 		return x.CreatedAt
 	}
 	return ""
+}
+
+func (x *StockMovement) GetStaffId() string {
+	if x != nil {
+		return x.StaffId
+	}
+	return ""
+}
+
+func (x *StockMovement) GetContragentId() string {
+	if x != nil {
+		return x.ContragentId
+	}
+	return ""
+}
+
+func (x *StockMovement) GetUnitCost() int64 {
+	if x != nil {
+		return x.UnitCost
+	}
+	return 0
 }
 
 type ListStockMovementsRequest struct {
@@ -7432,12 +7480,15 @@ const file_avtoms_workorder_v1_workorder_proto_rawDesc = "" +
 	"\x05brand\x18\n" +
 	" \x01(\tR\x05brand\x12\x1f\n" +
 	"\vsupplier_id\x18\v \x01(\tR\n" +
-	"supplierId\"h\n" +
+	"supplierId\"\xc5\x01\n" +
 	"\x19AdjustVariantStockRequest\x12\x1d\n" +
 	"\n" +
 	"variant_id\x18\x01 \x01(\tR\tvariantId\x12\x14\n" +
 	"\x05delta\x18\x02 \x01(\x01R\x05delta\x12\x16\n" +
-	"\x06reason\x18\x03 \x01(\tR\x06reason\"\xb0\x01\n" +
+	"\x06reason\x18\x03 \x01(\tR\x06reason\x12\x19\n" +
+	"\bstaff_id\x18\x04 \x01(\tR\astaffId\x12#\n" +
+	"\rcontragent_id\x18\x05 \x01(\tR\fcontragentId\x12\x1b\n" +
+	"\tunit_cost\x18\x06 \x01(\x03R\bunitCost\"\x8d\x02\n" +
 	"\rStockMovement\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1d\n" +
 	"\n" +
@@ -7446,7 +7497,10 @@ const file_avtoms_workorder_v1_workorder_proto_rawDesc = "" +
 	"\x06reason\x18\x04 \x01(\tR\x06reason\x12#\n" +
 	"\rbalance_after\x18\x05 \x01(\x01R\fbalanceAfter\x12\x1d\n" +
 	"\n" +
-	"created_at\x18\x06 \x01(\tR\tcreatedAt\":\n" +
+	"created_at\x18\x06 \x01(\tR\tcreatedAt\x12\x19\n" +
+	"\bstaff_id\x18\a \x01(\tR\astaffId\x12#\n" +
+	"\rcontragent_id\x18\b \x01(\tR\fcontragentId\x12\x1b\n" +
+	"\tunit_cost\x18\t \x01(\x03R\bunitCost\":\n" +
 	"\x19ListStockMovementsRequest\x12\x1d\n" +
 	"\n" +
 	"variant_id\x18\x01 \x01(\tR\tvariantId\"^\n" +

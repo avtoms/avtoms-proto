@@ -440,6 +440,9 @@ message AdjustVariantStockRequest {
   string variant_id = 1;
   double delta = 2;    // positive = receive stock, negative = consume/correct
   string reason = 3;   // free-text note (e.g. "received", "used", "stocktake")
+  string staff_id = 4;      // who recorded this movement (from JWT); empty for system moves
+  string contragent_id = 5; // supplier who delivered (income only); optional
+  int64 unit_cost = 6;      // purchase price per unit for this receipt, tiyin (income only)
 }
 
 // StockMovement is one entry in a variant's income/outcome ledger.
@@ -450,6 +453,9 @@ message StockMovement {
   string reason = 4;
   double balance_after = 5;  // on-hand quantity right after this movement
   string created_at = 6;     // RFC3339
+  string staff_id = 7;       // who recorded it (resolve name from the staff list)
+  string contragent_id = 8;  // supplier who delivered (income); resolve name from contragents
+  int64 unit_cost = 9;       // purchase price per unit for this receipt, tiyin
 }
 message ListStockMovementsRequest {
   string variant_id = 1;
