@@ -54,6 +54,14 @@ service WorkOrderService {
   rpc UpdateCatalogTerm(UpdateCatalogTermRequest) returns (CatalogTerm);
   rpc DeleteCatalogTerm(DeleteCatalogTermRequest) returns (DeleteCatalogTermResponse);
 
+  // Contragents: counterparties the shop transacts with — chiefly suppliers
+  // ("yetkazib beruvchi") that products are bought from. Shop-scoped; used as the
+  // supplier dropdown on the product form.
+  rpc ListContragents(ListContragentsRequest) returns (ListContragentsResponse);
+  rpc CreateContragent(CreateContragentRequest) returns (Contragent);
+  rpc UpdateContragent(UpdateContragentRequest) returns (Contragent);
+  rpc DeleteContragent(DeleteContragentRequest) returns (DeleteContragentResponse);
+
   // Appointments / scheduling.
   rpc ListAppointments(ListAppointmentsRequest) returns (ListAppointmentsResponse);
   rpc CreateAppointment(CreateAppointmentRequest) returns (Appointment);
@@ -364,6 +372,7 @@ message Product {
   repeated ProductProperty properties = 9;  // e.g. Size -> [S, M, L]
   repeated ProductVariant variants = 10;    // each combination, own price/stock
   string brand = 11;          // brand this product belongs to (e.g. "Bosch", "Shell")
+  string supplier_id = 12;    // linked contragent (supplier) id; empty if free-typed only
 }
 
 // ProductProperty is a named option that defines variants, with its allowed values.
@@ -412,6 +421,7 @@ message CreateProductRequest {
   repeated ProductProperty properties = 7;
   repeated ProductVariant variants = 8;
   string brand = 9;
+  string supplier_id = 10;
 }
 message UpdateProductRequest {
   string id = 1;
@@ -424,6 +434,7 @@ message UpdateProductRequest {
   repeated ProductProperty properties = 8;
   repeated ProductVariant variants = 9;
   string brand = 10;
+  string supplier_id = 11;
 }
 message AdjustVariantStockRequest {
   string variant_id = 1;
@@ -525,6 +536,47 @@ message DeleteCatalogTermRequest {
   string id = 1;
 }
 message DeleteCatalogTermResponse {
+  bool ok = 1;
+}
+
+// Contragent is a counterparty the shop transacts with — chiefly a supplier
+// ("yetkazib beruvchi") that products are bought from. Shop-scoped so each shop
+// keeps its own supplier list.
+message Contragent {
+  string id = 1;
+  string shop_id = 2;
+  string name = 3;
+  string phone = 4;
+  string address = 5;
+  string notes = 6;
+  bool active = 7;
+}
+message ListContragentsRequest {
+  string shop_id = 1;
+  bool include_inactive = 2;  // management page passes true; the product form omits it
+}
+message ListContragentsResponse {
+  repeated Contragent contragents = 1;
+}
+message CreateContragentRequest {
+  string shop_id = 1;
+  string name = 2;
+  string phone = 3;
+  string address = 4;
+  string notes = 5;
+}
+message UpdateContragentRequest {
+  string id = 1;
+  string name = 2;
+  string phone = 3;
+  string address = 4;
+  string notes = 5;
+  bool active = 6;
+}
+message DeleteContragentRequest {
+  string id = 1;
+}
+message DeleteContragentResponse {
   bool ok = 1;
 }
 

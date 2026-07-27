@@ -51,6 +51,10 @@ const (
 	WorkOrderService_CreateCatalogTerm_FullMethodName        = "/avtoms.workorder.v1.WorkOrderService/CreateCatalogTerm"
 	WorkOrderService_UpdateCatalogTerm_FullMethodName        = "/avtoms.workorder.v1.WorkOrderService/UpdateCatalogTerm"
 	WorkOrderService_DeleteCatalogTerm_FullMethodName        = "/avtoms.workorder.v1.WorkOrderService/DeleteCatalogTerm"
+	WorkOrderService_ListContragents_FullMethodName          = "/avtoms.workorder.v1.WorkOrderService/ListContragents"
+	WorkOrderService_CreateContragent_FullMethodName         = "/avtoms.workorder.v1.WorkOrderService/CreateContragent"
+	WorkOrderService_UpdateContragent_FullMethodName         = "/avtoms.workorder.v1.WorkOrderService/UpdateContragent"
+	WorkOrderService_DeleteContragent_FullMethodName         = "/avtoms.workorder.v1.WorkOrderService/DeleteContragent"
 	WorkOrderService_ListAppointments_FullMethodName         = "/avtoms.workorder.v1.WorkOrderService/ListAppointments"
 	WorkOrderService_CreateAppointment_FullMethodName        = "/avtoms.workorder.v1.WorkOrderService/CreateAppointment"
 	WorkOrderService_SetAppointmentState_FullMethodName      = "/avtoms.workorder.v1.WorkOrderService/SetAppointmentState"
@@ -120,6 +124,13 @@ type WorkOrderServiceClient interface {
 	CreateCatalogTerm(ctx context.Context, in *CreateCatalogTermRequest, opts ...grpc.CallOption) (*CatalogTerm, error)
 	UpdateCatalogTerm(ctx context.Context, in *UpdateCatalogTermRequest, opts ...grpc.CallOption) (*CatalogTerm, error)
 	DeleteCatalogTerm(ctx context.Context, in *DeleteCatalogTermRequest, opts ...grpc.CallOption) (*DeleteCatalogTermResponse, error)
+	// Contragents: counterparties the shop transacts with — chiefly suppliers
+	// ("yetkazib beruvchi") that products are bought from. Shop-scoped; used as the
+	// supplier dropdown on the product form.
+	ListContragents(ctx context.Context, in *ListContragentsRequest, opts ...grpc.CallOption) (*ListContragentsResponse, error)
+	CreateContragent(ctx context.Context, in *CreateContragentRequest, opts ...grpc.CallOption) (*Contragent, error)
+	UpdateContragent(ctx context.Context, in *UpdateContragentRequest, opts ...grpc.CallOption) (*Contragent, error)
+	DeleteContragent(ctx context.Context, in *DeleteContragentRequest, opts ...grpc.CallOption) (*DeleteContragentResponse, error)
 	// Appointments / scheduling.
 	ListAppointments(ctx context.Context, in *ListAppointmentsRequest, opts ...grpc.CallOption) (*ListAppointmentsResponse, error)
 	CreateAppointment(ctx context.Context, in *CreateAppointmentRequest, opts ...grpc.CallOption) (*Appointment, error)
@@ -478,6 +489,46 @@ func (c *workOrderServiceClient) DeleteCatalogTerm(ctx context.Context, in *Dele
 	return out, nil
 }
 
+func (c *workOrderServiceClient) ListContragents(ctx context.Context, in *ListContragentsRequest, opts ...grpc.CallOption) (*ListContragentsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListContragentsResponse)
+	err := c.cc.Invoke(ctx, WorkOrderService_ListContragents_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *workOrderServiceClient) CreateContragent(ctx context.Context, in *CreateContragentRequest, opts ...grpc.CallOption) (*Contragent, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Contragent)
+	err := c.cc.Invoke(ctx, WorkOrderService_CreateContragent_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *workOrderServiceClient) UpdateContragent(ctx context.Context, in *UpdateContragentRequest, opts ...grpc.CallOption) (*Contragent, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Contragent)
+	err := c.cc.Invoke(ctx, WorkOrderService_UpdateContragent_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *workOrderServiceClient) DeleteContragent(ctx context.Context, in *DeleteContragentRequest, opts ...grpc.CallOption) (*DeleteContragentResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(DeleteContragentResponse)
+	err := c.cc.Invoke(ctx, WorkOrderService_DeleteContragent_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *workOrderServiceClient) ListAppointments(ctx context.Context, in *ListAppointmentsRequest, opts ...grpc.CallOption) (*ListAppointmentsResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(ListAppointmentsResponse)
@@ -734,6 +785,13 @@ type WorkOrderServiceServer interface {
 	CreateCatalogTerm(context.Context, *CreateCatalogTermRequest) (*CatalogTerm, error)
 	UpdateCatalogTerm(context.Context, *UpdateCatalogTermRequest) (*CatalogTerm, error)
 	DeleteCatalogTerm(context.Context, *DeleteCatalogTermRequest) (*DeleteCatalogTermResponse, error)
+	// Contragents: counterparties the shop transacts with — chiefly suppliers
+	// ("yetkazib beruvchi") that products are bought from. Shop-scoped; used as the
+	// supplier dropdown on the product form.
+	ListContragents(context.Context, *ListContragentsRequest) (*ListContragentsResponse, error)
+	CreateContragent(context.Context, *CreateContragentRequest) (*Contragent, error)
+	UpdateContragent(context.Context, *UpdateContragentRequest) (*Contragent, error)
+	DeleteContragent(context.Context, *DeleteContragentRequest) (*DeleteContragentResponse, error)
 	// Appointments / scheduling.
 	ListAppointments(context.Context, *ListAppointmentsRequest) (*ListAppointmentsResponse, error)
 	CreateAppointment(context.Context, *CreateAppointmentRequest) (*Appointment, error)
@@ -867,6 +925,18 @@ func (UnimplementedWorkOrderServiceServer) UpdateCatalogTerm(context.Context, *U
 }
 func (UnimplementedWorkOrderServiceServer) DeleteCatalogTerm(context.Context, *DeleteCatalogTermRequest) (*DeleteCatalogTermResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method DeleteCatalogTerm not implemented")
+}
+func (UnimplementedWorkOrderServiceServer) ListContragents(context.Context, *ListContragentsRequest) (*ListContragentsResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListContragents not implemented")
+}
+func (UnimplementedWorkOrderServiceServer) CreateContragent(context.Context, *CreateContragentRequest) (*Contragent, error) {
+	return nil, status.Error(codes.Unimplemented, "method CreateContragent not implemented")
+}
+func (UnimplementedWorkOrderServiceServer) UpdateContragent(context.Context, *UpdateContragentRequest) (*Contragent, error) {
+	return nil, status.Error(codes.Unimplemented, "method UpdateContragent not implemented")
+}
+func (UnimplementedWorkOrderServiceServer) DeleteContragent(context.Context, *DeleteContragentRequest) (*DeleteContragentResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method DeleteContragent not implemented")
 }
 func (UnimplementedWorkOrderServiceServer) ListAppointments(context.Context, *ListAppointmentsRequest) (*ListAppointmentsResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method ListAppointments not implemented")
@@ -1528,6 +1598,78 @@ func _WorkOrderService_DeleteCatalogTerm_Handler(srv interface{}, ctx context.Co
 	return interceptor(ctx, in, info, handler)
 }
 
+func _WorkOrderService_ListContragents_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListContragentsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WorkOrderServiceServer).ListContragents(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: WorkOrderService_ListContragents_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WorkOrderServiceServer).ListContragents(ctx, req.(*ListContragentsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _WorkOrderService_CreateContragent_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateContragentRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WorkOrderServiceServer).CreateContragent(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: WorkOrderService_CreateContragent_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WorkOrderServiceServer).CreateContragent(ctx, req.(*CreateContragentRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _WorkOrderService_UpdateContragent_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateContragentRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WorkOrderServiceServer).UpdateContragent(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: WorkOrderService_UpdateContragent_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WorkOrderServiceServer).UpdateContragent(ctx, req.(*UpdateContragentRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _WorkOrderService_DeleteContragent_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteContragentRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WorkOrderServiceServer).DeleteContragent(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: WorkOrderService_DeleteContragent_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WorkOrderServiceServer).DeleteContragent(ctx, req.(*DeleteContragentRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _WorkOrderService_ListAppointments_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ListAppointmentsRequest)
 	if err := dec(in); err != nil {
@@ -2040,6 +2182,22 @@ var WorkOrderService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteCatalogTerm",
 			Handler:    _WorkOrderService_DeleteCatalogTerm_Handler,
+		},
+		{
+			MethodName: "ListContragents",
+			Handler:    _WorkOrderService_ListContragents_Handler,
+		},
+		{
+			MethodName: "CreateContragent",
+			Handler:    _WorkOrderService_CreateContragent_Handler,
+		},
+		{
+			MethodName: "UpdateContragent",
+			Handler:    _WorkOrderService_UpdateContragent_Handler,
+		},
+		{
+			MethodName: "DeleteContragent",
+			Handler:    _WorkOrderService_DeleteContragent_Handler,
 		},
 		{
 			MethodName: "ListAppointments",
