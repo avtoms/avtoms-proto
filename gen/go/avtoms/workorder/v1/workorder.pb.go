@@ -4345,6 +4345,7 @@ type CatalogTerm struct {
 	Name          string                 `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
 	Position      int32                  `protobuf:"varint,4,opt,name=position,proto3" json:"position,omitempty"`
 	Active        bool                   `protobuf:"varint,5,opt,name=active,proto3" json:"active,omitempty"`
+	LogoUrl       string                 `protobuf:"bytes,6,opt,name=logo_url,json=logoUrl,proto3" json:"logo_url,omitempty"` // optional brand logo (superadmin-uploaded); empty for categories
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -4412,6 +4413,13 @@ func (x *CatalogTerm) GetActive() bool {
 		return x.Active
 	}
 	return false
+}
+
+func (x *CatalogTerm) GetLogoUrl() string {
+	if x != nil {
+		return x.LogoUrl
+	}
+	return ""
 }
 
 type ListCatalogTermsRequest struct {
@@ -4514,6 +4522,7 @@ type CreateCatalogTermRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Type          string                 `protobuf:"bytes,1,opt,name=type,proto3" json:"type,omitempty"`
 	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	LogoUrl       string                 `protobuf:"bytes,3,opt,name=logo_url,json=logoUrl,proto3" json:"logo_url,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -4562,11 +4571,19 @@ func (x *CreateCatalogTermRequest) GetName() string {
 	return ""
 }
 
+func (x *CreateCatalogTermRequest) GetLogoUrl() string {
+	if x != nil {
+		return x.LogoUrl
+	}
+	return ""
+}
+
 type UpdateCatalogTermRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
 	Active        bool                   `protobuf:"varint,3,opt,name=active,proto3" json:"active,omitempty"`
+	LogoUrl       string                 `protobuf:"bytes,4,opt,name=logo_url,json=logoUrl,proto3" json:"logo_url,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -4620,6 +4637,13 @@ func (x *UpdateCatalogTermRequest) GetActive() bool {
 		return x.Active
 	}
 	return false
+}
+
+func (x *UpdateCatalogTermRequest) GetLogoUrl() string {
+	if x != nil {
+		return x.LogoUrl
+	}
+	return ""
 }
 
 type DeleteCatalogTermRequest struct {
@@ -7538,25 +7562,28 @@ const file_avtoms_workorder_v1_workorder_proto_rawDesc = "" +
 	"\x1fDeletePropertyDefinitionRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\"2\n" +
 	" DeletePropertyDefinitionResponse\x12\x0e\n" +
-	"\x02ok\x18\x01 \x01(\bR\x02ok\"y\n" +
+	"\x02ok\x18\x01 \x01(\bR\x02ok\"\x94\x01\n" +
 	"\vCatalogTerm\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
 	"\x04type\x18\x02 \x01(\tR\x04type\x12\x12\n" +
 	"\x04name\x18\x03 \x01(\tR\x04name\x12\x1a\n" +
 	"\bposition\x18\x04 \x01(\x05R\bposition\x12\x16\n" +
-	"\x06active\x18\x05 \x01(\bR\x06active\"X\n" +
+	"\x06active\x18\x05 \x01(\bR\x06active\x12\x19\n" +
+	"\blogo_url\x18\x06 \x01(\tR\alogoUrl\"X\n" +
 	"\x17ListCatalogTermsRequest\x12\x12\n" +
 	"\x04type\x18\x01 \x01(\tR\x04type\x12)\n" +
 	"\x10include_inactive\x18\x02 \x01(\bR\x0fincludeInactive\"R\n" +
 	"\x18ListCatalogTermsResponse\x126\n" +
-	"\x05terms\x18\x01 \x03(\v2 .avtoms.workorder.v1.CatalogTermR\x05terms\"B\n" +
+	"\x05terms\x18\x01 \x03(\v2 .avtoms.workorder.v1.CatalogTermR\x05terms\"]\n" +
 	"\x18CreateCatalogTermRequest\x12\x12\n" +
 	"\x04type\x18\x01 \x01(\tR\x04type\x12\x12\n" +
-	"\x04name\x18\x02 \x01(\tR\x04name\"V\n" +
+	"\x04name\x18\x02 \x01(\tR\x04name\x12\x19\n" +
+	"\blogo_url\x18\x03 \x01(\tR\alogoUrl\"q\n" +
 	"\x18UpdateCatalogTermRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x16\n" +
-	"\x06active\x18\x03 \x01(\bR\x06active\"*\n" +
+	"\x06active\x18\x03 \x01(\bR\x06active\x12\x19\n" +
+	"\blogo_url\x18\x04 \x01(\tR\alogoUrl\"*\n" +
 	"\x18DeleteCatalogTermRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\"+\n" +
 	"\x19DeleteCatalogTermResponse\x12\x0e\n" +

@@ -521,6 +521,7 @@ message CatalogTerm {
   string name = 3;
   int32 position = 4;
   bool active = 5;
+  string logo_url = 6; // optional brand logo (superadmin-uploaded); empty for categories
 }
 message ListCatalogTermsRequest {
   string type = 1;             // required: which list to return
@@ -532,11 +533,13 @@ message ListCatalogTermsResponse {
 message CreateCatalogTermRequest {
   string type = 1;
   string name = 2;
+  string logo_url = 3;
 }
 message UpdateCatalogTermRequest {
   string id = 1;
   string name = 2;
   bool active = 3;
+  string logo_url = 4;
 }
 message DeleteCatalogTermRequest {
   string id = 1;
