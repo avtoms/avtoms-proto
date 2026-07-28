@@ -44,6 +44,11 @@ const (
 	WorkOrderService_UpdateProduct_FullMethodName            = "/avtoms.workorder.v1.WorkOrderService/UpdateProduct"
 	WorkOrderService_AdjustVariantStock_FullMethodName       = "/avtoms.workorder.v1.WorkOrderService/AdjustVariantStock"
 	WorkOrderService_ListStockMovements_FullMethodName       = "/avtoms.workorder.v1.WorkOrderService/ListStockMovements"
+	WorkOrderService_CreateSale_FullMethodName               = "/avtoms.workorder.v1.WorkOrderService/CreateSale"
+	WorkOrderService_ListSales_FullMethodName                = "/avtoms.workorder.v1.WorkOrderService/ListSales"
+	WorkOrderService_GetSale_FullMethodName                  = "/avtoms.workorder.v1.WorkOrderService/GetSale"
+	WorkOrderService_VoidSale_FullMethodName                 = "/avtoms.workorder.v1.WorkOrderService/VoidSale"
+	WorkOrderService_SetSaleInvoice_FullMethodName           = "/avtoms.workorder.v1.WorkOrderService/SetSaleInvoice"
 	WorkOrderService_ListPropertyDefinitions_FullMethodName  = "/avtoms.workorder.v1.WorkOrderService/ListPropertyDefinitions"
 	WorkOrderService_CreatePropertyDefinition_FullMethodName = "/avtoms.workorder.v1.WorkOrderService/CreatePropertyDefinition"
 	WorkOrderService_UpdatePropertyDefinition_FullMethodName = "/avtoms.workorder.v1.WorkOrderService/UpdatePropertyDefinition"
@@ -115,6 +120,19 @@ type WorkOrderServiceClient interface {
 	AdjustVariantStock(ctx context.Context, in *AdjustVariantStockRequest, opts ...grpc.CallOption) (*ProductVariant, error)
 	// Stock ledger (income/outcome) for one variant, newest first.
 	ListStockMovements(ctx context.Context, in *ListStockMovementsRequest, opts ...grpc.CallOption) (*ListStockMovementsResponse, error)
+	// Counter sales: stock sold straight over the counter, with no work order, no
+	// vehicle and no customer. Sales live here because this service owns the warehouse —
+	// the stock leaves through the same movement ledger a work order uses, so a variant's
+	// history stays one story. The money side (invoice, receipt, payment method) is the
+	// invoice service's; the gateway composes the two.
+	CreateSale(ctx context.Context, in *CreateSaleRequest, opts ...grpc.CallOption) (*Sale, error)
+	ListSales(ctx context.Context, in *ListSalesRequest, opts ...grpc.CallOption) (*ListSalesResponse, error)
+	GetSale(ctx context.Context, in *GetSaleRequest, opts ...grpc.CallOption) (*Sale, error)
+	// VoidSale puts the stock back on the shelf and marks the sale reversed. Idempotent:
+	// voiding an already-voided sale returns it unchanged rather than double-restocking.
+	VoidSale(ctx context.Context, in *VoidSaleRequest, opts ...grpc.CallOption) (*Sale, error)
+	// SetSaleInvoice links the invoice the gateway generated back to the sale.
+	SetSaleInvoice(ctx context.Context, in *SetSaleInvoiceRequest, opts ...grpc.CallOption) (*Sale, error)
 	// Predefined product-property catalog (global, admin-managed). Any authenticated
 	// user may list them to populate the product form; only admins mutate them.
 	ListPropertyDefinitions(ctx context.Context, in *ListPropertyDefinitionsRequest, opts ...grpc.CallOption) (*ListPropertyDefinitionsResponse, error)
@@ -415,6 +433,56 @@ func (c *workOrderServiceClient) ListStockMovements(ctx context.Context, in *Lis
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(ListStockMovementsResponse)
 	err := c.cc.Invoke(ctx, WorkOrderService_ListStockMovements_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *workOrderServiceClient) CreateSale(ctx context.Context, in *CreateSaleRequest, opts ...grpc.CallOption) (*Sale, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Sale)
+	err := c.cc.Invoke(ctx, WorkOrderService_CreateSale_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *workOrderServiceClient) ListSales(ctx context.Context, in *ListSalesRequest, opts ...grpc.CallOption) (*ListSalesResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListSalesResponse)
+	err := c.cc.Invoke(ctx, WorkOrderService_ListSales_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *workOrderServiceClient) GetSale(ctx context.Context, in *GetSaleRequest, opts ...grpc.CallOption) (*Sale, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Sale)
+	err := c.cc.Invoke(ctx, WorkOrderService_GetSale_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *workOrderServiceClient) VoidSale(ctx context.Context, in *VoidSaleRequest, opts ...grpc.CallOption) (*Sale, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Sale)
+	err := c.cc.Invoke(ctx, WorkOrderService_VoidSale_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *workOrderServiceClient) SetSaleInvoice(ctx context.Context, in *SetSaleInvoiceRequest, opts ...grpc.CallOption) (*Sale, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Sale)
+	err := c.cc.Invoke(ctx, WorkOrderService_SetSaleInvoice_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -787,6 +855,19 @@ type WorkOrderServiceServer interface {
 	AdjustVariantStock(context.Context, *AdjustVariantStockRequest) (*ProductVariant, error)
 	// Stock ledger (income/outcome) for one variant, newest first.
 	ListStockMovements(context.Context, *ListStockMovementsRequest) (*ListStockMovementsResponse, error)
+	// Counter sales: stock sold straight over the counter, with no work order, no
+	// vehicle and no customer. Sales live here because this service owns the warehouse —
+	// the stock leaves through the same movement ledger a work order uses, so a variant's
+	// history stays one story. The money side (invoice, receipt, payment method) is the
+	// invoice service's; the gateway composes the two.
+	CreateSale(context.Context, *CreateSaleRequest) (*Sale, error)
+	ListSales(context.Context, *ListSalesRequest) (*ListSalesResponse, error)
+	GetSale(context.Context, *GetSaleRequest) (*Sale, error)
+	// VoidSale puts the stock back on the shelf and marks the sale reversed. Idempotent:
+	// voiding an already-voided sale returns it unchanged rather than double-restocking.
+	VoidSale(context.Context, *VoidSaleRequest) (*Sale, error)
+	// SetSaleInvoice links the invoice the gateway generated back to the sale.
+	SetSaleInvoice(context.Context, *SetSaleInvoiceRequest) (*Sale, error)
 	// Predefined product-property catalog (global, admin-managed). Any authenticated
 	// user may list them to populate the product form; only admins mutate them.
 	ListPropertyDefinitions(context.Context, *ListPropertyDefinitionsRequest) (*ListPropertyDefinitionsResponse, error)
@@ -917,6 +998,21 @@ func (UnimplementedWorkOrderServiceServer) AdjustVariantStock(context.Context, *
 }
 func (UnimplementedWorkOrderServiceServer) ListStockMovements(context.Context, *ListStockMovementsRequest) (*ListStockMovementsResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method ListStockMovements not implemented")
+}
+func (UnimplementedWorkOrderServiceServer) CreateSale(context.Context, *CreateSaleRequest) (*Sale, error) {
+	return nil, status.Error(codes.Unimplemented, "method CreateSale not implemented")
+}
+func (UnimplementedWorkOrderServiceServer) ListSales(context.Context, *ListSalesRequest) (*ListSalesResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListSales not implemented")
+}
+func (UnimplementedWorkOrderServiceServer) GetSale(context.Context, *GetSaleRequest) (*Sale, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetSale not implemented")
+}
+func (UnimplementedWorkOrderServiceServer) VoidSale(context.Context, *VoidSaleRequest) (*Sale, error) {
+	return nil, status.Error(codes.Unimplemented, "method VoidSale not implemented")
+}
+func (UnimplementedWorkOrderServiceServer) SetSaleInvoice(context.Context, *SetSaleInvoiceRequest) (*Sale, error) {
+	return nil, status.Error(codes.Unimplemented, "method SetSaleInvoice not implemented")
 }
 func (UnimplementedWorkOrderServiceServer) ListPropertyDefinitions(context.Context, *ListPropertyDefinitionsRequest) (*ListPropertyDefinitionsResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method ListPropertyDefinitions not implemented")
@@ -1484,6 +1580,96 @@ func _WorkOrderService_ListStockMovements_Handler(srv interface{}, ctx context.C
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(WorkOrderServiceServer).ListStockMovements(ctx, req.(*ListStockMovementsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _WorkOrderService_CreateSale_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateSaleRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WorkOrderServiceServer).CreateSale(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: WorkOrderService_CreateSale_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WorkOrderServiceServer).CreateSale(ctx, req.(*CreateSaleRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _WorkOrderService_ListSales_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListSalesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WorkOrderServiceServer).ListSales(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: WorkOrderService_ListSales_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WorkOrderServiceServer).ListSales(ctx, req.(*ListSalesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _WorkOrderService_GetSale_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetSaleRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WorkOrderServiceServer).GetSale(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: WorkOrderService_GetSale_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WorkOrderServiceServer).GetSale(ctx, req.(*GetSaleRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _WorkOrderService_VoidSale_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(VoidSaleRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WorkOrderServiceServer).VoidSale(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: WorkOrderService_VoidSale_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WorkOrderServiceServer).VoidSale(ctx, req.(*VoidSaleRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _WorkOrderService_SetSaleInvoice_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SetSaleInvoiceRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WorkOrderServiceServer).SetSaleInvoice(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: WorkOrderService_SetSaleInvoice_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WorkOrderServiceServer).SetSaleInvoice(ctx, req.(*SetSaleInvoiceRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -2188,6 +2374,26 @@ var WorkOrderService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ListStockMovements",
 			Handler:    _WorkOrderService_ListStockMovements_Handler,
+		},
+		{
+			MethodName: "CreateSale",
+			Handler:    _WorkOrderService_CreateSale_Handler,
+		},
+		{
+			MethodName: "ListSales",
+			Handler:    _WorkOrderService_ListSales_Handler,
+		},
+		{
+			MethodName: "GetSale",
+			Handler:    _WorkOrderService_GetSale_Handler,
+		},
+		{
+			MethodName: "VoidSale",
+			Handler:    _WorkOrderService_VoidSale_Handler,
+		},
+		{
+			MethodName: "SetSaleInvoice",
+			Handler:    _WorkOrderService_SetSaleInvoice_Handler,
 		},
 		{
 			MethodName: "ListPropertyDefinitions",

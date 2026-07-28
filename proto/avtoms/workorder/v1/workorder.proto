@@ -42,6 +42,20 @@ service WorkOrderService {
   // Stock ledger (income/outcome) for one variant, newest first.
   rpc ListStockMovements(ListStockMovementsRequest) returns (ListStockMovementsResponse);
 
+  // Counter sales: stock sold straight over the counter, with no work order, no
+  // vehicle and no customer. Sales live here because this service owns the warehouse —
+  // the stock leaves through the same movement ledger a work order uses, so a variant's
+  // history stays one story. The money side (invoice, receipt, payment method) is the
+  // invoice service's; the gateway composes the two.
+  rpc CreateSale(CreateSaleRequest) returns (Sale);
+  rpc ListSales(ListSalesRequest) returns (ListSalesResponse);
+  rpc GetSale(GetSaleRequest) returns (Sale);
+  // VoidSale puts the stock back on the shelf and marks the sale reversed. Idempotent:
+  // voiding an already-voided sale returns it unchanged rather than double-restocking.
+  rpc VoidSale(VoidSaleRequest) returns (Sale);
+  // SetSaleInvoice links the invoice the gateway generated back to the sale.
+  rpc SetSaleInvoice(SetSaleInvoiceRequest) returns (Sale);
+
   // Predefined product-property catalog (global, admin-managed). Any authenticated
   // user may list them to populate the product form; only admins mutate them.
   rpc ListPropertyDefinitions(ListPropertyDefinitionsRequest) returns (ListPropertyDefinitionsResponse);
@@ -463,6 +477,80 @@ message ListStockMovementsRequest {
 }
 message ListStockMovementsResponse {
   repeated StockMovement movements = 1;
+}
+
+// ── Counter sales ───────────────────────────────────────────────────────────────────
+// PaymentMethod mirrors avtoms.invoice.v1.PaymentMethod value for value. Services do not
+// import each other's protos, so the sale keeps its own copy of how the money arrived;
+// the gateway maps between the two when it generates the sale's invoice. Keep the numbers
+// in step with the invoice enum — the reporting breakdown groups on them.
+enum PaymentMethod {
+  PAYMENT_METHOD_UNSPECIFIED = 0;
+  PAYMENT_METHOD_CASH = 1;
+  PAYMENT_METHOD_OTHER = 2;
+  PAYMENT_METHOD_CARD = 3;
+}
+
+// SaleItem is one line of a counter sale: a warehouse variant, how much of it left, and
+// what it was actually sold for. Description, sku and unit_cost are snapshots taken at
+// sale time, so renaming or repricing the product later cannot rewrite history.
+message SaleItem {
+  string id = 1;
+  string variant_id = 2;
+  string description = 3;
+  double quantity = 4;    // may be fractional (3.5 l, 0.75 kg)
+  int64 unit_price = 5;   // agreed sell price per unit, tiyin
+  int64 unit_cost = 6;    // the variant's buy price at sale time, tiyin
+  string sku = 7;
+}
+
+message Sale {
+  string id = 1;
+  string shop_id = 2;
+  int64 sale_no = 3;      // per-shop sequence, shown to users as "S-0001"
+  string staff_id = 4;    // who sold it
+  repeated SaleItem items = 5;
+  int64 total = 6;        // sum of unit_price * quantity, tiyin
+  int64 total_cost = 7;   // sum of unit_cost * quantity, tiyin
+  PaymentMethod payment_method = 8;
+  string card_id = 9;     // saved shop card the money landed on (card payments)
+  string card_number = 10;
+  string invoice_id = 11; // the receipt generated for this sale
+  string note = 12;
+  bool voided = 13;
+  string voided_at = 14;  // RFC3339
+  string created_at = 15; // RFC3339
+}
+
+// CreateSaleRequest sells stock. Only variant_id, quantity and unit_price are read from
+// each item — description, sku and unit_cost are taken from the warehouse, not the caller.
+message CreateSaleRequest {
+  string shop_id = 1;
+  string staff_id = 2;
+  repeated SaleItem items = 3;
+  PaymentMethod payment_method = 4;
+  string card_id = 5;
+  string card_number = 6;
+  string note = 7;
+}
+message ListSalesRequest {
+  string shop_id = 1;
+  string from = 2; // RFC3339, inclusive; empty = no lower bound
+  string to = 3;   // RFC3339, inclusive; empty = no upper bound
+}
+message ListSalesResponse {
+  repeated Sale sales = 1;
+}
+message GetSaleRequest {
+  string id = 1;
+}
+message VoidSaleRequest {
+  string id = 1;
+  string staff_id = 2;
+}
+message SetSaleInvoiceRequest {
+  string id = 1;
+  string invoice_id = 2;
 }
 
 // PropertyDefinition is a predefined, admin-managed property a product can use
