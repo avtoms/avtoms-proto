@@ -614,12 +614,20 @@ message DeleteContragentResponse {
   bool ok = 1;
 }
 
-// ShopSettings holds per-shop pricing policy.
+// ShopSettings holds per-shop policy: pricing, and which statuses the shop's work orders
+// move through.
 message ShopSettings {
   string shop_id = 1;
   // Maximum discount a mechanic may apply to a menu-priced line, in percent (0-100).
   // 100 means no cap (the opt-in default). Owners/admins always bypass the cap.
   int32 max_discount_percent = 2;
+  // The statuses this shop's work orders move through. Empty means every status is enabled
+  // (the default, so existing shops are unaffected). DRAFT, READY, INVOICED, CLOSED and
+  // CANCELED are always in force — the server folds them back in if omitted — because order
+  // creation, the mechanic's done-roll-up, invoicing and revenue reporting depend on them.
+  // Legal transitions are derived from this set: the next enabled state after the current
+  // one, so disabling ESTIMATED and APPROVED makes DRAFT go straight to IN_PROGRESS.
+  repeated WorkOrderState enabled_states = 3;
 }
 message GetShopSettingsRequest {
   string shop_id = 1;
@@ -627,6 +635,7 @@ message GetShopSettingsRequest {
 message UpdateShopSettingsRequest {
   string shop_id = 1;
   int32 max_discount_percent = 2;
+  repeated WorkOrderState enabled_states = 3;
 }
 
 message ListWorkOrdersRequest {
