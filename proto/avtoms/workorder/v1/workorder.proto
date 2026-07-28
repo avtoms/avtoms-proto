@@ -471,20 +471,33 @@ message ListStockMovementsResponse {
 // from the predefined values below; text = free text.
 message PropertyDefinition {
   string id = 1;
+  // Canonical name and the stable identifier: a product's properties reference the catalog
+  // by this string, so it must not change once in use. Display uses the translations below,
+  // falling back to this when a translation is blank.
   string name = 2;
   string kind = 3;            // "text" | "number" | "select" | "color"
   string unit = 4;            // for number kind, e.g. "L", "mm", "kg", "Ah"
   int32 position = 5;
   bool active = 6;
   repeated PropertyDefinitionValue values = 7; // for select/color kinds
+  // Admin-editable display names per language (blank = fall back to name).
+  string name_uz_latn = 8;
+  string name_uz_cyrl = 9;
+  string name_ru = 10;
 }
 
 // PropertyDefinitionValue is one predefined value in a select/color property.
 message PropertyDefinitionValue {
   string id = 1;
+  // Canonical value and the stable identifier stored on a product's variants. Display uses
+  // the translations below, falling back to this when a translation is blank.
   string value = 2;           // label, e.g. "Red", "5W-30"
   string color_hex = 3;       // for color kind, e.g. "#E11D48"
   int32 position = 4;
+  // Admin-editable display values per language (blank = fall back to value).
+  string value_uz_latn = 5;
+  string value_uz_cyrl = 6;
+  string value_ru = 7;
 }
 
 message ListPropertyDefinitionsRequest {
@@ -498,14 +511,22 @@ message CreatePropertyDefinitionRequest {
   string kind = 2;
   string unit = 3;
   repeated PropertyDefinitionValue values = 4;
+  string name_uz_latn = 5;
+  string name_uz_cyrl = 6;
+  string name_ru = 7;
 }
 message UpdatePropertyDefinitionRequest {
   string id = 1;
+  // Renaming a property in use would orphan the products referencing it, so the canonical
+  // name is only applied when it is still free; translations are always editable.
   string name = 2;
   string kind = 3;
   string unit = 4;
   bool active = 5;
   repeated PropertyDefinitionValue values = 6;
+  string name_uz_latn = 7;
+  string name_uz_cyrl = 8;
+  string name_ru = 9;
 }
 message DeletePropertyDefinitionRequest {
   string id = 1;

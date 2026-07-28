@@ -3898,14 +3898,21 @@ func (x *ListStockMovementsResponse) GetMovements() []*StockMovement {
 // captures values: number = free numeric entry (with unit); select/color = pick
 // from the predefined values below; text = free text.
 type PropertyDefinition struct {
-	state         protoimpl.MessageState     `protogen:"open.v1"`
-	Id            string                     `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	Name          string                     `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	Kind          string                     `protobuf:"bytes,3,opt,name=kind,proto3" json:"kind,omitempty"` // "text" | "number" | "select" | "color"
-	Unit          string                     `protobuf:"bytes,4,opt,name=unit,proto3" json:"unit,omitempty"` // for number kind, e.g. "L", "mm", "kg", "Ah"
-	Position      int32                      `protobuf:"varint,5,opt,name=position,proto3" json:"position,omitempty"`
-	Active        bool                       `protobuf:"varint,6,opt,name=active,proto3" json:"active,omitempty"`
-	Values        []*PropertyDefinitionValue `protobuf:"bytes,7,rep,name=values,proto3" json:"values,omitempty"` // for select/color kinds
+	state protoimpl.MessageState `protogen:"open.v1"`
+	Id    string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	// Canonical name and the stable identifier: a product's properties reference the catalog
+	// by this string, so it must not change once in use. Display uses the translations below,
+	// falling back to this when a translation is blank.
+	Name     string                     `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	Kind     string                     `protobuf:"bytes,3,opt,name=kind,proto3" json:"kind,omitempty"` // "text" | "number" | "select" | "color"
+	Unit     string                     `protobuf:"bytes,4,opt,name=unit,proto3" json:"unit,omitempty"` // for number kind, e.g. "L", "mm", "kg", "Ah"
+	Position int32                      `protobuf:"varint,5,opt,name=position,proto3" json:"position,omitempty"`
+	Active   bool                       `protobuf:"varint,6,opt,name=active,proto3" json:"active,omitempty"`
+	Values   []*PropertyDefinitionValue `protobuf:"bytes,7,rep,name=values,proto3" json:"values,omitempty"` // for select/color kinds
+	// Admin-editable display names per language (blank = fall back to name).
+	NameUzLatn    string `protobuf:"bytes,8,opt,name=name_uz_latn,json=nameUzLatn,proto3" json:"name_uz_latn,omitempty"`
+	NameUzCyrl    string `protobuf:"bytes,9,opt,name=name_uz_cyrl,json=nameUzCyrl,proto3" json:"name_uz_cyrl,omitempty"`
+	NameRu        string `protobuf:"bytes,10,opt,name=name_ru,json=nameRu,proto3" json:"name_ru,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -3989,13 +3996,40 @@ func (x *PropertyDefinition) GetValues() []*PropertyDefinitionValue {
 	return nil
 }
 
+func (x *PropertyDefinition) GetNameUzLatn() string {
+	if x != nil {
+		return x.NameUzLatn
+	}
+	return ""
+}
+
+func (x *PropertyDefinition) GetNameUzCyrl() string {
+	if x != nil {
+		return x.NameUzCyrl
+	}
+	return ""
+}
+
+func (x *PropertyDefinition) GetNameRu() string {
+	if x != nil {
+		return x.NameRu
+	}
+	return ""
+}
+
 // PropertyDefinitionValue is one predefined value in a select/color property.
 type PropertyDefinitionValue struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	Value         string                 `protobuf:"bytes,2,opt,name=value,proto3" json:"value,omitempty"`                       // label, e.g. "Red", "5W-30"
-	ColorHex      string                 `protobuf:"bytes,3,opt,name=color_hex,json=colorHex,proto3" json:"color_hex,omitempty"` // for color kind, e.g. "#E11D48"
-	Position      int32                  `protobuf:"varint,4,opt,name=position,proto3" json:"position,omitempty"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	Id    string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	// Canonical value and the stable identifier stored on a product's variants. Display uses
+	// the translations below, falling back to this when a translation is blank.
+	Value    string `protobuf:"bytes,2,opt,name=value,proto3" json:"value,omitempty"`                       // label, e.g. "Red", "5W-30"
+	ColorHex string `protobuf:"bytes,3,opt,name=color_hex,json=colorHex,proto3" json:"color_hex,omitempty"` // for color kind, e.g. "#E11D48"
+	Position int32  `protobuf:"varint,4,opt,name=position,proto3" json:"position,omitempty"`
+	// Admin-editable display values per language (blank = fall back to value).
+	ValueUzLatn   string `protobuf:"bytes,5,opt,name=value_uz_latn,json=valueUzLatn,proto3" json:"value_uz_latn,omitempty"`
+	ValueUzCyrl   string `protobuf:"bytes,6,opt,name=value_uz_cyrl,json=valueUzCyrl,proto3" json:"value_uz_cyrl,omitempty"`
+	ValueRu       string `protobuf:"bytes,7,opt,name=value_ru,json=valueRu,proto3" json:"value_ru,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -4056,6 +4090,27 @@ func (x *PropertyDefinitionValue) GetPosition() int32 {
 		return x.Position
 	}
 	return 0
+}
+
+func (x *PropertyDefinitionValue) GetValueUzLatn() string {
+	if x != nil {
+		return x.ValueUzLatn
+	}
+	return ""
+}
+
+func (x *PropertyDefinitionValue) GetValueUzCyrl() string {
+	if x != nil {
+		return x.ValueUzCyrl
+	}
+	return ""
+}
+
+func (x *PropertyDefinitionValue) GetValueRu() string {
+	if x != nil {
+		return x.ValueRu
+	}
+	return ""
 }
 
 type ListPropertyDefinitionsRequest struct {
@@ -4152,6 +4207,9 @@ type CreatePropertyDefinitionRequest struct {
 	Kind          string                     `protobuf:"bytes,2,opt,name=kind,proto3" json:"kind,omitempty"`
 	Unit          string                     `protobuf:"bytes,3,opt,name=unit,proto3" json:"unit,omitempty"`
 	Values        []*PropertyDefinitionValue `protobuf:"bytes,4,rep,name=values,proto3" json:"values,omitempty"`
+	NameUzLatn    string                     `protobuf:"bytes,5,opt,name=name_uz_latn,json=nameUzLatn,proto3" json:"name_uz_latn,omitempty"`
+	NameUzCyrl    string                     `protobuf:"bytes,6,opt,name=name_uz_cyrl,json=nameUzCyrl,proto3" json:"name_uz_cyrl,omitempty"`
+	NameRu        string                     `protobuf:"bytes,7,opt,name=name_ru,json=nameRu,proto3" json:"name_ru,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -4214,14 +4272,40 @@ func (x *CreatePropertyDefinitionRequest) GetValues() []*PropertyDefinitionValue
 	return nil
 }
 
+func (x *CreatePropertyDefinitionRequest) GetNameUzLatn() string {
+	if x != nil {
+		return x.NameUzLatn
+	}
+	return ""
+}
+
+func (x *CreatePropertyDefinitionRequest) GetNameUzCyrl() string {
+	if x != nil {
+		return x.NameUzCyrl
+	}
+	return ""
+}
+
+func (x *CreatePropertyDefinitionRequest) GetNameRu() string {
+	if x != nil {
+		return x.NameRu
+	}
+	return ""
+}
+
 type UpdatePropertyDefinitionRequest struct {
-	state         protoimpl.MessageState     `protogen:"open.v1"`
-	Id            string                     `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	Id    string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	// Renaming a property in use would orphan the products referencing it, so the canonical
+	// name is only applied when it is still free; translations are always editable.
 	Name          string                     `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
 	Kind          string                     `protobuf:"bytes,3,opt,name=kind,proto3" json:"kind,omitempty"`
 	Unit          string                     `protobuf:"bytes,4,opt,name=unit,proto3" json:"unit,omitempty"`
 	Active        bool                       `protobuf:"varint,5,opt,name=active,proto3" json:"active,omitempty"`
 	Values        []*PropertyDefinitionValue `protobuf:"bytes,6,rep,name=values,proto3" json:"values,omitempty"`
+	NameUzLatn    string                     `protobuf:"bytes,7,opt,name=name_uz_latn,json=nameUzLatn,proto3" json:"name_uz_latn,omitempty"`
+	NameUzCyrl    string                     `protobuf:"bytes,8,opt,name=name_uz_cyrl,json=nameUzCyrl,proto3" json:"name_uz_cyrl,omitempty"`
+	NameRu        string                     `protobuf:"bytes,9,opt,name=name_ru,json=nameRu,proto3" json:"name_ru,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -4296,6 +4380,27 @@ func (x *UpdatePropertyDefinitionRequest) GetValues() []*PropertyDefinitionValue
 		return x.Values
 	}
 	return nil
+}
+
+func (x *UpdatePropertyDefinitionRequest) GetNameUzLatn() string {
+	if x != nil {
+		return x.NameUzLatn
+	}
+	return ""
+}
+
+func (x *UpdatePropertyDefinitionRequest) GetNameUzCyrl() string {
+	if x != nil {
+		return x.NameUzCyrl
+	}
+	return ""
+}
+
+func (x *UpdatePropertyDefinitionRequest) GetNameRu() string {
+	if x != nil {
+		return x.NameRu
+	}
+	return ""
 }
 
 type DeletePropertyDefinitionRequest struct {
@@ -7694,7 +7799,7 @@ const file_avtoms_workorder_v1_workorder_proto_rawDesc = "" +
 	"\n" +
 	"variant_id\x18\x01 \x01(\tR\tvariantId\"^\n" +
 	"\x1aListStockMovementsResponse\x12@\n" +
-	"\tmovements\x18\x01 \x03(\v2\".avtoms.workorder.v1.StockMovementR\tmovements\"\xda\x01\n" +
+	"\tmovements\x18\x01 \x03(\v2\".avtoms.workorder.v1.StockMovementR\tmovements\"\xb7\x02\n" +
 	"\x12PropertyDefinition\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x12\n" +
@@ -7702,28 +7807,47 @@ const file_avtoms_workorder_v1_workorder_proto_rawDesc = "" +
 	"\x04unit\x18\x04 \x01(\tR\x04unit\x12\x1a\n" +
 	"\bposition\x18\x05 \x01(\x05R\bposition\x12\x16\n" +
 	"\x06active\x18\x06 \x01(\bR\x06active\x12D\n" +
-	"\x06values\x18\a \x03(\v2,.avtoms.workorder.v1.PropertyDefinitionValueR\x06values\"x\n" +
+	"\x06values\x18\a \x03(\v2,.avtoms.workorder.v1.PropertyDefinitionValueR\x06values\x12 \n" +
+	"\fname_uz_latn\x18\b \x01(\tR\n" +
+	"nameUzLatn\x12 \n" +
+	"\fname_uz_cyrl\x18\t \x01(\tR\n" +
+	"nameUzCyrl\x12\x17\n" +
+	"\aname_ru\x18\n" +
+	" \x01(\tR\x06nameRu\"\xdb\x01\n" +
 	"\x17PropertyDefinitionValue\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x14\n" +
 	"\x05value\x18\x02 \x01(\tR\x05value\x12\x1b\n" +
 	"\tcolor_hex\x18\x03 \x01(\tR\bcolorHex\x12\x1a\n" +
-	"\bposition\x18\x04 \x01(\x05R\bposition\"K\n" +
+	"\bposition\x18\x04 \x01(\x05R\bposition\x12\"\n" +
+	"\rvalue_uz_latn\x18\x05 \x01(\tR\vvalueUzLatn\x12\"\n" +
+	"\rvalue_uz_cyrl\x18\x06 \x01(\tR\vvalueUzCyrl\x12\x19\n" +
+	"\bvalue_ru\x18\a \x01(\tR\avalueRu\"K\n" +
 	"\x1eListPropertyDefinitionsRequest\x12)\n" +
 	"\x10include_inactive\x18\x01 \x01(\bR\x0fincludeInactive\"l\n" +
 	"\x1fListPropertyDefinitionsResponse\x12I\n" +
-	"\vdefinitions\x18\x01 \x03(\v2'.avtoms.workorder.v1.PropertyDefinitionR\vdefinitions\"\xa3\x01\n" +
+	"\vdefinitions\x18\x01 \x03(\v2'.avtoms.workorder.v1.PropertyDefinitionR\vdefinitions\"\x80\x02\n" +
 	"\x1fCreatePropertyDefinitionRequest\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12\x12\n" +
 	"\x04kind\x18\x02 \x01(\tR\x04kind\x12\x12\n" +
 	"\x04unit\x18\x03 \x01(\tR\x04unit\x12D\n" +
-	"\x06values\x18\x04 \x03(\v2,.avtoms.workorder.v1.PropertyDefinitionValueR\x06values\"\xcb\x01\n" +
+	"\x06values\x18\x04 \x03(\v2,.avtoms.workorder.v1.PropertyDefinitionValueR\x06values\x12 \n" +
+	"\fname_uz_latn\x18\x05 \x01(\tR\n" +
+	"nameUzLatn\x12 \n" +
+	"\fname_uz_cyrl\x18\x06 \x01(\tR\n" +
+	"nameUzCyrl\x12\x17\n" +
+	"\aname_ru\x18\a \x01(\tR\x06nameRu\"\xa8\x02\n" +
 	"\x1fUpdatePropertyDefinitionRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x12\n" +
 	"\x04kind\x18\x03 \x01(\tR\x04kind\x12\x12\n" +
 	"\x04unit\x18\x04 \x01(\tR\x04unit\x12\x16\n" +
 	"\x06active\x18\x05 \x01(\bR\x06active\x12D\n" +
-	"\x06values\x18\x06 \x03(\v2,.avtoms.workorder.v1.PropertyDefinitionValueR\x06values\"1\n" +
+	"\x06values\x18\x06 \x03(\v2,.avtoms.workorder.v1.PropertyDefinitionValueR\x06values\x12 \n" +
+	"\fname_uz_latn\x18\a \x01(\tR\n" +
+	"nameUzLatn\x12 \n" +
+	"\fname_uz_cyrl\x18\b \x01(\tR\n" +
+	"nameUzCyrl\x12\x17\n" +
+	"\aname_ru\x18\t \x01(\tR\x06nameRu\"1\n" +
 	"\x1fDeletePropertyDefinitionRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\"2\n" +
 	" DeletePropertyDefinitionResponse\x12\x0e\n" +
