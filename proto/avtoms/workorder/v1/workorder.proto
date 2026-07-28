@@ -311,6 +311,17 @@ message VehicleStat {
   string customer_name = 9;
 }
 
+// PaymentBucket is income grouped by how it arrived. Filled by the gateway from the invoice
+// service, which holds the payment side for both work orders and counter sales — so unlike
+// a projection it covers the whole history.
+message PaymentBucket {
+  string method = 1;      // cash | card | other
+  string card_id = 2;
+  string card_number = 3;
+  int64 amount = 4;
+  int32 count = 5;
+}
+
 message Statistics {
   string shop_id = 1;
   string from = 2;
@@ -349,6 +360,9 @@ message Statistics {
   repeated VehicleStat top_vehicles = 25;
   int32 new_customers = 26;       // cars whose first-ever order falls inside the window
   int32 returning_customers = 27;
+
+  // how the money arrived; filled by the gateway
+  repeated PaymentBucket payments = 28;
 }
 
 enum ServiceReminderState {
