@@ -21,6 +21,10 @@ enum ReportKind {
   // Platform-wide (cross-shop) service performance for the super-admin: aggregates
   // line-item sales across every shop, ignoring shop_id. Not for tenant use.
   REPORT_KIND_PLATFORM_SERVICE_PERFORMANCE = 7;
+  // Income broken down by how it was received: cash, card (per receiving card) and
+  // other. Honors the from/to window. Rows: method, card_id, card_label, card_number,
+  // amount, count.
+  REPORT_KIND_PAYMENT_METHODS = 8;
 }
 
 message Dashboard {
