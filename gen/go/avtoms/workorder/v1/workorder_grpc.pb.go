@@ -61,6 +61,10 @@ const (
 	WorkOrderService_CreateContragent_FullMethodName         = "/avtoms.workorder.v1.WorkOrderService/CreateContragent"
 	WorkOrderService_UpdateContragent_FullMethodName         = "/avtoms.workorder.v1.WorkOrderService/UpdateContragent"
 	WorkOrderService_DeleteContragent_FullMethodName         = "/avtoms.workorder.v1.WorkOrderService/DeleteContragent"
+	WorkOrderService_ListContragentBalances_FullMethodName   = "/avtoms.workorder.v1.WorkOrderService/ListContragentBalances"
+	WorkOrderService_ListContragentLedger_FullMethodName     = "/avtoms.workorder.v1.WorkOrderService/ListContragentLedger"
+	WorkOrderService_RecordContragentEntry_FullMethodName    = "/avtoms.workorder.v1.WorkOrderService/RecordContragentEntry"
+	WorkOrderService_DeleteContragentEntry_FullMethodName    = "/avtoms.workorder.v1.WorkOrderService/DeleteContragentEntry"
 	WorkOrderService_ListAppointments_FullMethodName         = "/avtoms.workorder.v1.WorkOrderService/ListAppointments"
 	WorkOrderService_CreateAppointment_FullMethodName        = "/avtoms.workorder.v1.WorkOrderService/CreateAppointment"
 	WorkOrderService_SetAppointmentState_FullMethodName      = "/avtoms.workorder.v1.WorkOrderService/SetAppointmentState"
@@ -152,6 +156,14 @@ type WorkOrderServiceClient interface {
 	CreateContragent(ctx context.Context, in *CreateContragentRequest, opts ...grpc.CallOption) (*Contragent, error)
 	UpdateContragent(ctx context.Context, in *UpdateContragentRequest, opts ...grpc.CallOption) (*Contragent, error)
 	DeleteContragent(ctx context.Context, in *DeleteContragentRequest, opts ...grpc.CallOption) (*DeleteContragentResponse, error)
+	// Contragent accounts: what the shop owes a counterparty and what it has settled.
+	// Buying stock already recorded who supplied it and what it cost; this turns that into a
+	// running account, and adds the two things it was missing — paying a supplier without
+	// buying anything, and knowing the balance.
+	ListContragentBalances(ctx context.Context, in *ListContragentBalancesRequest, opts ...grpc.CallOption) (*ListContragentBalancesResponse, error)
+	ListContragentLedger(ctx context.Context, in *ListContragentLedgerRequest, opts ...grpc.CallOption) (*ListContragentLedgerResponse, error)
+	RecordContragentEntry(ctx context.Context, in *RecordContragentEntryRequest, opts ...grpc.CallOption) (*ContragentLedgerEntry, error)
+	DeleteContragentEntry(ctx context.Context, in *DeleteContragentEntryRequest, opts ...grpc.CallOption) (*DeleteContragentResponse, error)
 	// Appointments / scheduling.
 	ListAppointments(ctx context.Context, in *ListAppointmentsRequest, opts ...grpc.CallOption) (*ListAppointmentsResponse, error)
 	CreateAppointment(ctx context.Context, in *CreateAppointmentRequest, opts ...grpc.CallOption) (*Appointment, error)
@@ -616,6 +628,46 @@ func (c *workOrderServiceClient) DeleteContragent(ctx context.Context, in *Delet
 	return out, nil
 }
 
+func (c *workOrderServiceClient) ListContragentBalances(ctx context.Context, in *ListContragentBalancesRequest, opts ...grpc.CallOption) (*ListContragentBalancesResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListContragentBalancesResponse)
+	err := c.cc.Invoke(ctx, WorkOrderService_ListContragentBalances_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *workOrderServiceClient) ListContragentLedger(ctx context.Context, in *ListContragentLedgerRequest, opts ...grpc.CallOption) (*ListContragentLedgerResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListContragentLedgerResponse)
+	err := c.cc.Invoke(ctx, WorkOrderService_ListContragentLedger_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *workOrderServiceClient) RecordContragentEntry(ctx context.Context, in *RecordContragentEntryRequest, opts ...grpc.CallOption) (*ContragentLedgerEntry, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ContragentLedgerEntry)
+	err := c.cc.Invoke(ctx, WorkOrderService_RecordContragentEntry_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *workOrderServiceClient) DeleteContragentEntry(ctx context.Context, in *DeleteContragentEntryRequest, opts ...grpc.CallOption) (*DeleteContragentResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(DeleteContragentResponse)
+	err := c.cc.Invoke(ctx, WorkOrderService_DeleteContragentEntry_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *workOrderServiceClient) ListAppointments(ctx context.Context, in *ListAppointmentsRequest, opts ...grpc.CallOption) (*ListAppointmentsResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(ListAppointmentsResponse)
@@ -903,6 +955,14 @@ type WorkOrderServiceServer interface {
 	CreateContragent(context.Context, *CreateContragentRequest) (*Contragent, error)
 	UpdateContragent(context.Context, *UpdateContragentRequest) (*Contragent, error)
 	DeleteContragent(context.Context, *DeleteContragentRequest) (*DeleteContragentResponse, error)
+	// Contragent accounts: what the shop owes a counterparty and what it has settled.
+	// Buying stock already recorded who supplied it and what it cost; this turns that into a
+	// running account, and adds the two things it was missing — paying a supplier without
+	// buying anything, and knowing the balance.
+	ListContragentBalances(context.Context, *ListContragentBalancesRequest) (*ListContragentBalancesResponse, error)
+	ListContragentLedger(context.Context, *ListContragentLedgerRequest) (*ListContragentLedgerResponse, error)
+	RecordContragentEntry(context.Context, *RecordContragentEntryRequest) (*ContragentLedgerEntry, error)
+	DeleteContragentEntry(context.Context, *DeleteContragentEntryRequest) (*DeleteContragentResponse, error)
 	// Appointments / scheduling.
 	ListAppointments(context.Context, *ListAppointmentsRequest) (*ListAppointmentsResponse, error)
 	CreateAppointment(context.Context, *CreateAppointmentRequest) (*Appointment, error)
@@ -1072,6 +1132,18 @@ func (UnimplementedWorkOrderServiceServer) UpdateContragent(context.Context, *Up
 }
 func (UnimplementedWorkOrderServiceServer) DeleteContragent(context.Context, *DeleteContragentRequest) (*DeleteContragentResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method DeleteContragent not implemented")
+}
+func (UnimplementedWorkOrderServiceServer) ListContragentBalances(context.Context, *ListContragentBalancesRequest) (*ListContragentBalancesResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListContragentBalances not implemented")
+}
+func (UnimplementedWorkOrderServiceServer) ListContragentLedger(context.Context, *ListContragentLedgerRequest) (*ListContragentLedgerResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListContragentLedger not implemented")
+}
+func (UnimplementedWorkOrderServiceServer) RecordContragentEntry(context.Context, *RecordContragentEntryRequest) (*ContragentLedgerEntry, error) {
+	return nil, status.Error(codes.Unimplemented, "method RecordContragentEntry not implemented")
+}
+func (UnimplementedWorkOrderServiceServer) DeleteContragentEntry(context.Context, *DeleteContragentEntryRequest) (*DeleteContragentResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method DeleteContragentEntry not implemented")
 }
 func (UnimplementedWorkOrderServiceServer) ListAppointments(context.Context, *ListAppointmentsRequest) (*ListAppointmentsResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method ListAppointments not implemented")
@@ -1916,6 +1988,78 @@ func _WorkOrderService_DeleteContragent_Handler(srv interface{}, ctx context.Con
 	return interceptor(ctx, in, info, handler)
 }
 
+func _WorkOrderService_ListContragentBalances_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListContragentBalancesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WorkOrderServiceServer).ListContragentBalances(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: WorkOrderService_ListContragentBalances_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WorkOrderServiceServer).ListContragentBalances(ctx, req.(*ListContragentBalancesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _WorkOrderService_ListContragentLedger_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListContragentLedgerRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WorkOrderServiceServer).ListContragentLedger(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: WorkOrderService_ListContragentLedger_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WorkOrderServiceServer).ListContragentLedger(ctx, req.(*ListContragentLedgerRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _WorkOrderService_RecordContragentEntry_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RecordContragentEntryRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WorkOrderServiceServer).RecordContragentEntry(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: WorkOrderService_RecordContragentEntry_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WorkOrderServiceServer).RecordContragentEntry(ctx, req.(*RecordContragentEntryRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _WorkOrderService_DeleteContragentEntry_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteContragentEntryRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WorkOrderServiceServer).DeleteContragentEntry(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: WorkOrderService_DeleteContragentEntry_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WorkOrderServiceServer).DeleteContragentEntry(ctx, req.(*DeleteContragentEntryRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _WorkOrderService_ListAppointments_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ListAppointmentsRequest)
 	if err := dec(in); err != nil {
@@ -2486,6 +2630,22 @@ var WorkOrderService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteContragent",
 			Handler:    _WorkOrderService_DeleteContragent_Handler,
+		},
+		{
+			MethodName: "ListContragentBalances",
+			Handler:    _WorkOrderService_ListContragentBalances_Handler,
+		},
+		{
+			MethodName: "ListContragentLedger",
+			Handler:    _WorkOrderService_ListContragentLedger_Handler,
+		},
+		{
+			MethodName: "RecordContragentEntry",
+			Handler:    _WorkOrderService_RecordContragentEntry_Handler,
+		},
+		{
+			MethodName: "DeleteContragentEntry",
+			Handler:    _WorkOrderService_DeleteContragentEntry_Handler,
 		},
 		{
 			MethodName: "ListAppointments",

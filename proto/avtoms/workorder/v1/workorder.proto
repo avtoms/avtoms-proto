@@ -77,6 +77,15 @@ service WorkOrderService {
   rpc UpdateContragent(UpdateContragentRequest) returns (Contragent);
   rpc DeleteContragent(DeleteContragentRequest) returns (DeleteContragentResponse);
 
+  // Contragent accounts: what the shop owes a counterparty and what it has settled.
+  // Buying stock already recorded who supplied it and what it cost; this turns that into a
+  // running account, and adds the two things it was missing — paying a supplier without
+  // buying anything, and knowing the balance.
+  rpc ListContragentBalances(ListContragentBalancesRequest) returns (ListContragentBalancesResponse);
+  rpc ListContragentLedger(ListContragentLedgerRequest) returns (ListContragentLedgerResponse);
+  rpc RecordContragentEntry(RecordContragentEntryRequest) returns (ContragentLedgerEntry);
+  rpc DeleteContragentEntry(DeleteContragentEntryRequest) returns (DeleteContragentResponse);
+
   // Appointments / scheduling.
   rpc ListAppointments(ListAppointmentsRequest) returns (ListAppointmentsResponse);
   rpc CreateAppointment(CreateAppointmentRequest) returns (Appointment);
@@ -363,6 +372,11 @@ message Statistics {
 
   // how the money arrived; filled by the gateway
   repeated PaymentBucket payments = 28;
+
+  // Counterparty balances, all-time rather than windowed — a debt does not stop existing
+  // because you looked at one month. Not part of net_profit: see ContragentEntryKind.
+  int64 payable = 29;    // what the shop owes suppliers
+  int64 receivable = 30; // what counterparties owe the shop
 }
 
 enum ServiceReminderState {
@@ -581,6 +595,9 @@ message AdjustVariantStockRequest {
   string staff_id = 4;      // who recorded this movement (from JWT); empty for system moves
   string contragent_id = 5; // supplier who delivered (income only); optional
   int64 unit_cost = 6;      // purchase price per unit for this receipt, tiyin (income only)
+  // How much of this delivery was settled on the spot, tiyin (income only). The rest becomes
+  // debt on the supplier's account. Zero means the whole delivery was taken on credit.
+  int64 paid_amount = 7;
 }
 
 // StockMovement is one entry in a variant's income/outcome ledger.
@@ -823,6 +840,89 @@ message DeleteContragentRequest {
 }
 message DeleteContragentResponse {
   bool ok = 1;
+}
+
+// ── contragent accounts ─────────────────────────────────────────────────────────────
+// One signed ledger per counterparty. Amounts are ALWAYS positive and the direction lives
+// in the kind, so a row reads as an event rather than as a negative number someone has to
+// interpret. The balance is the signed sum, and POSITIVE MEANS WE OWE THEM.
+//
+// Deliberately not part of profit and loss. A part's cost already reaches profit once, when
+// it is fitted to a car or sold over the counter; subtracting the payment to the supplier as
+// well would count the same money twice and make the shop look less profitable than it is.
+// This is debt and cash movement, and nothing here touches ProfitAndLoss.
+enum ContragentEntryKind {
+  CONTRAGENT_ENTRY_KIND_UNSPECIFIED = 0;
+  CONTRAGENT_ENTRY_KIND_PURCHASE = 1;    // goods received from them        → +
+  CONTRAGENT_ENTRY_KIND_PAYMENT_OUT = 2; // we paid them                    → −
+  CONTRAGENT_ENTRY_KIND_CHARGE = 3;      // goods/services given to them    → −
+  CONTRAGENT_ENTRY_KIND_PAYMENT_IN = 4;  // they paid us                    → +
+}
+
+message ContragentLedgerEntry {
+  string id = 1;
+  string shop_id = 2;
+  string contragent_id = 3;
+  ContragentEntryKind kind = 4;
+  int64 amount = 5;         // tiyin, always positive
+  string description = 6;   // snapshot, e.g. "Motor oil 5W-30 · 4 l × 10"
+  string movement_id = 7;   // the stock movement a purchase came from, when it had one
+  PaymentMethod method = 8; // payments only
+  string staff_id = 9;
+  string occurred_at = 10;  // RFC3339 — when it happened, which may not be when it was typed
+  string note = 11;
+  string created_at = 12;
+}
+
+// ContragentBalance is one counterparty's account. balance = purchased + received
+// − paid − charged; positive means the shop owes them.
+message ContragentBalance {
+  string contragent_id = 1;
+  string name = 2;
+  int64 purchased = 3;
+  int64 paid = 4;
+  int64 charged = 5;
+  int64 received = 6;
+  int64 balance = 7;
+  string last_at = 8;   // most recent movement on the account, RFC3339
+  int32 entries = 9;
+}
+
+message ListContragentBalancesRequest {
+  string shop_id = 1;
+  // The window narrows the per-kind totals. The BALANCE ignores it and is always all-time:
+  // a debt does not stop existing because you looked at a single month.
+  string from = 2;
+  string to = 3;
+}
+message ListContragentBalancesResponse {
+  repeated ContragentBalance balances = 1;
+  int64 total_payable = 2;    // summed over counterparties we owe
+  int64 total_receivable = 3; // summed over counterparties who owe us
+}
+
+message ListContragentLedgerRequest {
+  string contragent_id = 1;
+  string from = 2;
+  string to = 3;
+}
+message ListContragentLedgerResponse {
+  repeated ContragentLedgerEntry entries = 1; // newest first
+  ContragentBalance summary = 2;
+}
+
+message RecordContragentEntryRequest {
+  string contragent_id = 1;
+  ContragentEntryKind kind = 2;
+  int64 amount = 3;
+  PaymentMethod method = 4;
+  string note = 5;
+  string occurred_at = 6; // RFC3339; empty means now
+  string staff_id = 7;    // from the token, at the gateway
+  string description = 8;
+}
+message DeleteContragentEntryRequest {
+  string id = 1;
 }
 
 // ShopSettings holds per-shop policy: pricing, and which statuses the shop's work orders
