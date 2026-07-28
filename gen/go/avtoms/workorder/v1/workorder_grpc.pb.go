@@ -76,6 +76,7 @@ const (
 	WorkOrderService_CreateShopExpense_FullMethodName        = "/avtoms.workorder.v1.WorkOrderService/CreateShopExpense"
 	WorkOrderService_DeleteShopExpense_FullMethodName        = "/avtoms.workorder.v1.WorkOrderService/DeleteShopExpense"
 	WorkOrderService_GetProfitAndLoss_FullMethodName         = "/avtoms.workorder.v1.WorkOrderService/GetProfitAndLoss"
+	WorkOrderService_GetStatistics_FullMethodName            = "/avtoms.workorder.v1.WorkOrderService/GetStatistics"
 	WorkOrderService_ListWarranties_FullMethodName           = "/avtoms.workorder.v1.WorkOrderService/ListWarranties"
 	WorkOrderService_CreateWarranty_FullMethodName           = "/avtoms.workorder.v1.WorkOrderService/CreateWarranty"
 	WorkOrderService_VoidWarranty_FullMethodName             = "/avtoms.workorder.v1.WorkOrderService/VoidWarranty"
@@ -171,6 +172,12 @@ type WorkOrderServiceClient interface {
 	CreateShopExpense(ctx context.Context, in *CreateShopExpenseRequest, opts ...grpc.CallOption) (*ShopExpense, error)
 	DeleteShopExpense(ctx context.Context, in *DeleteShopExpenseRequest, opts ...grpc.CallOption) (*DeleteShopExpenseResponse, error)
 	GetProfitAndLoss(ctx context.Context, in *GetProfitAndLossRequest, opts ...grpc.CallOption) (*ProfitAndLoss, error)
+	// GetStatistics answers the whole analytics screen in one call, computed live from this
+	// service's own tables rather than from a projected read model — so it covers the shop's
+	// entire history rather than only what has been observed since a projection shipped.
+	// One RPC because the screen has one period selector: every figure must describe the
+	// same window, and a fan-out of calls invites them to disagree.
+	GetStatistics(ctx context.Context, in *GetStatisticsRequest, opts ...grpc.CallOption) (*Statistics, error)
 	// Warranties on completed work (months / km coverage per vehicle).
 	ListWarranties(ctx context.Context, in *ListWarrantiesRequest, opts ...grpc.CallOption) (*ListWarrantiesResponse, error)
 	CreateWarranty(ctx context.Context, in *CreateWarrantyRequest, opts ...grpc.CallOption) (*Warranty, error)
@@ -759,6 +766,16 @@ func (c *workOrderServiceClient) GetProfitAndLoss(ctx context.Context, in *GetPr
 	return out, nil
 }
 
+func (c *workOrderServiceClient) GetStatistics(ctx context.Context, in *GetStatisticsRequest, opts ...grpc.CallOption) (*Statistics, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Statistics)
+	err := c.cc.Invoke(ctx, WorkOrderService_GetStatistics_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *workOrderServiceClient) ListWarranties(ctx context.Context, in *ListWarrantiesRequest, opts ...grpc.CallOption) (*ListWarrantiesResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(ListWarrantiesResponse)
@@ -906,6 +923,12 @@ type WorkOrderServiceServer interface {
 	CreateShopExpense(context.Context, *CreateShopExpenseRequest) (*ShopExpense, error)
 	DeleteShopExpense(context.Context, *DeleteShopExpenseRequest) (*DeleteShopExpenseResponse, error)
 	GetProfitAndLoss(context.Context, *GetProfitAndLossRequest) (*ProfitAndLoss, error)
+	// GetStatistics answers the whole analytics screen in one call, computed live from this
+	// service's own tables rather than from a projected read model — so it covers the shop's
+	// entire history rather than only what has been observed since a projection shipped.
+	// One RPC because the screen has one period selector: every figure must describe the
+	// same window, and a fan-out of calls invites them to disagree.
+	GetStatistics(context.Context, *GetStatisticsRequest) (*Statistics, error)
 	// Warranties on completed work (months / km coverage per vehicle).
 	ListWarranties(context.Context, *ListWarrantiesRequest) (*ListWarrantiesResponse, error)
 	CreateWarranty(context.Context, *CreateWarrantyRequest) (*Warranty, error)
@@ -1094,6 +1117,9 @@ func (UnimplementedWorkOrderServiceServer) DeleteShopExpense(context.Context, *D
 }
 func (UnimplementedWorkOrderServiceServer) GetProfitAndLoss(context.Context, *GetProfitAndLossRequest) (*ProfitAndLoss, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetProfitAndLoss not implemented")
+}
+func (UnimplementedWorkOrderServiceServer) GetStatistics(context.Context, *GetStatisticsRequest) (*Statistics, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetStatistics not implemented")
 }
 func (UnimplementedWorkOrderServiceServer) ListWarranties(context.Context, *ListWarrantiesRequest) (*ListWarrantiesResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method ListWarranties not implemented")
@@ -2160,6 +2186,24 @@ func _WorkOrderService_GetProfitAndLoss_Handler(srv interface{}, ctx context.Con
 	return interceptor(ctx, in, info, handler)
 }
 
+func _WorkOrderService_GetStatistics_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetStatisticsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WorkOrderServiceServer).GetStatistics(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: WorkOrderService_GetStatistics_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WorkOrderServiceServer).GetStatistics(ctx, req.(*GetStatisticsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _WorkOrderService_ListWarranties_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ListWarrantiesRequest)
 	if err := dec(in); err != nil {
@@ -2502,6 +2546,10 @@ var WorkOrderService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetProfitAndLoss",
 			Handler:    _WorkOrderService_GetProfitAndLoss_Handler,
+		},
+		{
+			MethodName: "GetStatistics",
+			Handler:    _WorkOrderService_GetStatistics_Handler,
 		},
 		{
 			MethodName: "ListWarranties",

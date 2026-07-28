@@ -101,6 +101,12 @@ service WorkOrderService {
   rpc CreateShopExpense(CreateShopExpenseRequest) returns (ShopExpense);
   rpc DeleteShopExpense(DeleteShopExpenseRequest) returns (DeleteShopExpenseResponse);
   rpc GetProfitAndLoss(GetProfitAndLossRequest) returns (ProfitAndLoss);
+  // GetStatistics answers the whole analytics screen in one call, computed live from this
+  // service's own tables rather than from a projected read model — so it covers the shop's
+  // entire history rather than only what has been observed since a projection shipped.
+  // One RPC because the screen has one period selector: every figure must describe the
+  // same window, and a fan-out of calls invites them to disagree.
+  rpc GetStatistics(GetStatisticsRequest) returns (Statistics);
 
   // Warranties on completed work (months / km coverage per vehicle).
   rpc ListWarranties(ListWarrantiesRequest) returns (ListWarrantiesResponse);
@@ -240,6 +246,109 @@ message GetProfitAndLossRequest {
   string shop_id = 1;
   string from = 2; // RFC3339 lower bound (optional)
   string to = 3;   // RFC3339 upper bound (optional)
+}
+
+// ── statistics ──────────────────────────────────────────────────────────────────────
+// Every figure below excludes cancelled work orders and voided sales: they describe what
+// the shop actually did, not what it started and undid.
+
+message GetStatisticsRequest {
+  string shop_id = 1;
+  string from = 2; // RFC3339 lower bound (optional)
+  string to = 3;   // RFC3339 upper bound (optional)
+}
+
+// DayPoint is one day of trading, for the trend chart.
+message DayPoint {
+  string day = 1;    // YYYY-MM-DD
+  int64 revenue = 2;
+  int64 cost = 3;
+  int32 orders = 4;
+  int32 sales = 5;
+}
+
+// StateBucket is how many orders sit in one state and what they are worth.
+message StateBucket {
+  WorkOrderState state = 1;
+  int32 count = 2;
+  int64 value = 3;
+}
+
+// MechanicStat is one worker's contribution over the window. hours counts only finished
+// timer entries — a timer still running has no duration to report yet.
+message MechanicStat {
+  string mechanic_id = 1;
+  int32 jobs = 2;        // distinct work orders they finished a line on
+  int32 lines_done = 3;
+  double hours = 4;
+  int64 revenue = 5;     // what their finished lines billed
+  string name = 6;       // filled by the gateway from the staff list
+}
+
+// ItemStat ranks one thing sold — a service by name, or a product by variant.
+message ItemStat {
+  string key = 1;        // variant id for products; the description for services
+  string name = 2;
+  string sku = 3;
+  double quantity = 4;   // may be fractional (3.5 l)
+  int64 revenue = 5;
+  int64 cost = 6;
+  int64 margin = 7;
+  int32 times = 8;       // how many separate lines sold it
+}
+
+// VehicleStat is one car's trading history with the shop. The identifying fields are filled
+// by the gateway; this service only knows the id.
+message VehicleStat {
+  string vehicle_id = 1;
+  int32 orders = 2;
+  int64 revenue = 3;
+  string first_at = 4;   // RFC3339, first order ever (not only within the window)
+  string last_at = 5;
+  string plate = 6;
+  string make = 7;
+  string model = 8;
+  string customer_name = 9;
+}
+
+message Statistics {
+  string shop_id = 1;
+  string from = 2;
+  string to = 3;
+
+  // money (tiyin)
+  int64 revenue = 4;          // order_revenue + sales_revenue
+  int64 order_revenue = 5;    // invoiced/closed work orders, net of their discount
+  int64 sales_revenue = 6;    // counter sales
+  int64 cost_of_goods = 7;
+  int64 gross_margin = 8;
+  int64 overhead = 9;
+  int64 net_profit = 10;
+  int64 discounts_given = 11; // whole-order discounts on counted orders
+  int64 avg_ticket = 12;
+  int32 order_count = 13;
+  int32 sale_count = 14;
+  repeated DayPoint by_day = 15;
+  repeated ExpenseBucket by_category = 16;
+
+  // work
+  repeated StateBucket funnel = 17;   // every state, including ones with no orders
+  repeated MechanicStat mechanics = 18;
+  double worked_hours = 19;
+  // Average hours from an order being created to it being invoiced. Read from the audit
+  // trail, so it covers only orders whose invoicing was recorded there.
+  double avg_lead_time_hours = 20;
+
+  // products & services
+  repeated ItemStat top_services = 21;
+  repeated ItemStat top_products = 22;  // materials fitted + counter sales, by variant
+  int64 stock_value = 23;               // CURRENT on-hand value; not windowed
+  int32 low_stock_count = 24;
+
+  // customers & cars
+  repeated VehicleStat top_vehicles = 25;
+  int32 new_customers = 26;       // cars whose first-ever order falls inside the window
+  int32 returning_customers = 27;
 }
 
 enum ServiceReminderState {
