@@ -25,6 +25,10 @@ enum ReportKind {
   // other. Honors the from/to window. Rows: method, card_id, card_label, card_number,
   // amount, count.
   REPORT_KIND_PAYMENT_METHODS = 8;
+  // Best-selling warehouse stock, whichever way it left the shelf: sold over the
+  // counter, or fitted to a car as a material on a work order. Ordered by revenue.
+  // Rows: product, sku, sold (may be fractional), revenue, cost, margin, times.
+  REPORT_KIND_TOP_PRODUCTS = 9;
 }
 
 message Dashboard {

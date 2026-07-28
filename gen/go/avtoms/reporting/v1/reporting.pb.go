@@ -38,6 +38,10 @@ const (
 	// other. Honors the from/to window. Rows: method, card_id, card_label, card_number,
 	// amount, count.
 	ReportKind_REPORT_KIND_PAYMENT_METHODS ReportKind = 8
+	// Best-selling warehouse stock, whichever way it left the shelf: sold over the
+	// counter, or fitted to a car as a material on a work order. Ordered by revenue.
+	// Rows: product, sku, sold (may be fractional), revenue, cost, margin, times.
+	ReportKind_REPORT_KIND_TOP_PRODUCTS ReportKind = 9
 )
 
 // Enum value maps for ReportKind.
@@ -52,6 +56,7 @@ var (
 		6: "REPORT_KIND_CUSTOMER_RETENTION",
 		7: "REPORT_KIND_PLATFORM_SERVICE_PERFORMANCE",
 		8: "REPORT_KIND_PAYMENT_METHODS",
+		9: "REPORT_KIND_TOP_PRODUCTS",
 	}
 	ReportKind_value = map[string]int32{
 		"REPORT_KIND_UNSPECIFIED":                  0,
@@ -63,6 +68,7 @@ var (
 		"REPORT_KIND_CUSTOMER_RETENTION":           6,
 		"REPORT_KIND_PLATFORM_SERVICE_PERFORMANCE": 7,
 		"REPORT_KIND_PAYMENT_METHODS":              8,
+		"REPORT_KIND_TOP_PRODUCTS":                 9,
 	}
 )
 
@@ -412,7 +418,7 @@ const file_avtoms_reporting_v1_reporting_proto_rawDesc = "" +
 	"\ashop_id\x18\x01 \x01(\tR\x06shopId\x123\n" +
 	"\x04kind\x18\x02 \x01(\x0e2\x1f.avtoms.reporting.v1.ReportKindR\x04kind\x12\x12\n" +
 	"\x04from\x18\x03 \x01(\tR\x04from\x12\x0e\n" +
-	"\x02to\x18\x04 \x01(\tR\x02to*\xcf\x02\n" +
+	"\x02to\x18\x04 \x01(\tR\x02to*\xed\x02\n" +
 	"\n" +
 	"ReportKind\x12\x1b\n" +
 	"\x17REPORT_KIND_UNSPECIFIED\x10\x00\x12\x1d\n" +
@@ -423,7 +429,8 @@ const file_avtoms_reporting_v1_reporting_proto_rawDesc = "" +
 	"\x1dREPORT_KIND_FISCAL_COMPLIANCE\x10\x05\x12\"\n" +
 	"\x1eREPORT_KIND_CUSTOMER_RETENTION\x10\x06\x12,\n" +
 	"(REPORT_KIND_PLATFORM_SERVICE_PERFORMANCE\x10\a\x12\x1f\n" +
-	"\x1bREPORT_KIND_PAYMENT_METHODS\x10\b2\xbd\x01\n" +
+	"\x1bREPORT_KIND_PAYMENT_METHODS\x10\b\x12\x1c\n" +
+	"\x18REPORT_KIND_TOP_PRODUCTS\x10\t2\xbd\x01\n" +
 	"\x10ReportingService\x12X\n" +
 	"\fGetDashboard\x12(.avtoms.reporting.v1.GetDashboardRequest\x1a\x1e.avtoms.reporting.v1.Dashboard\x12O\n" +
 	"\tGetReport\x12%.avtoms.reporting.v1.GetReportRequest\x1a\x1b.avtoms.reporting.v1.ReportB@Z>github.com/avtoms/proto/gen/go/avtoms/reporting/v1;reportingv1b\x06proto3"
