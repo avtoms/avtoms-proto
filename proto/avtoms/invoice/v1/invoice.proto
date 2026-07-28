@@ -12,6 +12,13 @@ service InvoiceService {
   rpc VoidReceipt(VoidReceiptRequest) returns (Invoice);
   rpc ResendReceipt(ResendReceiptRequest) returns (Invoice);
   rpc ListInvoices(ListInvoicesRequest) returns (ListInvoicesResponse);
+
+  // Shop payment cards — the shop's own receiving cards (HUMO/UZCARD/…) that a
+  // customer transfers to when paying by card. Managed once, reused per payment.
+  rpc ListShopCards(ListShopCardsRequest) returns (ListShopCardsResponse);
+  rpc CreateShopCard(CreateShopCardRequest) returns (ShopCard);
+  rpc UpdateShopCard(UpdateShopCardRequest) returns (ShopCard);
+  rpc DeleteShopCard(DeleteShopCardRequest) returns (DeleteShopCardResponse);
 }
 
 message ListInvoicesRequest {
@@ -33,6 +40,7 @@ enum PaymentMethod {
   PAYMENT_METHOD_UNSPECIFIED = 0;
   PAYMENT_METHOD_CASH = 1;
   PAYMENT_METHOD_OTHER = 2;
+  PAYMENT_METHOD_CARD = 3;
 }
 
 message Invoice {
@@ -46,6 +54,24 @@ message Invoice {
   bool paid = 8;
   PaymentMethod payment_method = 9;
   string created_at = 10;
+  // Set for a CARD payment: the saved shop card the money was received on (empty
+  // when the number was typed ad-hoc). Snapshot of the number kept in card_number.
+  string card_id = 11;
+  // The card number the payment was received on (masked/plain as entered). Filled
+  // for CARD payments whether the card was picked from the saved list or typed once.
+  string card_number = 12;
+}
+
+// ShopCard is one of a shop's own receiving cards. A customer paying by card
+// transfers to this number; the cashier picks which card the money landed on.
+message ShopCard {
+  string id = 1;
+  string shop_id = 2;
+  string label = 3;        // friendly name, e.g. "Kapital HUMO"
+  string card_number = 4;  // the receiving card number
+  string holder = 5;       // cardholder name (optional)
+  bool active = 6;
+  string created_at = 7;
 }
 
 message GenerateInvoiceRequest {
@@ -59,10 +85,41 @@ message GetInvoiceRequest {
 message MarkPaidRequest {
   string id = 1;
   PaymentMethod payment_method = 2;
+  // For a CARD payment: the saved shop card the money was received on (optional).
+  string card_id = 3;
+  // For a CARD payment: the card number the money was received on. Sent when the
+  // number was typed ad-hoc, or as a snapshot of the chosen saved card.
+  string card_number = 4;
 }
 message VoidReceiptRequest {
   string id = 1;
 }
 message ResendReceiptRequest {
+  string id = 1;
+}
+
+message ListShopCardsRequest {
+  string shop_id = 1;
+}
+message ListShopCardsResponse {
+  repeated ShopCard cards = 1;
+}
+message CreateShopCardRequest {
+  string shop_id = 1;
+  string label = 2;
+  string card_number = 3;
+  string holder = 4;
+}
+message UpdateShopCardRequest {
+  string id = 1;
+  string label = 2;
+  string card_number = 3;
+  string holder = 4;
+  bool active = 5;
+}
+message DeleteShopCardRequest {
+  string id = 1;
+}
+message DeleteShopCardResponse {
   string id = 1;
 }
