@@ -574,6 +574,13 @@ message CreateProductRequest {
   repeated ProductVariant variants = 8;
   string brand = 9;
   string supplier_id = 10;
+  // Stock arriving with this product is a delivery from supplier_id, so it lands on that
+  // supplier's account like any other. paid_amount is what was settled on the spot, tiyin;
+  // zero means the whole delivery was taken on credit. skip_debt records the stock without
+  // touching the account at all — for goods the shop already owned or a stocktake correction.
+  int64 paid_amount = 11;
+  bool skip_debt = 12;
+  string staff_id = 13;  // who saved this (from JWT), recorded on any movement it writes
 }
 message UpdateProductRequest {
   string id = 1;
@@ -587,6 +594,10 @@ message UpdateProductRequest {
   repeated ProductVariant variants = 9;
   string brand = 10;
   string supplier_id = 11;
+  // Raising a variant's quantity here is a delivery, settled the same way as on create.
+  int64 paid_amount = 12;
+  bool skip_debt = 13;
+  string staff_id = 14;  // who saved this (from JWT), recorded on any movement it writes
 }
 message AdjustVariantStockRequest {
   string variant_id = 1;

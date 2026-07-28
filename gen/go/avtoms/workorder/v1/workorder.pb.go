@@ -4353,17 +4353,24 @@ func (x *GetProductRequest) GetId() string {
 }
 
 type CreateProductRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	ShopId        string                 `protobuf:"bytes,1,opt,name=shop_id,json=shopId,proto3" json:"shop_id,omitempty"`
-	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	Description   string                 `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
-	Category      string                 `protobuf:"bytes,4,opt,name=category,proto3" json:"category,omitempty"`
-	Unit          string                 `protobuf:"bytes,5,opt,name=unit,proto3" json:"unit,omitempty"`
-	Supplier      string                 `protobuf:"bytes,6,opt,name=supplier,proto3" json:"supplier,omitempty"`
-	Properties    []*ProductProperty     `protobuf:"bytes,7,rep,name=properties,proto3" json:"properties,omitempty"`
-	Variants      []*ProductVariant      `protobuf:"bytes,8,rep,name=variants,proto3" json:"variants,omitempty"`
-	Brand         string                 `protobuf:"bytes,9,opt,name=brand,proto3" json:"brand,omitempty"`
-	SupplierId    string                 `protobuf:"bytes,10,opt,name=supplier_id,json=supplierId,proto3" json:"supplier_id,omitempty"`
+	state       protoimpl.MessageState `protogen:"open.v1"`
+	ShopId      string                 `protobuf:"bytes,1,opt,name=shop_id,json=shopId,proto3" json:"shop_id,omitempty"`
+	Name        string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	Description string                 `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
+	Category    string                 `protobuf:"bytes,4,opt,name=category,proto3" json:"category,omitempty"`
+	Unit        string                 `protobuf:"bytes,5,opt,name=unit,proto3" json:"unit,omitempty"`
+	Supplier    string                 `protobuf:"bytes,6,opt,name=supplier,proto3" json:"supplier,omitempty"`
+	Properties  []*ProductProperty     `protobuf:"bytes,7,rep,name=properties,proto3" json:"properties,omitempty"`
+	Variants    []*ProductVariant      `protobuf:"bytes,8,rep,name=variants,proto3" json:"variants,omitempty"`
+	Brand       string                 `protobuf:"bytes,9,opt,name=brand,proto3" json:"brand,omitempty"`
+	SupplierId  string                 `protobuf:"bytes,10,opt,name=supplier_id,json=supplierId,proto3" json:"supplier_id,omitempty"`
+	// Stock arriving with this product is a delivery from supplier_id, so it lands on that
+	// supplier's account like any other. paid_amount is what was settled on the spot, tiyin;
+	// zero means the whole delivery was taken on credit. skip_debt records the stock without
+	// touching the account at all — for goods the shop already owned or a stocktake correction.
+	PaidAmount    int64  `protobuf:"varint,11,opt,name=paid_amount,json=paidAmount,proto3" json:"paid_amount,omitempty"`
+	SkipDebt      bool   `protobuf:"varint,12,opt,name=skip_debt,json=skipDebt,proto3" json:"skip_debt,omitempty"`
+	StaffId       string `protobuf:"bytes,13,opt,name=staff_id,json=staffId,proto3" json:"staff_id,omitempty"` // who saved this (from JWT), recorded on any movement it writes
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -4468,19 +4475,44 @@ func (x *CreateProductRequest) GetSupplierId() string {
 	return ""
 }
 
+func (x *CreateProductRequest) GetPaidAmount() int64 {
+	if x != nil {
+		return x.PaidAmount
+	}
+	return 0
+}
+
+func (x *CreateProductRequest) GetSkipDebt() bool {
+	if x != nil {
+		return x.SkipDebt
+	}
+	return false
+}
+
+func (x *CreateProductRequest) GetStaffId() string {
+	if x != nil {
+		return x.StaffId
+	}
+	return ""
+}
+
 type UpdateProductRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	Description   string                 `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
-	Category      string                 `protobuf:"bytes,4,opt,name=category,proto3" json:"category,omitempty"`
-	Unit          string                 `protobuf:"bytes,5,opt,name=unit,proto3" json:"unit,omitempty"`
-	Supplier      string                 `protobuf:"bytes,6,opt,name=supplier,proto3" json:"supplier,omitempty"`
-	Active        bool                   `protobuf:"varint,7,opt,name=active,proto3" json:"active,omitempty"`
-	Properties    []*ProductProperty     `protobuf:"bytes,8,rep,name=properties,proto3" json:"properties,omitempty"`
-	Variants      []*ProductVariant      `protobuf:"bytes,9,rep,name=variants,proto3" json:"variants,omitempty"`
-	Brand         string                 `protobuf:"bytes,10,opt,name=brand,proto3" json:"brand,omitempty"`
-	SupplierId    string                 `protobuf:"bytes,11,opt,name=supplier_id,json=supplierId,proto3" json:"supplier_id,omitempty"`
+	state       protoimpl.MessageState `protogen:"open.v1"`
+	Id          string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Name        string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	Description string                 `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
+	Category    string                 `protobuf:"bytes,4,opt,name=category,proto3" json:"category,omitempty"`
+	Unit        string                 `protobuf:"bytes,5,opt,name=unit,proto3" json:"unit,omitempty"`
+	Supplier    string                 `protobuf:"bytes,6,opt,name=supplier,proto3" json:"supplier,omitempty"`
+	Active      bool                   `protobuf:"varint,7,opt,name=active,proto3" json:"active,omitempty"`
+	Properties  []*ProductProperty     `protobuf:"bytes,8,rep,name=properties,proto3" json:"properties,omitempty"`
+	Variants    []*ProductVariant      `protobuf:"bytes,9,rep,name=variants,proto3" json:"variants,omitempty"`
+	Brand       string                 `protobuf:"bytes,10,opt,name=brand,proto3" json:"brand,omitempty"`
+	SupplierId  string                 `protobuf:"bytes,11,opt,name=supplier_id,json=supplierId,proto3" json:"supplier_id,omitempty"`
+	// Raising a variant's quantity here is a delivery, settled the same way as on create.
+	PaidAmount    int64  `protobuf:"varint,12,opt,name=paid_amount,json=paidAmount,proto3" json:"paid_amount,omitempty"`
+	SkipDebt      bool   `protobuf:"varint,13,opt,name=skip_debt,json=skipDebt,proto3" json:"skip_debt,omitempty"`
+	StaffId       string `protobuf:"bytes,14,opt,name=staff_id,json=staffId,proto3" json:"staff_id,omitempty"` // who saved this (from JWT), recorded on any movement it writes
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -4588,6 +4620,27 @@ func (x *UpdateProductRequest) GetBrand() string {
 func (x *UpdateProductRequest) GetSupplierId() string {
 	if x != nil {
 		return x.SupplierId
+	}
+	return ""
+}
+
+func (x *UpdateProductRequest) GetPaidAmount() int64 {
+	if x != nil {
+		return x.PaidAmount
+	}
+	return 0
+}
+
+func (x *UpdateProductRequest) GetSkipDebt() bool {
+	if x != nil {
+		return x.SkipDebt
+	}
+	return false
+}
+
+func (x *UpdateProductRequest) GetStaffId() string {
+	if x != nil {
+		return x.StaffId
 	}
 	return ""
 }
@@ -10064,7 +10117,7 @@ const file_avtoms_workorder_v1_workorder_proto_rawDesc = "" +
 	"\x14ListProductsResponse\x128\n" +
 	"\bproducts\x18\x01 \x03(\v2\x1c.avtoms.workorder.v1.ProductR\bproducts\"#\n" +
 	"\x11GetProductRequest\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\"\xef\x02\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\"\xc8\x03\n" +
 	"\x14CreateProductRequest\x12\x17\n" +
 	"\ashop_id\x18\x01 \x01(\tR\x06shopId\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12 \n" +
@@ -10079,7 +10132,11 @@ const file_avtoms_workorder_v1_workorder_proto_rawDesc = "" +
 	"\x05brand\x18\t \x01(\tR\x05brand\x12\x1f\n" +
 	"\vsupplier_id\x18\n" +
 	" \x01(\tR\n" +
-	"supplierId\"\xfe\x02\n" +
+	"supplierId\x12\x1f\n" +
+	"\vpaid_amount\x18\v \x01(\x03R\n" +
+	"paidAmount\x12\x1b\n" +
+	"\tskip_debt\x18\f \x01(\bR\bskipDebt\x12\x19\n" +
+	"\bstaff_id\x18\r \x01(\tR\astaffId\"\xd7\x03\n" +
 	"\x14UpdateProductRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12 \n" +
@@ -10095,7 +10152,11 @@ const file_avtoms_workorder_v1_workorder_proto_rawDesc = "" +
 	"\x05brand\x18\n" +
 	" \x01(\tR\x05brand\x12\x1f\n" +
 	"\vsupplier_id\x18\v \x01(\tR\n" +
-	"supplierId\"\xe6\x01\n" +
+	"supplierId\x12\x1f\n" +
+	"\vpaid_amount\x18\f \x01(\x03R\n" +
+	"paidAmount\x12\x1b\n" +
+	"\tskip_debt\x18\r \x01(\bR\bskipDebt\x12\x19\n" +
+	"\bstaff_id\x18\x0e \x01(\tR\astaffId\"\xe6\x01\n" +
 	"\x19AdjustVariantStockRequest\x12\x1d\n" +
 	"\n" +
 	"variant_id\x18\x01 \x01(\tR\tvariantId\x12\x14\n" +
