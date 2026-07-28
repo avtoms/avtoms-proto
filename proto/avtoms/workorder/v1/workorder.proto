@@ -15,6 +15,7 @@ service WorkOrderService {
   rpc AssignMechanic(AssignMechanicRequest) returns (WorkOrder);
   rpc AssignLineItem(AssignLineItemRequest) returns (WorkOrder);
   rpc SetLineItemStatus(SetLineItemStatusRequest) returns (WorkOrder);
+  rpc SetOrderDiscount(SetOrderDiscountRequest) returns (WorkOrder);
 
   rpc StartTimer(StartTimerRequest) returns (TimeEntry);
   rpc StopTimer(StopTimerRequest) returns (TimeEntry);
@@ -705,6 +706,19 @@ message WorkOrder {
   // Human-friendly per-shop sequential order number (1, 2, 3, …). Shown to users as
   // "Z-0001"; the UUID id stays the internal/API identifier.
   int64 order_no = 19;
+  // Whole-order discount applied on top of any per-line negotiation. kind selects fixed vs
+  // percent; discount_value is tiyin (fixed) or basis points (percent, 100 = 1%); and
+  // discount_amount is the resulting reduction in tiyin, already reflected in total/margin.
+  DiscountKind discount_kind = 21;
+  int64 discount_value = 22;
+  int64 discount_amount = 23;
+}
+
+// DiscountKind selects how a whole-order discount is expressed.
+enum DiscountKind {
+  DISCOUNT_KIND_UNSPECIFIED = 0; // no order discount
+  DISCOUNT_KIND_FIXED = 1;       // discount_value is a fixed tiyin amount
+  DISCOUNT_KIND_PERCENT = 2;     // discount_value is basis points (100 = 1%)
 }
 
 message TimeEntry {
@@ -792,6 +806,13 @@ message SetLineItemStatusRequest {
   string work_order_id = 1;
   string line_item_id = 2;
   LineItemStatus status = 3;
+}
+message SetOrderDiscountRequest {
+  string work_order_id = 1;
+  DiscountKind discount_kind = 2;
+  // Fixed tiyin amount, or basis points for percent (100 = 1%). Ignored (treated as 0)
+  // when discount_kind is UNSPECIFIED.
+  int64 discount_value = 3;
 }
 message StartTimerRequest {
   string work_order_id = 1;
