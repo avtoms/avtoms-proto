@@ -5468,7 +5468,9 @@ type LineItem struct {
 	// What the customer is charged per unit, in minor units (tiyin). For a SERVICE this is the
 	// agreed/negotiated price, which may be below the menu default (see default_price).
 	UnitPrice int64 `protobuf:"varint,4,opt,name=unit_price,json=unitPrice,proto3" json:"unit_price,omitempty"`
-	Quantity  int32 `protobuf:"varint,5,opt,name=quantity,proto3" json:"quantity,omitempty"`
+	// Billed quantity per unit price. A whole number for services; may be fractional for a
+	// material (e.g. 1.5 litres of oil), so the line total is unit_price * quantity, rounded.
+	Quantity float64 `protobuf:"fixed64,5,opt,name=quantity,proto3" json:"quantity,omitempty"`
 	// The shop's expense (buy/cost price) per unit, in tiyin. 0 when not tracked.
 	// Per-line margin is (unit_price - cost) * quantity.
 	Cost int64 `protobuf:"varint,6,opt,name=cost,proto3" json:"cost,omitempty"`
@@ -5551,7 +5553,7 @@ func (x *LineItem) GetUnitPrice() int64 {
 	return 0
 }
 
-func (x *LineItem) GetQuantity() int32 {
+func (x *LineItem) GetQuantity() float64 {
 	if x != nil {
 		return x.Quantity
 	}
@@ -6263,8 +6265,8 @@ type UpdateLineItemRequest struct {
 	LineItemId  string                 `protobuf:"bytes,2,opt,name=line_item_id,json=lineItemId,proto3" json:"line_item_id,omitempty"`
 	Description string                 `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
 	UnitPrice   int64                  `protobuf:"varint,4,opt,name=unit_price,json=unitPrice,proto3" json:"unit_price,omitempty"` // agreed/negotiated sell price per unit (tiyin)
-	Quantity    int32                  `protobuf:"varint,5,opt,name=quantity,proto3" json:"quantity,omitempty"`
-	Cost        int64                  `protobuf:"varint,6,opt,name=cost,proto3" json:"cost,omitempty"` // shop expense per unit (tiyin)
+	Quantity    float64                `protobuf:"fixed64,5,opt,name=quantity,proto3" json:"quantity,omitempty"`                   // billed quantity; may be fractional for materials
+	Cost        int64                  `protobuf:"varint,6,opt,name=cost,proto3" json:"cost,omitempty"`                            // shop expense per unit (tiyin)
 	// Exact stock amount this material line draws (may be fractional). Changing it re-adjusts the
 	// linked variant's stock by the difference. Ignored for non-stock lines.
 	ConsumedQty float64 `protobuf:"fixed64,7,opt,name=consumed_qty,json=consumedQty,proto3" json:"consumed_qty,omitempty"`
@@ -6332,7 +6334,7 @@ func (x *UpdateLineItemRequest) GetUnitPrice() int64 {
 	return 0
 }
 
-func (x *UpdateLineItemRequest) GetQuantity() int32 {
+func (x *UpdateLineItemRequest) GetQuantity() float64 {
 	if x != nil {
 		return x.Quantity
 	}
@@ -7669,7 +7671,7 @@ const file_avtoms_workorder_v1_workorder_proto_rawDesc = "" +
 	"\vdescription\x18\x03 \x01(\tR\vdescription\x12\x1d\n" +
 	"\n" +
 	"unit_price\x18\x04 \x01(\x03R\tunitPrice\x12\x1a\n" +
-	"\bquantity\x18\x05 \x01(\x05R\bquantity\x12\x12\n" +
+	"\bquantity\x18\x05 \x01(\x01R\bquantity\x12\x12\n" +
 	"\x04cost\x18\x06 \x01(\x03R\x04cost\x12 \n" +
 	"\fmenu_item_id\x18\a \x01(\tR\n" +
 	"menuItemId\x12#\n" +
@@ -7756,7 +7758,7 @@ const file_avtoms_workorder_v1_workorder_proto_rawDesc = "" +
 	"\vdescription\x18\x03 \x01(\tR\vdescription\x12\x1d\n" +
 	"\n" +
 	"unit_price\x18\x04 \x01(\x03R\tunitPrice\x12\x1a\n" +
-	"\bquantity\x18\x05 \x01(\x05R\bquantity\x12\x12\n" +
+	"\bquantity\x18\x05 \x01(\x01R\bquantity\x12\x12\n" +
 	"\x04cost\x18\x06 \x01(\x03R\x04cost\x12!\n" +
 	"\fconsumed_qty\x18\a \x01(\x01R\vconsumedQty\x126\n" +
 	"\x17allow_discount_override\x18\b \x01(\bR\x15allowDiscountOverride\"]\n" +

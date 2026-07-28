@@ -653,7 +653,9 @@ message LineItem {
   // What the customer is charged per unit, in minor units (tiyin). For a SERVICE this is the
   // agreed/negotiated price, which may be below the menu default (see default_price).
   int64 unit_price = 4;
-  int32 quantity = 5;
+  // Billed quantity per unit price. A whole number for services; may be fractional for a
+  // material (e.g. 1.5 litres of oil), so the line total is unit_price * quantity, rounded.
+  double quantity = 5;
   // The shop's expense (buy/cost price) per unit, in tiyin. 0 when not tracked.
   // Per-line margin is (unit_price - cost) * quantity.
   int64 cost = 6;
@@ -761,7 +763,7 @@ message UpdateLineItemRequest {
   string line_item_id = 2;
   string description = 3;
   int64 unit_price = 4; // agreed/negotiated sell price per unit (tiyin)
-  int32 quantity = 5;
+  double quantity = 5;  // billed quantity; may be fractional for materials
   int64 cost = 6;       // shop expense per unit (tiyin)
   // Exact stock amount this material line draws (may be fractional). Changing it re-adjusts the
   // linked variant's stock by the difference. Ignored for non-stock lines.
