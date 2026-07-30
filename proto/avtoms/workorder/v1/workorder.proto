@@ -16,6 +16,9 @@ service WorkOrderService {
   rpc AssignLineItem(AssignLineItemRequest) returns (WorkOrder);
   rpc SetLineItemStatus(SetLineItemStatusRequest) returns (WorkOrder);
   rpc SetOrderDiscount(SetOrderDiscountRequest) returns (WorkOrder);
+  // SetWorkOrderNotes replaces the order's free-text note. The note is internal to the
+  // shop: it is not printed on the customer's check.
+  rpc SetWorkOrderNotes(SetWorkOrderNotesRequest) returns (WorkOrder);
 
   rpc StartTimer(StartTimerRequest) returns (TimeEntry);
   rpc StopTimer(StopTimerRequest) returns (TimeEntry);
@@ -1191,6 +1194,11 @@ message SetLineItemStatusRequest {
   string work_order_id = 1;
   string line_item_id = 2;
   LineItemStatus status = 3;
+}
+message SetWorkOrderNotesRequest {
+  string work_order_id = 1;
+  // The whole note, replacing whatever was there. Empty clears it.
+  string notes = 2;
 }
 message SetOrderDiscountRequest {
   string work_order_id = 1;

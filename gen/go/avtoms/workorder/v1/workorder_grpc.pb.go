@@ -29,6 +29,7 @@ const (
 	WorkOrderService_AssignLineItem_FullMethodName           = "/avtoms.workorder.v1.WorkOrderService/AssignLineItem"
 	WorkOrderService_SetLineItemStatus_FullMethodName        = "/avtoms.workorder.v1.WorkOrderService/SetLineItemStatus"
 	WorkOrderService_SetOrderDiscount_FullMethodName         = "/avtoms.workorder.v1.WorkOrderService/SetOrderDiscount"
+	WorkOrderService_SetWorkOrderNotes_FullMethodName        = "/avtoms.workorder.v1.WorkOrderService/SetWorkOrderNotes"
 	WorkOrderService_StartTimer_FullMethodName               = "/avtoms.workorder.v1.WorkOrderService/StartTimer"
 	WorkOrderService_StopTimer_FullMethodName                = "/avtoms.workorder.v1.WorkOrderService/StopTimer"
 	WorkOrderService_ListMenuItems_FullMethodName            = "/avtoms.workorder.v1.WorkOrderService/ListMenuItems"
@@ -105,6 +106,9 @@ type WorkOrderServiceClient interface {
 	AssignLineItem(ctx context.Context, in *AssignLineItemRequest, opts ...grpc.CallOption) (*WorkOrder, error)
 	SetLineItemStatus(ctx context.Context, in *SetLineItemStatusRequest, opts ...grpc.CallOption) (*WorkOrder, error)
 	SetOrderDiscount(ctx context.Context, in *SetOrderDiscountRequest, opts ...grpc.CallOption) (*WorkOrder, error)
+	// SetWorkOrderNotes replaces the order's free-text note. The note is internal to the
+	// shop: it is not printed on the customer's check.
+	SetWorkOrderNotes(ctx context.Context, in *SetWorkOrderNotesRequest, opts ...grpc.CallOption) (*WorkOrder, error)
 	StartTimer(ctx context.Context, in *StartTimerRequest, opts ...grpc.CallOption) (*TimeEntry, error)
 	StopTimer(ctx context.Context, in *StopTimerRequest, opts ...grpc.CallOption) (*TimeEntry, error)
 	ListMenuItems(ctx context.Context, in *ListMenuItemsRequest, opts ...grpc.CallOption) (*ListMenuItemsResponse, error)
@@ -302,6 +306,16 @@ func (c *workOrderServiceClient) SetOrderDiscount(ctx context.Context, in *SetOr
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(WorkOrder)
 	err := c.cc.Invoke(ctx, WorkOrderService_SetOrderDiscount_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *workOrderServiceClient) SetWorkOrderNotes(ctx context.Context, in *SetWorkOrderNotesRequest, opts ...grpc.CallOption) (*WorkOrder, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(WorkOrder)
+	err := c.cc.Invoke(ctx, WorkOrderService_SetWorkOrderNotes_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -904,6 +918,9 @@ type WorkOrderServiceServer interface {
 	AssignLineItem(context.Context, *AssignLineItemRequest) (*WorkOrder, error)
 	SetLineItemStatus(context.Context, *SetLineItemStatusRequest) (*WorkOrder, error)
 	SetOrderDiscount(context.Context, *SetOrderDiscountRequest) (*WorkOrder, error)
+	// SetWorkOrderNotes replaces the order's free-text note. The note is internal to the
+	// shop: it is not printed on the customer's check.
+	SetWorkOrderNotes(context.Context, *SetWorkOrderNotesRequest) (*WorkOrder, error)
 	StartTimer(context.Context, *StartTimerRequest) (*TimeEntry, error)
 	StopTimer(context.Context, *StopTimerRequest) (*TimeEntry, error)
 	ListMenuItems(context.Context, *ListMenuItemsRequest) (*ListMenuItemsResponse, error)
@@ -1036,6 +1053,9 @@ func (UnimplementedWorkOrderServiceServer) SetLineItemStatus(context.Context, *S
 }
 func (UnimplementedWorkOrderServiceServer) SetOrderDiscount(context.Context, *SetOrderDiscountRequest) (*WorkOrder, error) {
 	return nil, status.Error(codes.Unimplemented, "method SetOrderDiscount not implemented")
+}
+func (UnimplementedWorkOrderServiceServer) SetWorkOrderNotes(context.Context, *SetWorkOrderNotesRequest) (*WorkOrder, error) {
+	return nil, status.Error(codes.Unimplemented, "method SetWorkOrderNotes not implemented")
 }
 func (UnimplementedWorkOrderServiceServer) StartTimer(context.Context, *StartTimerRequest) (*TimeEntry, error) {
 	return nil, status.Error(codes.Unimplemented, "method StartTimer not implemented")
@@ -1408,6 +1428,24 @@ func _WorkOrderService_SetOrderDiscount_Handler(srv interface{}, ctx context.Con
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(WorkOrderServiceServer).SetOrderDiscount(ctx, req.(*SetOrderDiscountRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _WorkOrderService_SetWorkOrderNotes_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SetWorkOrderNotesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WorkOrderServiceServer).SetWorkOrderNotes(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: WorkOrderService_SetWorkOrderNotes_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WorkOrderServiceServer).SetWorkOrderNotes(ctx, req.(*SetWorkOrderNotesRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -2502,6 +2540,10 @@ var WorkOrderService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "SetOrderDiscount",
 			Handler:    _WorkOrderService_SetOrderDiscount_Handler,
+		},
+		{
+			MethodName: "SetWorkOrderNotes",
+			Handler:    _WorkOrderService_SetWorkOrderNotes_Handler,
 		},
 		{
 			MethodName: "StartTimer",

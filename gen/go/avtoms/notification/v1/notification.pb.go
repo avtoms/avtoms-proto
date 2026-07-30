@@ -2161,15 +2161,18 @@ func (x *SendTelegramRequest) GetBody() string {
 // finished sentence, so the wording stays in the notification service's own
 // translation table alongside every other push.
 type SendReceiptRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	ShopId        string                 `protobuf:"bytes,1,opt,name=shop_id,json=shopId,proto3" json:"shop_id,omitempty"`
-	ChatId        string                 `protobuf:"bytes,2,opt,name=chat_id,json=chatId,proto3" json:"chat_id,omitempty"`                // the customer's linked Telegram chat
-	DocumentUrl   string                 `protobuf:"bytes,3,opt,name=document_url,json=documentUrl,proto3" json:"document_url,omitempty"` // the rendered PDF; Telegram fetches this itself
-	CheckUrl      string                 `protobuf:"bytes,4,opt,name=check_url,json=checkUrl,proto3" json:"check_url,omitempty"`          // the public check page, appended to the caption
-	Language      v1.Language            `protobuf:"varint,5,opt,name=language,proto3,enum=avtoms.common.v1.Language" json:"language,omitempty"`
-	IsSale        bool                   `protobuf:"varint,6,opt,name=is_sale,json=isSale,proto3" json:"is_sale,omitempty"` // counter sale vs work order, picks the caption
-	Number        string                 `protobuf:"bytes,7,opt,name=number,proto3" json:"number,omitempty"`                // receipt number as shown to the customer
-	Total         int64                  `protobuf:"varint,8,opt,name=total,proto3" json:"total,omitempty"`                 // tiyin
+	state       protoimpl.MessageState `protogen:"open.v1"`
+	ShopId      string                 `protobuf:"bytes,1,opt,name=shop_id,json=shopId,proto3" json:"shop_id,omitempty"`
+	ChatId      string                 `protobuf:"bytes,2,opt,name=chat_id,json=chatId,proto3" json:"chat_id,omitempty"`                // the customer's linked Telegram chat
+	DocumentUrl string                 `protobuf:"bytes,3,opt,name=document_url,json=documentUrl,proto3" json:"document_url,omitempty"` // the rendered PDF; Telegram fetches this itself
+	CheckUrl    string                 `protobuf:"bytes,4,opt,name=check_url,json=checkUrl,proto3" json:"check_url,omitempty"`          // the public check page, appended to the caption
+	Language    v1.Language            `protobuf:"varint,5,opt,name=language,proto3,enum=avtoms.common.v1.Language" json:"language,omitempty"`
+	IsSale      bool                   `protobuf:"varint,6,opt,name=is_sale,json=isSale,proto3" json:"is_sale,omitempty"` // counter sale vs work order, picks the caption
+	// Whether the money is already in. An unpaid document is a bill to be settled and must
+	// not thank the customer for a purchase they have not made yet.
+	Paid          bool   `protobuf:"varint,9,opt,name=paid,proto3" json:"paid,omitempty"`
+	Number        string `protobuf:"bytes,7,opt,name=number,proto3" json:"number,omitempty"` // receipt number as shown to the customer
+	Total         int64  `protobuf:"varint,8,opt,name=total,proto3" json:"total,omitempty"`  // tiyin
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -2242,6 +2245,13 @@ func (x *SendReceiptRequest) GetLanguage() v1.Language {
 func (x *SendReceiptRequest) GetIsSale() bool {
 	if x != nil {
 		return x.IsSale
+	}
+	return false
+}
+
+func (x *SendReceiptRequest) GetPaid() bool {
+	if x != nil {
+		return x.Paid
 	}
 	return false
 }
@@ -2500,14 +2510,15 @@ const file_avtoms_notification_v1_notification_proto_rawDesc = "" +
 	"\x13SendTelegramRequest\x12\x17\n" +
 	"\ashop_id\x18\x01 \x01(\tR\x06shopId\x12'\n" +
 	"\x0ftelegram_handle\x18\x02 \x01(\tR\x0etelegramHandle\x12\x12\n" +
-	"\x04body\x18\x03 \x01(\tR\x04body\"\x85\x02\n" +
+	"\x04body\x18\x03 \x01(\tR\x04body\"\x99\x02\n" +
 	"\x12SendReceiptRequest\x12\x17\n" +
 	"\ashop_id\x18\x01 \x01(\tR\x06shopId\x12\x17\n" +
 	"\achat_id\x18\x02 \x01(\tR\x06chatId\x12!\n" +
 	"\fdocument_url\x18\x03 \x01(\tR\vdocumentUrl\x12\x1b\n" +
 	"\tcheck_url\x18\x04 \x01(\tR\bcheckUrl\x126\n" +
 	"\blanguage\x18\x05 \x01(\x0e2\x1a.avtoms.common.v1.LanguageR\blanguage\x12\x17\n" +
-	"\ais_sale\x18\x06 \x01(\bR\x06isSale\x12\x16\n" +
+	"\ais_sale\x18\x06 \x01(\bR\x06isSale\x12\x12\n" +
+	"\x04paid\x18\t \x01(\bR\x04paid\x12\x16\n" +
 	"\x06number\x18\a \x01(\tR\x06number\x12\x14\n" +
 	"\x05total\x18\b \x01(\x03R\x05total\"\xc5\x02\n" +
 	"\rNotifyRequest\x12\x17\n" +

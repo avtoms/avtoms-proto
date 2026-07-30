@@ -256,6 +256,9 @@ message SendReceiptRequest {
   string check_url = 4;     // the public check page, appended to the caption
   avtoms.common.v1.Language language = 5;
   bool is_sale = 6;         // counter sale vs work order, picks the caption
+  // Whether the money is already in. An unpaid document is a bill to be settled and must
+  // not thank the customer for a purchase they have not made yet.
+  bool paid = 9;
   string number = 7;        // receipt number as shown to the customer
   int64 total = 8;          // tiyin
 }
