@@ -2166,10 +2166,10 @@ type SendReceiptRequest struct {
 	ChatId        string                 `protobuf:"bytes,2,opt,name=chat_id,json=chatId,proto3" json:"chat_id,omitempty"`                // the customer's linked Telegram chat
 	DocumentUrl   string                 `protobuf:"bytes,3,opt,name=document_url,json=documentUrl,proto3" json:"document_url,omitempty"` // the rendered PDF; Telegram fetches this itself
 	CheckUrl      string                 `protobuf:"bytes,4,opt,name=check_url,json=checkUrl,proto3" json:"check_url,omitempty"`          // the public check page, appended to the caption
-	Language      string                 `protobuf:"bytes,5,opt,name=language,proto3" json:"language,omitempty"`                          // uz | uz-cyrl | ru; falls back to the default
-	IsSale        bool                   `protobuf:"varint,6,opt,name=is_sale,json=isSale,proto3" json:"is_sale,omitempty"`               // counter sale vs work order, picks the caption
-	Number        string                 `protobuf:"bytes,7,opt,name=number,proto3" json:"number,omitempty"`                              // receipt number as shown to the customer
-	Total         int64                  `protobuf:"varint,8,opt,name=total,proto3" json:"total,omitempty"`                               // tiyin
+	Language      v1.Language            `protobuf:"varint,5,opt,name=language,proto3,enum=avtoms.common.v1.Language" json:"language,omitempty"`
+	IsSale        bool                   `protobuf:"varint,6,opt,name=is_sale,json=isSale,proto3" json:"is_sale,omitempty"` // counter sale vs work order, picks the caption
+	Number        string                 `protobuf:"bytes,7,opt,name=number,proto3" json:"number,omitempty"`                // receipt number as shown to the customer
+	Total         int64                  `protobuf:"varint,8,opt,name=total,proto3" json:"total,omitempty"`                 // tiyin
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -2232,11 +2232,11 @@ func (x *SendReceiptRequest) GetCheckUrl() string {
 	return ""
 }
 
-func (x *SendReceiptRequest) GetLanguage() string {
+func (x *SendReceiptRequest) GetLanguage() v1.Language {
 	if x != nil {
 		return x.Language
 	}
-	return ""
+	return v1.Language(0)
 }
 
 func (x *SendReceiptRequest) GetIsSale() bool {
@@ -2500,13 +2500,13 @@ const file_avtoms_notification_v1_notification_proto_rawDesc = "" +
 	"\x13SendTelegramRequest\x12\x17\n" +
 	"\ashop_id\x18\x01 \x01(\tR\x06shopId\x12'\n" +
 	"\x0ftelegram_handle\x18\x02 \x01(\tR\x0etelegramHandle\x12\x12\n" +
-	"\x04body\x18\x03 \x01(\tR\x04body\"\xe9\x01\n" +
+	"\x04body\x18\x03 \x01(\tR\x04body\"\x85\x02\n" +
 	"\x12SendReceiptRequest\x12\x17\n" +
 	"\ashop_id\x18\x01 \x01(\tR\x06shopId\x12\x17\n" +
 	"\achat_id\x18\x02 \x01(\tR\x06chatId\x12!\n" +
 	"\fdocument_url\x18\x03 \x01(\tR\vdocumentUrl\x12\x1b\n" +
-	"\tcheck_url\x18\x04 \x01(\tR\bcheckUrl\x12\x1a\n" +
-	"\blanguage\x18\x05 \x01(\tR\blanguage\x12\x17\n" +
+	"\tcheck_url\x18\x04 \x01(\tR\bcheckUrl\x126\n" +
+	"\blanguage\x18\x05 \x01(\x0e2\x1a.avtoms.common.v1.LanguageR\blanguage\x12\x17\n" +
 	"\ais_sale\x18\x06 \x01(\bR\x06isSale\x12\x16\n" +
 	"\x06number\x18\a \x01(\tR\x06number\x12\x14\n" +
 	"\x05total\x18\b \x01(\x03R\x05total\"\xc5\x02\n" +
@@ -2627,54 +2627,55 @@ var file_avtoms_notification_v1_notification_proto_depIdxs = []int32{
 	38, // 9: avtoms.notification.v1.UpdateIntegrationRequest.values:type_name -> avtoms.notification.v1.UpdateIntegrationRequest.ValuesEntry
 	39, // 10: avtoms.notification.v1.IntegrationConfig.values:type_name -> avtoms.notification.v1.IntegrationConfig.ValuesEntry
 	0,  // 11: avtoms.notification.v1.SendResponse.channel:type_name -> avtoms.notification.v1.Channel
-	1,  // 12: avtoms.notification.v1.NotifyRequest.template:type_name -> avtoms.notification.v1.Template
-	41, // 13: avtoms.notification.v1.NotifyRequest.language:type_name -> avtoms.common.v1.Language
-	40, // 14: avtoms.notification.v1.NotifyRequest.params:type_name -> avtoms.notification.v1.NotifyRequest.ParamsEntry
-	33, // 15: avtoms.notification.v1.NotificationService.SendSms:input_type -> avtoms.notification.v1.SendSmsRequest
-	34, // 16: avtoms.notification.v1.NotificationService.SendTelegram:input_type -> avtoms.notification.v1.SendTelegramRequest
-	35, // 17: avtoms.notification.v1.NotificationService.SendReceipt:input_type -> avtoms.notification.v1.SendReceiptRequest
-	36, // 18: avtoms.notification.v1.NotificationService.Notify:input_type -> avtoms.notification.v1.NotifyRequest
-	27, // 19: avtoms.notification.v1.NotificationService.ListIntegrations:input_type -> avtoms.notification.v1.ListIntegrationsRequest
-	29, // 20: avtoms.notification.v1.NotificationService.GetIntegration:input_type -> avtoms.notification.v1.GetIntegrationRequest
-	30, // 21: avtoms.notification.v1.NotificationService.UpdateIntegration:input_type -> avtoms.notification.v1.UpdateIntegrationRequest
-	29, // 22: avtoms.notification.v1.NotificationService.GetIntegrationConfig:input_type -> avtoms.notification.v1.GetIntegrationRequest
-	24, // 23: avtoms.notification.v1.NotificationService.SendTestSms:input_type -> avtoms.notification.v1.SendTestSmsRequest
-	20, // 24: avtoms.notification.v1.NotificationService.CreateDemoRequest:input_type -> avtoms.notification.v1.CreateDemoRequestRequest
-	21, // 25: avtoms.notification.v1.NotificationService.ListDemoRequests:input_type -> avtoms.notification.v1.ListDemoRequestsRequest
-	23, // 26: avtoms.notification.v1.NotificationService.SetDemoRequestStatus:input_type -> avtoms.notification.v1.SetDemoRequestStatusRequest
-	3,  // 27: avtoms.notification.v1.NotificationService.CreateLead:input_type -> avtoms.notification.v1.CreateLeadRequest
-	4,  // 28: avtoms.notification.v1.NotificationService.ListLeads:input_type -> avtoms.notification.v1.ListLeadsRequest
-	6,  // 29: avtoms.notification.v1.NotificationService.UpdateLead:input_type -> avtoms.notification.v1.UpdateLeadRequest
-	7,  // 30: avtoms.notification.v1.NotificationService.DeleteLead:input_type -> avtoms.notification.v1.DeleteLeadRequest
-	11, // 31: avtoms.notification.v1.NotificationService.ListAiConversations:input_type -> avtoms.notification.v1.ListAiConversationsRequest
-	13, // 32: avtoms.notification.v1.NotificationService.GetAiConversation:input_type -> avtoms.notification.v1.GetAiConversationRequest
-	15, // 33: avtoms.notification.v1.NotificationService.AppendAiMessages:input_type -> avtoms.notification.v1.AppendAiMessagesRequest
-	17, // 34: avtoms.notification.v1.NotificationService.DeleteAiConversation:input_type -> avtoms.notification.v1.DeleteAiConversationRequest
-	32, // 35: avtoms.notification.v1.NotificationService.SendSms:output_type -> avtoms.notification.v1.SendResponse
-	32, // 36: avtoms.notification.v1.NotificationService.SendTelegram:output_type -> avtoms.notification.v1.SendResponse
-	32, // 37: avtoms.notification.v1.NotificationService.SendReceipt:output_type -> avtoms.notification.v1.SendResponse
-	32, // 38: avtoms.notification.v1.NotificationService.Notify:output_type -> avtoms.notification.v1.SendResponse
-	28, // 39: avtoms.notification.v1.NotificationService.ListIntegrations:output_type -> avtoms.notification.v1.ListIntegrationsResponse
-	26, // 40: avtoms.notification.v1.NotificationService.GetIntegration:output_type -> avtoms.notification.v1.Integration
-	26, // 41: avtoms.notification.v1.NotificationService.UpdateIntegration:output_type -> avtoms.notification.v1.Integration
-	31, // 42: avtoms.notification.v1.NotificationService.GetIntegrationConfig:output_type -> avtoms.notification.v1.IntegrationConfig
-	25, // 43: avtoms.notification.v1.NotificationService.SendTestSms:output_type -> avtoms.notification.v1.TestSmsResult
-	19, // 44: avtoms.notification.v1.NotificationService.CreateDemoRequest:output_type -> avtoms.notification.v1.DemoRequest
-	22, // 45: avtoms.notification.v1.NotificationService.ListDemoRequests:output_type -> avtoms.notification.v1.ListDemoRequestsResponse
-	19, // 46: avtoms.notification.v1.NotificationService.SetDemoRequestStatus:output_type -> avtoms.notification.v1.DemoRequest
-	2,  // 47: avtoms.notification.v1.NotificationService.CreateLead:output_type -> avtoms.notification.v1.Lead
-	5,  // 48: avtoms.notification.v1.NotificationService.ListLeads:output_type -> avtoms.notification.v1.ListLeadsResponse
-	2,  // 49: avtoms.notification.v1.NotificationService.UpdateLead:output_type -> avtoms.notification.v1.Lead
-	8,  // 50: avtoms.notification.v1.NotificationService.DeleteLead:output_type -> avtoms.notification.v1.DeleteLeadResponse
-	12, // 51: avtoms.notification.v1.NotificationService.ListAiConversations:output_type -> avtoms.notification.v1.ListAiConversationsResponse
-	14, // 52: avtoms.notification.v1.NotificationService.GetAiConversation:output_type -> avtoms.notification.v1.GetAiConversationResponse
-	16, // 53: avtoms.notification.v1.NotificationService.AppendAiMessages:output_type -> avtoms.notification.v1.AppendAiMessagesResponse
-	18, // 54: avtoms.notification.v1.NotificationService.DeleteAiConversation:output_type -> avtoms.notification.v1.DeleteAiConversationResponse
-	35, // [35:55] is the sub-list for method output_type
-	15, // [15:35] is the sub-list for method input_type
-	15, // [15:15] is the sub-list for extension type_name
-	15, // [15:15] is the sub-list for extension extendee
-	0,  // [0:15] is the sub-list for field type_name
+	41, // 12: avtoms.notification.v1.SendReceiptRequest.language:type_name -> avtoms.common.v1.Language
+	1,  // 13: avtoms.notification.v1.NotifyRequest.template:type_name -> avtoms.notification.v1.Template
+	41, // 14: avtoms.notification.v1.NotifyRequest.language:type_name -> avtoms.common.v1.Language
+	40, // 15: avtoms.notification.v1.NotifyRequest.params:type_name -> avtoms.notification.v1.NotifyRequest.ParamsEntry
+	33, // 16: avtoms.notification.v1.NotificationService.SendSms:input_type -> avtoms.notification.v1.SendSmsRequest
+	34, // 17: avtoms.notification.v1.NotificationService.SendTelegram:input_type -> avtoms.notification.v1.SendTelegramRequest
+	35, // 18: avtoms.notification.v1.NotificationService.SendReceipt:input_type -> avtoms.notification.v1.SendReceiptRequest
+	36, // 19: avtoms.notification.v1.NotificationService.Notify:input_type -> avtoms.notification.v1.NotifyRequest
+	27, // 20: avtoms.notification.v1.NotificationService.ListIntegrations:input_type -> avtoms.notification.v1.ListIntegrationsRequest
+	29, // 21: avtoms.notification.v1.NotificationService.GetIntegration:input_type -> avtoms.notification.v1.GetIntegrationRequest
+	30, // 22: avtoms.notification.v1.NotificationService.UpdateIntegration:input_type -> avtoms.notification.v1.UpdateIntegrationRequest
+	29, // 23: avtoms.notification.v1.NotificationService.GetIntegrationConfig:input_type -> avtoms.notification.v1.GetIntegrationRequest
+	24, // 24: avtoms.notification.v1.NotificationService.SendTestSms:input_type -> avtoms.notification.v1.SendTestSmsRequest
+	20, // 25: avtoms.notification.v1.NotificationService.CreateDemoRequest:input_type -> avtoms.notification.v1.CreateDemoRequestRequest
+	21, // 26: avtoms.notification.v1.NotificationService.ListDemoRequests:input_type -> avtoms.notification.v1.ListDemoRequestsRequest
+	23, // 27: avtoms.notification.v1.NotificationService.SetDemoRequestStatus:input_type -> avtoms.notification.v1.SetDemoRequestStatusRequest
+	3,  // 28: avtoms.notification.v1.NotificationService.CreateLead:input_type -> avtoms.notification.v1.CreateLeadRequest
+	4,  // 29: avtoms.notification.v1.NotificationService.ListLeads:input_type -> avtoms.notification.v1.ListLeadsRequest
+	6,  // 30: avtoms.notification.v1.NotificationService.UpdateLead:input_type -> avtoms.notification.v1.UpdateLeadRequest
+	7,  // 31: avtoms.notification.v1.NotificationService.DeleteLead:input_type -> avtoms.notification.v1.DeleteLeadRequest
+	11, // 32: avtoms.notification.v1.NotificationService.ListAiConversations:input_type -> avtoms.notification.v1.ListAiConversationsRequest
+	13, // 33: avtoms.notification.v1.NotificationService.GetAiConversation:input_type -> avtoms.notification.v1.GetAiConversationRequest
+	15, // 34: avtoms.notification.v1.NotificationService.AppendAiMessages:input_type -> avtoms.notification.v1.AppendAiMessagesRequest
+	17, // 35: avtoms.notification.v1.NotificationService.DeleteAiConversation:input_type -> avtoms.notification.v1.DeleteAiConversationRequest
+	32, // 36: avtoms.notification.v1.NotificationService.SendSms:output_type -> avtoms.notification.v1.SendResponse
+	32, // 37: avtoms.notification.v1.NotificationService.SendTelegram:output_type -> avtoms.notification.v1.SendResponse
+	32, // 38: avtoms.notification.v1.NotificationService.SendReceipt:output_type -> avtoms.notification.v1.SendResponse
+	32, // 39: avtoms.notification.v1.NotificationService.Notify:output_type -> avtoms.notification.v1.SendResponse
+	28, // 40: avtoms.notification.v1.NotificationService.ListIntegrations:output_type -> avtoms.notification.v1.ListIntegrationsResponse
+	26, // 41: avtoms.notification.v1.NotificationService.GetIntegration:output_type -> avtoms.notification.v1.Integration
+	26, // 42: avtoms.notification.v1.NotificationService.UpdateIntegration:output_type -> avtoms.notification.v1.Integration
+	31, // 43: avtoms.notification.v1.NotificationService.GetIntegrationConfig:output_type -> avtoms.notification.v1.IntegrationConfig
+	25, // 44: avtoms.notification.v1.NotificationService.SendTestSms:output_type -> avtoms.notification.v1.TestSmsResult
+	19, // 45: avtoms.notification.v1.NotificationService.CreateDemoRequest:output_type -> avtoms.notification.v1.DemoRequest
+	22, // 46: avtoms.notification.v1.NotificationService.ListDemoRequests:output_type -> avtoms.notification.v1.ListDemoRequestsResponse
+	19, // 47: avtoms.notification.v1.NotificationService.SetDemoRequestStatus:output_type -> avtoms.notification.v1.DemoRequest
+	2,  // 48: avtoms.notification.v1.NotificationService.CreateLead:output_type -> avtoms.notification.v1.Lead
+	5,  // 49: avtoms.notification.v1.NotificationService.ListLeads:output_type -> avtoms.notification.v1.ListLeadsResponse
+	2,  // 50: avtoms.notification.v1.NotificationService.UpdateLead:output_type -> avtoms.notification.v1.Lead
+	8,  // 51: avtoms.notification.v1.NotificationService.DeleteLead:output_type -> avtoms.notification.v1.DeleteLeadResponse
+	12, // 52: avtoms.notification.v1.NotificationService.ListAiConversations:output_type -> avtoms.notification.v1.ListAiConversationsResponse
+	14, // 53: avtoms.notification.v1.NotificationService.GetAiConversation:output_type -> avtoms.notification.v1.GetAiConversationResponse
+	16, // 54: avtoms.notification.v1.NotificationService.AppendAiMessages:output_type -> avtoms.notification.v1.AppendAiMessagesResponse
+	18, // 55: avtoms.notification.v1.NotificationService.DeleteAiConversation:output_type -> avtoms.notification.v1.DeleteAiConversationResponse
+	36, // [36:56] is the sub-list for method output_type
+	16, // [16:36] is the sub-list for method input_type
+	16, // [16:16] is the sub-list for extension type_name
+	16, // [16:16] is the sub-list for extension extendee
+	0,  // [0:16] is the sub-list for field type_name
 }
 
 func init() { file_avtoms_notification_v1_notification_proto_init() }

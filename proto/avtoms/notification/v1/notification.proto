@@ -254,7 +254,7 @@ message SendReceiptRequest {
   string chat_id = 2;       // the customer's linked Telegram chat
   string document_url = 3;  // the rendered PDF; Telegram fetches this itself
   string check_url = 4;     // the public check page, appended to the caption
-  string language = 5;      // uz | uz-cyrl | ru; falls back to the default
+  avtoms.common.v1.Language language = 5;
   bool is_sale = 6;         // counter sale vs work order, picks the caption
   string number = 7;        // receipt number as shown to the customer
   int64 total = 8;          // tiyin
