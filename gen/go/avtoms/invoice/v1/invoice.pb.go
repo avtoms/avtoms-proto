@@ -233,7 +233,11 @@ type Invoice struct {
 	CardId string `protobuf:"bytes,11,opt,name=card_id,json=cardId,proto3" json:"card_id,omitempty"`
 	// The card number the payment was received on (masked/plain as entered). Filled
 	// for CARD payments whether the card was picked from the saved list or typed once.
-	CardNumber    string `protobuf:"bytes,12,opt,name=card_number,json=cardNumber,proto3" json:"card_number,omitempty"`
+	CardNumber string `protobuf:"bytes,12,opt,name=card_number,json=cardNumber,proto3" json:"card_number,omitempty"`
+	// Unguessable public handle for this receipt (128 bits of randomness, base62).
+	// It is what the QR on the check encodes and what the customer's link carries, so
+	// the invoice id itself never has to become public. Minted at generation time.
+	PublicToken   string `protobuf:"bytes,13,opt,name=public_token,json=publicToken,proto3" json:"public_token,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -348,6 +352,13 @@ func (x *Invoice) GetCardId() string {
 func (x *Invoice) GetCardNumber() string {
 	if x != nil {
 		return x.CardNumber
+	}
+	return ""
+}
+
+func (x *Invoice) GetPublicToken() string {
+	if x != nil {
+		return x.PublicToken
 	}
 	return ""
 }
@@ -550,6 +561,50 @@ func (x *GetInvoiceRequest) GetId() string {
 	return ""
 }
 
+type GetInvoiceByTokenRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Token         string                 `protobuf:"bytes,1,opt,name=token,proto3" json:"token,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetInvoiceByTokenRequest) Reset() {
+	*x = GetInvoiceByTokenRequest{}
+	mi := &file_avtoms_invoice_v1_invoice_proto_msgTypes[6]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetInvoiceByTokenRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetInvoiceByTokenRequest) ProtoMessage() {}
+
+func (x *GetInvoiceByTokenRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_avtoms_invoice_v1_invoice_proto_msgTypes[6]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetInvoiceByTokenRequest.ProtoReflect.Descriptor instead.
+func (*GetInvoiceByTokenRequest) Descriptor() ([]byte, []int) {
+	return file_avtoms_invoice_v1_invoice_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *GetInvoiceByTokenRequest) GetToken() string {
+	if x != nil {
+		return x.Token
+	}
+	return ""
+}
+
 type MarkPaidRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
@@ -565,7 +620,7 @@ type MarkPaidRequest struct {
 
 func (x *MarkPaidRequest) Reset() {
 	*x = MarkPaidRequest{}
-	mi := &file_avtoms_invoice_v1_invoice_proto_msgTypes[6]
+	mi := &file_avtoms_invoice_v1_invoice_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -577,7 +632,7 @@ func (x *MarkPaidRequest) String() string {
 func (*MarkPaidRequest) ProtoMessage() {}
 
 func (x *MarkPaidRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_invoice_v1_invoice_proto_msgTypes[6]
+	mi := &file_avtoms_invoice_v1_invoice_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -590,7 +645,7 @@ func (x *MarkPaidRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MarkPaidRequest.ProtoReflect.Descriptor instead.
 func (*MarkPaidRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_invoice_v1_invoice_proto_rawDescGZIP(), []int{6}
+	return file_avtoms_invoice_v1_invoice_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *MarkPaidRequest) GetId() string {
@@ -630,7 +685,7 @@ type VoidReceiptRequest struct {
 
 func (x *VoidReceiptRequest) Reset() {
 	*x = VoidReceiptRequest{}
-	mi := &file_avtoms_invoice_v1_invoice_proto_msgTypes[7]
+	mi := &file_avtoms_invoice_v1_invoice_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -642,7 +697,7 @@ func (x *VoidReceiptRequest) String() string {
 func (*VoidReceiptRequest) ProtoMessage() {}
 
 func (x *VoidReceiptRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_invoice_v1_invoice_proto_msgTypes[7]
+	mi := &file_avtoms_invoice_v1_invoice_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -655,7 +710,7 @@ func (x *VoidReceiptRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use VoidReceiptRequest.ProtoReflect.Descriptor instead.
 func (*VoidReceiptRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_invoice_v1_invoice_proto_rawDescGZIP(), []int{7}
+	return file_avtoms_invoice_v1_invoice_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *VoidReceiptRequest) GetId() string {
@@ -674,7 +729,7 @@ type ResendReceiptRequest struct {
 
 func (x *ResendReceiptRequest) Reset() {
 	*x = ResendReceiptRequest{}
-	mi := &file_avtoms_invoice_v1_invoice_proto_msgTypes[8]
+	mi := &file_avtoms_invoice_v1_invoice_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -686,7 +741,7 @@ func (x *ResendReceiptRequest) String() string {
 func (*ResendReceiptRequest) ProtoMessage() {}
 
 func (x *ResendReceiptRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_invoice_v1_invoice_proto_msgTypes[8]
+	mi := &file_avtoms_invoice_v1_invoice_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -699,7 +754,7 @@ func (x *ResendReceiptRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ResendReceiptRequest.ProtoReflect.Descriptor instead.
 func (*ResendReceiptRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_invoice_v1_invoice_proto_rawDescGZIP(), []int{8}
+	return file_avtoms_invoice_v1_invoice_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *ResendReceiptRequest) GetId() string {
@@ -718,7 +773,7 @@ type ListShopCardsRequest struct {
 
 func (x *ListShopCardsRequest) Reset() {
 	*x = ListShopCardsRequest{}
-	mi := &file_avtoms_invoice_v1_invoice_proto_msgTypes[9]
+	mi := &file_avtoms_invoice_v1_invoice_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -730,7 +785,7 @@ func (x *ListShopCardsRequest) String() string {
 func (*ListShopCardsRequest) ProtoMessage() {}
 
 func (x *ListShopCardsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_invoice_v1_invoice_proto_msgTypes[9]
+	mi := &file_avtoms_invoice_v1_invoice_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -743,7 +798,7 @@ func (x *ListShopCardsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListShopCardsRequest.ProtoReflect.Descriptor instead.
 func (*ListShopCardsRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_invoice_v1_invoice_proto_rawDescGZIP(), []int{9}
+	return file_avtoms_invoice_v1_invoice_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *ListShopCardsRequest) GetShopId() string {
@@ -762,7 +817,7 @@ type ListShopCardsResponse struct {
 
 func (x *ListShopCardsResponse) Reset() {
 	*x = ListShopCardsResponse{}
-	mi := &file_avtoms_invoice_v1_invoice_proto_msgTypes[10]
+	mi := &file_avtoms_invoice_v1_invoice_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -774,7 +829,7 @@ func (x *ListShopCardsResponse) String() string {
 func (*ListShopCardsResponse) ProtoMessage() {}
 
 func (x *ListShopCardsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_invoice_v1_invoice_proto_msgTypes[10]
+	mi := &file_avtoms_invoice_v1_invoice_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -787,7 +842,7 @@ func (x *ListShopCardsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListShopCardsResponse.ProtoReflect.Descriptor instead.
 func (*ListShopCardsResponse) Descriptor() ([]byte, []int) {
-	return file_avtoms_invoice_v1_invoice_proto_rawDescGZIP(), []int{10}
+	return file_avtoms_invoice_v1_invoice_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *ListShopCardsResponse) GetCards() []*ShopCard {
@@ -809,7 +864,7 @@ type CreateShopCardRequest struct {
 
 func (x *CreateShopCardRequest) Reset() {
 	*x = CreateShopCardRequest{}
-	mi := &file_avtoms_invoice_v1_invoice_proto_msgTypes[11]
+	mi := &file_avtoms_invoice_v1_invoice_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -821,7 +876,7 @@ func (x *CreateShopCardRequest) String() string {
 func (*CreateShopCardRequest) ProtoMessage() {}
 
 func (x *CreateShopCardRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_invoice_v1_invoice_proto_msgTypes[11]
+	mi := &file_avtoms_invoice_v1_invoice_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -834,7 +889,7 @@ func (x *CreateShopCardRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateShopCardRequest.ProtoReflect.Descriptor instead.
 func (*CreateShopCardRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_invoice_v1_invoice_proto_rawDescGZIP(), []int{11}
+	return file_avtoms_invoice_v1_invoice_proto_rawDescGZIP(), []int{12}
 }
 
 func (x *CreateShopCardRequest) GetShopId() string {
@@ -878,7 +933,7 @@ type UpdateShopCardRequest struct {
 
 func (x *UpdateShopCardRequest) Reset() {
 	*x = UpdateShopCardRequest{}
-	mi := &file_avtoms_invoice_v1_invoice_proto_msgTypes[12]
+	mi := &file_avtoms_invoice_v1_invoice_proto_msgTypes[13]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -890,7 +945,7 @@ func (x *UpdateShopCardRequest) String() string {
 func (*UpdateShopCardRequest) ProtoMessage() {}
 
 func (x *UpdateShopCardRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_invoice_v1_invoice_proto_msgTypes[12]
+	mi := &file_avtoms_invoice_v1_invoice_proto_msgTypes[13]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -903,7 +958,7 @@ func (x *UpdateShopCardRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateShopCardRequest.ProtoReflect.Descriptor instead.
 func (*UpdateShopCardRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_invoice_v1_invoice_proto_rawDescGZIP(), []int{12}
+	return file_avtoms_invoice_v1_invoice_proto_rawDescGZIP(), []int{13}
 }
 
 func (x *UpdateShopCardRequest) GetId() string {
@@ -950,7 +1005,7 @@ type DeleteShopCardRequest struct {
 
 func (x *DeleteShopCardRequest) Reset() {
 	*x = DeleteShopCardRequest{}
-	mi := &file_avtoms_invoice_v1_invoice_proto_msgTypes[13]
+	mi := &file_avtoms_invoice_v1_invoice_proto_msgTypes[14]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -962,7 +1017,7 @@ func (x *DeleteShopCardRequest) String() string {
 func (*DeleteShopCardRequest) ProtoMessage() {}
 
 func (x *DeleteShopCardRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_invoice_v1_invoice_proto_msgTypes[13]
+	mi := &file_avtoms_invoice_v1_invoice_proto_msgTypes[14]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -975,7 +1030,7 @@ func (x *DeleteShopCardRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteShopCardRequest.ProtoReflect.Descriptor instead.
 func (*DeleteShopCardRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_invoice_v1_invoice_proto_rawDescGZIP(), []int{13}
+	return file_avtoms_invoice_v1_invoice_proto_rawDescGZIP(), []int{14}
 }
 
 func (x *DeleteShopCardRequest) GetId() string {
@@ -994,7 +1049,7 @@ type DeleteShopCardResponse struct {
 
 func (x *DeleteShopCardResponse) Reset() {
 	*x = DeleteShopCardResponse{}
-	mi := &file_avtoms_invoice_v1_invoice_proto_msgTypes[14]
+	mi := &file_avtoms_invoice_v1_invoice_proto_msgTypes[15]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1006,7 +1061,7 @@ func (x *DeleteShopCardResponse) String() string {
 func (*DeleteShopCardResponse) ProtoMessage() {}
 
 func (x *DeleteShopCardResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_invoice_v1_invoice_proto_msgTypes[14]
+	mi := &file_avtoms_invoice_v1_invoice_proto_msgTypes[15]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1019,7 +1074,7 @@ func (x *DeleteShopCardResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteShopCardResponse.ProtoReflect.Descriptor instead.
 func (*DeleteShopCardResponse) Descriptor() ([]byte, []int) {
-	return file_avtoms_invoice_v1_invoice_proto_rawDescGZIP(), []int{14}
+	return file_avtoms_invoice_v1_invoice_proto_rawDescGZIP(), []int{15}
 }
 
 func (x *DeleteShopCardResponse) GetId() string {
@@ -1037,7 +1092,7 @@ const file_avtoms_invoice_v1_invoice_proto_rawDesc = "" +
 	"\x13ListInvoicesRequest\x12\x17\n" +
 	"\ashop_id\x18\x01 \x01(\tR\x06shopId\"N\n" +
 	"\x14ListInvoicesResponse\x126\n" +
-	"\binvoices\x18\x01 \x03(\v2\x1a.avtoms.invoice.v1.InvoiceR\binvoices\"\xb1\x03\n" +
+	"\binvoices\x18\x01 \x03(\v2\x1a.avtoms.invoice.v1.InvoiceR\binvoices\"\xd4\x03\n" +
 	"\aInvoice\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x17\n" +
 	"\ashop_id\x18\x02 \x01(\tR\x06shopId\x12\"\n" +
@@ -1053,7 +1108,8 @@ const file_avtoms_invoice_v1_invoice_proto_rawDesc = "" +
 	" \x01(\tR\tcreatedAt\x12\x17\n" +
 	"\acard_id\x18\v \x01(\tR\x06cardId\x12\x1f\n" +
 	"\vcard_number\x18\f \x01(\tR\n" +
-	"cardNumber\"\xb9\x01\n" +
+	"cardNumber\x12!\n" +
+	"\fpublic_token\x18\r \x01(\tR\vpublicToken\"\xb9\x01\n" +
 	"\bShopCard\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x17\n" +
 	"\ashop_id\x18\x02 \x01(\tR\x06shopId\x12\x14\n" +
@@ -1069,7 +1125,9 @@ const file_avtoms_invoice_v1_invoice_proto_rawDesc = "" +
 	"\rwork_order_id\x18\x02 \x01(\tR\vworkOrderId\x12\x14\n" +
 	"\x05total\x18\x03 \x01(\x03R\x05total\"#\n" +
 	"\x11GetInvoiceRequest\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\"\xa4\x01\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\"0\n" +
+	"\x18GetInvoiceByTokenRequest\x12\x14\n" +
+	"\x05token\x18\x01 \x01(\tR\x05token\"\xa4\x01\n" +
 	"\x0fMarkPaidRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12G\n" +
 	"\x0epayment_method\x18\x02 \x01(\x0e2 .avtoms.invoice.v1.PaymentMethodR\rpaymentMethod\x12\x17\n" +
@@ -1111,11 +1169,12 @@ const file_avtoms_invoice_v1_invoice_proto_rawDesc = "" +
 	"\x1aPAYMENT_METHOD_UNSPECIFIED\x10\x00\x12\x17\n" +
 	"\x13PAYMENT_METHOD_CASH\x10\x01\x12\x18\n" +
 	"\x14PAYMENT_METHOD_OTHER\x10\x02\x12\x17\n" +
-	"\x13PAYMENT_METHOD_CARD\x10\x032\x8c\a\n" +
+	"\x13PAYMENT_METHOD_CARD\x10\x032\xea\a\n" +
 	"\x0eInvoiceService\x12X\n" +
 	"\x0fGenerateInvoice\x12).avtoms.invoice.v1.GenerateInvoiceRequest\x1a\x1a.avtoms.invoice.v1.Invoice\x12N\n" +
 	"\n" +
-	"GetInvoice\x12$.avtoms.invoice.v1.GetInvoiceRequest\x1a\x1a.avtoms.invoice.v1.Invoice\x12J\n" +
+	"GetInvoice\x12$.avtoms.invoice.v1.GetInvoiceRequest\x1a\x1a.avtoms.invoice.v1.Invoice\x12\\\n" +
+	"\x11GetInvoiceByToken\x12+.avtoms.invoice.v1.GetInvoiceByTokenRequest\x1a\x1a.avtoms.invoice.v1.Invoice\x12J\n" +
 	"\bMarkPaid\x12\".avtoms.invoice.v1.MarkPaidRequest\x1a\x1a.avtoms.invoice.v1.Invoice\x12P\n" +
 	"\vVoidReceipt\x12%.avtoms.invoice.v1.VoidReceiptRequest\x1a\x1a.avtoms.invoice.v1.Invoice\x12T\n" +
 	"\rResendReceipt\x12'.avtoms.invoice.v1.ResendReceiptRequest\x1a\x1a.avtoms.invoice.v1.Invoice\x12_\n" +
@@ -1138,25 +1197,26 @@ func file_avtoms_invoice_v1_invoice_proto_rawDescGZIP() []byte {
 }
 
 var file_avtoms_invoice_v1_invoice_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
-var file_avtoms_invoice_v1_invoice_proto_msgTypes = make([]protoimpl.MessageInfo, 15)
+var file_avtoms_invoice_v1_invoice_proto_msgTypes = make([]protoimpl.MessageInfo, 16)
 var file_avtoms_invoice_v1_invoice_proto_goTypes = []any{
-	(FiscalStatus)(0),              // 0: avtoms.invoice.v1.FiscalStatus
-	(PaymentMethod)(0),             // 1: avtoms.invoice.v1.PaymentMethod
-	(*ListInvoicesRequest)(nil),    // 2: avtoms.invoice.v1.ListInvoicesRequest
-	(*ListInvoicesResponse)(nil),   // 3: avtoms.invoice.v1.ListInvoicesResponse
-	(*Invoice)(nil),                // 4: avtoms.invoice.v1.Invoice
-	(*ShopCard)(nil),               // 5: avtoms.invoice.v1.ShopCard
-	(*GenerateInvoiceRequest)(nil), // 6: avtoms.invoice.v1.GenerateInvoiceRequest
-	(*GetInvoiceRequest)(nil),      // 7: avtoms.invoice.v1.GetInvoiceRequest
-	(*MarkPaidRequest)(nil),        // 8: avtoms.invoice.v1.MarkPaidRequest
-	(*VoidReceiptRequest)(nil),     // 9: avtoms.invoice.v1.VoidReceiptRequest
-	(*ResendReceiptRequest)(nil),   // 10: avtoms.invoice.v1.ResendReceiptRequest
-	(*ListShopCardsRequest)(nil),   // 11: avtoms.invoice.v1.ListShopCardsRequest
-	(*ListShopCardsResponse)(nil),  // 12: avtoms.invoice.v1.ListShopCardsResponse
-	(*CreateShopCardRequest)(nil),  // 13: avtoms.invoice.v1.CreateShopCardRequest
-	(*UpdateShopCardRequest)(nil),  // 14: avtoms.invoice.v1.UpdateShopCardRequest
-	(*DeleteShopCardRequest)(nil),  // 15: avtoms.invoice.v1.DeleteShopCardRequest
-	(*DeleteShopCardResponse)(nil), // 16: avtoms.invoice.v1.DeleteShopCardResponse
+	(FiscalStatus)(0),                // 0: avtoms.invoice.v1.FiscalStatus
+	(PaymentMethod)(0),               // 1: avtoms.invoice.v1.PaymentMethod
+	(*ListInvoicesRequest)(nil),      // 2: avtoms.invoice.v1.ListInvoicesRequest
+	(*ListInvoicesResponse)(nil),     // 3: avtoms.invoice.v1.ListInvoicesResponse
+	(*Invoice)(nil),                  // 4: avtoms.invoice.v1.Invoice
+	(*ShopCard)(nil),                 // 5: avtoms.invoice.v1.ShopCard
+	(*GenerateInvoiceRequest)(nil),   // 6: avtoms.invoice.v1.GenerateInvoiceRequest
+	(*GetInvoiceRequest)(nil),        // 7: avtoms.invoice.v1.GetInvoiceRequest
+	(*GetInvoiceByTokenRequest)(nil), // 8: avtoms.invoice.v1.GetInvoiceByTokenRequest
+	(*MarkPaidRequest)(nil),          // 9: avtoms.invoice.v1.MarkPaidRequest
+	(*VoidReceiptRequest)(nil),       // 10: avtoms.invoice.v1.VoidReceiptRequest
+	(*ResendReceiptRequest)(nil),     // 11: avtoms.invoice.v1.ResendReceiptRequest
+	(*ListShopCardsRequest)(nil),     // 12: avtoms.invoice.v1.ListShopCardsRequest
+	(*ListShopCardsResponse)(nil),    // 13: avtoms.invoice.v1.ListShopCardsResponse
+	(*CreateShopCardRequest)(nil),    // 14: avtoms.invoice.v1.CreateShopCardRequest
+	(*UpdateShopCardRequest)(nil),    // 15: avtoms.invoice.v1.UpdateShopCardRequest
+	(*DeleteShopCardRequest)(nil),    // 16: avtoms.invoice.v1.DeleteShopCardRequest
+	(*DeleteShopCardResponse)(nil),   // 17: avtoms.invoice.v1.DeleteShopCardResponse
 }
 var file_avtoms_invoice_v1_invoice_proto_depIdxs = []int32{
 	4,  // 0: avtoms.invoice.v1.ListInvoicesResponse.invoices:type_name -> avtoms.invoice.v1.Invoice
@@ -1166,26 +1226,28 @@ var file_avtoms_invoice_v1_invoice_proto_depIdxs = []int32{
 	5,  // 4: avtoms.invoice.v1.ListShopCardsResponse.cards:type_name -> avtoms.invoice.v1.ShopCard
 	6,  // 5: avtoms.invoice.v1.InvoiceService.GenerateInvoice:input_type -> avtoms.invoice.v1.GenerateInvoiceRequest
 	7,  // 6: avtoms.invoice.v1.InvoiceService.GetInvoice:input_type -> avtoms.invoice.v1.GetInvoiceRequest
-	8,  // 7: avtoms.invoice.v1.InvoiceService.MarkPaid:input_type -> avtoms.invoice.v1.MarkPaidRequest
-	9,  // 8: avtoms.invoice.v1.InvoiceService.VoidReceipt:input_type -> avtoms.invoice.v1.VoidReceiptRequest
-	10, // 9: avtoms.invoice.v1.InvoiceService.ResendReceipt:input_type -> avtoms.invoice.v1.ResendReceiptRequest
-	2,  // 10: avtoms.invoice.v1.InvoiceService.ListInvoices:input_type -> avtoms.invoice.v1.ListInvoicesRequest
-	11, // 11: avtoms.invoice.v1.InvoiceService.ListShopCards:input_type -> avtoms.invoice.v1.ListShopCardsRequest
-	13, // 12: avtoms.invoice.v1.InvoiceService.CreateShopCard:input_type -> avtoms.invoice.v1.CreateShopCardRequest
-	14, // 13: avtoms.invoice.v1.InvoiceService.UpdateShopCard:input_type -> avtoms.invoice.v1.UpdateShopCardRequest
-	15, // 14: avtoms.invoice.v1.InvoiceService.DeleteShopCard:input_type -> avtoms.invoice.v1.DeleteShopCardRequest
-	4,  // 15: avtoms.invoice.v1.InvoiceService.GenerateInvoice:output_type -> avtoms.invoice.v1.Invoice
-	4,  // 16: avtoms.invoice.v1.InvoiceService.GetInvoice:output_type -> avtoms.invoice.v1.Invoice
-	4,  // 17: avtoms.invoice.v1.InvoiceService.MarkPaid:output_type -> avtoms.invoice.v1.Invoice
-	4,  // 18: avtoms.invoice.v1.InvoiceService.VoidReceipt:output_type -> avtoms.invoice.v1.Invoice
-	4,  // 19: avtoms.invoice.v1.InvoiceService.ResendReceipt:output_type -> avtoms.invoice.v1.Invoice
-	3,  // 20: avtoms.invoice.v1.InvoiceService.ListInvoices:output_type -> avtoms.invoice.v1.ListInvoicesResponse
-	12, // 21: avtoms.invoice.v1.InvoiceService.ListShopCards:output_type -> avtoms.invoice.v1.ListShopCardsResponse
-	5,  // 22: avtoms.invoice.v1.InvoiceService.CreateShopCard:output_type -> avtoms.invoice.v1.ShopCard
-	5,  // 23: avtoms.invoice.v1.InvoiceService.UpdateShopCard:output_type -> avtoms.invoice.v1.ShopCard
-	16, // 24: avtoms.invoice.v1.InvoiceService.DeleteShopCard:output_type -> avtoms.invoice.v1.DeleteShopCardResponse
-	15, // [15:25] is the sub-list for method output_type
-	5,  // [5:15] is the sub-list for method input_type
+	8,  // 7: avtoms.invoice.v1.InvoiceService.GetInvoiceByToken:input_type -> avtoms.invoice.v1.GetInvoiceByTokenRequest
+	9,  // 8: avtoms.invoice.v1.InvoiceService.MarkPaid:input_type -> avtoms.invoice.v1.MarkPaidRequest
+	10, // 9: avtoms.invoice.v1.InvoiceService.VoidReceipt:input_type -> avtoms.invoice.v1.VoidReceiptRequest
+	11, // 10: avtoms.invoice.v1.InvoiceService.ResendReceipt:input_type -> avtoms.invoice.v1.ResendReceiptRequest
+	2,  // 11: avtoms.invoice.v1.InvoiceService.ListInvoices:input_type -> avtoms.invoice.v1.ListInvoicesRequest
+	12, // 12: avtoms.invoice.v1.InvoiceService.ListShopCards:input_type -> avtoms.invoice.v1.ListShopCardsRequest
+	14, // 13: avtoms.invoice.v1.InvoiceService.CreateShopCard:input_type -> avtoms.invoice.v1.CreateShopCardRequest
+	15, // 14: avtoms.invoice.v1.InvoiceService.UpdateShopCard:input_type -> avtoms.invoice.v1.UpdateShopCardRequest
+	16, // 15: avtoms.invoice.v1.InvoiceService.DeleteShopCard:input_type -> avtoms.invoice.v1.DeleteShopCardRequest
+	4,  // 16: avtoms.invoice.v1.InvoiceService.GenerateInvoice:output_type -> avtoms.invoice.v1.Invoice
+	4,  // 17: avtoms.invoice.v1.InvoiceService.GetInvoice:output_type -> avtoms.invoice.v1.Invoice
+	4,  // 18: avtoms.invoice.v1.InvoiceService.GetInvoiceByToken:output_type -> avtoms.invoice.v1.Invoice
+	4,  // 19: avtoms.invoice.v1.InvoiceService.MarkPaid:output_type -> avtoms.invoice.v1.Invoice
+	4,  // 20: avtoms.invoice.v1.InvoiceService.VoidReceipt:output_type -> avtoms.invoice.v1.Invoice
+	4,  // 21: avtoms.invoice.v1.InvoiceService.ResendReceipt:output_type -> avtoms.invoice.v1.Invoice
+	3,  // 22: avtoms.invoice.v1.InvoiceService.ListInvoices:output_type -> avtoms.invoice.v1.ListInvoicesResponse
+	13, // 23: avtoms.invoice.v1.InvoiceService.ListShopCards:output_type -> avtoms.invoice.v1.ListShopCardsResponse
+	5,  // 24: avtoms.invoice.v1.InvoiceService.CreateShopCard:output_type -> avtoms.invoice.v1.ShopCard
+	5,  // 25: avtoms.invoice.v1.InvoiceService.UpdateShopCard:output_type -> avtoms.invoice.v1.ShopCard
+	17, // 26: avtoms.invoice.v1.InvoiceService.DeleteShopCard:output_type -> avtoms.invoice.v1.DeleteShopCardResponse
+	16, // [16:27] is the sub-list for method output_type
+	5,  // [5:16] is the sub-list for method input_type
 	5,  // [5:5] is the sub-list for extension type_name
 	5,  // [5:5] is the sub-list for extension extendee
 	0,  // [0:5] is the sub-list for field type_name
@@ -1202,7 +1264,7 @@ func file_avtoms_invoice_v1_invoice_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_avtoms_invoice_v1_invoice_proto_rawDesc), len(file_avtoms_invoice_v1_invoice_proto_rawDesc)),
 			NumEnums:      2,
-			NumMessages:   15,
+			NumMessages:   16,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

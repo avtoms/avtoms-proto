@@ -8,6 +8,10 @@ option go_package = "github.com/avtoms/proto/gen/go/avtoms/invoice/v1;invoicev1"
 service InvoiceService {
   rpc GenerateInvoice(GenerateInvoiceRequest) returns (Invoice);
   rpc GetInvoice(GetInvoiceRequest) returns (Invoice);
+  // GetInvoiceByToken resolves an invoice from its public_token — the identity a
+  // customer's receipt link carries. Serves the unauthenticated check page, so it
+  // must be reachable with nothing but the token.
+  rpc GetInvoiceByToken(GetInvoiceByTokenRequest) returns (Invoice);
   rpc MarkPaid(MarkPaidRequest) returns (Invoice);
   rpc VoidReceipt(VoidReceiptRequest) returns (Invoice);
   rpc ResendReceipt(ResendReceiptRequest) returns (Invoice);
@@ -60,6 +64,10 @@ message Invoice {
   // The card number the payment was received on (masked/plain as entered). Filled
   // for CARD payments whether the card was picked from the saved list or typed once.
   string card_number = 12;
+  // Unguessable public handle for this receipt (128 bits of randomness, base62).
+  // It is what the QR on the check encodes and what the customer's link carries, so
+  // the invoice id itself never has to become public. Minted at generation time.
+  string public_token = 13;
 }
 
 // ShopCard is one of a shop's own receiving cards. A customer paying by card
@@ -81,6 +89,9 @@ message GenerateInvoiceRequest {
 }
 message GetInvoiceRequest {
   string id = 1;
+}
+message GetInvoiceByTokenRequest {
+  string token = 1;
 }
 message MarkPaidRequest {
   string id = 1;

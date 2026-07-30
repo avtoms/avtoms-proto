@@ -681,6 +681,9 @@ message Sale {
   DiscountKind discount_kind = 17;
   int64 discount_value = 18;
   int64 discount_amount = 19;
+  // Optional: who bought it. A walk-in leaves this empty and sells exactly as before —
+  // it exists so a counter sale has somewhere to send the receipt.
+  string customer_id = 20;
 }
 
 // CreateSaleRequest sells stock. Only variant_id, quantity and unit_price are read from
@@ -699,6 +702,7 @@ message CreateSaleRequest {
   // Set by the gateway from the caller's role: an owner may go past the shop's discount cap,
   // a worker on the counter may not. Never trusted from the request body.
   bool allow_discount_override = 10;
+  string customer_id = 11; // optional; set to send this sale's receipt to a customer
 }
 message ListSalesRequest {
   string shop_id = 1;
@@ -966,6 +970,13 @@ message ShopSettings {
   // Legal transitions are derived from this set: the next enabled state after the current
   // one, so disabling ESTIMATED and APPROVED makes DRAFT go straight to IN_PROGRESS.
   repeated WorkOrderState enabled_states = 3;
+  // Shop identity as it appears on a printed or sent receipt. It lives here because
+  // this is already the shop's per-shop configuration; before this it existed only in
+  // one browser's localStorage, which a server-rendered receipt cannot reach.
+  string name = 4;
+  string address = 5;
+  string tin = 6;     // STIR / INN
+  string phone = 7;
 }
 message GetShopSettingsRequest {
   string shop_id = 1;
@@ -974,6 +985,10 @@ message UpdateShopSettingsRequest {
   string shop_id = 1;
   int32 max_discount_percent = 2;
   repeated WorkOrderState enabled_states = 3;
+  string name = 4;
+  string address = 5;
+  string tin = 6;
+  string phone = 7;
 }
 
 message ListWorkOrdersRequest {

@@ -5058,8 +5058,11 @@ type Sale struct {
 	DiscountKind   DiscountKind `protobuf:"varint,17,opt,name=discount_kind,json=discountKind,proto3,enum=avtoms.workorder.v1.DiscountKind" json:"discount_kind,omitempty"`
 	DiscountValue  int64        `protobuf:"varint,18,opt,name=discount_value,json=discountValue,proto3" json:"discount_value,omitempty"`
 	DiscountAmount int64        `protobuf:"varint,19,opt,name=discount_amount,json=discountAmount,proto3" json:"discount_amount,omitempty"`
-	unknownFields  protoimpl.UnknownFields
-	sizeCache      protoimpl.SizeCache
+	// Optional: who bought it. A walk-in leaves this empty and sells exactly as before —
+	// it exists so a counter sale has somewhere to send the receipt.
+	CustomerId    string `protobuf:"bytes,20,opt,name=customer_id,json=customerId,proto3" json:"customer_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *Sale) Reset() {
@@ -5225,6 +5228,13 @@ func (x *Sale) GetDiscountAmount() int64 {
 	return 0
 }
 
+func (x *Sale) GetCustomerId() string {
+	if x != nil {
+		return x.CustomerId
+	}
+	return ""
+}
+
 // CreateSaleRequest sells stock. Only variant_id, quantity and unit_price are read from
 // each item — description, sku and unit_cost are taken from the warehouse, not the caller.
 type CreateSaleRequest struct {
@@ -5241,7 +5251,8 @@ type CreateSaleRequest struct {
 	DiscountValue int64        `protobuf:"varint,9,opt,name=discount_value,json=discountValue,proto3" json:"discount_value,omitempty"`
 	// Set by the gateway from the caller's role: an owner may go past the shop's discount cap,
 	// a worker on the counter may not. Never trusted from the request body.
-	AllowDiscountOverride bool `protobuf:"varint,10,opt,name=allow_discount_override,json=allowDiscountOverride,proto3" json:"allow_discount_override,omitempty"`
+	AllowDiscountOverride bool   `protobuf:"varint,10,opt,name=allow_discount_override,json=allowDiscountOverride,proto3" json:"allow_discount_override,omitempty"`
+	CustomerId            string `protobuf:"bytes,11,opt,name=customer_id,json=customerId,proto3" json:"customer_id,omitempty"` // optional; set to send this sale's receipt to a customer
 	unknownFields         protoimpl.UnknownFields
 	sizeCache             protoimpl.SizeCache
 }
@@ -5344,6 +5355,13 @@ func (x *CreateSaleRequest) GetAllowDiscountOverride() bool {
 		return x.AllowDiscountOverride
 	}
 	return false
+}
+
+func (x *CreateSaleRequest) GetCustomerId() string {
+	if x != nil {
+		return x.CustomerId
+	}
+	return ""
 }
 
 type ListSalesRequest struct {
@@ -7692,6 +7710,13 @@ type ShopSettings struct {
 	// Legal transitions are derived from this set: the next enabled state after the current
 	// one, so disabling ESTIMATED and APPROVED makes DRAFT go straight to IN_PROGRESS.
 	EnabledStates []WorkOrderState `protobuf:"varint,3,rep,packed,name=enabled_states,json=enabledStates,proto3,enum=avtoms.workorder.v1.WorkOrderState" json:"enabled_states,omitempty"`
+	// Shop identity as it appears on a printed or sent receipt. It lives here because
+	// this is already the shop's per-shop configuration; before this it existed only in
+	// one browser's localStorage, which a server-rendered receipt cannot reach.
+	Name          string `protobuf:"bytes,4,opt,name=name,proto3" json:"name,omitempty"`
+	Address       string `protobuf:"bytes,5,opt,name=address,proto3" json:"address,omitempty"`
+	Tin           string `protobuf:"bytes,6,opt,name=tin,proto3" json:"tin,omitempty"` // STIR / INN
+	Phone         string `protobuf:"bytes,7,opt,name=phone,proto3" json:"phone,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -7747,6 +7772,34 @@ func (x *ShopSettings) GetEnabledStates() []WorkOrderState {
 	return nil
 }
 
+func (x *ShopSettings) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *ShopSettings) GetAddress() string {
+	if x != nil {
+		return x.Address
+	}
+	return ""
+}
+
+func (x *ShopSettings) GetTin() string {
+	if x != nil {
+		return x.Tin
+	}
+	return ""
+}
+
+func (x *ShopSettings) GetPhone() string {
+	if x != nil {
+		return x.Phone
+	}
+	return ""
+}
+
 type GetShopSettingsRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	ShopId        string                 `protobuf:"bytes,1,opt,name=shop_id,json=shopId,proto3" json:"shop_id,omitempty"`
@@ -7796,6 +7849,10 @@ type UpdateShopSettingsRequest struct {
 	ShopId             string                 `protobuf:"bytes,1,opt,name=shop_id,json=shopId,proto3" json:"shop_id,omitempty"`
 	MaxDiscountPercent int32                  `protobuf:"varint,2,opt,name=max_discount_percent,json=maxDiscountPercent,proto3" json:"max_discount_percent,omitempty"`
 	EnabledStates      []WorkOrderState       `protobuf:"varint,3,rep,packed,name=enabled_states,json=enabledStates,proto3,enum=avtoms.workorder.v1.WorkOrderState" json:"enabled_states,omitempty"`
+	Name               string                 `protobuf:"bytes,4,opt,name=name,proto3" json:"name,omitempty"`
+	Address            string                 `protobuf:"bytes,5,opt,name=address,proto3" json:"address,omitempty"`
+	Tin                string                 `protobuf:"bytes,6,opt,name=tin,proto3" json:"tin,omitempty"`
+	Phone              string                 `protobuf:"bytes,7,opt,name=phone,proto3" json:"phone,omitempty"`
 	unknownFields      protoimpl.UnknownFields
 	sizeCache          protoimpl.SizeCache
 }
@@ -7849,6 +7906,34 @@ func (x *UpdateShopSettingsRequest) GetEnabledStates() []WorkOrderState {
 		return x.EnabledStates
 	}
 	return nil
+}
+
+func (x *UpdateShopSettingsRequest) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *UpdateShopSettingsRequest) GetAddress() string {
+	if x != nil {
+		return x.Address
+	}
+	return ""
+}
+
+func (x *UpdateShopSettingsRequest) GetTin() string {
+	if x != nil {
+		return x.Tin
+	}
+	return ""
+}
+
+func (x *UpdateShopSettingsRequest) GetPhone() string {
+	if x != nil {
+		return x.Phone
+	}
+	return ""
 }
 
 type ListWorkOrdersRequest struct {
@@ -10258,7 +10343,7 @@ const file_avtoms_workorder_v1_workorder_proto_rawDesc = "" +
 	"\n" +
 	"unit_price\x18\x05 \x01(\x03R\tunitPrice\x12\x1b\n" +
 	"\tunit_cost\x18\x06 \x01(\x03R\bunitCost\x12\x10\n" +
-	"\x03sku\x18\a \x01(\tR\x03sku\"\x8d\x05\n" +
+	"\x03sku\x18\a \x01(\tR\x03sku\"\xae\x05\n" +
 	"\x04Sale\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x17\n" +
 	"\ashop_id\x18\x02 \x01(\tR\x06shopId\x12\x17\n" +
@@ -10283,7 +10368,9 @@ const file_avtoms_workorder_v1_workorder_proto_rawDesc = "" +
 	"\bsubtotal\x18\x10 \x01(\x03R\bsubtotal\x12F\n" +
 	"\rdiscount_kind\x18\x11 \x01(\x0e2!.avtoms.workorder.v1.DiscountKindR\fdiscountKind\x12%\n" +
 	"\x0ediscount_value\x18\x12 \x01(\x03R\rdiscountValue\x12'\n" +
-	"\x0fdiscount_amount\x18\x13 \x01(\x03R\x0ediscountAmount\"\xbc\x03\n" +
+	"\x0fdiscount_amount\x18\x13 \x01(\x03R\x0ediscountAmount\x12\x1f\n" +
+	"\vcustomer_id\x18\x14 \x01(\tR\n" +
+	"customerId\"\xdd\x03\n" +
 	"\x11CreateSaleRequest\x12\x17\n" +
 	"\ashop_id\x18\x01 \x01(\tR\x06shopId\x12\x19\n" +
 	"\bstaff_id\x18\x02 \x01(\tR\astaffId\x123\n" +
@@ -10296,7 +10383,9 @@ const file_avtoms_workorder_v1_workorder_proto_rawDesc = "" +
 	"\rdiscount_kind\x18\b \x01(\x0e2!.avtoms.workorder.v1.DiscountKindR\fdiscountKind\x12%\n" +
 	"\x0ediscount_value\x18\t \x01(\x03R\rdiscountValue\x126\n" +
 	"\x17allow_discount_override\x18\n" +
-	" \x01(\bR\x15allowDiscountOverride\"O\n" +
+	" \x01(\bR\x15allowDiscountOverride\x12\x1f\n" +
+	"\vcustomer_id\x18\v \x01(\tR\n" +
+	"customerId\"O\n" +
 	"\x10ListSalesRequest\x12\x17\n" +
 	"\ashop_id\x18\x01 \x01(\tR\x06shopId\x12\x12\n" +
 	"\x04from\x18\x02 \x01(\tR\x04from\x12\x0e\n" +
@@ -10476,17 +10565,25 @@ const file_avtoms_workorder_v1_workorder_proto_rawDesc = "" +
 	"\bstaff_id\x18\a \x01(\tR\astaffId\x12 \n" +
 	"\vdescription\x18\b \x01(\tR\vdescription\".\n" +
 	"\x1cDeleteContragentEntryRequest\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\"\xa5\x01\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\"\xfb\x01\n" +
 	"\fShopSettings\x12\x17\n" +
 	"\ashop_id\x18\x01 \x01(\tR\x06shopId\x120\n" +
 	"\x14max_discount_percent\x18\x02 \x01(\x05R\x12maxDiscountPercent\x12J\n" +
-	"\x0eenabled_states\x18\x03 \x03(\x0e2#.avtoms.workorder.v1.WorkOrderStateR\renabledStates\"1\n" +
+	"\x0eenabled_states\x18\x03 \x03(\x0e2#.avtoms.workorder.v1.WorkOrderStateR\renabledStates\x12\x12\n" +
+	"\x04name\x18\x04 \x01(\tR\x04name\x12\x18\n" +
+	"\aaddress\x18\x05 \x01(\tR\aaddress\x12\x10\n" +
+	"\x03tin\x18\x06 \x01(\tR\x03tin\x12\x14\n" +
+	"\x05phone\x18\a \x01(\tR\x05phone\"1\n" +
 	"\x16GetShopSettingsRequest\x12\x17\n" +
-	"\ashop_id\x18\x01 \x01(\tR\x06shopId\"\xb2\x01\n" +
+	"\ashop_id\x18\x01 \x01(\tR\x06shopId\"\x88\x02\n" +
 	"\x19UpdateShopSettingsRequest\x12\x17\n" +
 	"\ashop_id\x18\x01 \x01(\tR\x06shopId\x120\n" +
 	"\x14max_discount_percent\x18\x02 \x01(\x05R\x12maxDiscountPercent\x12J\n" +
-	"\x0eenabled_states\x18\x03 \x03(\x0e2#.avtoms.workorder.v1.WorkOrderStateR\renabledStates\"\xbc\x01\n" +
+	"\x0eenabled_states\x18\x03 \x03(\x0e2#.avtoms.workorder.v1.WorkOrderStateR\renabledStates\x12\x12\n" +
+	"\x04name\x18\x04 \x01(\tR\x04name\x12\x18\n" +
+	"\aaddress\x18\x05 \x01(\tR\aaddress\x12\x10\n" +
+	"\x03tin\x18\x06 \x01(\tR\x03tin\x12\x14\n" +
+	"\x05phone\x18\a \x01(\tR\x05phone\"\xbc\x01\n" +
 	"\x15ListWorkOrdersRequest\x12\x17\n" +
 	"\ashop_id\x18\x01 \x01(\tR\x06shopId\x129\n" +
 	"\x05state\x18\x02 \x01(\x0e2#.avtoms.workorder.v1.WorkOrderStateR\x05state\x120\n" +

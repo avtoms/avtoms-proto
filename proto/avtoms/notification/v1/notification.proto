@@ -10,6 +10,9 @@ option go_package = "github.com/avtoms/proto/gen/go/avtoms/notification/v1;notif
 service NotificationService {
   rpc SendSms(SendSmsRequest) returns (SendResponse);
   rpc SendTelegram(SendTelegramRequest) returns (SendResponse);
+  // SendReceipt delivers a finished receipt to a customer as a Telegram document.
+  // Telegram fetches document_url itself, so the caller passes a link rather than bytes.
+  rpc SendReceipt(SendReceiptRequest) returns (SendResponse);
   // Notify picks the best channel (Telegram, falling back to SMS).
   rpc Notify(NotifyRequest) returns (SendResponse);
 
@@ -242,6 +245,19 @@ message SendTelegramRequest {
   string shop_id = 1;
   string telegram_handle = 2;
   string body = 3;
+}
+// SendReceiptRequest carries the facts the caption is built from rather than a
+// finished sentence, so the wording stays in the notification service's own
+// translation table alongside every other push.
+message SendReceiptRequest {
+  string shop_id = 1;
+  string chat_id = 2;       // the customer's linked Telegram chat
+  string document_url = 3;  // the rendered PDF; Telegram fetches this itself
+  string check_url = 4;     // the public check page, appended to the caption
+  string language = 5;      // uz | uz-cyrl | ru; falls back to the default
+  bool is_sale = 6;         // counter sale vs work order, picks the caption
+  string number = 7;        // receipt number as shown to the customer
+  int64 total = 8;          // tiyin
 }
 
 message NotifyRequest {

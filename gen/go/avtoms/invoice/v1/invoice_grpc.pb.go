@@ -19,16 +19,17 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	InvoiceService_GenerateInvoice_FullMethodName = "/avtoms.invoice.v1.InvoiceService/GenerateInvoice"
-	InvoiceService_GetInvoice_FullMethodName      = "/avtoms.invoice.v1.InvoiceService/GetInvoice"
-	InvoiceService_MarkPaid_FullMethodName        = "/avtoms.invoice.v1.InvoiceService/MarkPaid"
-	InvoiceService_VoidReceipt_FullMethodName     = "/avtoms.invoice.v1.InvoiceService/VoidReceipt"
-	InvoiceService_ResendReceipt_FullMethodName   = "/avtoms.invoice.v1.InvoiceService/ResendReceipt"
-	InvoiceService_ListInvoices_FullMethodName    = "/avtoms.invoice.v1.InvoiceService/ListInvoices"
-	InvoiceService_ListShopCards_FullMethodName   = "/avtoms.invoice.v1.InvoiceService/ListShopCards"
-	InvoiceService_CreateShopCard_FullMethodName  = "/avtoms.invoice.v1.InvoiceService/CreateShopCard"
-	InvoiceService_UpdateShopCard_FullMethodName  = "/avtoms.invoice.v1.InvoiceService/UpdateShopCard"
-	InvoiceService_DeleteShopCard_FullMethodName  = "/avtoms.invoice.v1.InvoiceService/DeleteShopCard"
+	InvoiceService_GenerateInvoice_FullMethodName   = "/avtoms.invoice.v1.InvoiceService/GenerateInvoice"
+	InvoiceService_GetInvoice_FullMethodName        = "/avtoms.invoice.v1.InvoiceService/GetInvoice"
+	InvoiceService_GetInvoiceByToken_FullMethodName = "/avtoms.invoice.v1.InvoiceService/GetInvoiceByToken"
+	InvoiceService_MarkPaid_FullMethodName          = "/avtoms.invoice.v1.InvoiceService/MarkPaid"
+	InvoiceService_VoidReceipt_FullMethodName       = "/avtoms.invoice.v1.InvoiceService/VoidReceipt"
+	InvoiceService_ResendReceipt_FullMethodName     = "/avtoms.invoice.v1.InvoiceService/ResendReceipt"
+	InvoiceService_ListInvoices_FullMethodName      = "/avtoms.invoice.v1.InvoiceService/ListInvoices"
+	InvoiceService_ListShopCards_FullMethodName     = "/avtoms.invoice.v1.InvoiceService/ListShopCards"
+	InvoiceService_CreateShopCard_FullMethodName    = "/avtoms.invoice.v1.InvoiceService/CreateShopCard"
+	InvoiceService_UpdateShopCard_FullMethodName    = "/avtoms.invoice.v1.InvoiceService/UpdateShopCard"
+	InvoiceService_DeleteShopCard_FullMethodName    = "/avtoms.invoice.v1.InvoiceService/DeleteShopCard"
 )
 
 // InvoiceServiceClient is the client API for InvoiceService service.
@@ -39,6 +40,10 @@ const (
 type InvoiceServiceClient interface {
 	GenerateInvoice(ctx context.Context, in *GenerateInvoiceRequest, opts ...grpc.CallOption) (*Invoice, error)
 	GetInvoice(ctx context.Context, in *GetInvoiceRequest, opts ...grpc.CallOption) (*Invoice, error)
+	// GetInvoiceByToken resolves an invoice from its public_token — the identity a
+	// customer's receipt link carries. Serves the unauthenticated check page, so it
+	// must be reachable with nothing but the token.
+	GetInvoiceByToken(ctx context.Context, in *GetInvoiceByTokenRequest, opts ...grpc.CallOption) (*Invoice, error)
 	MarkPaid(ctx context.Context, in *MarkPaidRequest, opts ...grpc.CallOption) (*Invoice, error)
 	VoidReceipt(ctx context.Context, in *VoidReceiptRequest, opts ...grpc.CallOption) (*Invoice, error)
 	ResendReceipt(ctx context.Context, in *ResendReceiptRequest, opts ...grpc.CallOption) (*Invoice, error)
@@ -73,6 +78,16 @@ func (c *invoiceServiceClient) GetInvoice(ctx context.Context, in *GetInvoiceReq
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(Invoice)
 	err := c.cc.Invoke(ctx, InvoiceService_GetInvoice_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *invoiceServiceClient) GetInvoiceByToken(ctx context.Context, in *GetInvoiceByTokenRequest, opts ...grpc.CallOption) (*Invoice, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Invoice)
+	err := c.cc.Invoke(ctx, InvoiceService_GetInvoiceByToken_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -167,6 +182,10 @@ func (c *invoiceServiceClient) DeleteShopCard(ctx context.Context, in *DeleteSho
 type InvoiceServiceServer interface {
 	GenerateInvoice(context.Context, *GenerateInvoiceRequest) (*Invoice, error)
 	GetInvoice(context.Context, *GetInvoiceRequest) (*Invoice, error)
+	// GetInvoiceByToken resolves an invoice from its public_token — the identity a
+	// customer's receipt link carries. Serves the unauthenticated check page, so it
+	// must be reachable with nothing but the token.
+	GetInvoiceByToken(context.Context, *GetInvoiceByTokenRequest) (*Invoice, error)
 	MarkPaid(context.Context, *MarkPaidRequest) (*Invoice, error)
 	VoidReceipt(context.Context, *VoidReceiptRequest) (*Invoice, error)
 	ResendReceipt(context.Context, *ResendReceiptRequest) (*Invoice, error)
@@ -192,6 +211,9 @@ func (UnimplementedInvoiceServiceServer) GenerateInvoice(context.Context, *Gener
 }
 func (UnimplementedInvoiceServiceServer) GetInvoice(context.Context, *GetInvoiceRequest) (*Invoice, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetInvoice not implemented")
+}
+func (UnimplementedInvoiceServiceServer) GetInvoiceByToken(context.Context, *GetInvoiceByTokenRequest) (*Invoice, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetInvoiceByToken not implemented")
 }
 func (UnimplementedInvoiceServiceServer) MarkPaid(context.Context, *MarkPaidRequest) (*Invoice, error) {
 	return nil, status.Error(codes.Unimplemented, "method MarkPaid not implemented")
@@ -270,6 +292,24 @@ func _InvoiceService_GetInvoice_Handler(srv interface{}, ctx context.Context, de
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(InvoiceServiceServer).GetInvoice(ctx, req.(*GetInvoiceRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _InvoiceService_GetInvoiceByToken_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetInvoiceByTokenRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(InvoiceServiceServer).GetInvoiceByToken(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: InvoiceService_GetInvoiceByToken_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(InvoiceServiceServer).GetInvoiceByToken(ctx, req.(*GetInvoiceByTokenRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -432,6 +472,10 @@ var InvoiceService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetInvoice",
 			Handler:    _InvoiceService_GetInvoice_Handler,
+		},
+		{
+			MethodName: "GetInvoiceByToken",
+			Handler:    _InvoiceService_GetInvoiceByToken_Handler,
 		},
 		{
 			MethodName: "MarkPaid",
