@@ -7717,6 +7717,7 @@ type ShopSettings struct {
 	Address       string `protobuf:"bytes,5,opt,name=address,proto3" json:"address,omitempty"`
 	Tin           string `protobuf:"bytes,6,opt,name=tin,proto3" json:"tin,omitempty"` // STIR / INN
 	Phone         string `protobuf:"bytes,7,opt,name=phone,proto3" json:"phone,omitempty"`
+	Hours         string `protobuf:"bytes,8,opt,name=hours,proto3" json:"hours,omitempty"` // opening hours, as printed on the check
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -7800,6 +7801,13 @@ func (x *ShopSettings) GetPhone() string {
 	return ""
 }
 
+func (x *ShopSettings) GetHours() string {
+	if x != nil {
+		return x.Hours
+	}
+	return ""
+}
+
 type GetShopSettingsRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	ShopId        string                 `protobuf:"bytes,1,opt,name=shop_id,json=shopId,proto3" json:"shop_id,omitempty"`
@@ -7853,6 +7861,7 @@ type UpdateShopSettingsRequest struct {
 	Address            string                 `protobuf:"bytes,5,opt,name=address,proto3" json:"address,omitempty"`
 	Tin                string                 `protobuf:"bytes,6,opt,name=tin,proto3" json:"tin,omitempty"`
 	Phone              string                 `protobuf:"bytes,7,opt,name=phone,proto3" json:"phone,omitempty"`
+	Hours              string                 `protobuf:"bytes,8,opt,name=hours,proto3" json:"hours,omitempty"`
 	unknownFields      protoimpl.UnknownFields
 	sizeCache          protoimpl.SizeCache
 }
@@ -7932,6 +7941,13 @@ func (x *UpdateShopSettingsRequest) GetTin() string {
 func (x *UpdateShopSettingsRequest) GetPhone() string {
 	if x != nil {
 		return x.Phone
+	}
+	return ""
+}
+
+func (x *UpdateShopSettingsRequest) GetHours() string {
+	if x != nil {
+		return x.Hours
 	}
 	return ""
 }
@@ -10565,7 +10581,7 @@ const file_avtoms_workorder_v1_workorder_proto_rawDesc = "" +
 	"\bstaff_id\x18\a \x01(\tR\astaffId\x12 \n" +
 	"\vdescription\x18\b \x01(\tR\vdescription\".\n" +
 	"\x1cDeleteContragentEntryRequest\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\"\xfb\x01\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\"\x91\x02\n" +
 	"\fShopSettings\x12\x17\n" +
 	"\ashop_id\x18\x01 \x01(\tR\x06shopId\x120\n" +
 	"\x14max_discount_percent\x18\x02 \x01(\x05R\x12maxDiscountPercent\x12J\n" +
@@ -10573,9 +10589,10 @@ const file_avtoms_workorder_v1_workorder_proto_rawDesc = "" +
 	"\x04name\x18\x04 \x01(\tR\x04name\x12\x18\n" +
 	"\aaddress\x18\x05 \x01(\tR\aaddress\x12\x10\n" +
 	"\x03tin\x18\x06 \x01(\tR\x03tin\x12\x14\n" +
-	"\x05phone\x18\a \x01(\tR\x05phone\"1\n" +
+	"\x05phone\x18\a \x01(\tR\x05phone\x12\x14\n" +
+	"\x05hours\x18\b \x01(\tR\x05hours\"1\n" +
 	"\x16GetShopSettingsRequest\x12\x17\n" +
-	"\ashop_id\x18\x01 \x01(\tR\x06shopId\"\x88\x02\n" +
+	"\ashop_id\x18\x01 \x01(\tR\x06shopId\"\x9e\x02\n" +
 	"\x19UpdateShopSettingsRequest\x12\x17\n" +
 	"\ashop_id\x18\x01 \x01(\tR\x06shopId\x120\n" +
 	"\x14max_discount_percent\x18\x02 \x01(\x05R\x12maxDiscountPercent\x12J\n" +
@@ -10583,7 +10600,8 @@ const file_avtoms_workorder_v1_workorder_proto_rawDesc = "" +
 	"\x04name\x18\x04 \x01(\tR\x04name\x12\x18\n" +
 	"\aaddress\x18\x05 \x01(\tR\aaddress\x12\x10\n" +
 	"\x03tin\x18\x06 \x01(\tR\x03tin\x12\x14\n" +
-	"\x05phone\x18\a \x01(\tR\x05phone\"\xbc\x01\n" +
+	"\x05phone\x18\a \x01(\tR\x05phone\x12\x14\n" +
+	"\x05hours\x18\b \x01(\tR\x05hours\"\xbc\x01\n" +
 	"\x15ListWorkOrdersRequest\x12\x17\n" +
 	"\ashop_id\x18\x01 \x01(\tR\x06shopId\x129\n" +
 	"\x05state\x18\x02 \x01(\x0e2#.avtoms.workorder.v1.WorkOrderStateR\x05state\x120\n" +

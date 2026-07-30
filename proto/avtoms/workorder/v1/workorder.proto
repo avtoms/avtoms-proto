@@ -977,6 +977,7 @@ message ShopSettings {
   string address = 5;
   string tin = 6;     // STIR / INN
   string phone = 7;
+  string hours = 8;   // opening hours, as printed on the check
 }
 message GetShopSettingsRequest {
   string shop_id = 1;
@@ -989,6 +990,7 @@ message UpdateShopSettingsRequest {
   string address = 5;
   string tin = 6;
   string phone = 7;
+  string hours = 8;
 }
 
 message ListWorkOrdersRequest {
