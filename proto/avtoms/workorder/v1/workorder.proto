@@ -89,6 +89,12 @@ service WorkOrderService {
   rpc RecordContragentEntry(RecordContragentEntryRequest) returns (ContragentLedgerEntry);
   rpc DeleteContragentEntry(DeleteContragentEntryRequest) returns (DeleteContragentResponse);
 
+  // Customer accounts: what clients owe the shop for anything taken on credit ("nasiya").
+  rpc ListCustomerBalances(ListCustomerBalancesRequest) returns (ListCustomerBalancesResponse);
+  rpc ListCustomerLedger(ListCustomerLedgerRequest) returns (ListCustomerLedgerResponse);
+  rpc RecordCustomerEntry(RecordCustomerEntryRequest) returns (CustomerLedgerEntry);
+  rpc DeleteCustomerEntry(DeleteCustomerEntryRequest) returns (DeleteCustomerEntryResponse);
+
   // Appointments / scheduling.
   rpc ListAppointments(ListAppointmentsRequest) returns (ListAppointmentsResponse);
   rpc CreateAppointment(CreateAppointmentRequest) returns (Appointment);
@@ -380,6 +386,13 @@ message Statistics {
   // because you looked at one month. Not part of net_profit: see ContragentEntryKind.
   int64 payable = 29;    // what the shop owes suppliers
   int64 receivable = 30; // what counterparties owe the shop
+  // What CLIENTS owe for goods and work taken on credit. All-time like the two above, and
+  // likewise outside net_profit: this money was already counted as revenue when the goods
+  // went out — this line says how much of it has not arrived yet.
+  int64 client_debt = 31;
+  // How much of the window's revenue was taken on credit rather than collected. Part of
+  // revenue, shown separately so "we billed 10m" and "we hold 10m" are not confused.
+  int64 credit_revenue = 32;
 }
 
 enum ServiceReminderState {
@@ -643,6 +656,14 @@ enum PaymentMethod {
   PAYMENT_METHOD_CASH = 1;
   PAYMENT_METHOD_OTHER = 2;
   PAYMENT_METHOD_CARD = 3;
+  // Sold on credit ("nasiya"): the goods left, no money arrived, and the buyer owes it.
+  // The sale still counts as revenue — the shop earned it the moment the goods went out —
+  // and the amount owed is carried on the buyer's customer_ledger account until they pay.
+  // Because nobody can owe a debt anonymously, a credit sale REQUIRES a customer_id.
+  //
+  // Kept numerically identical to invoice.v1.PaymentMethod: the gateway casts one to the
+  // other when it issues a sale's receipt, so the two enums must never drift apart.
+  PAYMENT_METHOD_CREDIT = 4;
 }
 
 // SaleItem is one line of a counter sale: a warehouse variant, how much of it left, and
@@ -959,6 +980,101 @@ message DeleteContragentEntryRequest {
   string id = 1;
 }
 
+// ── customer accounts (nasiya) ───────────────────────────────────────────────────────
+// The mirror image of the contragent ledger, for the other side of the counter: what
+// CUSTOMERS owe the shop. A sale or an order settled on credit writes a charge here, and
+// every repayment writes a payment against it.
+//
+// The sign convention is flipped from the contragent one on purpose, because the question
+// being asked is different. There it was "how much do we owe this supplier"; here it is
+// "how much does this client owe us", and POSITIVE MEANS THE CLIENT OWES THE SHOP. Both
+// screens then read the same way round: a big positive number is money you are waiting on.
+//
+// This is debt and cash movement, NOT revenue. The revenue was already recognised when the
+// goods went out and the invoice was raised; counting the repayment as income as well would
+// book the same money twice.
+enum CustomerEntryKind {
+  CUSTOMER_ENTRY_KIND_UNSPECIFIED = 0;
+  CUSTOMER_ENTRY_KIND_CHARGE = 1;      // sold to them on credit           → +
+  CUSTOMER_ENTRY_KIND_PAYMENT_IN = 2;  // they paid off some of the debt   → −
+}
+
+message CustomerLedgerEntry {
+  string id = 1;
+  string shop_id = 2;
+  string customer_id = 3;
+  CustomerEntryKind kind = 4;
+  int64 amount = 5;          // tiyin, always positive
+  string description = 6;    // snapshot, e.g. "S-0042 · 3 dona"
+  string sale_id = 7;        // the counter sale a charge came from, when it had one
+  string work_order_id = 8;  // the order a charge came from, when it had one
+  string invoice_id = 9;
+  PaymentMethod method = 10; // how a repayment arrived; payments only
+  string staff_id = 11;
+  string occurred_at = 12;   // RFC3339 — when it happened, not when it was typed
+  string note = 13;
+  string created_at = 14;
+}
+
+// CustomerBalance is one client's account. balance = charged − paid; positive means the
+// client owes the shop.
+message CustomerBalance {
+  string customer_id = 1;
+  int64 charged = 2;
+  int64 paid = 3;
+  int64 balance = 4;
+  string last_at = 5;  // most recent movement on the account, RFC3339
+  int32 entries = 6;
+  // Denormalized for display, filled in by the GATEWAY from the customer service — this
+  // service does not own customers and leaves both empty.
+  string name = 7;
+  string phone = 8;
+}
+
+message ListCustomerBalancesRequest {
+  string shop_id = 1;
+  // The window narrows charged/paid. The BALANCE ignores it and is always all-time: a debt
+  // does not stop existing because you looked at a single month.
+  string from = 2;
+  string to = 3;
+}
+message ListCustomerBalancesResponse {
+  repeated CustomerBalance balances = 1; // most in debt first
+  int64 total_receivable = 2;            // summed over clients who owe the shop
+}
+
+message ListCustomerLedgerRequest {
+  string customer_id = 1;
+  string from = 2;
+  string to = 3;
+}
+message ListCustomerLedgerResponse {
+  repeated CustomerLedgerEntry entries = 1; // newest first
+  CustomerBalance summary = 2;
+}
+
+message RecordCustomerEntryRequest {
+  string shop_id = 1;
+  string customer_id = 2;
+  CustomerEntryKind kind = 3;
+  int64 amount = 4;
+  PaymentMethod method = 5;
+  string note = 6;
+  string occurred_at = 7; // RFC3339; empty means now
+  string staff_id = 8;    // from the token, at the gateway
+  string description = 9;
+  // Set when the charge is raised by closing an order on credit, so voiding or re-paying
+  // that order can find its entry again instead of leaving a duplicate debt behind.
+  string work_order_id = 10;
+  string invoice_id = 11;
+}
+message DeleteCustomerEntryRequest {
+  string id = 1;
+}
+message DeleteCustomerEntryResponse {
+  bool ok = 1;
+}
+
 // ShopSettings holds per-shop policy: pricing, and which statuses the shop's work orders
 // move through.
 message ShopSettings {
@@ -1100,6 +1216,14 @@ message WorkOrder {
   DiscountKind discount_kind = 21;
   int64 discount_value = 22;
   int64 discount_amount = 23;
+  // Also denormalized by the gateway from the vehicle's owner. The id is what a credit
+  // close charges the debt to, and the phone is what a service reminder is sent to — both
+  // otherwise cost the caller two extra round trips to find.
+  string customer_id = 24;
+  string customer_phone = 25;
+  // The odometer reading on the vehicle, so a reminder set at closing time can be dated
+  // "10 000 km from here" without a separate lookup.
+  int64 mileage = 26;
 }
 
 // DiscountKind selects how a whole-order discount is expressed.

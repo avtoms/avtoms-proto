@@ -83,6 +83,13 @@ const (
 	PaymentMethod_PAYMENT_METHOD_CASH        PaymentMethod = 1
 	PaymentMethod_PAYMENT_METHOD_OTHER       PaymentMethod = 2
 	PaymentMethod_PAYMENT_METHOD_CARD        PaymentMethod = 3
+	// Taken on credit ("nasiya"): the invoice is settled for accounting — the work is done
+	// and the revenue is earned — but no money has arrived. What is owed is tracked on the
+	// buyer's account in the workorder service, not here.
+	//
+	// Numerically identical to workorder.v1.PaymentMethod, which the gateway casts to this
+	// one when a counter sale's receipt is issued. The two must never drift apart.
+	PaymentMethod_PAYMENT_METHOD_CREDIT PaymentMethod = 4
 )
 
 // Enum value maps for PaymentMethod.
@@ -92,12 +99,14 @@ var (
 		1: "PAYMENT_METHOD_CASH",
 		2: "PAYMENT_METHOD_OTHER",
 		3: "PAYMENT_METHOD_CARD",
+		4: "PAYMENT_METHOD_CREDIT",
 	}
 	PaymentMethod_value = map[string]int32{
 		"PAYMENT_METHOD_UNSPECIFIED": 0,
 		"PAYMENT_METHOD_CASH":        1,
 		"PAYMENT_METHOD_OTHER":       2,
 		"PAYMENT_METHOD_CARD":        3,
+		"PAYMENT_METHOD_CREDIT":      4,
 	}
 )
 
@@ -1164,12 +1173,13 @@ const file_avtoms_invoice_v1_invoice_proto_rawDesc = "" +
 	"\x15FISCAL_STATUS_PENDING\x10\x01\x12\x1c\n" +
 	"\x18FISCAL_STATUS_FISCALIZED\x10\x02\x12\x18\n" +
 	"\x14FISCAL_STATUS_FAILED\x10\x03\x12\x18\n" +
-	"\x14FISCAL_STATUS_VOIDED\x10\x04*{\n" +
+	"\x14FISCAL_STATUS_VOIDED\x10\x04*\x96\x01\n" +
 	"\rPaymentMethod\x12\x1e\n" +
 	"\x1aPAYMENT_METHOD_UNSPECIFIED\x10\x00\x12\x17\n" +
 	"\x13PAYMENT_METHOD_CASH\x10\x01\x12\x18\n" +
 	"\x14PAYMENT_METHOD_OTHER\x10\x02\x12\x17\n" +
-	"\x13PAYMENT_METHOD_CARD\x10\x032\xea\a\n" +
+	"\x13PAYMENT_METHOD_CARD\x10\x03\x12\x19\n" +
+	"\x15PAYMENT_METHOD_CREDIT\x10\x042\xea\a\n" +
 	"\x0eInvoiceService\x12X\n" +
 	"\x0fGenerateInvoice\x12).avtoms.invoice.v1.GenerateInvoiceRequest\x1a\x1a.avtoms.invoice.v1.Invoice\x12N\n" +
 	"\n" +

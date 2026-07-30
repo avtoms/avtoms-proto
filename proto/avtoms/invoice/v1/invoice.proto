@@ -45,6 +45,13 @@ enum PaymentMethod {
   PAYMENT_METHOD_CASH = 1;
   PAYMENT_METHOD_OTHER = 2;
   PAYMENT_METHOD_CARD = 3;
+  // Taken on credit ("nasiya"): the invoice is settled for accounting — the work is done
+  // and the revenue is earned — but no money has arrived. What is owed is tracked on the
+  // buyer's account in the workorder service, not here.
+  //
+  // Numerically identical to workorder.v1.PaymentMethod, which the gateway casts to this
+  // one when a counter sale's receipt is issued. The two must never drift apart.
+  PAYMENT_METHOD_CREDIT = 4;
 }
 
 message Invoice {

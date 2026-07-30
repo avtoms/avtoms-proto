@@ -66,6 +66,10 @@ const (
 	WorkOrderService_ListContragentLedger_FullMethodName     = "/avtoms.workorder.v1.WorkOrderService/ListContragentLedger"
 	WorkOrderService_RecordContragentEntry_FullMethodName    = "/avtoms.workorder.v1.WorkOrderService/RecordContragentEntry"
 	WorkOrderService_DeleteContragentEntry_FullMethodName    = "/avtoms.workorder.v1.WorkOrderService/DeleteContragentEntry"
+	WorkOrderService_ListCustomerBalances_FullMethodName     = "/avtoms.workorder.v1.WorkOrderService/ListCustomerBalances"
+	WorkOrderService_ListCustomerLedger_FullMethodName       = "/avtoms.workorder.v1.WorkOrderService/ListCustomerLedger"
+	WorkOrderService_RecordCustomerEntry_FullMethodName      = "/avtoms.workorder.v1.WorkOrderService/RecordCustomerEntry"
+	WorkOrderService_DeleteCustomerEntry_FullMethodName      = "/avtoms.workorder.v1.WorkOrderService/DeleteCustomerEntry"
 	WorkOrderService_ListAppointments_FullMethodName         = "/avtoms.workorder.v1.WorkOrderService/ListAppointments"
 	WorkOrderService_CreateAppointment_FullMethodName        = "/avtoms.workorder.v1.WorkOrderService/CreateAppointment"
 	WorkOrderService_SetAppointmentState_FullMethodName      = "/avtoms.workorder.v1.WorkOrderService/SetAppointmentState"
@@ -168,6 +172,11 @@ type WorkOrderServiceClient interface {
 	ListContragentLedger(ctx context.Context, in *ListContragentLedgerRequest, opts ...grpc.CallOption) (*ListContragentLedgerResponse, error)
 	RecordContragentEntry(ctx context.Context, in *RecordContragentEntryRequest, opts ...grpc.CallOption) (*ContragentLedgerEntry, error)
 	DeleteContragentEntry(ctx context.Context, in *DeleteContragentEntryRequest, opts ...grpc.CallOption) (*DeleteContragentResponse, error)
+	// Customer accounts: what clients owe the shop for anything taken on credit ("nasiya").
+	ListCustomerBalances(ctx context.Context, in *ListCustomerBalancesRequest, opts ...grpc.CallOption) (*ListCustomerBalancesResponse, error)
+	ListCustomerLedger(ctx context.Context, in *ListCustomerLedgerRequest, opts ...grpc.CallOption) (*ListCustomerLedgerResponse, error)
+	RecordCustomerEntry(ctx context.Context, in *RecordCustomerEntryRequest, opts ...grpc.CallOption) (*CustomerLedgerEntry, error)
+	DeleteCustomerEntry(ctx context.Context, in *DeleteCustomerEntryRequest, opts ...grpc.CallOption) (*DeleteCustomerEntryResponse, error)
 	// Appointments / scheduling.
 	ListAppointments(ctx context.Context, in *ListAppointmentsRequest, opts ...grpc.CallOption) (*ListAppointmentsResponse, error)
 	CreateAppointment(ctx context.Context, in *CreateAppointmentRequest, opts ...grpc.CallOption) (*Appointment, error)
@@ -682,6 +691,46 @@ func (c *workOrderServiceClient) DeleteContragentEntry(ctx context.Context, in *
 	return out, nil
 }
 
+func (c *workOrderServiceClient) ListCustomerBalances(ctx context.Context, in *ListCustomerBalancesRequest, opts ...grpc.CallOption) (*ListCustomerBalancesResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListCustomerBalancesResponse)
+	err := c.cc.Invoke(ctx, WorkOrderService_ListCustomerBalances_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *workOrderServiceClient) ListCustomerLedger(ctx context.Context, in *ListCustomerLedgerRequest, opts ...grpc.CallOption) (*ListCustomerLedgerResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListCustomerLedgerResponse)
+	err := c.cc.Invoke(ctx, WorkOrderService_ListCustomerLedger_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *workOrderServiceClient) RecordCustomerEntry(ctx context.Context, in *RecordCustomerEntryRequest, opts ...grpc.CallOption) (*CustomerLedgerEntry, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CustomerLedgerEntry)
+	err := c.cc.Invoke(ctx, WorkOrderService_RecordCustomerEntry_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *workOrderServiceClient) DeleteCustomerEntry(ctx context.Context, in *DeleteCustomerEntryRequest, opts ...grpc.CallOption) (*DeleteCustomerEntryResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(DeleteCustomerEntryResponse)
+	err := c.cc.Invoke(ctx, WorkOrderService_DeleteCustomerEntry_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *workOrderServiceClient) ListAppointments(ctx context.Context, in *ListAppointmentsRequest, opts ...grpc.CallOption) (*ListAppointmentsResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(ListAppointmentsResponse)
@@ -980,6 +1029,11 @@ type WorkOrderServiceServer interface {
 	ListContragentLedger(context.Context, *ListContragentLedgerRequest) (*ListContragentLedgerResponse, error)
 	RecordContragentEntry(context.Context, *RecordContragentEntryRequest) (*ContragentLedgerEntry, error)
 	DeleteContragentEntry(context.Context, *DeleteContragentEntryRequest) (*DeleteContragentResponse, error)
+	// Customer accounts: what clients owe the shop for anything taken on credit ("nasiya").
+	ListCustomerBalances(context.Context, *ListCustomerBalancesRequest) (*ListCustomerBalancesResponse, error)
+	ListCustomerLedger(context.Context, *ListCustomerLedgerRequest) (*ListCustomerLedgerResponse, error)
+	RecordCustomerEntry(context.Context, *RecordCustomerEntryRequest) (*CustomerLedgerEntry, error)
+	DeleteCustomerEntry(context.Context, *DeleteCustomerEntryRequest) (*DeleteCustomerEntryResponse, error)
 	// Appointments / scheduling.
 	ListAppointments(context.Context, *ListAppointmentsRequest) (*ListAppointmentsResponse, error)
 	CreateAppointment(context.Context, *CreateAppointmentRequest) (*Appointment, error)
@@ -1164,6 +1218,18 @@ func (UnimplementedWorkOrderServiceServer) RecordContragentEntry(context.Context
 }
 func (UnimplementedWorkOrderServiceServer) DeleteContragentEntry(context.Context, *DeleteContragentEntryRequest) (*DeleteContragentResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method DeleteContragentEntry not implemented")
+}
+func (UnimplementedWorkOrderServiceServer) ListCustomerBalances(context.Context, *ListCustomerBalancesRequest) (*ListCustomerBalancesResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListCustomerBalances not implemented")
+}
+func (UnimplementedWorkOrderServiceServer) ListCustomerLedger(context.Context, *ListCustomerLedgerRequest) (*ListCustomerLedgerResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListCustomerLedger not implemented")
+}
+func (UnimplementedWorkOrderServiceServer) RecordCustomerEntry(context.Context, *RecordCustomerEntryRequest) (*CustomerLedgerEntry, error) {
+	return nil, status.Error(codes.Unimplemented, "method RecordCustomerEntry not implemented")
+}
+func (UnimplementedWorkOrderServiceServer) DeleteCustomerEntry(context.Context, *DeleteCustomerEntryRequest) (*DeleteCustomerEntryResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method DeleteCustomerEntry not implemented")
 }
 func (UnimplementedWorkOrderServiceServer) ListAppointments(context.Context, *ListAppointmentsRequest) (*ListAppointmentsResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method ListAppointments not implemented")
@@ -2098,6 +2164,78 @@ func _WorkOrderService_DeleteContragentEntry_Handler(srv interface{}, ctx contex
 	return interceptor(ctx, in, info, handler)
 }
 
+func _WorkOrderService_ListCustomerBalances_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListCustomerBalancesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WorkOrderServiceServer).ListCustomerBalances(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: WorkOrderService_ListCustomerBalances_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WorkOrderServiceServer).ListCustomerBalances(ctx, req.(*ListCustomerBalancesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _WorkOrderService_ListCustomerLedger_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListCustomerLedgerRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WorkOrderServiceServer).ListCustomerLedger(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: WorkOrderService_ListCustomerLedger_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WorkOrderServiceServer).ListCustomerLedger(ctx, req.(*ListCustomerLedgerRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _WorkOrderService_RecordCustomerEntry_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RecordCustomerEntryRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WorkOrderServiceServer).RecordCustomerEntry(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: WorkOrderService_RecordCustomerEntry_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WorkOrderServiceServer).RecordCustomerEntry(ctx, req.(*RecordCustomerEntryRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _WorkOrderService_DeleteCustomerEntry_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteCustomerEntryRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WorkOrderServiceServer).DeleteCustomerEntry(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: WorkOrderService_DeleteCustomerEntry_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WorkOrderServiceServer).DeleteCustomerEntry(ctx, req.(*DeleteCustomerEntryRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _WorkOrderService_ListAppointments_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ListAppointmentsRequest)
 	if err := dec(in); err != nil {
@@ -2688,6 +2826,22 @@ var WorkOrderService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteContragentEntry",
 			Handler:    _WorkOrderService_DeleteContragentEntry_Handler,
+		},
+		{
+			MethodName: "ListCustomerBalances",
+			Handler:    _WorkOrderService_ListCustomerBalances_Handler,
+		},
+		{
+			MethodName: "ListCustomerLedger",
+			Handler:    _WorkOrderService_ListCustomerLedger_Handler,
+		},
+		{
+			MethodName: "RecordCustomerEntry",
+			Handler:    _WorkOrderService_RecordCustomerEntry_Handler,
+		},
+		{
+			MethodName: "DeleteCustomerEntry",
+			Handler:    _WorkOrderService_DeleteCustomerEntry_Handler,
 		},
 		{
 			MethodName: "ListAppointments",

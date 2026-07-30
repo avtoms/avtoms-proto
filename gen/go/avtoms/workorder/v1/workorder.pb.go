@@ -189,6 +189,14 @@ const (
 	PaymentMethod_PAYMENT_METHOD_CASH        PaymentMethod = 1
 	PaymentMethod_PAYMENT_METHOD_OTHER       PaymentMethod = 2
 	PaymentMethod_PAYMENT_METHOD_CARD        PaymentMethod = 3
+	// Sold on credit ("nasiya"): the goods left, no money arrived, and the buyer owes it.
+	// The sale still counts as revenue — the shop earned it the moment the goods went out —
+	// and the amount owed is carried on the buyer's customer_ledger account until they pay.
+	// Because nobody can owe a debt anonymously, a credit sale REQUIRES a customer_id.
+	//
+	// Kept numerically identical to invoice.v1.PaymentMethod: the gateway casts one to the
+	// other when it issues a sale's receipt, so the two enums must never drift apart.
+	PaymentMethod_PAYMENT_METHOD_CREDIT PaymentMethod = 4
 )
 
 // Enum value maps for PaymentMethod.
@@ -198,12 +206,14 @@ var (
 		1: "PAYMENT_METHOD_CASH",
 		2: "PAYMENT_METHOD_OTHER",
 		3: "PAYMENT_METHOD_CARD",
+		4: "PAYMENT_METHOD_CREDIT",
 	}
 	PaymentMethod_value = map[string]int32{
 		"PAYMENT_METHOD_UNSPECIFIED": 0,
 		"PAYMENT_METHOD_CASH":        1,
 		"PAYMENT_METHOD_OTHER":       2,
 		"PAYMENT_METHOD_CARD":        3,
+		"PAYMENT_METHOD_CREDIT":      4,
 	}
 )
 
@@ -298,6 +308,68 @@ func (ContragentEntryKind) EnumDescriptor() ([]byte, []int) {
 	return file_avtoms_workorder_v1_workorder_proto_rawDescGZIP(), []int{4}
 }
 
+// ── customer accounts (nasiya) ───────────────────────────────────────────────────────
+// The mirror image of the contragent ledger, for the other side of the counter: what
+// CUSTOMERS owe the shop. A sale or an order settled on credit writes a charge here, and
+// every repayment writes a payment against it.
+//
+// The sign convention is flipped from the contragent one on purpose, because the question
+// being asked is different. There it was "how much do we owe this supplier"; here it is
+// "how much does this client owe us", and POSITIVE MEANS THE CLIENT OWES THE SHOP. Both
+// screens then read the same way round: a big positive number is money you are waiting on.
+//
+// This is debt and cash movement, NOT revenue. The revenue was already recognised when the
+// goods went out and the invoice was raised; counting the repayment as income as well would
+// book the same money twice.
+type CustomerEntryKind int32
+
+const (
+	CustomerEntryKind_CUSTOMER_ENTRY_KIND_UNSPECIFIED CustomerEntryKind = 0
+	CustomerEntryKind_CUSTOMER_ENTRY_KIND_CHARGE      CustomerEntryKind = 1 // sold to them on credit           → +
+	CustomerEntryKind_CUSTOMER_ENTRY_KIND_PAYMENT_IN  CustomerEntryKind = 2 // they paid off some of the debt   → −
+)
+
+// Enum value maps for CustomerEntryKind.
+var (
+	CustomerEntryKind_name = map[int32]string{
+		0: "CUSTOMER_ENTRY_KIND_UNSPECIFIED",
+		1: "CUSTOMER_ENTRY_KIND_CHARGE",
+		2: "CUSTOMER_ENTRY_KIND_PAYMENT_IN",
+	}
+	CustomerEntryKind_value = map[string]int32{
+		"CUSTOMER_ENTRY_KIND_UNSPECIFIED": 0,
+		"CUSTOMER_ENTRY_KIND_CHARGE":      1,
+		"CUSTOMER_ENTRY_KIND_PAYMENT_IN":  2,
+	}
+)
+
+func (x CustomerEntryKind) Enum() *CustomerEntryKind {
+	p := new(CustomerEntryKind)
+	*p = x
+	return p
+}
+
+func (x CustomerEntryKind) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (CustomerEntryKind) Descriptor() protoreflect.EnumDescriptor {
+	return file_avtoms_workorder_v1_workorder_proto_enumTypes[5].Descriptor()
+}
+
+func (CustomerEntryKind) Type() protoreflect.EnumType {
+	return &file_avtoms_workorder_v1_workorder_proto_enumTypes[5]
+}
+
+func (x CustomerEntryKind) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use CustomerEntryKind.Descriptor instead.
+func (CustomerEntryKind) EnumDescriptor() ([]byte, []int) {
+	return file_avtoms_workorder_v1_workorder_proto_rawDescGZIP(), []int{5}
+}
+
 type WorkOrderState int32
 
 const (
@@ -349,11 +421,11 @@ func (x WorkOrderState) String() string {
 }
 
 func (WorkOrderState) Descriptor() protoreflect.EnumDescriptor {
-	return file_avtoms_workorder_v1_workorder_proto_enumTypes[5].Descriptor()
+	return file_avtoms_workorder_v1_workorder_proto_enumTypes[6].Descriptor()
 }
 
 func (WorkOrderState) Type() protoreflect.EnumType {
-	return &file_avtoms_workorder_v1_workorder_proto_enumTypes[5]
+	return &file_avtoms_workorder_v1_workorder_proto_enumTypes[6]
 }
 
 func (x WorkOrderState) Number() protoreflect.EnumNumber {
@@ -362,7 +434,7 @@ func (x WorkOrderState) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use WorkOrderState.Descriptor instead.
 func (WorkOrderState) EnumDescriptor() ([]byte, []int) {
-	return file_avtoms_workorder_v1_workorder_proto_rawDescGZIP(), []int{5}
+	return file_avtoms_workorder_v1_workorder_proto_rawDescGZIP(), []int{6}
 }
 
 type LineItemKind int32
@@ -404,11 +476,11 @@ func (x LineItemKind) String() string {
 }
 
 func (LineItemKind) Descriptor() protoreflect.EnumDescriptor {
-	return file_avtoms_workorder_v1_workorder_proto_enumTypes[6].Descriptor()
+	return file_avtoms_workorder_v1_workorder_proto_enumTypes[7].Descriptor()
 }
 
 func (LineItemKind) Type() protoreflect.EnumType {
-	return &file_avtoms_workorder_v1_workorder_proto_enumTypes[6]
+	return &file_avtoms_workorder_v1_workorder_proto_enumTypes[7]
 }
 
 func (x LineItemKind) Number() protoreflect.EnumNumber {
@@ -417,7 +489,7 @@ func (x LineItemKind) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use LineItemKind.Descriptor instead.
 func (LineItemKind) EnumDescriptor() ([]byte, []int) {
-	return file_avtoms_workorder_v1_workorder_proto_rawDescGZIP(), []int{6}
+	return file_avtoms_workorder_v1_workorder_proto_rawDescGZIP(), []int{7}
 }
 
 // LineItemStatus is the per-service progress a mechanic drives. When every SERVICE line on an
@@ -458,11 +530,11 @@ func (x LineItemStatus) String() string {
 }
 
 func (LineItemStatus) Descriptor() protoreflect.EnumDescriptor {
-	return file_avtoms_workorder_v1_workorder_proto_enumTypes[7].Descriptor()
+	return file_avtoms_workorder_v1_workorder_proto_enumTypes[8].Descriptor()
 }
 
 func (LineItemStatus) Type() protoreflect.EnumType {
-	return &file_avtoms_workorder_v1_workorder_proto_enumTypes[7]
+	return &file_avtoms_workorder_v1_workorder_proto_enumTypes[8]
 }
 
 func (x LineItemStatus) Number() protoreflect.EnumNumber {
@@ -471,7 +543,7 @@ func (x LineItemStatus) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use LineItemStatus.Descriptor instead.
 func (LineItemStatus) EnumDescriptor() ([]byte, []int) {
-	return file_avtoms_workorder_v1_workorder_proto_rawDescGZIP(), []int{7}
+	return file_avtoms_workorder_v1_workorder_proto_rawDescGZIP(), []int{8}
 }
 
 // DiscountKind selects how a whole-order discount is expressed.
@@ -508,11 +580,11 @@ func (x DiscountKind) String() string {
 }
 
 func (DiscountKind) Descriptor() protoreflect.EnumDescriptor {
-	return file_avtoms_workorder_v1_workorder_proto_enumTypes[8].Descriptor()
+	return file_avtoms_workorder_v1_workorder_proto_enumTypes[9].Descriptor()
 }
 
 func (DiscountKind) Type() protoreflect.EnumType {
-	return &file_avtoms_workorder_v1_workorder_proto_enumTypes[8]
+	return &file_avtoms_workorder_v1_workorder_proto_enumTypes[9]
 }
 
 func (x DiscountKind) Number() protoreflect.EnumNumber {
@@ -521,7 +593,7 @@ func (x DiscountKind) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use DiscountKind.Descriptor instead.
 func (DiscountKind) EnumDescriptor() ([]byte, []int) {
-	return file_avtoms_workorder_v1_workorder_proto_rawDescGZIP(), []int{8}
+	return file_avtoms_workorder_v1_workorder_proto_rawDescGZIP(), []int{9}
 }
 
 // ApprovalLink is a freshly minted token for a work order's estimate.
@@ -2420,8 +2492,15 @@ type Statistics struct {
 	Payments []*PaymentBucket `protobuf:"bytes,28,rep,name=payments,proto3" json:"payments,omitempty"`
 	// Counterparty balances, all-time rather than windowed — a debt does not stop existing
 	// because you looked at one month. Not part of net_profit: see ContragentEntryKind.
-	Payable       int64 `protobuf:"varint,29,opt,name=payable,proto3" json:"payable,omitempty"`       // what the shop owes suppliers
-	Receivable    int64 `protobuf:"varint,30,opt,name=receivable,proto3" json:"receivable,omitempty"` // what counterparties owe the shop
+	Payable    int64 `protobuf:"varint,29,opt,name=payable,proto3" json:"payable,omitempty"`       // what the shop owes suppliers
+	Receivable int64 `protobuf:"varint,30,opt,name=receivable,proto3" json:"receivable,omitempty"` // what counterparties owe the shop
+	// What CLIENTS owe for goods and work taken on credit. All-time like the two above, and
+	// likewise outside net_profit: this money was already counted as revenue when the goods
+	// went out — this line says how much of it has not arrived yet.
+	ClientDebt int64 `protobuf:"varint,31,opt,name=client_debt,json=clientDebt,proto3" json:"client_debt,omitempty"`
+	// How much of the window's revenue was taken on credit rather than collected. Part of
+	// revenue, shown separately so "we billed 10m" and "we hold 10m" are not confused.
+	CreditRevenue int64 `protobuf:"varint,32,opt,name=credit_revenue,json=creditRevenue,proto3" json:"credit_revenue,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -2662,6 +2741,20 @@ func (x *Statistics) GetPayable() int64 {
 func (x *Statistics) GetReceivable() int64 {
 	if x != nil {
 		return x.Receivable
+	}
+	return 0
+}
+
+func (x *Statistics) GetClientDebt() int64 {
+	if x != nil {
+		return x.ClientDebt
+	}
+	return 0
+}
+
+func (x *Statistics) GetCreditRevenue() int64 {
+	if x != nil {
+		return x.CreditRevenue
 	}
 	return 0
 }
@@ -7695,6 +7788,698 @@ func (x *DeleteContragentEntryRequest) GetId() string {
 	return ""
 }
 
+type CustomerLedgerEntry struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	ShopId        string                 `protobuf:"bytes,2,opt,name=shop_id,json=shopId,proto3" json:"shop_id,omitempty"`
+	CustomerId    string                 `protobuf:"bytes,3,opt,name=customer_id,json=customerId,proto3" json:"customer_id,omitempty"`
+	Kind          CustomerEntryKind      `protobuf:"varint,4,opt,name=kind,proto3,enum=avtoms.workorder.v1.CustomerEntryKind" json:"kind,omitempty"`
+	Amount        int64                  `protobuf:"varint,5,opt,name=amount,proto3" json:"amount,omitempty"`                               // tiyin, always positive
+	Description   string                 `protobuf:"bytes,6,opt,name=description,proto3" json:"description,omitempty"`                      // snapshot, e.g. "S-0042 · 3 dona"
+	SaleId        string                 `protobuf:"bytes,7,opt,name=sale_id,json=saleId,proto3" json:"sale_id,omitempty"`                  // the counter sale a charge came from, when it had one
+	WorkOrderId   string                 `protobuf:"bytes,8,opt,name=work_order_id,json=workOrderId,proto3" json:"work_order_id,omitempty"` // the order a charge came from, when it had one
+	InvoiceId     string                 `protobuf:"bytes,9,opt,name=invoice_id,json=invoiceId,proto3" json:"invoice_id,omitempty"`
+	Method        PaymentMethod          `protobuf:"varint,10,opt,name=method,proto3,enum=avtoms.workorder.v1.PaymentMethod" json:"method,omitempty"` // how a repayment arrived; payments only
+	StaffId       string                 `protobuf:"bytes,11,opt,name=staff_id,json=staffId,proto3" json:"staff_id,omitempty"`
+	OccurredAt    string                 `protobuf:"bytes,12,opt,name=occurred_at,json=occurredAt,proto3" json:"occurred_at,omitempty"` // RFC3339 — when it happened, not when it was typed
+	Note          string                 `protobuf:"bytes,13,opt,name=note,proto3" json:"note,omitempty"`
+	CreatedAt     string                 `protobuf:"bytes,14,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CustomerLedgerEntry) Reset() {
+	*x = CustomerLedgerEntry{}
+	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[95]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CustomerLedgerEntry) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CustomerLedgerEntry) ProtoMessage() {}
+
+func (x *CustomerLedgerEntry) ProtoReflect() protoreflect.Message {
+	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[95]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CustomerLedgerEntry.ProtoReflect.Descriptor instead.
+func (*CustomerLedgerEntry) Descriptor() ([]byte, []int) {
+	return file_avtoms_workorder_v1_workorder_proto_rawDescGZIP(), []int{95}
+}
+
+func (x *CustomerLedgerEntry) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *CustomerLedgerEntry) GetShopId() string {
+	if x != nil {
+		return x.ShopId
+	}
+	return ""
+}
+
+func (x *CustomerLedgerEntry) GetCustomerId() string {
+	if x != nil {
+		return x.CustomerId
+	}
+	return ""
+}
+
+func (x *CustomerLedgerEntry) GetKind() CustomerEntryKind {
+	if x != nil {
+		return x.Kind
+	}
+	return CustomerEntryKind_CUSTOMER_ENTRY_KIND_UNSPECIFIED
+}
+
+func (x *CustomerLedgerEntry) GetAmount() int64 {
+	if x != nil {
+		return x.Amount
+	}
+	return 0
+}
+
+func (x *CustomerLedgerEntry) GetDescription() string {
+	if x != nil {
+		return x.Description
+	}
+	return ""
+}
+
+func (x *CustomerLedgerEntry) GetSaleId() string {
+	if x != nil {
+		return x.SaleId
+	}
+	return ""
+}
+
+func (x *CustomerLedgerEntry) GetWorkOrderId() string {
+	if x != nil {
+		return x.WorkOrderId
+	}
+	return ""
+}
+
+func (x *CustomerLedgerEntry) GetInvoiceId() string {
+	if x != nil {
+		return x.InvoiceId
+	}
+	return ""
+}
+
+func (x *CustomerLedgerEntry) GetMethod() PaymentMethod {
+	if x != nil {
+		return x.Method
+	}
+	return PaymentMethod_PAYMENT_METHOD_UNSPECIFIED
+}
+
+func (x *CustomerLedgerEntry) GetStaffId() string {
+	if x != nil {
+		return x.StaffId
+	}
+	return ""
+}
+
+func (x *CustomerLedgerEntry) GetOccurredAt() string {
+	if x != nil {
+		return x.OccurredAt
+	}
+	return ""
+}
+
+func (x *CustomerLedgerEntry) GetNote() string {
+	if x != nil {
+		return x.Note
+	}
+	return ""
+}
+
+func (x *CustomerLedgerEntry) GetCreatedAt() string {
+	if x != nil {
+		return x.CreatedAt
+	}
+	return ""
+}
+
+// CustomerBalance is one client's account. balance = charged − paid; positive means the
+// client owes the shop.
+type CustomerBalance struct {
+	state      protoimpl.MessageState `protogen:"open.v1"`
+	CustomerId string                 `protobuf:"bytes,1,opt,name=customer_id,json=customerId,proto3" json:"customer_id,omitempty"`
+	Charged    int64                  `protobuf:"varint,2,opt,name=charged,proto3" json:"charged,omitempty"`
+	Paid       int64                  `protobuf:"varint,3,opt,name=paid,proto3" json:"paid,omitempty"`
+	Balance    int64                  `protobuf:"varint,4,opt,name=balance,proto3" json:"balance,omitempty"`
+	LastAt     string                 `protobuf:"bytes,5,opt,name=last_at,json=lastAt,proto3" json:"last_at,omitempty"` // most recent movement on the account, RFC3339
+	Entries    int32                  `protobuf:"varint,6,opt,name=entries,proto3" json:"entries,omitempty"`
+	// Denormalized for display, filled in by the GATEWAY from the customer service — this
+	// service does not own customers and leaves both empty.
+	Name          string `protobuf:"bytes,7,opt,name=name,proto3" json:"name,omitempty"`
+	Phone         string `protobuf:"bytes,8,opt,name=phone,proto3" json:"phone,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CustomerBalance) Reset() {
+	*x = CustomerBalance{}
+	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[96]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CustomerBalance) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CustomerBalance) ProtoMessage() {}
+
+func (x *CustomerBalance) ProtoReflect() protoreflect.Message {
+	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[96]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CustomerBalance.ProtoReflect.Descriptor instead.
+func (*CustomerBalance) Descriptor() ([]byte, []int) {
+	return file_avtoms_workorder_v1_workorder_proto_rawDescGZIP(), []int{96}
+}
+
+func (x *CustomerBalance) GetCustomerId() string {
+	if x != nil {
+		return x.CustomerId
+	}
+	return ""
+}
+
+func (x *CustomerBalance) GetCharged() int64 {
+	if x != nil {
+		return x.Charged
+	}
+	return 0
+}
+
+func (x *CustomerBalance) GetPaid() int64 {
+	if x != nil {
+		return x.Paid
+	}
+	return 0
+}
+
+func (x *CustomerBalance) GetBalance() int64 {
+	if x != nil {
+		return x.Balance
+	}
+	return 0
+}
+
+func (x *CustomerBalance) GetLastAt() string {
+	if x != nil {
+		return x.LastAt
+	}
+	return ""
+}
+
+func (x *CustomerBalance) GetEntries() int32 {
+	if x != nil {
+		return x.Entries
+	}
+	return 0
+}
+
+func (x *CustomerBalance) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *CustomerBalance) GetPhone() string {
+	if x != nil {
+		return x.Phone
+	}
+	return ""
+}
+
+type ListCustomerBalancesRequest struct {
+	state  protoimpl.MessageState `protogen:"open.v1"`
+	ShopId string                 `protobuf:"bytes,1,opt,name=shop_id,json=shopId,proto3" json:"shop_id,omitempty"`
+	// The window narrows charged/paid. The BALANCE ignores it and is always all-time: a debt
+	// does not stop existing because you looked at a single month.
+	From          string `protobuf:"bytes,2,opt,name=from,proto3" json:"from,omitempty"`
+	To            string `protobuf:"bytes,3,opt,name=to,proto3" json:"to,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListCustomerBalancesRequest) Reset() {
+	*x = ListCustomerBalancesRequest{}
+	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[97]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListCustomerBalancesRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListCustomerBalancesRequest) ProtoMessage() {}
+
+func (x *ListCustomerBalancesRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[97]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListCustomerBalancesRequest.ProtoReflect.Descriptor instead.
+func (*ListCustomerBalancesRequest) Descriptor() ([]byte, []int) {
+	return file_avtoms_workorder_v1_workorder_proto_rawDescGZIP(), []int{97}
+}
+
+func (x *ListCustomerBalancesRequest) GetShopId() string {
+	if x != nil {
+		return x.ShopId
+	}
+	return ""
+}
+
+func (x *ListCustomerBalancesRequest) GetFrom() string {
+	if x != nil {
+		return x.From
+	}
+	return ""
+}
+
+func (x *ListCustomerBalancesRequest) GetTo() string {
+	if x != nil {
+		return x.To
+	}
+	return ""
+}
+
+type ListCustomerBalancesResponse struct {
+	state           protoimpl.MessageState `protogen:"open.v1"`
+	Balances        []*CustomerBalance     `protobuf:"bytes,1,rep,name=balances,proto3" json:"balances,omitempty"`                                       // most in debt first
+	TotalReceivable int64                  `protobuf:"varint,2,opt,name=total_receivable,json=totalReceivable,proto3" json:"total_receivable,omitempty"` // summed over clients who owe the shop
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
+}
+
+func (x *ListCustomerBalancesResponse) Reset() {
+	*x = ListCustomerBalancesResponse{}
+	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[98]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListCustomerBalancesResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListCustomerBalancesResponse) ProtoMessage() {}
+
+func (x *ListCustomerBalancesResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[98]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListCustomerBalancesResponse.ProtoReflect.Descriptor instead.
+func (*ListCustomerBalancesResponse) Descriptor() ([]byte, []int) {
+	return file_avtoms_workorder_v1_workorder_proto_rawDescGZIP(), []int{98}
+}
+
+func (x *ListCustomerBalancesResponse) GetBalances() []*CustomerBalance {
+	if x != nil {
+		return x.Balances
+	}
+	return nil
+}
+
+func (x *ListCustomerBalancesResponse) GetTotalReceivable() int64 {
+	if x != nil {
+		return x.TotalReceivable
+	}
+	return 0
+}
+
+type ListCustomerLedgerRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	CustomerId    string                 `protobuf:"bytes,1,opt,name=customer_id,json=customerId,proto3" json:"customer_id,omitempty"`
+	From          string                 `protobuf:"bytes,2,opt,name=from,proto3" json:"from,omitempty"`
+	To            string                 `protobuf:"bytes,3,opt,name=to,proto3" json:"to,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListCustomerLedgerRequest) Reset() {
+	*x = ListCustomerLedgerRequest{}
+	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[99]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListCustomerLedgerRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListCustomerLedgerRequest) ProtoMessage() {}
+
+func (x *ListCustomerLedgerRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[99]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListCustomerLedgerRequest.ProtoReflect.Descriptor instead.
+func (*ListCustomerLedgerRequest) Descriptor() ([]byte, []int) {
+	return file_avtoms_workorder_v1_workorder_proto_rawDescGZIP(), []int{99}
+}
+
+func (x *ListCustomerLedgerRequest) GetCustomerId() string {
+	if x != nil {
+		return x.CustomerId
+	}
+	return ""
+}
+
+func (x *ListCustomerLedgerRequest) GetFrom() string {
+	if x != nil {
+		return x.From
+	}
+	return ""
+}
+
+func (x *ListCustomerLedgerRequest) GetTo() string {
+	if x != nil {
+		return x.To
+	}
+	return ""
+}
+
+type ListCustomerLedgerResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Entries       []*CustomerLedgerEntry `protobuf:"bytes,1,rep,name=entries,proto3" json:"entries,omitempty"` // newest first
+	Summary       *CustomerBalance       `protobuf:"bytes,2,opt,name=summary,proto3" json:"summary,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListCustomerLedgerResponse) Reset() {
+	*x = ListCustomerLedgerResponse{}
+	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[100]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListCustomerLedgerResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListCustomerLedgerResponse) ProtoMessage() {}
+
+func (x *ListCustomerLedgerResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[100]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListCustomerLedgerResponse.ProtoReflect.Descriptor instead.
+func (*ListCustomerLedgerResponse) Descriptor() ([]byte, []int) {
+	return file_avtoms_workorder_v1_workorder_proto_rawDescGZIP(), []int{100}
+}
+
+func (x *ListCustomerLedgerResponse) GetEntries() []*CustomerLedgerEntry {
+	if x != nil {
+		return x.Entries
+	}
+	return nil
+}
+
+func (x *ListCustomerLedgerResponse) GetSummary() *CustomerBalance {
+	if x != nil {
+		return x.Summary
+	}
+	return nil
+}
+
+type RecordCustomerEntryRequest struct {
+	state       protoimpl.MessageState `protogen:"open.v1"`
+	ShopId      string                 `protobuf:"bytes,1,opt,name=shop_id,json=shopId,proto3" json:"shop_id,omitempty"`
+	CustomerId  string                 `protobuf:"bytes,2,opt,name=customer_id,json=customerId,proto3" json:"customer_id,omitempty"`
+	Kind        CustomerEntryKind      `protobuf:"varint,3,opt,name=kind,proto3,enum=avtoms.workorder.v1.CustomerEntryKind" json:"kind,omitempty"`
+	Amount      int64                  `protobuf:"varint,4,opt,name=amount,proto3" json:"amount,omitempty"`
+	Method      PaymentMethod          `protobuf:"varint,5,opt,name=method,proto3,enum=avtoms.workorder.v1.PaymentMethod" json:"method,omitempty"`
+	Note        string                 `protobuf:"bytes,6,opt,name=note,proto3" json:"note,omitempty"`
+	OccurredAt  string                 `protobuf:"bytes,7,opt,name=occurred_at,json=occurredAt,proto3" json:"occurred_at,omitempty"` // RFC3339; empty means now
+	StaffId     string                 `protobuf:"bytes,8,opt,name=staff_id,json=staffId,proto3" json:"staff_id,omitempty"`          // from the token, at the gateway
+	Description string                 `protobuf:"bytes,9,opt,name=description,proto3" json:"description,omitempty"`
+	// Set when the charge is raised by closing an order on credit, so voiding or re-paying
+	// that order can find its entry again instead of leaving a duplicate debt behind.
+	WorkOrderId   string `protobuf:"bytes,10,opt,name=work_order_id,json=workOrderId,proto3" json:"work_order_id,omitempty"`
+	InvoiceId     string `protobuf:"bytes,11,opt,name=invoice_id,json=invoiceId,proto3" json:"invoice_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *RecordCustomerEntryRequest) Reset() {
+	*x = RecordCustomerEntryRequest{}
+	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[101]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RecordCustomerEntryRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RecordCustomerEntryRequest) ProtoMessage() {}
+
+func (x *RecordCustomerEntryRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[101]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RecordCustomerEntryRequest.ProtoReflect.Descriptor instead.
+func (*RecordCustomerEntryRequest) Descriptor() ([]byte, []int) {
+	return file_avtoms_workorder_v1_workorder_proto_rawDescGZIP(), []int{101}
+}
+
+func (x *RecordCustomerEntryRequest) GetShopId() string {
+	if x != nil {
+		return x.ShopId
+	}
+	return ""
+}
+
+func (x *RecordCustomerEntryRequest) GetCustomerId() string {
+	if x != nil {
+		return x.CustomerId
+	}
+	return ""
+}
+
+func (x *RecordCustomerEntryRequest) GetKind() CustomerEntryKind {
+	if x != nil {
+		return x.Kind
+	}
+	return CustomerEntryKind_CUSTOMER_ENTRY_KIND_UNSPECIFIED
+}
+
+func (x *RecordCustomerEntryRequest) GetAmount() int64 {
+	if x != nil {
+		return x.Amount
+	}
+	return 0
+}
+
+func (x *RecordCustomerEntryRequest) GetMethod() PaymentMethod {
+	if x != nil {
+		return x.Method
+	}
+	return PaymentMethod_PAYMENT_METHOD_UNSPECIFIED
+}
+
+func (x *RecordCustomerEntryRequest) GetNote() string {
+	if x != nil {
+		return x.Note
+	}
+	return ""
+}
+
+func (x *RecordCustomerEntryRequest) GetOccurredAt() string {
+	if x != nil {
+		return x.OccurredAt
+	}
+	return ""
+}
+
+func (x *RecordCustomerEntryRequest) GetStaffId() string {
+	if x != nil {
+		return x.StaffId
+	}
+	return ""
+}
+
+func (x *RecordCustomerEntryRequest) GetDescription() string {
+	if x != nil {
+		return x.Description
+	}
+	return ""
+}
+
+func (x *RecordCustomerEntryRequest) GetWorkOrderId() string {
+	if x != nil {
+		return x.WorkOrderId
+	}
+	return ""
+}
+
+func (x *RecordCustomerEntryRequest) GetInvoiceId() string {
+	if x != nil {
+		return x.InvoiceId
+	}
+	return ""
+}
+
+type DeleteCustomerEntryRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DeleteCustomerEntryRequest) Reset() {
+	*x = DeleteCustomerEntryRequest{}
+	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[102]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeleteCustomerEntryRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteCustomerEntryRequest) ProtoMessage() {}
+
+func (x *DeleteCustomerEntryRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[102]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteCustomerEntryRequest.ProtoReflect.Descriptor instead.
+func (*DeleteCustomerEntryRequest) Descriptor() ([]byte, []int) {
+	return file_avtoms_workorder_v1_workorder_proto_rawDescGZIP(), []int{102}
+}
+
+func (x *DeleteCustomerEntryRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+type DeleteCustomerEntryResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Ok            bool                   `protobuf:"varint,1,opt,name=ok,proto3" json:"ok,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DeleteCustomerEntryResponse) Reset() {
+	*x = DeleteCustomerEntryResponse{}
+	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[103]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeleteCustomerEntryResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteCustomerEntryResponse) ProtoMessage() {}
+
+func (x *DeleteCustomerEntryResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[103]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteCustomerEntryResponse.ProtoReflect.Descriptor instead.
+func (*DeleteCustomerEntryResponse) Descriptor() ([]byte, []int) {
+	return file_avtoms_workorder_v1_workorder_proto_rawDescGZIP(), []int{103}
+}
+
+func (x *DeleteCustomerEntryResponse) GetOk() bool {
+	if x != nil {
+		return x.Ok
+	}
+	return false
+}
+
 // ShopSettings holds per-shop policy: pricing, and which statuses the shop's work orders
 // move through.
 type ShopSettings struct {
@@ -7724,7 +8509,7 @@ type ShopSettings struct {
 
 func (x *ShopSettings) Reset() {
 	*x = ShopSettings{}
-	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[95]
+	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[104]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -7736,7 +8521,7 @@ func (x *ShopSettings) String() string {
 func (*ShopSettings) ProtoMessage() {}
 
 func (x *ShopSettings) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[95]
+	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[104]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -7749,7 +8534,7 @@ func (x *ShopSettings) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ShopSettings.ProtoReflect.Descriptor instead.
 func (*ShopSettings) Descriptor() ([]byte, []int) {
-	return file_avtoms_workorder_v1_workorder_proto_rawDescGZIP(), []int{95}
+	return file_avtoms_workorder_v1_workorder_proto_rawDescGZIP(), []int{104}
 }
 
 func (x *ShopSettings) GetShopId() string {
@@ -7817,7 +8602,7 @@ type GetShopSettingsRequest struct {
 
 func (x *GetShopSettingsRequest) Reset() {
 	*x = GetShopSettingsRequest{}
-	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[96]
+	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[105]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -7829,7 +8614,7 @@ func (x *GetShopSettingsRequest) String() string {
 func (*GetShopSettingsRequest) ProtoMessage() {}
 
 func (x *GetShopSettingsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[96]
+	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[105]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -7842,7 +8627,7 @@ func (x *GetShopSettingsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetShopSettingsRequest.ProtoReflect.Descriptor instead.
 func (*GetShopSettingsRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_workorder_v1_workorder_proto_rawDescGZIP(), []int{96}
+	return file_avtoms_workorder_v1_workorder_proto_rawDescGZIP(), []int{105}
 }
 
 func (x *GetShopSettingsRequest) GetShopId() string {
@@ -7868,7 +8653,7 @@ type UpdateShopSettingsRequest struct {
 
 func (x *UpdateShopSettingsRequest) Reset() {
 	*x = UpdateShopSettingsRequest{}
-	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[97]
+	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[106]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -7880,7 +8665,7 @@ func (x *UpdateShopSettingsRequest) String() string {
 func (*UpdateShopSettingsRequest) ProtoMessage() {}
 
 func (x *UpdateShopSettingsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[97]
+	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[106]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -7893,7 +8678,7 @@ func (x *UpdateShopSettingsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateShopSettingsRequest.ProtoReflect.Descriptor instead.
 func (*UpdateShopSettingsRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_workorder_v1_workorder_proto_rawDescGZIP(), []int{97}
+	return file_avtoms_workorder_v1_workorder_proto_rawDescGZIP(), []int{106}
 }
 
 func (x *UpdateShopSettingsRequest) GetShopId() string {
@@ -7964,7 +8749,7 @@ type ListWorkOrdersRequest struct {
 
 func (x *ListWorkOrdersRequest) Reset() {
 	*x = ListWorkOrdersRequest{}
-	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[98]
+	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[107]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -7976,7 +8761,7 @@ func (x *ListWorkOrdersRequest) String() string {
 func (*ListWorkOrdersRequest) ProtoMessage() {}
 
 func (x *ListWorkOrdersRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[98]
+	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[107]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -7989,7 +8774,7 @@ func (x *ListWorkOrdersRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListWorkOrdersRequest.ProtoReflect.Descriptor instead.
 func (*ListWorkOrdersRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_workorder_v1_workorder_proto_rawDescGZIP(), []int{98}
+	return file_avtoms_workorder_v1_workorder_proto_rawDescGZIP(), []int{107}
 }
 
 func (x *ListWorkOrdersRequest) GetShopId() string {
@@ -8029,7 +8814,7 @@ type ListWorkOrdersResponse struct {
 
 func (x *ListWorkOrdersResponse) Reset() {
 	*x = ListWorkOrdersResponse{}
-	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[99]
+	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[108]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -8041,7 +8826,7 @@ func (x *ListWorkOrdersResponse) String() string {
 func (*ListWorkOrdersResponse) ProtoMessage() {}
 
 func (x *ListWorkOrdersResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[99]
+	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[108]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -8054,7 +8839,7 @@ func (x *ListWorkOrdersResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListWorkOrdersResponse.ProtoReflect.Descriptor instead.
 func (*ListWorkOrdersResponse) Descriptor() ([]byte, []int) {
-	return file_avtoms_workorder_v1_workorder_proto_rawDescGZIP(), []int{99}
+	return file_avtoms_workorder_v1_workorder_proto_rawDescGZIP(), []int{108}
 }
 
 func (x *ListWorkOrdersResponse) GetWorkOrders() []*WorkOrder {
@@ -8101,7 +8886,7 @@ type LineItem struct {
 
 func (x *LineItem) Reset() {
 	*x = LineItem{}
-	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[100]
+	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[109]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -8113,7 +8898,7 @@ func (x *LineItem) String() string {
 func (*LineItem) ProtoMessage() {}
 
 func (x *LineItem) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[100]
+	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[109]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -8126,7 +8911,7 @@ func (x *LineItem) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LineItem.ProtoReflect.Descriptor instead.
 func (*LineItem) Descriptor() ([]byte, []int) {
-	return file_avtoms_workorder_v1_workorder_proto_rawDescGZIP(), []int{100}
+	return file_avtoms_workorder_v1_workorder_proto_rawDescGZIP(), []int{109}
 }
 
 func (x *LineItem) GetId() string {
@@ -8247,13 +9032,21 @@ type WorkOrder struct {
 	DiscountKind   DiscountKind `protobuf:"varint,21,opt,name=discount_kind,json=discountKind,proto3,enum=avtoms.workorder.v1.DiscountKind" json:"discount_kind,omitempty"`
 	DiscountValue  int64        `protobuf:"varint,22,opt,name=discount_value,json=discountValue,proto3" json:"discount_value,omitempty"`
 	DiscountAmount int64        `protobuf:"varint,23,opt,name=discount_amount,json=discountAmount,proto3" json:"discount_amount,omitempty"`
-	unknownFields  protoimpl.UnknownFields
-	sizeCache      protoimpl.SizeCache
+	// Also denormalized by the gateway from the vehicle's owner. The id is what a credit
+	// close charges the debt to, and the phone is what a service reminder is sent to — both
+	// otherwise cost the caller two extra round trips to find.
+	CustomerId    string `protobuf:"bytes,24,opt,name=customer_id,json=customerId,proto3" json:"customer_id,omitempty"`
+	CustomerPhone string `protobuf:"bytes,25,opt,name=customer_phone,json=customerPhone,proto3" json:"customer_phone,omitempty"`
+	// The odometer reading on the vehicle, so a reminder set at closing time can be dated
+	// "10 000 km from here" without a separate lookup.
+	Mileage       int64 `protobuf:"varint,26,opt,name=mileage,proto3" json:"mileage,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *WorkOrder) Reset() {
 	*x = WorkOrder{}
-	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[101]
+	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[110]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -8265,7 +9058,7 @@ func (x *WorkOrder) String() string {
 func (*WorkOrder) ProtoMessage() {}
 
 func (x *WorkOrder) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[101]
+	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[110]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -8278,7 +9071,7 @@ func (x *WorkOrder) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use WorkOrder.ProtoReflect.Descriptor instead.
 func (*WorkOrder) Descriptor() ([]byte, []int) {
-	return file_avtoms_workorder_v1_workorder_proto_rawDescGZIP(), []int{101}
+	return file_avtoms_workorder_v1_workorder_proto_rawDescGZIP(), []int{110}
 }
 
 func (x *WorkOrder) GetId() string {
@@ -8442,6 +9235,27 @@ func (x *WorkOrder) GetDiscountAmount() int64 {
 	return 0
 }
 
+func (x *WorkOrder) GetCustomerId() string {
+	if x != nil {
+		return x.CustomerId
+	}
+	return ""
+}
+
+func (x *WorkOrder) GetCustomerPhone() string {
+	if x != nil {
+		return x.CustomerPhone
+	}
+	return ""
+}
+
+func (x *WorkOrder) GetMileage() int64 {
+	if x != nil {
+		return x.Mileage
+	}
+	return 0
+}
+
 type TimeEntry struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
@@ -8455,7 +9269,7 @@ type TimeEntry struct {
 
 func (x *TimeEntry) Reset() {
 	*x = TimeEntry{}
-	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[102]
+	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[111]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -8467,7 +9281,7 @@ func (x *TimeEntry) String() string {
 func (*TimeEntry) ProtoMessage() {}
 
 func (x *TimeEntry) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[102]
+	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[111]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -8480,7 +9294,7 @@ func (x *TimeEntry) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TimeEntry.ProtoReflect.Descriptor instead.
 func (*TimeEntry) Descriptor() ([]byte, []int) {
-	return file_avtoms_workorder_v1_workorder_proto_rawDescGZIP(), []int{102}
+	return file_avtoms_workorder_v1_workorder_proto_rawDescGZIP(), []int{111}
 }
 
 func (x *TimeEntry) GetId() string {
@@ -8534,7 +9348,7 @@ type MenuMaterial struct {
 
 func (x *MenuMaterial) Reset() {
 	*x = MenuMaterial{}
-	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[103]
+	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[112]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -8546,7 +9360,7 @@ func (x *MenuMaterial) String() string {
 func (*MenuMaterial) ProtoMessage() {}
 
 func (x *MenuMaterial) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[103]
+	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[112]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -8559,7 +9373,7 @@ func (x *MenuMaterial) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MenuMaterial.ProtoReflect.Descriptor instead.
 func (*MenuMaterial) Descriptor() ([]byte, []int) {
-	return file_avtoms_workorder_v1_workorder_proto_rawDescGZIP(), []int{103}
+	return file_avtoms_workorder_v1_workorder_proto_rawDescGZIP(), []int{112}
 }
 
 func (x *MenuMaterial) GetName() string {
@@ -8627,7 +9441,7 @@ type MenuItem struct {
 
 func (x *MenuItem) Reset() {
 	*x = MenuItem{}
-	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[104]
+	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[113]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -8639,7 +9453,7 @@ func (x *MenuItem) String() string {
 func (*MenuItem) ProtoMessage() {}
 
 func (x *MenuItem) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[104]
+	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[113]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -8652,7 +9466,7 @@ func (x *MenuItem) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MenuItem.ProtoReflect.Descriptor instead.
 func (*MenuItem) Descriptor() ([]byte, []int) {
-	return file_avtoms_workorder_v1_workorder_proto_rawDescGZIP(), []int{104}
+	return file_avtoms_workorder_v1_workorder_proto_rawDescGZIP(), []int{113}
 }
 
 func (x *MenuItem) GetId() string {
@@ -8742,7 +9556,7 @@ type CreateWorkOrderRequest struct {
 
 func (x *CreateWorkOrderRequest) Reset() {
 	*x = CreateWorkOrderRequest{}
-	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[105]
+	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[114]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -8754,7 +9568,7 @@ func (x *CreateWorkOrderRequest) String() string {
 func (*CreateWorkOrderRequest) ProtoMessage() {}
 
 func (x *CreateWorkOrderRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[105]
+	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[114]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -8767,7 +9581,7 @@ func (x *CreateWorkOrderRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateWorkOrderRequest.ProtoReflect.Descriptor instead.
 func (*CreateWorkOrderRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_workorder_v1_workorder_proto_rawDescGZIP(), []int{105}
+	return file_avtoms_workorder_v1_workorder_proto_rawDescGZIP(), []int{114}
 }
 
 func (x *CreateWorkOrderRequest) GetShopId() string {
@@ -8793,7 +9607,7 @@ type GetWorkOrderRequest struct {
 
 func (x *GetWorkOrderRequest) Reset() {
 	*x = GetWorkOrderRequest{}
-	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[106]
+	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[115]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -8805,7 +9619,7 @@ func (x *GetWorkOrderRequest) String() string {
 func (*GetWorkOrderRequest) ProtoMessage() {}
 
 func (x *GetWorkOrderRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[106]
+	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[115]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -8818,7 +9632,7 @@ func (x *GetWorkOrderRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetWorkOrderRequest.ProtoReflect.Descriptor instead.
 func (*GetWorkOrderRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_workorder_v1_workorder_proto_rawDescGZIP(), []int{106}
+	return file_avtoms_workorder_v1_workorder_proto_rawDescGZIP(), []int{115}
 }
 
 func (x *GetWorkOrderRequest) GetId() string {
@@ -8841,7 +9655,7 @@ type AddLineItemRequest struct {
 
 func (x *AddLineItemRequest) Reset() {
 	*x = AddLineItemRequest{}
-	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[107]
+	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[116]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -8853,7 +9667,7 @@ func (x *AddLineItemRequest) String() string {
 func (*AddLineItemRequest) ProtoMessage() {}
 
 func (x *AddLineItemRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[107]
+	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[116]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -8866,7 +9680,7 @@ func (x *AddLineItemRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AddLineItemRequest.ProtoReflect.Descriptor instead.
 func (*AddLineItemRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_workorder_v1_workorder_proto_rawDescGZIP(), []int{107}
+	return file_avtoms_workorder_v1_workorder_proto_rawDescGZIP(), []int{116}
 }
 
 func (x *AddLineItemRequest) GetWorkOrderId() string {
@@ -8909,7 +9723,7 @@ type UpdateLineItemRequest struct {
 
 func (x *UpdateLineItemRequest) Reset() {
 	*x = UpdateLineItemRequest{}
-	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[108]
+	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[117]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -8921,7 +9735,7 @@ func (x *UpdateLineItemRequest) String() string {
 func (*UpdateLineItemRequest) ProtoMessage() {}
 
 func (x *UpdateLineItemRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[108]
+	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[117]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -8934,7 +9748,7 @@ func (x *UpdateLineItemRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateLineItemRequest.ProtoReflect.Descriptor instead.
 func (*UpdateLineItemRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_workorder_v1_workorder_proto_rawDescGZIP(), []int{108}
+	return file_avtoms_workorder_v1_workorder_proto_rawDescGZIP(), []int{117}
 }
 
 func (x *UpdateLineItemRequest) GetWorkOrderId() string {
@@ -9003,7 +9817,7 @@ type RemoveLineItemRequest struct {
 
 func (x *RemoveLineItemRequest) Reset() {
 	*x = RemoveLineItemRequest{}
-	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[109]
+	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[118]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -9015,7 +9829,7 @@ func (x *RemoveLineItemRequest) String() string {
 func (*RemoveLineItemRequest) ProtoMessage() {}
 
 func (x *RemoveLineItemRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[109]
+	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[118]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -9028,7 +9842,7 @@ func (x *RemoveLineItemRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RemoveLineItemRequest.ProtoReflect.Descriptor instead.
 func (*RemoveLineItemRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_workorder_v1_workorder_proto_rawDescGZIP(), []int{109}
+	return file_avtoms_workorder_v1_workorder_proto_rawDescGZIP(), []int{118}
 }
 
 func (x *RemoveLineItemRequest) GetWorkOrderId() string {
@@ -9055,7 +9869,7 @@ type TransitionStateRequest struct {
 
 func (x *TransitionStateRequest) Reset() {
 	*x = TransitionStateRequest{}
-	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[110]
+	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[119]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -9067,7 +9881,7 @@ func (x *TransitionStateRequest) String() string {
 func (*TransitionStateRequest) ProtoMessage() {}
 
 func (x *TransitionStateRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[110]
+	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[119]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -9080,7 +9894,7 @@ func (x *TransitionStateRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TransitionStateRequest.ProtoReflect.Descriptor instead.
 func (*TransitionStateRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_workorder_v1_workorder_proto_rawDescGZIP(), []int{110}
+	return file_avtoms_workorder_v1_workorder_proto_rawDescGZIP(), []int{119}
 }
 
 func (x *TransitionStateRequest) GetWorkOrderId() string {
@@ -9107,7 +9921,7 @@ type AssignMechanicRequest struct {
 
 func (x *AssignMechanicRequest) Reset() {
 	*x = AssignMechanicRequest{}
-	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[111]
+	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[120]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -9119,7 +9933,7 @@ func (x *AssignMechanicRequest) String() string {
 func (*AssignMechanicRequest) ProtoMessage() {}
 
 func (x *AssignMechanicRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[111]
+	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[120]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -9132,7 +9946,7 @@ func (x *AssignMechanicRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AssignMechanicRequest.ProtoReflect.Descriptor instead.
 func (*AssignMechanicRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_workorder_v1_workorder_proto_rawDescGZIP(), []int{111}
+	return file_avtoms_workorder_v1_workorder_proto_rawDescGZIP(), []int{120}
 }
 
 func (x *AssignMechanicRequest) GetWorkOrderId() string {
@@ -9160,7 +9974,7 @@ type AssignLineItemRequest struct {
 
 func (x *AssignLineItemRequest) Reset() {
 	*x = AssignLineItemRequest{}
-	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[112]
+	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[121]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -9172,7 +9986,7 @@ func (x *AssignLineItemRequest) String() string {
 func (*AssignLineItemRequest) ProtoMessage() {}
 
 func (x *AssignLineItemRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[112]
+	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[121]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -9185,7 +9999,7 @@ func (x *AssignLineItemRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AssignLineItemRequest.ProtoReflect.Descriptor instead.
 func (*AssignLineItemRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_workorder_v1_workorder_proto_rawDescGZIP(), []int{112}
+	return file_avtoms_workorder_v1_workorder_proto_rawDescGZIP(), []int{121}
 }
 
 func (x *AssignLineItemRequest) GetWorkOrderId() string {
@@ -9220,7 +10034,7 @@ type SetLineItemStatusRequest struct {
 
 func (x *SetLineItemStatusRequest) Reset() {
 	*x = SetLineItemStatusRequest{}
-	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[113]
+	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[122]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -9232,7 +10046,7 @@ func (x *SetLineItemStatusRequest) String() string {
 func (*SetLineItemStatusRequest) ProtoMessage() {}
 
 func (x *SetLineItemStatusRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[113]
+	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[122]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -9245,7 +10059,7 @@ func (x *SetLineItemStatusRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SetLineItemStatusRequest.ProtoReflect.Descriptor instead.
 func (*SetLineItemStatusRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_workorder_v1_workorder_proto_rawDescGZIP(), []int{113}
+	return file_avtoms_workorder_v1_workorder_proto_rawDescGZIP(), []int{122}
 }
 
 func (x *SetLineItemStatusRequest) GetWorkOrderId() string {
@@ -9280,7 +10094,7 @@ type SetWorkOrderNotesRequest struct {
 
 func (x *SetWorkOrderNotesRequest) Reset() {
 	*x = SetWorkOrderNotesRequest{}
-	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[114]
+	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[123]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -9292,7 +10106,7 @@ func (x *SetWorkOrderNotesRequest) String() string {
 func (*SetWorkOrderNotesRequest) ProtoMessage() {}
 
 func (x *SetWorkOrderNotesRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[114]
+	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[123]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -9305,7 +10119,7 @@ func (x *SetWorkOrderNotesRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SetWorkOrderNotesRequest.ProtoReflect.Descriptor instead.
 func (*SetWorkOrderNotesRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_workorder_v1_workorder_proto_rawDescGZIP(), []int{114}
+	return file_avtoms_workorder_v1_workorder_proto_rawDescGZIP(), []int{123}
 }
 
 func (x *SetWorkOrderNotesRequest) GetWorkOrderId() string {
@@ -9335,7 +10149,7 @@ type SetOrderDiscountRequest struct {
 
 func (x *SetOrderDiscountRequest) Reset() {
 	*x = SetOrderDiscountRequest{}
-	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[115]
+	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[124]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -9347,7 +10161,7 @@ func (x *SetOrderDiscountRequest) String() string {
 func (*SetOrderDiscountRequest) ProtoMessage() {}
 
 func (x *SetOrderDiscountRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[115]
+	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[124]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -9360,7 +10174,7 @@ func (x *SetOrderDiscountRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SetOrderDiscountRequest.ProtoReflect.Descriptor instead.
 func (*SetOrderDiscountRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_workorder_v1_workorder_proto_rawDescGZIP(), []int{115}
+	return file_avtoms_workorder_v1_workorder_proto_rawDescGZIP(), []int{124}
 }
 
 func (x *SetOrderDiscountRequest) GetWorkOrderId() string {
@@ -9394,7 +10208,7 @@ type StartTimerRequest struct {
 
 func (x *StartTimerRequest) Reset() {
 	*x = StartTimerRequest{}
-	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[116]
+	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[125]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -9406,7 +10220,7 @@ func (x *StartTimerRequest) String() string {
 func (*StartTimerRequest) ProtoMessage() {}
 
 func (x *StartTimerRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[116]
+	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[125]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -9419,7 +10233,7 @@ func (x *StartTimerRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use StartTimerRequest.ProtoReflect.Descriptor instead.
 func (*StartTimerRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_workorder_v1_workorder_proto_rawDescGZIP(), []int{116}
+	return file_avtoms_workorder_v1_workorder_proto_rawDescGZIP(), []int{125}
 }
 
 func (x *StartTimerRequest) GetWorkOrderId() string {
@@ -9446,7 +10260,7 @@ type StopTimerRequest struct {
 
 func (x *StopTimerRequest) Reset() {
 	*x = StopTimerRequest{}
-	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[117]
+	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[126]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -9458,7 +10272,7 @@ func (x *StopTimerRequest) String() string {
 func (*StopTimerRequest) ProtoMessage() {}
 
 func (x *StopTimerRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[117]
+	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[126]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -9471,7 +10285,7 @@ func (x *StopTimerRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use StopTimerRequest.ProtoReflect.Descriptor instead.
 func (*StopTimerRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_workorder_v1_workorder_proto_rawDescGZIP(), []int{117}
+	return file_avtoms_workorder_v1_workorder_proto_rawDescGZIP(), []int{126}
 }
 
 func (x *StopTimerRequest) GetWorkOrderId() string {
@@ -9497,7 +10311,7 @@ type ListMenuItemsRequest struct {
 
 func (x *ListMenuItemsRequest) Reset() {
 	*x = ListMenuItemsRequest{}
-	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[118]
+	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[127]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -9509,7 +10323,7 @@ func (x *ListMenuItemsRequest) String() string {
 func (*ListMenuItemsRequest) ProtoMessage() {}
 
 func (x *ListMenuItemsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[118]
+	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[127]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -9522,7 +10336,7 @@ func (x *ListMenuItemsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListMenuItemsRequest.ProtoReflect.Descriptor instead.
 func (*ListMenuItemsRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_workorder_v1_workorder_proto_rawDescGZIP(), []int{118}
+	return file_avtoms_workorder_v1_workorder_proto_rawDescGZIP(), []int{127}
 }
 
 func (x *ListMenuItemsRequest) GetShopId() string {
@@ -9541,7 +10355,7 @@ type ListMenuItemsResponse struct {
 
 func (x *ListMenuItemsResponse) Reset() {
 	*x = ListMenuItemsResponse{}
-	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[119]
+	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[128]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -9553,7 +10367,7 @@ func (x *ListMenuItemsResponse) String() string {
 func (*ListMenuItemsResponse) ProtoMessage() {}
 
 func (x *ListMenuItemsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[119]
+	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[128]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -9566,7 +10380,7 @@ func (x *ListMenuItemsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListMenuItemsResponse.ProtoReflect.Descriptor instead.
 func (*ListMenuItemsResponse) Descriptor() ([]byte, []int) {
-	return file_avtoms_workorder_v1_workorder_proto_rawDescGZIP(), []int{119}
+	return file_avtoms_workorder_v1_workorder_proto_rawDescGZIP(), []int{128}
 }
 
 func (x *ListMenuItemsResponse) GetItems() []*MenuItem {
@@ -9593,7 +10407,7 @@ type CreateMenuItemRequest struct {
 
 func (x *CreateMenuItemRequest) Reset() {
 	*x = CreateMenuItemRequest{}
-	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[120]
+	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[129]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -9605,7 +10419,7 @@ func (x *CreateMenuItemRequest) String() string {
 func (*CreateMenuItemRequest) ProtoMessage() {}
 
 func (x *CreateMenuItemRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[120]
+	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[129]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -9618,7 +10432,7 @@ func (x *CreateMenuItemRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateMenuItemRequest.ProtoReflect.Descriptor instead.
 func (*CreateMenuItemRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_workorder_v1_workorder_proto_rawDescGZIP(), []int{120}
+	return file_avtoms_workorder_v1_workorder_proto_rawDescGZIP(), []int{129}
 }
 
 func (x *CreateMenuItemRequest) GetShopId() string {
@@ -9705,7 +10519,7 @@ type UpdateMenuItemRequest struct {
 
 func (x *UpdateMenuItemRequest) Reset() {
 	*x = UpdateMenuItemRequest{}
-	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[121]
+	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[130]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -9717,7 +10531,7 @@ func (x *UpdateMenuItemRequest) String() string {
 func (*UpdateMenuItemRequest) ProtoMessage() {}
 
 func (x *UpdateMenuItemRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[121]
+	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[130]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -9730,7 +10544,7 @@ func (x *UpdateMenuItemRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateMenuItemRequest.ProtoReflect.Descriptor instead.
 func (*UpdateMenuItemRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_workorder_v1_workorder_proto_rawDescGZIP(), []int{121}
+	return file_avtoms_workorder_v1_workorder_proto_rawDescGZIP(), []int{130}
 }
 
 func (x *UpdateMenuItemRequest) GetId() string {
@@ -9819,7 +10633,7 @@ type MenuPriceChange struct {
 
 func (x *MenuPriceChange) Reset() {
 	*x = MenuPriceChange{}
-	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[122]
+	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[131]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -9831,7 +10645,7 @@ func (x *MenuPriceChange) String() string {
 func (*MenuPriceChange) ProtoMessage() {}
 
 func (x *MenuPriceChange) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[122]
+	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[131]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -9844,7 +10658,7 @@ func (x *MenuPriceChange) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MenuPriceChange.ProtoReflect.Descriptor instead.
 func (*MenuPriceChange) Descriptor() ([]byte, []int) {
-	return file_avtoms_workorder_v1_workorder_proto_rawDescGZIP(), []int{122}
+	return file_avtoms_workorder_v1_workorder_proto_rawDescGZIP(), []int{131}
 }
 
 func (x *MenuPriceChange) GetId() string {
@@ -9905,7 +10719,7 @@ type ListMenuPriceHistoryRequest struct {
 
 func (x *ListMenuPriceHistoryRequest) Reset() {
 	*x = ListMenuPriceHistoryRequest{}
-	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[123]
+	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[132]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -9917,7 +10731,7 @@ func (x *ListMenuPriceHistoryRequest) String() string {
 func (*ListMenuPriceHistoryRequest) ProtoMessage() {}
 
 func (x *ListMenuPriceHistoryRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[123]
+	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[132]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -9930,7 +10744,7 @@ func (x *ListMenuPriceHistoryRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListMenuPriceHistoryRequest.ProtoReflect.Descriptor instead.
 func (*ListMenuPriceHistoryRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_workorder_v1_workorder_proto_rawDescGZIP(), []int{123}
+	return file_avtoms_workorder_v1_workorder_proto_rawDescGZIP(), []int{132}
 }
 
 func (x *ListMenuPriceHistoryRequest) GetMenuItemId() string {
@@ -9949,7 +10763,7 @@ type ListMenuPriceHistoryResponse struct {
 
 func (x *ListMenuPriceHistoryResponse) Reset() {
 	*x = ListMenuPriceHistoryResponse{}
-	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[124]
+	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[133]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -9961,7 +10775,7 @@ func (x *ListMenuPriceHistoryResponse) String() string {
 func (*ListMenuPriceHistoryResponse) ProtoMessage() {}
 
 func (x *ListMenuPriceHistoryResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[124]
+	mi := &file_avtoms_workorder_v1_workorder_proto_msgTypes[133]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -9974,7 +10788,7 @@ func (x *ListMenuPriceHistoryResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListMenuPriceHistoryResponse.ProtoReflect.Descriptor instead.
 func (*ListMenuPriceHistoryResponse) Descriptor() ([]byte, []int) {
-	return file_avtoms_workorder_v1_workorder_proto_rawDescGZIP(), []int{124}
+	return file_avtoms_workorder_v1_workorder_proto_rawDescGZIP(), []int{133}
 }
 
 func (x *ListMenuPriceHistoryResponse) GetChanges() []*MenuPriceChange {
@@ -10146,7 +10960,8 @@ const file_avtoms_workorder_v1_workorder_proto_rawDesc = "" +
 	"\vcard_number\x18\x03 \x01(\tR\n" +
 	"cardNumber\x12\x16\n" +
 	"\x06amount\x18\x04 \x01(\x03R\x06amount\x12\x14\n" +
-	"\x05count\x18\x05 \x01(\x05R\x05count\"\xe1\t\n" +
+	"\x05count\x18\x05 \x01(\x05R\x05count\"\xa9\n" +
+	"\n" +
 	"\n" +
 	"Statistics\x12\x17\n" +
 	"\ashop_id\x18\x01 \x01(\tR\x06shopId\x12\x12\n" +
@@ -10187,7 +11002,10 @@ const file_avtoms_workorder_v1_workorder_proto_rawDesc = "" +
 	"\apayable\x18\x1d \x01(\x03R\apayable\x12\x1e\n" +
 	"\n" +
 	"receivable\x18\x1e \x01(\x03R\n" +
-	"receivable\"\xd1\x03\n" +
+	"receivable\x12\x1f\n" +
+	"\vclient_debt\x18\x1f \x01(\x03R\n" +
+	"clientDebt\x12%\n" +
+	"\x0ecredit_revenue\x18  \x01(\x03R\rcreditRevenue\"\xd1\x03\n" +
 	"\x0fServiceReminder\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x17\n" +
 	"\ashop_id\x18\x02 \x01(\tR\x06shopId\x12\x1d\n" +
@@ -10634,7 +11452,72 @@ const file_avtoms_workorder_v1_workorder_proto_rawDesc = "" +
 	"\bstaff_id\x18\a \x01(\tR\astaffId\x12 \n" +
 	"\vdescription\x18\b \x01(\tR\vdescription\".\n" +
 	"\x1cDeleteContragentEntryRequest\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\"\x91\x02\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\"\xdc\x03\n" +
+	"\x13CustomerLedgerEntry\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x17\n" +
+	"\ashop_id\x18\x02 \x01(\tR\x06shopId\x12\x1f\n" +
+	"\vcustomer_id\x18\x03 \x01(\tR\n" +
+	"customerId\x12:\n" +
+	"\x04kind\x18\x04 \x01(\x0e2&.avtoms.workorder.v1.CustomerEntryKindR\x04kind\x12\x16\n" +
+	"\x06amount\x18\x05 \x01(\x03R\x06amount\x12 \n" +
+	"\vdescription\x18\x06 \x01(\tR\vdescription\x12\x17\n" +
+	"\asale_id\x18\a \x01(\tR\x06saleId\x12\"\n" +
+	"\rwork_order_id\x18\b \x01(\tR\vworkOrderId\x12\x1d\n" +
+	"\n" +
+	"invoice_id\x18\t \x01(\tR\tinvoiceId\x12:\n" +
+	"\x06method\x18\n" +
+	" \x01(\x0e2\".avtoms.workorder.v1.PaymentMethodR\x06method\x12\x19\n" +
+	"\bstaff_id\x18\v \x01(\tR\astaffId\x12\x1f\n" +
+	"\voccurred_at\x18\f \x01(\tR\n" +
+	"occurredAt\x12\x12\n" +
+	"\x04note\x18\r \x01(\tR\x04note\x12\x1d\n" +
+	"\n" +
+	"created_at\x18\x0e \x01(\tR\tcreatedAt\"\xd7\x01\n" +
+	"\x0fCustomerBalance\x12\x1f\n" +
+	"\vcustomer_id\x18\x01 \x01(\tR\n" +
+	"customerId\x12\x18\n" +
+	"\acharged\x18\x02 \x01(\x03R\acharged\x12\x12\n" +
+	"\x04paid\x18\x03 \x01(\x03R\x04paid\x12\x18\n" +
+	"\abalance\x18\x04 \x01(\x03R\abalance\x12\x17\n" +
+	"\alast_at\x18\x05 \x01(\tR\x06lastAt\x12\x18\n" +
+	"\aentries\x18\x06 \x01(\x05R\aentries\x12\x12\n" +
+	"\x04name\x18\a \x01(\tR\x04name\x12\x14\n" +
+	"\x05phone\x18\b \x01(\tR\x05phone\"Z\n" +
+	"\x1bListCustomerBalancesRequest\x12\x17\n" +
+	"\ashop_id\x18\x01 \x01(\tR\x06shopId\x12\x12\n" +
+	"\x04from\x18\x02 \x01(\tR\x04from\x12\x0e\n" +
+	"\x02to\x18\x03 \x01(\tR\x02to\"\x8b\x01\n" +
+	"\x1cListCustomerBalancesResponse\x12@\n" +
+	"\bbalances\x18\x01 \x03(\v2$.avtoms.workorder.v1.CustomerBalanceR\bbalances\x12)\n" +
+	"\x10total_receivable\x18\x02 \x01(\x03R\x0ftotalReceivable\"`\n" +
+	"\x19ListCustomerLedgerRequest\x12\x1f\n" +
+	"\vcustomer_id\x18\x01 \x01(\tR\n" +
+	"customerId\x12\x12\n" +
+	"\x04from\x18\x02 \x01(\tR\x04from\x12\x0e\n" +
+	"\x02to\x18\x03 \x01(\tR\x02to\"\xa0\x01\n" +
+	"\x1aListCustomerLedgerResponse\x12B\n" +
+	"\aentries\x18\x01 \x03(\v2(.avtoms.workorder.v1.CustomerLedgerEntryR\aentries\x12>\n" +
+	"\asummary\x18\x02 \x01(\v2$.avtoms.workorder.v1.CustomerBalanceR\asummary\"\x9b\x03\n" +
+	"\x1aRecordCustomerEntryRequest\x12\x17\n" +
+	"\ashop_id\x18\x01 \x01(\tR\x06shopId\x12\x1f\n" +
+	"\vcustomer_id\x18\x02 \x01(\tR\n" +
+	"customerId\x12:\n" +
+	"\x04kind\x18\x03 \x01(\x0e2&.avtoms.workorder.v1.CustomerEntryKindR\x04kind\x12\x16\n" +
+	"\x06amount\x18\x04 \x01(\x03R\x06amount\x12:\n" +
+	"\x06method\x18\x05 \x01(\x0e2\".avtoms.workorder.v1.PaymentMethodR\x06method\x12\x12\n" +
+	"\x04note\x18\x06 \x01(\tR\x04note\x12\x1f\n" +
+	"\voccurred_at\x18\a \x01(\tR\n" +
+	"occurredAt\x12\x19\n" +
+	"\bstaff_id\x18\b \x01(\tR\astaffId\x12 \n" +
+	"\vdescription\x18\t \x01(\tR\vdescription\x12\"\n" +
+	"\rwork_order_id\x18\n" +
+	" \x01(\tR\vworkOrderId\x12\x1d\n" +
+	"\n" +
+	"invoice_id\x18\v \x01(\tR\tinvoiceId\",\n" +
+	"\x1aDeleteCustomerEntryRequest\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\"-\n" +
+	"\x1bDeleteCustomerEntryResponse\x12\x0e\n" +
+	"\x02ok\x18\x01 \x01(\bR\x02ok\"\x91\x02\n" +
 	"\fShopSettings\x12\x17\n" +
 	"\ashop_id\x18\x01 \x01(\tR\x06shopId\x120\n" +
 	"\x14max_discount_percent\x18\x02 \x01(\x05R\x12maxDiscountPercent\x12J\n" +
@@ -10680,7 +11563,7 @@ const file_avtoms_workorder_v1_workorder_proto_rawDesc = "" +
 	" \x01(\x0e2#.avtoms.workorder.v1.LineItemStatusR\x06status\x12\x1d\n" +
 	"\n" +
 	"variant_id\x18\v \x01(\tR\tvariantId\x12!\n" +
-	"\fconsumed_qty\x18\f \x01(\x01R\vconsumedQty\"\xb4\x06\n" +
+	"\fconsumed_qty\x18\f \x01(\x01R\vconsumedQty\"\x96\a\n" +
 	"\tWorkOrder\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x17\n" +
 	"\ashop_id\x18\x02 \x01(\tR\x06shopId\x12\x1d\n" +
@@ -10709,7 +11592,11 @@ const file_avtoms_workorder_v1_workorder_proto_rawDesc = "" +
 	"\border_no\x18\x13 \x01(\x03R\aorderNo\x12F\n" +
 	"\rdiscount_kind\x18\x15 \x01(\x0e2!.avtoms.workorder.v1.DiscountKindR\fdiscountKind\x12%\n" +
 	"\x0ediscount_value\x18\x16 \x01(\x03R\rdiscountValue\x12'\n" +
-	"\x0fdiscount_amount\x18\x17 \x01(\x03R\x0ediscountAmount\"\x9e\x01\n" +
+	"\x0fdiscount_amount\x18\x17 \x01(\x03R\x0ediscountAmount\x12\x1f\n" +
+	"\vcustomer_id\x18\x18 \x01(\tR\n" +
+	"customerId\x12%\n" +
+	"\x0ecustomer_phone\x18\x19 \x01(\tR\rcustomerPhone\x12\x18\n" +
+	"\amileage\x18\x1a \x01(\x03R\amileage\"\x9e\x01\n" +
 	"\tTimeEntry\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\"\n" +
 	"\rwork_order_id\x18\x02 \x01(\tR\vworkOrderId\x12\x1f\n" +
@@ -10860,18 +11747,23 @@ const file_avtoms_workorder_v1_workorder_proto_rawDesc = "" +
 	"\x1dAPPOINTMENT_STATE_UNSPECIFIED\x10\x00\x12\x1f\n" +
 	"\x1bAPPOINTMENT_STATE_SCHEDULED\x10\x01\x12\x1a\n" +
 	"\x16APPOINTMENT_STATE_DONE\x10\x02\x12\x1e\n" +
-	"\x1aAPPOINTMENT_STATE_CANCELED\x10\x03*{\n" +
+	"\x1aAPPOINTMENT_STATE_CANCELED\x10\x03*\x96\x01\n" +
 	"\rPaymentMethod\x12\x1e\n" +
 	"\x1aPAYMENT_METHOD_UNSPECIFIED\x10\x00\x12\x17\n" +
 	"\x13PAYMENT_METHOD_CASH\x10\x01\x12\x18\n" +
 	"\x14PAYMENT_METHOD_OTHER\x10\x02\x12\x17\n" +
-	"\x13PAYMENT_METHOD_CARD\x10\x03*\xcf\x01\n" +
+	"\x13PAYMENT_METHOD_CARD\x10\x03\x12\x19\n" +
+	"\x15PAYMENT_METHOD_CREDIT\x10\x04*\xcf\x01\n" +
 	"\x13ContragentEntryKind\x12%\n" +
 	"!CONTRAGENT_ENTRY_KIND_UNSPECIFIED\x10\x00\x12\"\n" +
 	"\x1eCONTRAGENT_ENTRY_KIND_PURCHASE\x10\x01\x12%\n" +
 	"!CONTRAGENT_ENTRY_KIND_PAYMENT_OUT\x10\x02\x12 \n" +
 	"\x1cCONTRAGENT_ENTRY_KIND_CHARGE\x10\x03\x12$\n" +
-	" CONTRAGENT_ENTRY_KIND_PAYMENT_IN\x10\x04*\xa6\x02\n" +
+	" CONTRAGENT_ENTRY_KIND_PAYMENT_IN\x10\x04*|\n" +
+	"\x11CustomerEntryKind\x12#\n" +
+	"\x1fCUSTOMER_ENTRY_KIND_UNSPECIFIED\x10\x00\x12\x1e\n" +
+	"\x1aCUSTOMER_ENTRY_KIND_CHARGE\x10\x01\x12\"\n" +
+	"\x1eCUSTOMER_ENTRY_KIND_PAYMENT_IN\x10\x02*\xa6\x02\n" +
 	"\x0eWorkOrderState\x12 \n" +
 	"\x1cWORK_ORDER_STATE_UNSPECIFIED\x10\x00\x12\x1a\n" +
 	"\x16WORK_ORDER_STATE_DRAFT\x10\x01\x12\x1e\n" +
@@ -10896,7 +11788,7 @@ const file_avtoms_workorder_v1_workorder_proto_rawDesc = "" +
 	"\fDiscountKind\x12\x1d\n" +
 	"\x19DISCOUNT_KIND_UNSPECIFIED\x10\x00\x12\x17\n" +
 	"\x13DISCOUNT_KIND_FIXED\x10\x01\x12\x19\n" +
-	"\x15DISCOUNT_KIND_PERCENT\x10\x022\x918\n" +
+	"\x15DISCOUNT_KIND_PERCENT\x10\x022\xf1;\n" +
 	"\x10WorkOrderService\x12^\n" +
 	"\x0fCreateWorkOrder\x12+.avtoms.workorder.v1.CreateWorkOrderRequest\x1a\x1e.avtoms.workorder.v1.WorkOrder\x12X\n" +
 	"\fGetWorkOrder\x12(.avtoms.workorder.v1.GetWorkOrderRequest\x1a\x1e.avtoms.workorder.v1.WorkOrder\x12V\n" +
@@ -10947,7 +11839,11 @@ const file_avtoms_workorder_v1_workorder_proto_rawDesc = "" +
 	"\x16ListContragentBalances\x122.avtoms.workorder.v1.ListContragentBalancesRequest\x1a3.avtoms.workorder.v1.ListContragentBalancesResponse\x12{\n" +
 	"\x14ListContragentLedger\x120.avtoms.workorder.v1.ListContragentLedgerRequest\x1a1.avtoms.workorder.v1.ListContragentLedgerResponse\x12v\n" +
 	"\x15RecordContragentEntry\x121.avtoms.workorder.v1.RecordContragentEntryRequest\x1a*.avtoms.workorder.v1.ContragentLedgerEntry\x12y\n" +
-	"\x15DeleteContragentEntry\x121.avtoms.workorder.v1.DeleteContragentEntryRequest\x1a-.avtoms.workorder.v1.DeleteContragentResponse\x12o\n" +
+	"\x15DeleteContragentEntry\x121.avtoms.workorder.v1.DeleteContragentEntryRequest\x1a-.avtoms.workorder.v1.DeleteContragentResponse\x12{\n" +
+	"\x14ListCustomerBalances\x120.avtoms.workorder.v1.ListCustomerBalancesRequest\x1a1.avtoms.workorder.v1.ListCustomerBalancesResponse\x12u\n" +
+	"\x12ListCustomerLedger\x12..avtoms.workorder.v1.ListCustomerLedgerRequest\x1a/.avtoms.workorder.v1.ListCustomerLedgerResponse\x12p\n" +
+	"\x13RecordCustomerEntry\x12/.avtoms.workorder.v1.RecordCustomerEntryRequest\x1a(.avtoms.workorder.v1.CustomerLedgerEntry\x12x\n" +
+	"\x13DeleteCustomerEntry\x12/.avtoms.workorder.v1.DeleteCustomerEntryRequest\x1a0.avtoms.workorder.v1.DeleteCustomerEntryResponse\x12o\n" +
 	"\x10ListAppointments\x12,.avtoms.workorder.v1.ListAppointmentsRequest\x1a-.avtoms.workorder.v1.ListAppointmentsResponse\x12d\n" +
 	"\x11CreateAppointment\x12-.avtoms.workorder.v1.CreateAppointmentRequest\x1a .avtoms.workorder.v1.Appointment\x12h\n" +
 	"\x13SetAppointmentState\x12/.avtoms.workorder.v1.SetAppointmentStateRequest\x1a .avtoms.workorder.v1.Appointment\x12`\n" +
@@ -10983,355 +11879,380 @@ func file_avtoms_workorder_v1_workorder_proto_rawDescGZIP() []byte {
 	return file_avtoms_workorder_v1_workorder_proto_rawDescData
 }
 
-var file_avtoms_workorder_v1_workorder_proto_enumTypes = make([]protoimpl.EnumInfo, 9)
-var file_avtoms_workorder_v1_workorder_proto_msgTypes = make([]protoimpl.MessageInfo, 125)
+var file_avtoms_workorder_v1_workorder_proto_enumTypes = make([]protoimpl.EnumInfo, 10)
+var file_avtoms_workorder_v1_workorder_proto_msgTypes = make([]protoimpl.MessageInfo, 134)
 var file_avtoms_workorder_v1_workorder_proto_goTypes = []any{
 	(ApprovalStatus)(0),                      // 0: avtoms.workorder.v1.ApprovalStatus
 	(ServiceReminderState)(0),                // 1: avtoms.workorder.v1.ServiceReminderState
 	(AppointmentState)(0),                    // 2: avtoms.workorder.v1.AppointmentState
 	(PaymentMethod)(0),                       // 3: avtoms.workorder.v1.PaymentMethod
 	(ContragentEntryKind)(0),                 // 4: avtoms.workorder.v1.ContragentEntryKind
-	(WorkOrderState)(0),                      // 5: avtoms.workorder.v1.WorkOrderState
-	(LineItemKind)(0),                        // 6: avtoms.workorder.v1.LineItemKind
-	(LineItemStatus)(0),                      // 7: avtoms.workorder.v1.LineItemStatus
-	(DiscountKind)(0),                        // 8: avtoms.workorder.v1.DiscountKind
-	(*ApprovalLink)(nil),                     // 9: avtoms.workorder.v1.ApprovalLink
-	(*ApprovalInfo)(nil),                     // 10: avtoms.workorder.v1.ApprovalInfo
-	(*CreateApprovalLinkRequest)(nil),        // 11: avtoms.workorder.v1.CreateApprovalLinkRequest
-	(*ResolveApprovalRequest)(nil),           // 12: avtoms.workorder.v1.ResolveApprovalRequest
-	(*DecideApprovalRequest)(nil),            // 13: avtoms.workorder.v1.DecideApprovalRequest
-	(*Warranty)(nil),                         // 14: avtoms.workorder.v1.Warranty
-	(*ListWarrantiesRequest)(nil),            // 15: avtoms.workorder.v1.ListWarrantiesRequest
-	(*ListWarrantiesResponse)(nil),           // 16: avtoms.workorder.v1.ListWarrantiesResponse
-	(*CreateWarrantyRequest)(nil),            // 17: avtoms.workorder.v1.CreateWarrantyRequest
-	(*VoidWarrantyRequest)(nil),              // 18: avtoms.workorder.v1.VoidWarrantyRequest
-	(*ShopExpense)(nil),                      // 19: avtoms.workorder.v1.ShopExpense
-	(*ListShopExpensesRequest)(nil),          // 20: avtoms.workorder.v1.ListShopExpensesRequest
-	(*ListShopExpensesResponse)(nil),         // 21: avtoms.workorder.v1.ListShopExpensesResponse
-	(*CreateShopExpenseRequest)(nil),         // 22: avtoms.workorder.v1.CreateShopExpenseRequest
-	(*DeleteShopExpenseRequest)(nil),         // 23: avtoms.workorder.v1.DeleteShopExpenseRequest
-	(*DeleteShopExpenseResponse)(nil),        // 24: avtoms.workorder.v1.DeleteShopExpenseResponse
-	(*ExpenseBucket)(nil),                    // 25: avtoms.workorder.v1.ExpenseBucket
-	(*ProfitAndLoss)(nil),                    // 26: avtoms.workorder.v1.ProfitAndLoss
-	(*GetProfitAndLossRequest)(nil),          // 27: avtoms.workorder.v1.GetProfitAndLossRequest
-	(*GetStatisticsRequest)(nil),             // 28: avtoms.workorder.v1.GetStatisticsRequest
-	(*DayPoint)(nil),                         // 29: avtoms.workorder.v1.DayPoint
-	(*StateBucket)(nil),                      // 30: avtoms.workorder.v1.StateBucket
-	(*MechanicStat)(nil),                     // 31: avtoms.workorder.v1.MechanicStat
-	(*ItemStat)(nil),                         // 32: avtoms.workorder.v1.ItemStat
-	(*VehicleStat)(nil),                      // 33: avtoms.workorder.v1.VehicleStat
-	(*PaymentBucket)(nil),                    // 34: avtoms.workorder.v1.PaymentBucket
-	(*Statistics)(nil),                       // 35: avtoms.workorder.v1.Statistics
-	(*ServiceReminder)(nil),                  // 36: avtoms.workorder.v1.ServiceReminder
-	(*ListServiceRemindersRequest)(nil),      // 37: avtoms.workorder.v1.ListServiceRemindersRequest
-	(*ListServiceRemindersResponse)(nil),     // 38: avtoms.workorder.v1.ListServiceRemindersResponse
-	(*CreateServiceReminderRequest)(nil),     // 39: avtoms.workorder.v1.CreateServiceReminderRequest
-	(*SetServiceReminderStateRequest)(nil),   // 40: avtoms.workorder.v1.SetServiceReminderStateRequest
-	(*ListDueRemindersRequest)(nil),          // 41: avtoms.workorder.v1.ListDueRemindersRequest
-	(*ListDueAppointmentsRequest)(nil),       // 42: avtoms.workorder.v1.ListDueAppointmentsRequest
-	(*MarkNotifiedRequest)(nil),              // 43: avtoms.workorder.v1.MarkNotifiedRequest
-	(*MarkNotifiedResponse)(nil),             // 44: avtoms.workorder.v1.MarkNotifiedResponse
-	(*AuditEntry)(nil),                       // 45: avtoms.workorder.v1.AuditEntry
-	(*GetAuditLogRequest)(nil),               // 46: avtoms.workorder.v1.GetAuditLogRequest
-	(*GetAuditLogResponse)(nil),              // 47: avtoms.workorder.v1.GetAuditLogResponse
-	(*Appointment)(nil),                      // 48: avtoms.workorder.v1.Appointment
-	(*ListAppointmentsRequest)(nil),          // 49: avtoms.workorder.v1.ListAppointmentsRequest
-	(*ListAppointmentsResponse)(nil),         // 50: avtoms.workorder.v1.ListAppointmentsResponse
-	(*CreateAppointmentRequest)(nil),         // 51: avtoms.workorder.v1.CreateAppointmentRequest
-	(*SetAppointmentStateRequest)(nil),       // 52: avtoms.workorder.v1.SetAppointmentStateRequest
-	(*Product)(nil),                          // 53: avtoms.workorder.v1.Product
-	(*ProductProperty)(nil),                  // 54: avtoms.workorder.v1.ProductProperty
-	(*ProductVariant)(nil),                   // 55: avtoms.workorder.v1.ProductVariant
-	(*VariantAttribute)(nil),                 // 56: avtoms.workorder.v1.VariantAttribute
-	(*ListProductsRequest)(nil),              // 57: avtoms.workorder.v1.ListProductsRequest
-	(*ListProductsResponse)(nil),             // 58: avtoms.workorder.v1.ListProductsResponse
-	(*GetProductRequest)(nil),                // 59: avtoms.workorder.v1.GetProductRequest
-	(*CreateProductRequest)(nil),             // 60: avtoms.workorder.v1.CreateProductRequest
-	(*UpdateProductRequest)(nil),             // 61: avtoms.workorder.v1.UpdateProductRequest
-	(*AdjustVariantStockRequest)(nil),        // 62: avtoms.workorder.v1.AdjustVariantStockRequest
-	(*StockMovement)(nil),                    // 63: avtoms.workorder.v1.StockMovement
-	(*ListStockMovementsRequest)(nil),        // 64: avtoms.workorder.v1.ListStockMovementsRequest
-	(*ListStockMovementsResponse)(nil),       // 65: avtoms.workorder.v1.ListStockMovementsResponse
-	(*SaleItem)(nil),                         // 66: avtoms.workorder.v1.SaleItem
-	(*Sale)(nil),                             // 67: avtoms.workorder.v1.Sale
-	(*CreateSaleRequest)(nil),                // 68: avtoms.workorder.v1.CreateSaleRequest
-	(*ListSalesRequest)(nil),                 // 69: avtoms.workorder.v1.ListSalesRequest
-	(*ListSalesResponse)(nil),                // 70: avtoms.workorder.v1.ListSalesResponse
-	(*GetSaleRequest)(nil),                   // 71: avtoms.workorder.v1.GetSaleRequest
-	(*VoidSaleRequest)(nil),                  // 72: avtoms.workorder.v1.VoidSaleRequest
-	(*SetSaleInvoiceRequest)(nil),            // 73: avtoms.workorder.v1.SetSaleInvoiceRequest
-	(*PropertyDefinition)(nil),               // 74: avtoms.workorder.v1.PropertyDefinition
-	(*PropertyDefinitionValue)(nil),          // 75: avtoms.workorder.v1.PropertyDefinitionValue
-	(*ListPropertyDefinitionsRequest)(nil),   // 76: avtoms.workorder.v1.ListPropertyDefinitionsRequest
-	(*ListPropertyDefinitionsResponse)(nil),  // 77: avtoms.workorder.v1.ListPropertyDefinitionsResponse
-	(*CreatePropertyDefinitionRequest)(nil),  // 78: avtoms.workorder.v1.CreatePropertyDefinitionRequest
-	(*UpdatePropertyDefinitionRequest)(nil),  // 79: avtoms.workorder.v1.UpdatePropertyDefinitionRequest
-	(*DeletePropertyDefinitionRequest)(nil),  // 80: avtoms.workorder.v1.DeletePropertyDefinitionRequest
-	(*DeletePropertyDefinitionResponse)(nil), // 81: avtoms.workorder.v1.DeletePropertyDefinitionResponse
-	(*CatalogTerm)(nil),                      // 82: avtoms.workorder.v1.CatalogTerm
-	(*ListCatalogTermsRequest)(nil),          // 83: avtoms.workorder.v1.ListCatalogTermsRequest
-	(*ListCatalogTermsResponse)(nil),         // 84: avtoms.workorder.v1.ListCatalogTermsResponse
-	(*CreateCatalogTermRequest)(nil),         // 85: avtoms.workorder.v1.CreateCatalogTermRequest
-	(*UpdateCatalogTermRequest)(nil),         // 86: avtoms.workorder.v1.UpdateCatalogTermRequest
-	(*DeleteCatalogTermRequest)(nil),         // 87: avtoms.workorder.v1.DeleteCatalogTermRequest
-	(*DeleteCatalogTermResponse)(nil),        // 88: avtoms.workorder.v1.DeleteCatalogTermResponse
-	(*Contragent)(nil),                       // 89: avtoms.workorder.v1.Contragent
-	(*ListContragentsRequest)(nil),           // 90: avtoms.workorder.v1.ListContragentsRequest
-	(*ListContragentsResponse)(nil),          // 91: avtoms.workorder.v1.ListContragentsResponse
-	(*CreateContragentRequest)(nil),          // 92: avtoms.workorder.v1.CreateContragentRequest
-	(*UpdateContragentRequest)(nil),          // 93: avtoms.workorder.v1.UpdateContragentRequest
-	(*DeleteContragentRequest)(nil),          // 94: avtoms.workorder.v1.DeleteContragentRequest
-	(*DeleteContragentResponse)(nil),         // 95: avtoms.workorder.v1.DeleteContragentResponse
-	(*ContragentLedgerEntry)(nil),            // 96: avtoms.workorder.v1.ContragentLedgerEntry
-	(*ContragentBalance)(nil),                // 97: avtoms.workorder.v1.ContragentBalance
-	(*ListContragentBalancesRequest)(nil),    // 98: avtoms.workorder.v1.ListContragentBalancesRequest
-	(*ListContragentBalancesResponse)(nil),   // 99: avtoms.workorder.v1.ListContragentBalancesResponse
-	(*ListContragentLedgerRequest)(nil),      // 100: avtoms.workorder.v1.ListContragentLedgerRequest
-	(*ListContragentLedgerResponse)(nil),     // 101: avtoms.workorder.v1.ListContragentLedgerResponse
-	(*RecordContragentEntryRequest)(nil),     // 102: avtoms.workorder.v1.RecordContragentEntryRequest
-	(*DeleteContragentEntryRequest)(nil),     // 103: avtoms.workorder.v1.DeleteContragentEntryRequest
-	(*ShopSettings)(nil),                     // 104: avtoms.workorder.v1.ShopSettings
-	(*GetShopSettingsRequest)(nil),           // 105: avtoms.workorder.v1.GetShopSettingsRequest
-	(*UpdateShopSettingsRequest)(nil),        // 106: avtoms.workorder.v1.UpdateShopSettingsRequest
-	(*ListWorkOrdersRequest)(nil),            // 107: avtoms.workorder.v1.ListWorkOrdersRequest
-	(*ListWorkOrdersResponse)(nil),           // 108: avtoms.workorder.v1.ListWorkOrdersResponse
-	(*LineItem)(nil),                         // 109: avtoms.workorder.v1.LineItem
-	(*WorkOrder)(nil),                        // 110: avtoms.workorder.v1.WorkOrder
-	(*TimeEntry)(nil),                        // 111: avtoms.workorder.v1.TimeEntry
-	(*MenuMaterial)(nil),                     // 112: avtoms.workorder.v1.MenuMaterial
-	(*MenuItem)(nil),                         // 113: avtoms.workorder.v1.MenuItem
-	(*CreateWorkOrderRequest)(nil),           // 114: avtoms.workorder.v1.CreateWorkOrderRequest
-	(*GetWorkOrderRequest)(nil),              // 115: avtoms.workorder.v1.GetWorkOrderRequest
-	(*AddLineItemRequest)(nil),               // 116: avtoms.workorder.v1.AddLineItemRequest
-	(*UpdateLineItemRequest)(nil),            // 117: avtoms.workorder.v1.UpdateLineItemRequest
-	(*RemoveLineItemRequest)(nil),            // 118: avtoms.workorder.v1.RemoveLineItemRequest
-	(*TransitionStateRequest)(nil),           // 119: avtoms.workorder.v1.TransitionStateRequest
-	(*AssignMechanicRequest)(nil),            // 120: avtoms.workorder.v1.AssignMechanicRequest
-	(*AssignLineItemRequest)(nil),            // 121: avtoms.workorder.v1.AssignLineItemRequest
-	(*SetLineItemStatusRequest)(nil),         // 122: avtoms.workorder.v1.SetLineItemStatusRequest
-	(*SetWorkOrderNotesRequest)(nil),         // 123: avtoms.workorder.v1.SetWorkOrderNotesRequest
-	(*SetOrderDiscountRequest)(nil),          // 124: avtoms.workorder.v1.SetOrderDiscountRequest
-	(*StartTimerRequest)(nil),                // 125: avtoms.workorder.v1.StartTimerRequest
-	(*StopTimerRequest)(nil),                 // 126: avtoms.workorder.v1.StopTimerRequest
-	(*ListMenuItemsRequest)(nil),             // 127: avtoms.workorder.v1.ListMenuItemsRequest
-	(*ListMenuItemsResponse)(nil),            // 128: avtoms.workorder.v1.ListMenuItemsResponse
-	(*CreateMenuItemRequest)(nil),            // 129: avtoms.workorder.v1.CreateMenuItemRequest
-	(*UpdateMenuItemRequest)(nil),            // 130: avtoms.workorder.v1.UpdateMenuItemRequest
-	(*MenuPriceChange)(nil),                  // 131: avtoms.workorder.v1.MenuPriceChange
-	(*ListMenuPriceHistoryRequest)(nil),      // 132: avtoms.workorder.v1.ListMenuPriceHistoryRequest
-	(*ListMenuPriceHistoryResponse)(nil),     // 133: avtoms.workorder.v1.ListMenuPriceHistoryResponse
+	(CustomerEntryKind)(0),                   // 5: avtoms.workorder.v1.CustomerEntryKind
+	(WorkOrderState)(0),                      // 6: avtoms.workorder.v1.WorkOrderState
+	(LineItemKind)(0),                        // 7: avtoms.workorder.v1.LineItemKind
+	(LineItemStatus)(0),                      // 8: avtoms.workorder.v1.LineItemStatus
+	(DiscountKind)(0),                        // 9: avtoms.workorder.v1.DiscountKind
+	(*ApprovalLink)(nil),                     // 10: avtoms.workorder.v1.ApprovalLink
+	(*ApprovalInfo)(nil),                     // 11: avtoms.workorder.v1.ApprovalInfo
+	(*CreateApprovalLinkRequest)(nil),        // 12: avtoms.workorder.v1.CreateApprovalLinkRequest
+	(*ResolveApprovalRequest)(nil),           // 13: avtoms.workorder.v1.ResolveApprovalRequest
+	(*DecideApprovalRequest)(nil),            // 14: avtoms.workorder.v1.DecideApprovalRequest
+	(*Warranty)(nil),                         // 15: avtoms.workorder.v1.Warranty
+	(*ListWarrantiesRequest)(nil),            // 16: avtoms.workorder.v1.ListWarrantiesRequest
+	(*ListWarrantiesResponse)(nil),           // 17: avtoms.workorder.v1.ListWarrantiesResponse
+	(*CreateWarrantyRequest)(nil),            // 18: avtoms.workorder.v1.CreateWarrantyRequest
+	(*VoidWarrantyRequest)(nil),              // 19: avtoms.workorder.v1.VoidWarrantyRequest
+	(*ShopExpense)(nil),                      // 20: avtoms.workorder.v1.ShopExpense
+	(*ListShopExpensesRequest)(nil),          // 21: avtoms.workorder.v1.ListShopExpensesRequest
+	(*ListShopExpensesResponse)(nil),         // 22: avtoms.workorder.v1.ListShopExpensesResponse
+	(*CreateShopExpenseRequest)(nil),         // 23: avtoms.workorder.v1.CreateShopExpenseRequest
+	(*DeleteShopExpenseRequest)(nil),         // 24: avtoms.workorder.v1.DeleteShopExpenseRequest
+	(*DeleteShopExpenseResponse)(nil),        // 25: avtoms.workorder.v1.DeleteShopExpenseResponse
+	(*ExpenseBucket)(nil),                    // 26: avtoms.workorder.v1.ExpenseBucket
+	(*ProfitAndLoss)(nil),                    // 27: avtoms.workorder.v1.ProfitAndLoss
+	(*GetProfitAndLossRequest)(nil),          // 28: avtoms.workorder.v1.GetProfitAndLossRequest
+	(*GetStatisticsRequest)(nil),             // 29: avtoms.workorder.v1.GetStatisticsRequest
+	(*DayPoint)(nil),                         // 30: avtoms.workorder.v1.DayPoint
+	(*StateBucket)(nil),                      // 31: avtoms.workorder.v1.StateBucket
+	(*MechanicStat)(nil),                     // 32: avtoms.workorder.v1.MechanicStat
+	(*ItemStat)(nil),                         // 33: avtoms.workorder.v1.ItemStat
+	(*VehicleStat)(nil),                      // 34: avtoms.workorder.v1.VehicleStat
+	(*PaymentBucket)(nil),                    // 35: avtoms.workorder.v1.PaymentBucket
+	(*Statistics)(nil),                       // 36: avtoms.workorder.v1.Statistics
+	(*ServiceReminder)(nil),                  // 37: avtoms.workorder.v1.ServiceReminder
+	(*ListServiceRemindersRequest)(nil),      // 38: avtoms.workorder.v1.ListServiceRemindersRequest
+	(*ListServiceRemindersResponse)(nil),     // 39: avtoms.workorder.v1.ListServiceRemindersResponse
+	(*CreateServiceReminderRequest)(nil),     // 40: avtoms.workorder.v1.CreateServiceReminderRequest
+	(*SetServiceReminderStateRequest)(nil),   // 41: avtoms.workorder.v1.SetServiceReminderStateRequest
+	(*ListDueRemindersRequest)(nil),          // 42: avtoms.workorder.v1.ListDueRemindersRequest
+	(*ListDueAppointmentsRequest)(nil),       // 43: avtoms.workorder.v1.ListDueAppointmentsRequest
+	(*MarkNotifiedRequest)(nil),              // 44: avtoms.workorder.v1.MarkNotifiedRequest
+	(*MarkNotifiedResponse)(nil),             // 45: avtoms.workorder.v1.MarkNotifiedResponse
+	(*AuditEntry)(nil),                       // 46: avtoms.workorder.v1.AuditEntry
+	(*GetAuditLogRequest)(nil),               // 47: avtoms.workorder.v1.GetAuditLogRequest
+	(*GetAuditLogResponse)(nil),              // 48: avtoms.workorder.v1.GetAuditLogResponse
+	(*Appointment)(nil),                      // 49: avtoms.workorder.v1.Appointment
+	(*ListAppointmentsRequest)(nil),          // 50: avtoms.workorder.v1.ListAppointmentsRequest
+	(*ListAppointmentsResponse)(nil),         // 51: avtoms.workorder.v1.ListAppointmentsResponse
+	(*CreateAppointmentRequest)(nil),         // 52: avtoms.workorder.v1.CreateAppointmentRequest
+	(*SetAppointmentStateRequest)(nil),       // 53: avtoms.workorder.v1.SetAppointmentStateRequest
+	(*Product)(nil),                          // 54: avtoms.workorder.v1.Product
+	(*ProductProperty)(nil),                  // 55: avtoms.workorder.v1.ProductProperty
+	(*ProductVariant)(nil),                   // 56: avtoms.workorder.v1.ProductVariant
+	(*VariantAttribute)(nil),                 // 57: avtoms.workorder.v1.VariantAttribute
+	(*ListProductsRequest)(nil),              // 58: avtoms.workorder.v1.ListProductsRequest
+	(*ListProductsResponse)(nil),             // 59: avtoms.workorder.v1.ListProductsResponse
+	(*GetProductRequest)(nil),                // 60: avtoms.workorder.v1.GetProductRequest
+	(*CreateProductRequest)(nil),             // 61: avtoms.workorder.v1.CreateProductRequest
+	(*UpdateProductRequest)(nil),             // 62: avtoms.workorder.v1.UpdateProductRequest
+	(*AdjustVariantStockRequest)(nil),        // 63: avtoms.workorder.v1.AdjustVariantStockRequest
+	(*StockMovement)(nil),                    // 64: avtoms.workorder.v1.StockMovement
+	(*ListStockMovementsRequest)(nil),        // 65: avtoms.workorder.v1.ListStockMovementsRequest
+	(*ListStockMovementsResponse)(nil),       // 66: avtoms.workorder.v1.ListStockMovementsResponse
+	(*SaleItem)(nil),                         // 67: avtoms.workorder.v1.SaleItem
+	(*Sale)(nil),                             // 68: avtoms.workorder.v1.Sale
+	(*CreateSaleRequest)(nil),                // 69: avtoms.workorder.v1.CreateSaleRequest
+	(*ListSalesRequest)(nil),                 // 70: avtoms.workorder.v1.ListSalesRequest
+	(*ListSalesResponse)(nil),                // 71: avtoms.workorder.v1.ListSalesResponse
+	(*GetSaleRequest)(nil),                   // 72: avtoms.workorder.v1.GetSaleRequest
+	(*VoidSaleRequest)(nil),                  // 73: avtoms.workorder.v1.VoidSaleRequest
+	(*SetSaleInvoiceRequest)(nil),            // 74: avtoms.workorder.v1.SetSaleInvoiceRequest
+	(*PropertyDefinition)(nil),               // 75: avtoms.workorder.v1.PropertyDefinition
+	(*PropertyDefinitionValue)(nil),          // 76: avtoms.workorder.v1.PropertyDefinitionValue
+	(*ListPropertyDefinitionsRequest)(nil),   // 77: avtoms.workorder.v1.ListPropertyDefinitionsRequest
+	(*ListPropertyDefinitionsResponse)(nil),  // 78: avtoms.workorder.v1.ListPropertyDefinitionsResponse
+	(*CreatePropertyDefinitionRequest)(nil),  // 79: avtoms.workorder.v1.CreatePropertyDefinitionRequest
+	(*UpdatePropertyDefinitionRequest)(nil),  // 80: avtoms.workorder.v1.UpdatePropertyDefinitionRequest
+	(*DeletePropertyDefinitionRequest)(nil),  // 81: avtoms.workorder.v1.DeletePropertyDefinitionRequest
+	(*DeletePropertyDefinitionResponse)(nil), // 82: avtoms.workorder.v1.DeletePropertyDefinitionResponse
+	(*CatalogTerm)(nil),                      // 83: avtoms.workorder.v1.CatalogTerm
+	(*ListCatalogTermsRequest)(nil),          // 84: avtoms.workorder.v1.ListCatalogTermsRequest
+	(*ListCatalogTermsResponse)(nil),         // 85: avtoms.workorder.v1.ListCatalogTermsResponse
+	(*CreateCatalogTermRequest)(nil),         // 86: avtoms.workorder.v1.CreateCatalogTermRequest
+	(*UpdateCatalogTermRequest)(nil),         // 87: avtoms.workorder.v1.UpdateCatalogTermRequest
+	(*DeleteCatalogTermRequest)(nil),         // 88: avtoms.workorder.v1.DeleteCatalogTermRequest
+	(*DeleteCatalogTermResponse)(nil),        // 89: avtoms.workorder.v1.DeleteCatalogTermResponse
+	(*Contragent)(nil),                       // 90: avtoms.workorder.v1.Contragent
+	(*ListContragentsRequest)(nil),           // 91: avtoms.workorder.v1.ListContragentsRequest
+	(*ListContragentsResponse)(nil),          // 92: avtoms.workorder.v1.ListContragentsResponse
+	(*CreateContragentRequest)(nil),          // 93: avtoms.workorder.v1.CreateContragentRequest
+	(*UpdateContragentRequest)(nil),          // 94: avtoms.workorder.v1.UpdateContragentRequest
+	(*DeleteContragentRequest)(nil),          // 95: avtoms.workorder.v1.DeleteContragentRequest
+	(*DeleteContragentResponse)(nil),         // 96: avtoms.workorder.v1.DeleteContragentResponse
+	(*ContragentLedgerEntry)(nil),            // 97: avtoms.workorder.v1.ContragentLedgerEntry
+	(*ContragentBalance)(nil),                // 98: avtoms.workorder.v1.ContragentBalance
+	(*ListContragentBalancesRequest)(nil),    // 99: avtoms.workorder.v1.ListContragentBalancesRequest
+	(*ListContragentBalancesResponse)(nil),   // 100: avtoms.workorder.v1.ListContragentBalancesResponse
+	(*ListContragentLedgerRequest)(nil),      // 101: avtoms.workorder.v1.ListContragentLedgerRequest
+	(*ListContragentLedgerResponse)(nil),     // 102: avtoms.workorder.v1.ListContragentLedgerResponse
+	(*RecordContragentEntryRequest)(nil),     // 103: avtoms.workorder.v1.RecordContragentEntryRequest
+	(*DeleteContragentEntryRequest)(nil),     // 104: avtoms.workorder.v1.DeleteContragentEntryRequest
+	(*CustomerLedgerEntry)(nil),              // 105: avtoms.workorder.v1.CustomerLedgerEntry
+	(*CustomerBalance)(nil),                  // 106: avtoms.workorder.v1.CustomerBalance
+	(*ListCustomerBalancesRequest)(nil),      // 107: avtoms.workorder.v1.ListCustomerBalancesRequest
+	(*ListCustomerBalancesResponse)(nil),     // 108: avtoms.workorder.v1.ListCustomerBalancesResponse
+	(*ListCustomerLedgerRequest)(nil),        // 109: avtoms.workorder.v1.ListCustomerLedgerRequest
+	(*ListCustomerLedgerResponse)(nil),       // 110: avtoms.workorder.v1.ListCustomerLedgerResponse
+	(*RecordCustomerEntryRequest)(nil),       // 111: avtoms.workorder.v1.RecordCustomerEntryRequest
+	(*DeleteCustomerEntryRequest)(nil),       // 112: avtoms.workorder.v1.DeleteCustomerEntryRequest
+	(*DeleteCustomerEntryResponse)(nil),      // 113: avtoms.workorder.v1.DeleteCustomerEntryResponse
+	(*ShopSettings)(nil),                     // 114: avtoms.workorder.v1.ShopSettings
+	(*GetShopSettingsRequest)(nil),           // 115: avtoms.workorder.v1.GetShopSettingsRequest
+	(*UpdateShopSettingsRequest)(nil),        // 116: avtoms.workorder.v1.UpdateShopSettingsRequest
+	(*ListWorkOrdersRequest)(nil),            // 117: avtoms.workorder.v1.ListWorkOrdersRequest
+	(*ListWorkOrdersResponse)(nil),           // 118: avtoms.workorder.v1.ListWorkOrdersResponse
+	(*LineItem)(nil),                         // 119: avtoms.workorder.v1.LineItem
+	(*WorkOrder)(nil),                        // 120: avtoms.workorder.v1.WorkOrder
+	(*TimeEntry)(nil),                        // 121: avtoms.workorder.v1.TimeEntry
+	(*MenuMaterial)(nil),                     // 122: avtoms.workorder.v1.MenuMaterial
+	(*MenuItem)(nil),                         // 123: avtoms.workorder.v1.MenuItem
+	(*CreateWorkOrderRequest)(nil),           // 124: avtoms.workorder.v1.CreateWorkOrderRequest
+	(*GetWorkOrderRequest)(nil),              // 125: avtoms.workorder.v1.GetWorkOrderRequest
+	(*AddLineItemRequest)(nil),               // 126: avtoms.workorder.v1.AddLineItemRequest
+	(*UpdateLineItemRequest)(nil),            // 127: avtoms.workorder.v1.UpdateLineItemRequest
+	(*RemoveLineItemRequest)(nil),            // 128: avtoms.workorder.v1.RemoveLineItemRequest
+	(*TransitionStateRequest)(nil),           // 129: avtoms.workorder.v1.TransitionStateRequest
+	(*AssignMechanicRequest)(nil),            // 130: avtoms.workorder.v1.AssignMechanicRequest
+	(*AssignLineItemRequest)(nil),            // 131: avtoms.workorder.v1.AssignLineItemRequest
+	(*SetLineItemStatusRequest)(nil),         // 132: avtoms.workorder.v1.SetLineItemStatusRequest
+	(*SetWorkOrderNotesRequest)(nil),         // 133: avtoms.workorder.v1.SetWorkOrderNotesRequest
+	(*SetOrderDiscountRequest)(nil),          // 134: avtoms.workorder.v1.SetOrderDiscountRequest
+	(*StartTimerRequest)(nil),                // 135: avtoms.workorder.v1.StartTimerRequest
+	(*StopTimerRequest)(nil),                 // 136: avtoms.workorder.v1.StopTimerRequest
+	(*ListMenuItemsRequest)(nil),             // 137: avtoms.workorder.v1.ListMenuItemsRequest
+	(*ListMenuItemsResponse)(nil),            // 138: avtoms.workorder.v1.ListMenuItemsResponse
+	(*CreateMenuItemRequest)(nil),            // 139: avtoms.workorder.v1.CreateMenuItemRequest
+	(*UpdateMenuItemRequest)(nil),            // 140: avtoms.workorder.v1.UpdateMenuItemRequest
+	(*MenuPriceChange)(nil),                  // 141: avtoms.workorder.v1.MenuPriceChange
+	(*ListMenuPriceHistoryRequest)(nil),      // 142: avtoms.workorder.v1.ListMenuPriceHistoryRequest
+	(*ListMenuPriceHistoryResponse)(nil),     // 143: avtoms.workorder.v1.ListMenuPriceHistoryResponse
 }
 var file_avtoms_workorder_v1_workorder_proto_depIdxs = []int32{
 	0,   // 0: avtoms.workorder.v1.ApprovalInfo.status:type_name -> avtoms.workorder.v1.ApprovalStatus
-	14,  // 1: avtoms.workorder.v1.ListWarrantiesResponse.warranties:type_name -> avtoms.workorder.v1.Warranty
-	19,  // 2: avtoms.workorder.v1.ListShopExpensesResponse.expenses:type_name -> avtoms.workorder.v1.ShopExpense
-	25,  // 3: avtoms.workorder.v1.ProfitAndLoss.by_category:type_name -> avtoms.workorder.v1.ExpenseBucket
-	5,   // 4: avtoms.workorder.v1.StateBucket.state:type_name -> avtoms.workorder.v1.WorkOrderState
-	29,  // 5: avtoms.workorder.v1.Statistics.by_day:type_name -> avtoms.workorder.v1.DayPoint
-	25,  // 6: avtoms.workorder.v1.Statistics.by_category:type_name -> avtoms.workorder.v1.ExpenseBucket
-	30,  // 7: avtoms.workorder.v1.Statistics.funnel:type_name -> avtoms.workorder.v1.StateBucket
-	31,  // 8: avtoms.workorder.v1.Statistics.mechanics:type_name -> avtoms.workorder.v1.MechanicStat
-	32,  // 9: avtoms.workorder.v1.Statistics.top_services:type_name -> avtoms.workorder.v1.ItemStat
-	32,  // 10: avtoms.workorder.v1.Statistics.top_products:type_name -> avtoms.workorder.v1.ItemStat
-	33,  // 11: avtoms.workorder.v1.Statistics.top_vehicles:type_name -> avtoms.workorder.v1.VehicleStat
-	34,  // 12: avtoms.workorder.v1.Statistics.payments:type_name -> avtoms.workorder.v1.PaymentBucket
+	15,  // 1: avtoms.workorder.v1.ListWarrantiesResponse.warranties:type_name -> avtoms.workorder.v1.Warranty
+	20,  // 2: avtoms.workorder.v1.ListShopExpensesResponse.expenses:type_name -> avtoms.workorder.v1.ShopExpense
+	26,  // 3: avtoms.workorder.v1.ProfitAndLoss.by_category:type_name -> avtoms.workorder.v1.ExpenseBucket
+	6,   // 4: avtoms.workorder.v1.StateBucket.state:type_name -> avtoms.workorder.v1.WorkOrderState
+	30,  // 5: avtoms.workorder.v1.Statistics.by_day:type_name -> avtoms.workorder.v1.DayPoint
+	26,  // 6: avtoms.workorder.v1.Statistics.by_category:type_name -> avtoms.workorder.v1.ExpenseBucket
+	31,  // 7: avtoms.workorder.v1.Statistics.funnel:type_name -> avtoms.workorder.v1.StateBucket
+	32,  // 8: avtoms.workorder.v1.Statistics.mechanics:type_name -> avtoms.workorder.v1.MechanicStat
+	33,  // 9: avtoms.workorder.v1.Statistics.top_services:type_name -> avtoms.workorder.v1.ItemStat
+	33,  // 10: avtoms.workorder.v1.Statistics.top_products:type_name -> avtoms.workorder.v1.ItemStat
+	34,  // 11: avtoms.workorder.v1.Statistics.top_vehicles:type_name -> avtoms.workorder.v1.VehicleStat
+	35,  // 12: avtoms.workorder.v1.Statistics.payments:type_name -> avtoms.workorder.v1.PaymentBucket
 	1,   // 13: avtoms.workorder.v1.ServiceReminder.state:type_name -> avtoms.workorder.v1.ServiceReminderState
-	36,  // 14: avtoms.workorder.v1.ListServiceRemindersResponse.reminders:type_name -> avtoms.workorder.v1.ServiceReminder
+	37,  // 14: avtoms.workorder.v1.ListServiceRemindersResponse.reminders:type_name -> avtoms.workorder.v1.ServiceReminder
 	1,   // 15: avtoms.workorder.v1.SetServiceReminderStateRequest.state:type_name -> avtoms.workorder.v1.ServiceReminderState
-	45,  // 16: avtoms.workorder.v1.GetAuditLogResponse.entries:type_name -> avtoms.workorder.v1.AuditEntry
+	46,  // 16: avtoms.workorder.v1.GetAuditLogResponse.entries:type_name -> avtoms.workorder.v1.AuditEntry
 	2,   // 17: avtoms.workorder.v1.Appointment.state:type_name -> avtoms.workorder.v1.AppointmentState
-	48,  // 18: avtoms.workorder.v1.ListAppointmentsResponse.appointments:type_name -> avtoms.workorder.v1.Appointment
+	49,  // 18: avtoms.workorder.v1.ListAppointmentsResponse.appointments:type_name -> avtoms.workorder.v1.Appointment
 	2,   // 19: avtoms.workorder.v1.SetAppointmentStateRequest.state:type_name -> avtoms.workorder.v1.AppointmentState
-	54,  // 20: avtoms.workorder.v1.Product.properties:type_name -> avtoms.workorder.v1.ProductProperty
-	55,  // 21: avtoms.workorder.v1.Product.variants:type_name -> avtoms.workorder.v1.ProductVariant
-	56,  // 22: avtoms.workorder.v1.ProductVariant.attributes:type_name -> avtoms.workorder.v1.VariantAttribute
-	53,  // 23: avtoms.workorder.v1.ListProductsResponse.products:type_name -> avtoms.workorder.v1.Product
-	54,  // 24: avtoms.workorder.v1.CreateProductRequest.properties:type_name -> avtoms.workorder.v1.ProductProperty
-	55,  // 25: avtoms.workorder.v1.CreateProductRequest.variants:type_name -> avtoms.workorder.v1.ProductVariant
-	54,  // 26: avtoms.workorder.v1.UpdateProductRequest.properties:type_name -> avtoms.workorder.v1.ProductProperty
-	55,  // 27: avtoms.workorder.v1.UpdateProductRequest.variants:type_name -> avtoms.workorder.v1.ProductVariant
-	63,  // 28: avtoms.workorder.v1.ListStockMovementsResponse.movements:type_name -> avtoms.workorder.v1.StockMovement
-	66,  // 29: avtoms.workorder.v1.Sale.items:type_name -> avtoms.workorder.v1.SaleItem
+	55,  // 20: avtoms.workorder.v1.Product.properties:type_name -> avtoms.workorder.v1.ProductProperty
+	56,  // 21: avtoms.workorder.v1.Product.variants:type_name -> avtoms.workorder.v1.ProductVariant
+	57,  // 22: avtoms.workorder.v1.ProductVariant.attributes:type_name -> avtoms.workorder.v1.VariantAttribute
+	54,  // 23: avtoms.workorder.v1.ListProductsResponse.products:type_name -> avtoms.workorder.v1.Product
+	55,  // 24: avtoms.workorder.v1.CreateProductRequest.properties:type_name -> avtoms.workorder.v1.ProductProperty
+	56,  // 25: avtoms.workorder.v1.CreateProductRequest.variants:type_name -> avtoms.workorder.v1.ProductVariant
+	55,  // 26: avtoms.workorder.v1.UpdateProductRequest.properties:type_name -> avtoms.workorder.v1.ProductProperty
+	56,  // 27: avtoms.workorder.v1.UpdateProductRequest.variants:type_name -> avtoms.workorder.v1.ProductVariant
+	64,  // 28: avtoms.workorder.v1.ListStockMovementsResponse.movements:type_name -> avtoms.workorder.v1.StockMovement
+	67,  // 29: avtoms.workorder.v1.Sale.items:type_name -> avtoms.workorder.v1.SaleItem
 	3,   // 30: avtoms.workorder.v1.Sale.payment_method:type_name -> avtoms.workorder.v1.PaymentMethod
-	8,   // 31: avtoms.workorder.v1.Sale.discount_kind:type_name -> avtoms.workorder.v1.DiscountKind
-	66,  // 32: avtoms.workorder.v1.CreateSaleRequest.items:type_name -> avtoms.workorder.v1.SaleItem
+	9,   // 31: avtoms.workorder.v1.Sale.discount_kind:type_name -> avtoms.workorder.v1.DiscountKind
+	67,  // 32: avtoms.workorder.v1.CreateSaleRequest.items:type_name -> avtoms.workorder.v1.SaleItem
 	3,   // 33: avtoms.workorder.v1.CreateSaleRequest.payment_method:type_name -> avtoms.workorder.v1.PaymentMethod
-	8,   // 34: avtoms.workorder.v1.CreateSaleRequest.discount_kind:type_name -> avtoms.workorder.v1.DiscountKind
-	67,  // 35: avtoms.workorder.v1.ListSalesResponse.sales:type_name -> avtoms.workorder.v1.Sale
-	75,  // 36: avtoms.workorder.v1.PropertyDefinition.values:type_name -> avtoms.workorder.v1.PropertyDefinitionValue
-	74,  // 37: avtoms.workorder.v1.ListPropertyDefinitionsResponse.definitions:type_name -> avtoms.workorder.v1.PropertyDefinition
-	75,  // 38: avtoms.workorder.v1.CreatePropertyDefinitionRequest.values:type_name -> avtoms.workorder.v1.PropertyDefinitionValue
-	75,  // 39: avtoms.workorder.v1.UpdatePropertyDefinitionRequest.values:type_name -> avtoms.workorder.v1.PropertyDefinitionValue
-	82,  // 40: avtoms.workorder.v1.ListCatalogTermsResponse.terms:type_name -> avtoms.workorder.v1.CatalogTerm
-	89,  // 41: avtoms.workorder.v1.ListContragentsResponse.contragents:type_name -> avtoms.workorder.v1.Contragent
+	9,   // 34: avtoms.workorder.v1.CreateSaleRequest.discount_kind:type_name -> avtoms.workorder.v1.DiscountKind
+	68,  // 35: avtoms.workorder.v1.ListSalesResponse.sales:type_name -> avtoms.workorder.v1.Sale
+	76,  // 36: avtoms.workorder.v1.PropertyDefinition.values:type_name -> avtoms.workorder.v1.PropertyDefinitionValue
+	75,  // 37: avtoms.workorder.v1.ListPropertyDefinitionsResponse.definitions:type_name -> avtoms.workorder.v1.PropertyDefinition
+	76,  // 38: avtoms.workorder.v1.CreatePropertyDefinitionRequest.values:type_name -> avtoms.workorder.v1.PropertyDefinitionValue
+	76,  // 39: avtoms.workorder.v1.UpdatePropertyDefinitionRequest.values:type_name -> avtoms.workorder.v1.PropertyDefinitionValue
+	83,  // 40: avtoms.workorder.v1.ListCatalogTermsResponse.terms:type_name -> avtoms.workorder.v1.CatalogTerm
+	90,  // 41: avtoms.workorder.v1.ListContragentsResponse.contragents:type_name -> avtoms.workorder.v1.Contragent
 	4,   // 42: avtoms.workorder.v1.ContragentLedgerEntry.kind:type_name -> avtoms.workorder.v1.ContragentEntryKind
 	3,   // 43: avtoms.workorder.v1.ContragentLedgerEntry.method:type_name -> avtoms.workorder.v1.PaymentMethod
-	97,  // 44: avtoms.workorder.v1.ListContragentBalancesResponse.balances:type_name -> avtoms.workorder.v1.ContragentBalance
-	96,  // 45: avtoms.workorder.v1.ListContragentLedgerResponse.entries:type_name -> avtoms.workorder.v1.ContragentLedgerEntry
-	97,  // 46: avtoms.workorder.v1.ListContragentLedgerResponse.summary:type_name -> avtoms.workorder.v1.ContragentBalance
+	98,  // 44: avtoms.workorder.v1.ListContragentBalancesResponse.balances:type_name -> avtoms.workorder.v1.ContragentBalance
+	97,  // 45: avtoms.workorder.v1.ListContragentLedgerResponse.entries:type_name -> avtoms.workorder.v1.ContragentLedgerEntry
+	98,  // 46: avtoms.workorder.v1.ListContragentLedgerResponse.summary:type_name -> avtoms.workorder.v1.ContragentBalance
 	4,   // 47: avtoms.workorder.v1.RecordContragentEntryRequest.kind:type_name -> avtoms.workorder.v1.ContragentEntryKind
 	3,   // 48: avtoms.workorder.v1.RecordContragentEntryRequest.method:type_name -> avtoms.workorder.v1.PaymentMethod
-	5,   // 49: avtoms.workorder.v1.ShopSettings.enabled_states:type_name -> avtoms.workorder.v1.WorkOrderState
-	5,   // 50: avtoms.workorder.v1.UpdateShopSettingsRequest.enabled_states:type_name -> avtoms.workorder.v1.WorkOrderState
-	5,   // 51: avtoms.workorder.v1.ListWorkOrdersRequest.state:type_name -> avtoms.workorder.v1.WorkOrderState
-	110, // 52: avtoms.workorder.v1.ListWorkOrdersResponse.work_orders:type_name -> avtoms.workorder.v1.WorkOrder
-	6,   // 53: avtoms.workorder.v1.LineItem.kind:type_name -> avtoms.workorder.v1.LineItemKind
-	7,   // 54: avtoms.workorder.v1.LineItem.status:type_name -> avtoms.workorder.v1.LineItemStatus
-	5,   // 55: avtoms.workorder.v1.WorkOrder.state:type_name -> avtoms.workorder.v1.WorkOrderState
-	109, // 56: avtoms.workorder.v1.WorkOrder.line_items:type_name -> avtoms.workorder.v1.LineItem
-	8,   // 57: avtoms.workorder.v1.WorkOrder.discount_kind:type_name -> avtoms.workorder.v1.DiscountKind
-	112, // 58: avtoms.workorder.v1.MenuItem.materials:type_name -> avtoms.workorder.v1.MenuMaterial
-	109, // 59: avtoms.workorder.v1.AddLineItemRequest.line_item:type_name -> avtoms.workorder.v1.LineItem
-	5,   // 60: avtoms.workorder.v1.TransitionStateRequest.target:type_name -> avtoms.workorder.v1.WorkOrderState
-	7,   // 61: avtoms.workorder.v1.SetLineItemStatusRequest.status:type_name -> avtoms.workorder.v1.LineItemStatus
-	8,   // 62: avtoms.workorder.v1.SetOrderDiscountRequest.discount_kind:type_name -> avtoms.workorder.v1.DiscountKind
-	113, // 63: avtoms.workorder.v1.ListMenuItemsResponse.items:type_name -> avtoms.workorder.v1.MenuItem
-	112, // 64: avtoms.workorder.v1.CreateMenuItemRequest.materials:type_name -> avtoms.workorder.v1.MenuMaterial
-	112, // 65: avtoms.workorder.v1.UpdateMenuItemRequest.materials:type_name -> avtoms.workorder.v1.MenuMaterial
-	131, // 66: avtoms.workorder.v1.ListMenuPriceHistoryResponse.changes:type_name -> avtoms.workorder.v1.MenuPriceChange
-	114, // 67: avtoms.workorder.v1.WorkOrderService.CreateWorkOrder:input_type -> avtoms.workorder.v1.CreateWorkOrderRequest
-	115, // 68: avtoms.workorder.v1.WorkOrderService.GetWorkOrder:input_type -> avtoms.workorder.v1.GetWorkOrderRequest
-	116, // 69: avtoms.workorder.v1.WorkOrderService.AddLineItem:input_type -> avtoms.workorder.v1.AddLineItemRequest
-	117, // 70: avtoms.workorder.v1.WorkOrderService.UpdateLineItem:input_type -> avtoms.workorder.v1.UpdateLineItemRequest
-	118, // 71: avtoms.workorder.v1.WorkOrderService.RemoveLineItem:input_type -> avtoms.workorder.v1.RemoveLineItemRequest
-	119, // 72: avtoms.workorder.v1.WorkOrderService.TransitionState:input_type -> avtoms.workorder.v1.TransitionStateRequest
-	120, // 73: avtoms.workorder.v1.WorkOrderService.AssignMechanic:input_type -> avtoms.workorder.v1.AssignMechanicRequest
-	121, // 74: avtoms.workorder.v1.WorkOrderService.AssignLineItem:input_type -> avtoms.workorder.v1.AssignLineItemRequest
-	122, // 75: avtoms.workorder.v1.WorkOrderService.SetLineItemStatus:input_type -> avtoms.workorder.v1.SetLineItemStatusRequest
-	124, // 76: avtoms.workorder.v1.WorkOrderService.SetOrderDiscount:input_type -> avtoms.workorder.v1.SetOrderDiscountRequest
-	123, // 77: avtoms.workorder.v1.WorkOrderService.SetWorkOrderNotes:input_type -> avtoms.workorder.v1.SetWorkOrderNotesRequest
-	125, // 78: avtoms.workorder.v1.WorkOrderService.StartTimer:input_type -> avtoms.workorder.v1.StartTimerRequest
-	126, // 79: avtoms.workorder.v1.WorkOrderService.StopTimer:input_type -> avtoms.workorder.v1.StopTimerRequest
-	127, // 80: avtoms.workorder.v1.WorkOrderService.ListMenuItems:input_type -> avtoms.workorder.v1.ListMenuItemsRequest
-	129, // 81: avtoms.workorder.v1.WorkOrderService.CreateMenuItem:input_type -> avtoms.workorder.v1.CreateMenuItemRequest
-	130, // 82: avtoms.workorder.v1.WorkOrderService.UpdateMenuItem:input_type -> avtoms.workorder.v1.UpdateMenuItemRequest
-	132, // 83: avtoms.workorder.v1.WorkOrderService.ListMenuPriceHistory:input_type -> avtoms.workorder.v1.ListMenuPriceHistoryRequest
-	107, // 84: avtoms.workorder.v1.WorkOrderService.ListWorkOrders:input_type -> avtoms.workorder.v1.ListWorkOrdersRequest
-	105, // 85: avtoms.workorder.v1.WorkOrderService.GetShopSettings:input_type -> avtoms.workorder.v1.GetShopSettingsRequest
-	106, // 86: avtoms.workorder.v1.WorkOrderService.UpdateShopSettings:input_type -> avtoms.workorder.v1.UpdateShopSettingsRequest
-	57,  // 87: avtoms.workorder.v1.WorkOrderService.ListProducts:input_type -> avtoms.workorder.v1.ListProductsRequest
-	59,  // 88: avtoms.workorder.v1.WorkOrderService.GetProduct:input_type -> avtoms.workorder.v1.GetProductRequest
-	60,  // 89: avtoms.workorder.v1.WorkOrderService.CreateProduct:input_type -> avtoms.workorder.v1.CreateProductRequest
-	61,  // 90: avtoms.workorder.v1.WorkOrderService.UpdateProduct:input_type -> avtoms.workorder.v1.UpdateProductRequest
-	62,  // 91: avtoms.workorder.v1.WorkOrderService.AdjustVariantStock:input_type -> avtoms.workorder.v1.AdjustVariantStockRequest
-	64,  // 92: avtoms.workorder.v1.WorkOrderService.ListStockMovements:input_type -> avtoms.workorder.v1.ListStockMovementsRequest
-	68,  // 93: avtoms.workorder.v1.WorkOrderService.CreateSale:input_type -> avtoms.workorder.v1.CreateSaleRequest
-	69,  // 94: avtoms.workorder.v1.WorkOrderService.ListSales:input_type -> avtoms.workorder.v1.ListSalesRequest
-	71,  // 95: avtoms.workorder.v1.WorkOrderService.GetSale:input_type -> avtoms.workorder.v1.GetSaleRequest
-	72,  // 96: avtoms.workorder.v1.WorkOrderService.VoidSale:input_type -> avtoms.workorder.v1.VoidSaleRequest
-	73,  // 97: avtoms.workorder.v1.WorkOrderService.SetSaleInvoice:input_type -> avtoms.workorder.v1.SetSaleInvoiceRequest
-	76,  // 98: avtoms.workorder.v1.WorkOrderService.ListPropertyDefinitions:input_type -> avtoms.workorder.v1.ListPropertyDefinitionsRequest
-	78,  // 99: avtoms.workorder.v1.WorkOrderService.CreatePropertyDefinition:input_type -> avtoms.workorder.v1.CreatePropertyDefinitionRequest
-	79,  // 100: avtoms.workorder.v1.WorkOrderService.UpdatePropertyDefinition:input_type -> avtoms.workorder.v1.UpdatePropertyDefinitionRequest
-	80,  // 101: avtoms.workorder.v1.WorkOrderService.DeletePropertyDefinition:input_type -> avtoms.workorder.v1.DeletePropertyDefinitionRequest
-	83,  // 102: avtoms.workorder.v1.WorkOrderService.ListCatalogTerms:input_type -> avtoms.workorder.v1.ListCatalogTermsRequest
-	85,  // 103: avtoms.workorder.v1.WorkOrderService.CreateCatalogTerm:input_type -> avtoms.workorder.v1.CreateCatalogTermRequest
-	86,  // 104: avtoms.workorder.v1.WorkOrderService.UpdateCatalogTerm:input_type -> avtoms.workorder.v1.UpdateCatalogTermRequest
-	87,  // 105: avtoms.workorder.v1.WorkOrderService.DeleteCatalogTerm:input_type -> avtoms.workorder.v1.DeleteCatalogTermRequest
-	90,  // 106: avtoms.workorder.v1.WorkOrderService.ListContragents:input_type -> avtoms.workorder.v1.ListContragentsRequest
-	92,  // 107: avtoms.workorder.v1.WorkOrderService.CreateContragent:input_type -> avtoms.workorder.v1.CreateContragentRequest
-	93,  // 108: avtoms.workorder.v1.WorkOrderService.UpdateContragent:input_type -> avtoms.workorder.v1.UpdateContragentRequest
-	94,  // 109: avtoms.workorder.v1.WorkOrderService.DeleteContragent:input_type -> avtoms.workorder.v1.DeleteContragentRequest
-	98,  // 110: avtoms.workorder.v1.WorkOrderService.ListContragentBalances:input_type -> avtoms.workorder.v1.ListContragentBalancesRequest
-	100, // 111: avtoms.workorder.v1.WorkOrderService.ListContragentLedger:input_type -> avtoms.workorder.v1.ListContragentLedgerRequest
-	102, // 112: avtoms.workorder.v1.WorkOrderService.RecordContragentEntry:input_type -> avtoms.workorder.v1.RecordContragentEntryRequest
-	103, // 113: avtoms.workorder.v1.WorkOrderService.DeleteContragentEntry:input_type -> avtoms.workorder.v1.DeleteContragentEntryRequest
-	49,  // 114: avtoms.workorder.v1.WorkOrderService.ListAppointments:input_type -> avtoms.workorder.v1.ListAppointmentsRequest
-	51,  // 115: avtoms.workorder.v1.WorkOrderService.CreateAppointment:input_type -> avtoms.workorder.v1.CreateAppointmentRequest
-	52,  // 116: avtoms.workorder.v1.WorkOrderService.SetAppointmentState:input_type -> avtoms.workorder.v1.SetAppointmentStateRequest
-	46,  // 117: avtoms.workorder.v1.WorkOrderService.GetAuditLog:input_type -> avtoms.workorder.v1.GetAuditLogRequest
-	37,  // 118: avtoms.workorder.v1.WorkOrderService.ListServiceReminders:input_type -> avtoms.workorder.v1.ListServiceRemindersRequest
-	39,  // 119: avtoms.workorder.v1.WorkOrderService.CreateServiceReminder:input_type -> avtoms.workorder.v1.CreateServiceReminderRequest
-	40,  // 120: avtoms.workorder.v1.WorkOrderService.SetServiceReminderState:input_type -> avtoms.workorder.v1.SetServiceReminderStateRequest
-	41,  // 121: avtoms.workorder.v1.WorkOrderService.ListDueReminders:input_type -> avtoms.workorder.v1.ListDueRemindersRequest
-	43,  // 122: avtoms.workorder.v1.WorkOrderService.MarkReminderNotified:input_type -> avtoms.workorder.v1.MarkNotifiedRequest
-	42,  // 123: avtoms.workorder.v1.WorkOrderService.ListDueAppointments:input_type -> avtoms.workorder.v1.ListDueAppointmentsRequest
-	43,  // 124: avtoms.workorder.v1.WorkOrderService.MarkAppointmentReminded:input_type -> avtoms.workorder.v1.MarkNotifiedRequest
-	20,  // 125: avtoms.workorder.v1.WorkOrderService.ListShopExpenses:input_type -> avtoms.workorder.v1.ListShopExpensesRequest
-	22,  // 126: avtoms.workorder.v1.WorkOrderService.CreateShopExpense:input_type -> avtoms.workorder.v1.CreateShopExpenseRequest
-	23,  // 127: avtoms.workorder.v1.WorkOrderService.DeleteShopExpense:input_type -> avtoms.workorder.v1.DeleteShopExpenseRequest
-	27,  // 128: avtoms.workorder.v1.WorkOrderService.GetProfitAndLoss:input_type -> avtoms.workorder.v1.GetProfitAndLossRequest
-	28,  // 129: avtoms.workorder.v1.WorkOrderService.GetStatistics:input_type -> avtoms.workorder.v1.GetStatisticsRequest
-	15,  // 130: avtoms.workorder.v1.WorkOrderService.ListWarranties:input_type -> avtoms.workorder.v1.ListWarrantiesRequest
-	17,  // 131: avtoms.workorder.v1.WorkOrderService.CreateWarranty:input_type -> avtoms.workorder.v1.CreateWarrantyRequest
-	18,  // 132: avtoms.workorder.v1.WorkOrderService.VoidWarranty:input_type -> avtoms.workorder.v1.VoidWarrantyRequest
-	11,  // 133: avtoms.workorder.v1.WorkOrderService.CreateApprovalLink:input_type -> avtoms.workorder.v1.CreateApprovalLinkRequest
-	12,  // 134: avtoms.workorder.v1.WorkOrderService.ResolveApproval:input_type -> avtoms.workorder.v1.ResolveApprovalRequest
-	13,  // 135: avtoms.workorder.v1.WorkOrderService.DecideApproval:input_type -> avtoms.workorder.v1.DecideApprovalRequest
-	110, // 136: avtoms.workorder.v1.WorkOrderService.CreateWorkOrder:output_type -> avtoms.workorder.v1.WorkOrder
-	110, // 137: avtoms.workorder.v1.WorkOrderService.GetWorkOrder:output_type -> avtoms.workorder.v1.WorkOrder
-	110, // 138: avtoms.workorder.v1.WorkOrderService.AddLineItem:output_type -> avtoms.workorder.v1.WorkOrder
-	110, // 139: avtoms.workorder.v1.WorkOrderService.UpdateLineItem:output_type -> avtoms.workorder.v1.WorkOrder
-	110, // 140: avtoms.workorder.v1.WorkOrderService.RemoveLineItem:output_type -> avtoms.workorder.v1.WorkOrder
-	110, // 141: avtoms.workorder.v1.WorkOrderService.TransitionState:output_type -> avtoms.workorder.v1.WorkOrder
-	110, // 142: avtoms.workorder.v1.WorkOrderService.AssignMechanic:output_type -> avtoms.workorder.v1.WorkOrder
-	110, // 143: avtoms.workorder.v1.WorkOrderService.AssignLineItem:output_type -> avtoms.workorder.v1.WorkOrder
-	110, // 144: avtoms.workorder.v1.WorkOrderService.SetLineItemStatus:output_type -> avtoms.workorder.v1.WorkOrder
-	110, // 145: avtoms.workorder.v1.WorkOrderService.SetOrderDiscount:output_type -> avtoms.workorder.v1.WorkOrder
-	110, // 146: avtoms.workorder.v1.WorkOrderService.SetWorkOrderNotes:output_type -> avtoms.workorder.v1.WorkOrder
-	111, // 147: avtoms.workorder.v1.WorkOrderService.StartTimer:output_type -> avtoms.workorder.v1.TimeEntry
-	111, // 148: avtoms.workorder.v1.WorkOrderService.StopTimer:output_type -> avtoms.workorder.v1.TimeEntry
-	128, // 149: avtoms.workorder.v1.WorkOrderService.ListMenuItems:output_type -> avtoms.workorder.v1.ListMenuItemsResponse
-	113, // 150: avtoms.workorder.v1.WorkOrderService.CreateMenuItem:output_type -> avtoms.workorder.v1.MenuItem
-	113, // 151: avtoms.workorder.v1.WorkOrderService.UpdateMenuItem:output_type -> avtoms.workorder.v1.MenuItem
-	133, // 152: avtoms.workorder.v1.WorkOrderService.ListMenuPriceHistory:output_type -> avtoms.workorder.v1.ListMenuPriceHistoryResponse
-	108, // 153: avtoms.workorder.v1.WorkOrderService.ListWorkOrders:output_type -> avtoms.workorder.v1.ListWorkOrdersResponse
-	104, // 154: avtoms.workorder.v1.WorkOrderService.GetShopSettings:output_type -> avtoms.workorder.v1.ShopSettings
-	104, // 155: avtoms.workorder.v1.WorkOrderService.UpdateShopSettings:output_type -> avtoms.workorder.v1.ShopSettings
-	58,  // 156: avtoms.workorder.v1.WorkOrderService.ListProducts:output_type -> avtoms.workorder.v1.ListProductsResponse
-	53,  // 157: avtoms.workorder.v1.WorkOrderService.GetProduct:output_type -> avtoms.workorder.v1.Product
-	53,  // 158: avtoms.workorder.v1.WorkOrderService.CreateProduct:output_type -> avtoms.workorder.v1.Product
-	53,  // 159: avtoms.workorder.v1.WorkOrderService.UpdateProduct:output_type -> avtoms.workorder.v1.Product
-	55,  // 160: avtoms.workorder.v1.WorkOrderService.AdjustVariantStock:output_type -> avtoms.workorder.v1.ProductVariant
-	65,  // 161: avtoms.workorder.v1.WorkOrderService.ListStockMovements:output_type -> avtoms.workorder.v1.ListStockMovementsResponse
-	67,  // 162: avtoms.workorder.v1.WorkOrderService.CreateSale:output_type -> avtoms.workorder.v1.Sale
-	70,  // 163: avtoms.workorder.v1.WorkOrderService.ListSales:output_type -> avtoms.workorder.v1.ListSalesResponse
-	67,  // 164: avtoms.workorder.v1.WorkOrderService.GetSale:output_type -> avtoms.workorder.v1.Sale
-	67,  // 165: avtoms.workorder.v1.WorkOrderService.VoidSale:output_type -> avtoms.workorder.v1.Sale
-	67,  // 166: avtoms.workorder.v1.WorkOrderService.SetSaleInvoice:output_type -> avtoms.workorder.v1.Sale
-	77,  // 167: avtoms.workorder.v1.WorkOrderService.ListPropertyDefinitions:output_type -> avtoms.workorder.v1.ListPropertyDefinitionsResponse
-	74,  // 168: avtoms.workorder.v1.WorkOrderService.CreatePropertyDefinition:output_type -> avtoms.workorder.v1.PropertyDefinition
-	74,  // 169: avtoms.workorder.v1.WorkOrderService.UpdatePropertyDefinition:output_type -> avtoms.workorder.v1.PropertyDefinition
-	81,  // 170: avtoms.workorder.v1.WorkOrderService.DeletePropertyDefinition:output_type -> avtoms.workorder.v1.DeletePropertyDefinitionResponse
-	84,  // 171: avtoms.workorder.v1.WorkOrderService.ListCatalogTerms:output_type -> avtoms.workorder.v1.ListCatalogTermsResponse
-	82,  // 172: avtoms.workorder.v1.WorkOrderService.CreateCatalogTerm:output_type -> avtoms.workorder.v1.CatalogTerm
-	82,  // 173: avtoms.workorder.v1.WorkOrderService.UpdateCatalogTerm:output_type -> avtoms.workorder.v1.CatalogTerm
-	88,  // 174: avtoms.workorder.v1.WorkOrderService.DeleteCatalogTerm:output_type -> avtoms.workorder.v1.DeleteCatalogTermResponse
-	91,  // 175: avtoms.workorder.v1.WorkOrderService.ListContragents:output_type -> avtoms.workorder.v1.ListContragentsResponse
-	89,  // 176: avtoms.workorder.v1.WorkOrderService.CreateContragent:output_type -> avtoms.workorder.v1.Contragent
-	89,  // 177: avtoms.workorder.v1.WorkOrderService.UpdateContragent:output_type -> avtoms.workorder.v1.Contragent
-	95,  // 178: avtoms.workorder.v1.WorkOrderService.DeleteContragent:output_type -> avtoms.workorder.v1.DeleteContragentResponse
-	99,  // 179: avtoms.workorder.v1.WorkOrderService.ListContragentBalances:output_type -> avtoms.workorder.v1.ListContragentBalancesResponse
-	101, // 180: avtoms.workorder.v1.WorkOrderService.ListContragentLedger:output_type -> avtoms.workorder.v1.ListContragentLedgerResponse
-	96,  // 181: avtoms.workorder.v1.WorkOrderService.RecordContragentEntry:output_type -> avtoms.workorder.v1.ContragentLedgerEntry
-	95,  // 182: avtoms.workorder.v1.WorkOrderService.DeleteContragentEntry:output_type -> avtoms.workorder.v1.DeleteContragentResponse
-	50,  // 183: avtoms.workorder.v1.WorkOrderService.ListAppointments:output_type -> avtoms.workorder.v1.ListAppointmentsResponse
-	48,  // 184: avtoms.workorder.v1.WorkOrderService.CreateAppointment:output_type -> avtoms.workorder.v1.Appointment
-	48,  // 185: avtoms.workorder.v1.WorkOrderService.SetAppointmentState:output_type -> avtoms.workorder.v1.Appointment
-	47,  // 186: avtoms.workorder.v1.WorkOrderService.GetAuditLog:output_type -> avtoms.workorder.v1.GetAuditLogResponse
-	38,  // 187: avtoms.workorder.v1.WorkOrderService.ListServiceReminders:output_type -> avtoms.workorder.v1.ListServiceRemindersResponse
-	36,  // 188: avtoms.workorder.v1.WorkOrderService.CreateServiceReminder:output_type -> avtoms.workorder.v1.ServiceReminder
-	36,  // 189: avtoms.workorder.v1.WorkOrderService.SetServiceReminderState:output_type -> avtoms.workorder.v1.ServiceReminder
-	38,  // 190: avtoms.workorder.v1.WorkOrderService.ListDueReminders:output_type -> avtoms.workorder.v1.ListServiceRemindersResponse
-	44,  // 191: avtoms.workorder.v1.WorkOrderService.MarkReminderNotified:output_type -> avtoms.workorder.v1.MarkNotifiedResponse
-	50,  // 192: avtoms.workorder.v1.WorkOrderService.ListDueAppointments:output_type -> avtoms.workorder.v1.ListAppointmentsResponse
-	44,  // 193: avtoms.workorder.v1.WorkOrderService.MarkAppointmentReminded:output_type -> avtoms.workorder.v1.MarkNotifiedResponse
-	21,  // 194: avtoms.workorder.v1.WorkOrderService.ListShopExpenses:output_type -> avtoms.workorder.v1.ListShopExpensesResponse
-	19,  // 195: avtoms.workorder.v1.WorkOrderService.CreateShopExpense:output_type -> avtoms.workorder.v1.ShopExpense
-	24,  // 196: avtoms.workorder.v1.WorkOrderService.DeleteShopExpense:output_type -> avtoms.workorder.v1.DeleteShopExpenseResponse
-	26,  // 197: avtoms.workorder.v1.WorkOrderService.GetProfitAndLoss:output_type -> avtoms.workorder.v1.ProfitAndLoss
-	35,  // 198: avtoms.workorder.v1.WorkOrderService.GetStatistics:output_type -> avtoms.workorder.v1.Statistics
-	16,  // 199: avtoms.workorder.v1.WorkOrderService.ListWarranties:output_type -> avtoms.workorder.v1.ListWarrantiesResponse
-	14,  // 200: avtoms.workorder.v1.WorkOrderService.CreateWarranty:output_type -> avtoms.workorder.v1.Warranty
-	14,  // 201: avtoms.workorder.v1.WorkOrderService.VoidWarranty:output_type -> avtoms.workorder.v1.Warranty
-	9,   // 202: avtoms.workorder.v1.WorkOrderService.CreateApprovalLink:output_type -> avtoms.workorder.v1.ApprovalLink
-	10,  // 203: avtoms.workorder.v1.WorkOrderService.ResolveApproval:output_type -> avtoms.workorder.v1.ApprovalInfo
-	10,  // 204: avtoms.workorder.v1.WorkOrderService.DecideApproval:output_type -> avtoms.workorder.v1.ApprovalInfo
-	136, // [136:205] is the sub-list for method output_type
-	67,  // [67:136] is the sub-list for method input_type
-	67,  // [67:67] is the sub-list for extension type_name
-	67,  // [67:67] is the sub-list for extension extendee
-	0,   // [0:67] is the sub-list for field type_name
+	5,   // 49: avtoms.workorder.v1.CustomerLedgerEntry.kind:type_name -> avtoms.workorder.v1.CustomerEntryKind
+	3,   // 50: avtoms.workorder.v1.CustomerLedgerEntry.method:type_name -> avtoms.workorder.v1.PaymentMethod
+	106, // 51: avtoms.workorder.v1.ListCustomerBalancesResponse.balances:type_name -> avtoms.workorder.v1.CustomerBalance
+	105, // 52: avtoms.workorder.v1.ListCustomerLedgerResponse.entries:type_name -> avtoms.workorder.v1.CustomerLedgerEntry
+	106, // 53: avtoms.workorder.v1.ListCustomerLedgerResponse.summary:type_name -> avtoms.workorder.v1.CustomerBalance
+	5,   // 54: avtoms.workorder.v1.RecordCustomerEntryRequest.kind:type_name -> avtoms.workorder.v1.CustomerEntryKind
+	3,   // 55: avtoms.workorder.v1.RecordCustomerEntryRequest.method:type_name -> avtoms.workorder.v1.PaymentMethod
+	6,   // 56: avtoms.workorder.v1.ShopSettings.enabled_states:type_name -> avtoms.workorder.v1.WorkOrderState
+	6,   // 57: avtoms.workorder.v1.UpdateShopSettingsRequest.enabled_states:type_name -> avtoms.workorder.v1.WorkOrderState
+	6,   // 58: avtoms.workorder.v1.ListWorkOrdersRequest.state:type_name -> avtoms.workorder.v1.WorkOrderState
+	120, // 59: avtoms.workorder.v1.ListWorkOrdersResponse.work_orders:type_name -> avtoms.workorder.v1.WorkOrder
+	7,   // 60: avtoms.workorder.v1.LineItem.kind:type_name -> avtoms.workorder.v1.LineItemKind
+	8,   // 61: avtoms.workorder.v1.LineItem.status:type_name -> avtoms.workorder.v1.LineItemStatus
+	6,   // 62: avtoms.workorder.v1.WorkOrder.state:type_name -> avtoms.workorder.v1.WorkOrderState
+	119, // 63: avtoms.workorder.v1.WorkOrder.line_items:type_name -> avtoms.workorder.v1.LineItem
+	9,   // 64: avtoms.workorder.v1.WorkOrder.discount_kind:type_name -> avtoms.workorder.v1.DiscountKind
+	122, // 65: avtoms.workorder.v1.MenuItem.materials:type_name -> avtoms.workorder.v1.MenuMaterial
+	119, // 66: avtoms.workorder.v1.AddLineItemRequest.line_item:type_name -> avtoms.workorder.v1.LineItem
+	6,   // 67: avtoms.workorder.v1.TransitionStateRequest.target:type_name -> avtoms.workorder.v1.WorkOrderState
+	8,   // 68: avtoms.workorder.v1.SetLineItemStatusRequest.status:type_name -> avtoms.workorder.v1.LineItemStatus
+	9,   // 69: avtoms.workorder.v1.SetOrderDiscountRequest.discount_kind:type_name -> avtoms.workorder.v1.DiscountKind
+	123, // 70: avtoms.workorder.v1.ListMenuItemsResponse.items:type_name -> avtoms.workorder.v1.MenuItem
+	122, // 71: avtoms.workorder.v1.CreateMenuItemRequest.materials:type_name -> avtoms.workorder.v1.MenuMaterial
+	122, // 72: avtoms.workorder.v1.UpdateMenuItemRequest.materials:type_name -> avtoms.workorder.v1.MenuMaterial
+	141, // 73: avtoms.workorder.v1.ListMenuPriceHistoryResponse.changes:type_name -> avtoms.workorder.v1.MenuPriceChange
+	124, // 74: avtoms.workorder.v1.WorkOrderService.CreateWorkOrder:input_type -> avtoms.workorder.v1.CreateWorkOrderRequest
+	125, // 75: avtoms.workorder.v1.WorkOrderService.GetWorkOrder:input_type -> avtoms.workorder.v1.GetWorkOrderRequest
+	126, // 76: avtoms.workorder.v1.WorkOrderService.AddLineItem:input_type -> avtoms.workorder.v1.AddLineItemRequest
+	127, // 77: avtoms.workorder.v1.WorkOrderService.UpdateLineItem:input_type -> avtoms.workorder.v1.UpdateLineItemRequest
+	128, // 78: avtoms.workorder.v1.WorkOrderService.RemoveLineItem:input_type -> avtoms.workorder.v1.RemoveLineItemRequest
+	129, // 79: avtoms.workorder.v1.WorkOrderService.TransitionState:input_type -> avtoms.workorder.v1.TransitionStateRequest
+	130, // 80: avtoms.workorder.v1.WorkOrderService.AssignMechanic:input_type -> avtoms.workorder.v1.AssignMechanicRequest
+	131, // 81: avtoms.workorder.v1.WorkOrderService.AssignLineItem:input_type -> avtoms.workorder.v1.AssignLineItemRequest
+	132, // 82: avtoms.workorder.v1.WorkOrderService.SetLineItemStatus:input_type -> avtoms.workorder.v1.SetLineItemStatusRequest
+	134, // 83: avtoms.workorder.v1.WorkOrderService.SetOrderDiscount:input_type -> avtoms.workorder.v1.SetOrderDiscountRequest
+	133, // 84: avtoms.workorder.v1.WorkOrderService.SetWorkOrderNotes:input_type -> avtoms.workorder.v1.SetWorkOrderNotesRequest
+	135, // 85: avtoms.workorder.v1.WorkOrderService.StartTimer:input_type -> avtoms.workorder.v1.StartTimerRequest
+	136, // 86: avtoms.workorder.v1.WorkOrderService.StopTimer:input_type -> avtoms.workorder.v1.StopTimerRequest
+	137, // 87: avtoms.workorder.v1.WorkOrderService.ListMenuItems:input_type -> avtoms.workorder.v1.ListMenuItemsRequest
+	139, // 88: avtoms.workorder.v1.WorkOrderService.CreateMenuItem:input_type -> avtoms.workorder.v1.CreateMenuItemRequest
+	140, // 89: avtoms.workorder.v1.WorkOrderService.UpdateMenuItem:input_type -> avtoms.workorder.v1.UpdateMenuItemRequest
+	142, // 90: avtoms.workorder.v1.WorkOrderService.ListMenuPriceHistory:input_type -> avtoms.workorder.v1.ListMenuPriceHistoryRequest
+	117, // 91: avtoms.workorder.v1.WorkOrderService.ListWorkOrders:input_type -> avtoms.workorder.v1.ListWorkOrdersRequest
+	115, // 92: avtoms.workorder.v1.WorkOrderService.GetShopSettings:input_type -> avtoms.workorder.v1.GetShopSettingsRequest
+	116, // 93: avtoms.workorder.v1.WorkOrderService.UpdateShopSettings:input_type -> avtoms.workorder.v1.UpdateShopSettingsRequest
+	58,  // 94: avtoms.workorder.v1.WorkOrderService.ListProducts:input_type -> avtoms.workorder.v1.ListProductsRequest
+	60,  // 95: avtoms.workorder.v1.WorkOrderService.GetProduct:input_type -> avtoms.workorder.v1.GetProductRequest
+	61,  // 96: avtoms.workorder.v1.WorkOrderService.CreateProduct:input_type -> avtoms.workorder.v1.CreateProductRequest
+	62,  // 97: avtoms.workorder.v1.WorkOrderService.UpdateProduct:input_type -> avtoms.workorder.v1.UpdateProductRequest
+	63,  // 98: avtoms.workorder.v1.WorkOrderService.AdjustVariantStock:input_type -> avtoms.workorder.v1.AdjustVariantStockRequest
+	65,  // 99: avtoms.workorder.v1.WorkOrderService.ListStockMovements:input_type -> avtoms.workorder.v1.ListStockMovementsRequest
+	69,  // 100: avtoms.workorder.v1.WorkOrderService.CreateSale:input_type -> avtoms.workorder.v1.CreateSaleRequest
+	70,  // 101: avtoms.workorder.v1.WorkOrderService.ListSales:input_type -> avtoms.workorder.v1.ListSalesRequest
+	72,  // 102: avtoms.workorder.v1.WorkOrderService.GetSale:input_type -> avtoms.workorder.v1.GetSaleRequest
+	73,  // 103: avtoms.workorder.v1.WorkOrderService.VoidSale:input_type -> avtoms.workorder.v1.VoidSaleRequest
+	74,  // 104: avtoms.workorder.v1.WorkOrderService.SetSaleInvoice:input_type -> avtoms.workorder.v1.SetSaleInvoiceRequest
+	77,  // 105: avtoms.workorder.v1.WorkOrderService.ListPropertyDefinitions:input_type -> avtoms.workorder.v1.ListPropertyDefinitionsRequest
+	79,  // 106: avtoms.workorder.v1.WorkOrderService.CreatePropertyDefinition:input_type -> avtoms.workorder.v1.CreatePropertyDefinitionRequest
+	80,  // 107: avtoms.workorder.v1.WorkOrderService.UpdatePropertyDefinition:input_type -> avtoms.workorder.v1.UpdatePropertyDefinitionRequest
+	81,  // 108: avtoms.workorder.v1.WorkOrderService.DeletePropertyDefinition:input_type -> avtoms.workorder.v1.DeletePropertyDefinitionRequest
+	84,  // 109: avtoms.workorder.v1.WorkOrderService.ListCatalogTerms:input_type -> avtoms.workorder.v1.ListCatalogTermsRequest
+	86,  // 110: avtoms.workorder.v1.WorkOrderService.CreateCatalogTerm:input_type -> avtoms.workorder.v1.CreateCatalogTermRequest
+	87,  // 111: avtoms.workorder.v1.WorkOrderService.UpdateCatalogTerm:input_type -> avtoms.workorder.v1.UpdateCatalogTermRequest
+	88,  // 112: avtoms.workorder.v1.WorkOrderService.DeleteCatalogTerm:input_type -> avtoms.workorder.v1.DeleteCatalogTermRequest
+	91,  // 113: avtoms.workorder.v1.WorkOrderService.ListContragents:input_type -> avtoms.workorder.v1.ListContragentsRequest
+	93,  // 114: avtoms.workorder.v1.WorkOrderService.CreateContragent:input_type -> avtoms.workorder.v1.CreateContragentRequest
+	94,  // 115: avtoms.workorder.v1.WorkOrderService.UpdateContragent:input_type -> avtoms.workorder.v1.UpdateContragentRequest
+	95,  // 116: avtoms.workorder.v1.WorkOrderService.DeleteContragent:input_type -> avtoms.workorder.v1.DeleteContragentRequest
+	99,  // 117: avtoms.workorder.v1.WorkOrderService.ListContragentBalances:input_type -> avtoms.workorder.v1.ListContragentBalancesRequest
+	101, // 118: avtoms.workorder.v1.WorkOrderService.ListContragentLedger:input_type -> avtoms.workorder.v1.ListContragentLedgerRequest
+	103, // 119: avtoms.workorder.v1.WorkOrderService.RecordContragentEntry:input_type -> avtoms.workorder.v1.RecordContragentEntryRequest
+	104, // 120: avtoms.workorder.v1.WorkOrderService.DeleteContragentEntry:input_type -> avtoms.workorder.v1.DeleteContragentEntryRequest
+	107, // 121: avtoms.workorder.v1.WorkOrderService.ListCustomerBalances:input_type -> avtoms.workorder.v1.ListCustomerBalancesRequest
+	109, // 122: avtoms.workorder.v1.WorkOrderService.ListCustomerLedger:input_type -> avtoms.workorder.v1.ListCustomerLedgerRequest
+	111, // 123: avtoms.workorder.v1.WorkOrderService.RecordCustomerEntry:input_type -> avtoms.workorder.v1.RecordCustomerEntryRequest
+	112, // 124: avtoms.workorder.v1.WorkOrderService.DeleteCustomerEntry:input_type -> avtoms.workorder.v1.DeleteCustomerEntryRequest
+	50,  // 125: avtoms.workorder.v1.WorkOrderService.ListAppointments:input_type -> avtoms.workorder.v1.ListAppointmentsRequest
+	52,  // 126: avtoms.workorder.v1.WorkOrderService.CreateAppointment:input_type -> avtoms.workorder.v1.CreateAppointmentRequest
+	53,  // 127: avtoms.workorder.v1.WorkOrderService.SetAppointmentState:input_type -> avtoms.workorder.v1.SetAppointmentStateRequest
+	47,  // 128: avtoms.workorder.v1.WorkOrderService.GetAuditLog:input_type -> avtoms.workorder.v1.GetAuditLogRequest
+	38,  // 129: avtoms.workorder.v1.WorkOrderService.ListServiceReminders:input_type -> avtoms.workorder.v1.ListServiceRemindersRequest
+	40,  // 130: avtoms.workorder.v1.WorkOrderService.CreateServiceReminder:input_type -> avtoms.workorder.v1.CreateServiceReminderRequest
+	41,  // 131: avtoms.workorder.v1.WorkOrderService.SetServiceReminderState:input_type -> avtoms.workorder.v1.SetServiceReminderStateRequest
+	42,  // 132: avtoms.workorder.v1.WorkOrderService.ListDueReminders:input_type -> avtoms.workorder.v1.ListDueRemindersRequest
+	44,  // 133: avtoms.workorder.v1.WorkOrderService.MarkReminderNotified:input_type -> avtoms.workorder.v1.MarkNotifiedRequest
+	43,  // 134: avtoms.workorder.v1.WorkOrderService.ListDueAppointments:input_type -> avtoms.workorder.v1.ListDueAppointmentsRequest
+	44,  // 135: avtoms.workorder.v1.WorkOrderService.MarkAppointmentReminded:input_type -> avtoms.workorder.v1.MarkNotifiedRequest
+	21,  // 136: avtoms.workorder.v1.WorkOrderService.ListShopExpenses:input_type -> avtoms.workorder.v1.ListShopExpensesRequest
+	23,  // 137: avtoms.workorder.v1.WorkOrderService.CreateShopExpense:input_type -> avtoms.workorder.v1.CreateShopExpenseRequest
+	24,  // 138: avtoms.workorder.v1.WorkOrderService.DeleteShopExpense:input_type -> avtoms.workorder.v1.DeleteShopExpenseRequest
+	28,  // 139: avtoms.workorder.v1.WorkOrderService.GetProfitAndLoss:input_type -> avtoms.workorder.v1.GetProfitAndLossRequest
+	29,  // 140: avtoms.workorder.v1.WorkOrderService.GetStatistics:input_type -> avtoms.workorder.v1.GetStatisticsRequest
+	16,  // 141: avtoms.workorder.v1.WorkOrderService.ListWarranties:input_type -> avtoms.workorder.v1.ListWarrantiesRequest
+	18,  // 142: avtoms.workorder.v1.WorkOrderService.CreateWarranty:input_type -> avtoms.workorder.v1.CreateWarrantyRequest
+	19,  // 143: avtoms.workorder.v1.WorkOrderService.VoidWarranty:input_type -> avtoms.workorder.v1.VoidWarrantyRequest
+	12,  // 144: avtoms.workorder.v1.WorkOrderService.CreateApprovalLink:input_type -> avtoms.workorder.v1.CreateApprovalLinkRequest
+	13,  // 145: avtoms.workorder.v1.WorkOrderService.ResolveApproval:input_type -> avtoms.workorder.v1.ResolveApprovalRequest
+	14,  // 146: avtoms.workorder.v1.WorkOrderService.DecideApproval:input_type -> avtoms.workorder.v1.DecideApprovalRequest
+	120, // 147: avtoms.workorder.v1.WorkOrderService.CreateWorkOrder:output_type -> avtoms.workorder.v1.WorkOrder
+	120, // 148: avtoms.workorder.v1.WorkOrderService.GetWorkOrder:output_type -> avtoms.workorder.v1.WorkOrder
+	120, // 149: avtoms.workorder.v1.WorkOrderService.AddLineItem:output_type -> avtoms.workorder.v1.WorkOrder
+	120, // 150: avtoms.workorder.v1.WorkOrderService.UpdateLineItem:output_type -> avtoms.workorder.v1.WorkOrder
+	120, // 151: avtoms.workorder.v1.WorkOrderService.RemoveLineItem:output_type -> avtoms.workorder.v1.WorkOrder
+	120, // 152: avtoms.workorder.v1.WorkOrderService.TransitionState:output_type -> avtoms.workorder.v1.WorkOrder
+	120, // 153: avtoms.workorder.v1.WorkOrderService.AssignMechanic:output_type -> avtoms.workorder.v1.WorkOrder
+	120, // 154: avtoms.workorder.v1.WorkOrderService.AssignLineItem:output_type -> avtoms.workorder.v1.WorkOrder
+	120, // 155: avtoms.workorder.v1.WorkOrderService.SetLineItemStatus:output_type -> avtoms.workorder.v1.WorkOrder
+	120, // 156: avtoms.workorder.v1.WorkOrderService.SetOrderDiscount:output_type -> avtoms.workorder.v1.WorkOrder
+	120, // 157: avtoms.workorder.v1.WorkOrderService.SetWorkOrderNotes:output_type -> avtoms.workorder.v1.WorkOrder
+	121, // 158: avtoms.workorder.v1.WorkOrderService.StartTimer:output_type -> avtoms.workorder.v1.TimeEntry
+	121, // 159: avtoms.workorder.v1.WorkOrderService.StopTimer:output_type -> avtoms.workorder.v1.TimeEntry
+	138, // 160: avtoms.workorder.v1.WorkOrderService.ListMenuItems:output_type -> avtoms.workorder.v1.ListMenuItemsResponse
+	123, // 161: avtoms.workorder.v1.WorkOrderService.CreateMenuItem:output_type -> avtoms.workorder.v1.MenuItem
+	123, // 162: avtoms.workorder.v1.WorkOrderService.UpdateMenuItem:output_type -> avtoms.workorder.v1.MenuItem
+	143, // 163: avtoms.workorder.v1.WorkOrderService.ListMenuPriceHistory:output_type -> avtoms.workorder.v1.ListMenuPriceHistoryResponse
+	118, // 164: avtoms.workorder.v1.WorkOrderService.ListWorkOrders:output_type -> avtoms.workorder.v1.ListWorkOrdersResponse
+	114, // 165: avtoms.workorder.v1.WorkOrderService.GetShopSettings:output_type -> avtoms.workorder.v1.ShopSettings
+	114, // 166: avtoms.workorder.v1.WorkOrderService.UpdateShopSettings:output_type -> avtoms.workorder.v1.ShopSettings
+	59,  // 167: avtoms.workorder.v1.WorkOrderService.ListProducts:output_type -> avtoms.workorder.v1.ListProductsResponse
+	54,  // 168: avtoms.workorder.v1.WorkOrderService.GetProduct:output_type -> avtoms.workorder.v1.Product
+	54,  // 169: avtoms.workorder.v1.WorkOrderService.CreateProduct:output_type -> avtoms.workorder.v1.Product
+	54,  // 170: avtoms.workorder.v1.WorkOrderService.UpdateProduct:output_type -> avtoms.workorder.v1.Product
+	56,  // 171: avtoms.workorder.v1.WorkOrderService.AdjustVariantStock:output_type -> avtoms.workorder.v1.ProductVariant
+	66,  // 172: avtoms.workorder.v1.WorkOrderService.ListStockMovements:output_type -> avtoms.workorder.v1.ListStockMovementsResponse
+	68,  // 173: avtoms.workorder.v1.WorkOrderService.CreateSale:output_type -> avtoms.workorder.v1.Sale
+	71,  // 174: avtoms.workorder.v1.WorkOrderService.ListSales:output_type -> avtoms.workorder.v1.ListSalesResponse
+	68,  // 175: avtoms.workorder.v1.WorkOrderService.GetSale:output_type -> avtoms.workorder.v1.Sale
+	68,  // 176: avtoms.workorder.v1.WorkOrderService.VoidSale:output_type -> avtoms.workorder.v1.Sale
+	68,  // 177: avtoms.workorder.v1.WorkOrderService.SetSaleInvoice:output_type -> avtoms.workorder.v1.Sale
+	78,  // 178: avtoms.workorder.v1.WorkOrderService.ListPropertyDefinitions:output_type -> avtoms.workorder.v1.ListPropertyDefinitionsResponse
+	75,  // 179: avtoms.workorder.v1.WorkOrderService.CreatePropertyDefinition:output_type -> avtoms.workorder.v1.PropertyDefinition
+	75,  // 180: avtoms.workorder.v1.WorkOrderService.UpdatePropertyDefinition:output_type -> avtoms.workorder.v1.PropertyDefinition
+	82,  // 181: avtoms.workorder.v1.WorkOrderService.DeletePropertyDefinition:output_type -> avtoms.workorder.v1.DeletePropertyDefinitionResponse
+	85,  // 182: avtoms.workorder.v1.WorkOrderService.ListCatalogTerms:output_type -> avtoms.workorder.v1.ListCatalogTermsResponse
+	83,  // 183: avtoms.workorder.v1.WorkOrderService.CreateCatalogTerm:output_type -> avtoms.workorder.v1.CatalogTerm
+	83,  // 184: avtoms.workorder.v1.WorkOrderService.UpdateCatalogTerm:output_type -> avtoms.workorder.v1.CatalogTerm
+	89,  // 185: avtoms.workorder.v1.WorkOrderService.DeleteCatalogTerm:output_type -> avtoms.workorder.v1.DeleteCatalogTermResponse
+	92,  // 186: avtoms.workorder.v1.WorkOrderService.ListContragents:output_type -> avtoms.workorder.v1.ListContragentsResponse
+	90,  // 187: avtoms.workorder.v1.WorkOrderService.CreateContragent:output_type -> avtoms.workorder.v1.Contragent
+	90,  // 188: avtoms.workorder.v1.WorkOrderService.UpdateContragent:output_type -> avtoms.workorder.v1.Contragent
+	96,  // 189: avtoms.workorder.v1.WorkOrderService.DeleteContragent:output_type -> avtoms.workorder.v1.DeleteContragentResponse
+	100, // 190: avtoms.workorder.v1.WorkOrderService.ListContragentBalances:output_type -> avtoms.workorder.v1.ListContragentBalancesResponse
+	102, // 191: avtoms.workorder.v1.WorkOrderService.ListContragentLedger:output_type -> avtoms.workorder.v1.ListContragentLedgerResponse
+	97,  // 192: avtoms.workorder.v1.WorkOrderService.RecordContragentEntry:output_type -> avtoms.workorder.v1.ContragentLedgerEntry
+	96,  // 193: avtoms.workorder.v1.WorkOrderService.DeleteContragentEntry:output_type -> avtoms.workorder.v1.DeleteContragentResponse
+	108, // 194: avtoms.workorder.v1.WorkOrderService.ListCustomerBalances:output_type -> avtoms.workorder.v1.ListCustomerBalancesResponse
+	110, // 195: avtoms.workorder.v1.WorkOrderService.ListCustomerLedger:output_type -> avtoms.workorder.v1.ListCustomerLedgerResponse
+	105, // 196: avtoms.workorder.v1.WorkOrderService.RecordCustomerEntry:output_type -> avtoms.workorder.v1.CustomerLedgerEntry
+	113, // 197: avtoms.workorder.v1.WorkOrderService.DeleteCustomerEntry:output_type -> avtoms.workorder.v1.DeleteCustomerEntryResponse
+	51,  // 198: avtoms.workorder.v1.WorkOrderService.ListAppointments:output_type -> avtoms.workorder.v1.ListAppointmentsResponse
+	49,  // 199: avtoms.workorder.v1.WorkOrderService.CreateAppointment:output_type -> avtoms.workorder.v1.Appointment
+	49,  // 200: avtoms.workorder.v1.WorkOrderService.SetAppointmentState:output_type -> avtoms.workorder.v1.Appointment
+	48,  // 201: avtoms.workorder.v1.WorkOrderService.GetAuditLog:output_type -> avtoms.workorder.v1.GetAuditLogResponse
+	39,  // 202: avtoms.workorder.v1.WorkOrderService.ListServiceReminders:output_type -> avtoms.workorder.v1.ListServiceRemindersResponse
+	37,  // 203: avtoms.workorder.v1.WorkOrderService.CreateServiceReminder:output_type -> avtoms.workorder.v1.ServiceReminder
+	37,  // 204: avtoms.workorder.v1.WorkOrderService.SetServiceReminderState:output_type -> avtoms.workorder.v1.ServiceReminder
+	39,  // 205: avtoms.workorder.v1.WorkOrderService.ListDueReminders:output_type -> avtoms.workorder.v1.ListServiceRemindersResponse
+	45,  // 206: avtoms.workorder.v1.WorkOrderService.MarkReminderNotified:output_type -> avtoms.workorder.v1.MarkNotifiedResponse
+	51,  // 207: avtoms.workorder.v1.WorkOrderService.ListDueAppointments:output_type -> avtoms.workorder.v1.ListAppointmentsResponse
+	45,  // 208: avtoms.workorder.v1.WorkOrderService.MarkAppointmentReminded:output_type -> avtoms.workorder.v1.MarkNotifiedResponse
+	22,  // 209: avtoms.workorder.v1.WorkOrderService.ListShopExpenses:output_type -> avtoms.workorder.v1.ListShopExpensesResponse
+	20,  // 210: avtoms.workorder.v1.WorkOrderService.CreateShopExpense:output_type -> avtoms.workorder.v1.ShopExpense
+	25,  // 211: avtoms.workorder.v1.WorkOrderService.DeleteShopExpense:output_type -> avtoms.workorder.v1.DeleteShopExpenseResponse
+	27,  // 212: avtoms.workorder.v1.WorkOrderService.GetProfitAndLoss:output_type -> avtoms.workorder.v1.ProfitAndLoss
+	36,  // 213: avtoms.workorder.v1.WorkOrderService.GetStatistics:output_type -> avtoms.workorder.v1.Statistics
+	17,  // 214: avtoms.workorder.v1.WorkOrderService.ListWarranties:output_type -> avtoms.workorder.v1.ListWarrantiesResponse
+	15,  // 215: avtoms.workorder.v1.WorkOrderService.CreateWarranty:output_type -> avtoms.workorder.v1.Warranty
+	15,  // 216: avtoms.workorder.v1.WorkOrderService.VoidWarranty:output_type -> avtoms.workorder.v1.Warranty
+	10,  // 217: avtoms.workorder.v1.WorkOrderService.CreateApprovalLink:output_type -> avtoms.workorder.v1.ApprovalLink
+	11,  // 218: avtoms.workorder.v1.WorkOrderService.ResolveApproval:output_type -> avtoms.workorder.v1.ApprovalInfo
+	11,  // 219: avtoms.workorder.v1.WorkOrderService.DecideApproval:output_type -> avtoms.workorder.v1.ApprovalInfo
+	147, // [147:220] is the sub-list for method output_type
+	74,  // [74:147] is the sub-list for method input_type
+	74,  // [74:74] is the sub-list for extension type_name
+	74,  // [74:74] is the sub-list for extension extendee
+	0,   // [0:74] is the sub-list for field type_name
 }
 
 func init() { file_avtoms_workorder_v1_workorder_proto_init() }
@@ -11344,8 +12265,8 @@ func file_avtoms_workorder_v1_workorder_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_avtoms_workorder_v1_workorder_proto_rawDesc), len(file_avtoms_workorder_v1_workorder_proto_rawDesc)),
-			NumEnums:      9,
-			NumMessages:   125,
+			NumEnums:      10,
+			NumMessages:   134,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
