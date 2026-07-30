@@ -661,8 +661,11 @@ message Sale {
   int64 sale_no = 3;      // per-shop sequence, shown to users as "S-0001"
   string staff_id = 4;    // who sold it
   repeated SaleItem items = 5;
-  int64 total = 6;        // sum of unit_price * quantity, tiyin
-  int64 total_cost = 7;   // sum of unit_cost * quantity, tiyin
+  // total is what was actually charged: subtotal minus discount_amount. It stays the field
+  // everything downstream reads — the receipt, the reporting projection and the void reversal
+  // all take this one, so a discount reaches them without any of them knowing about discounts.
+  int64 total = 6;        // subtotal - discount_amount, tiyin
+  int64 total_cost = 7;   // sum of unit_cost * quantity, tiyin — what the goods cost, never discounted
   PaymentMethod payment_method = 8;
   string card_id = 9;     // saved shop card the money landed on (card payments)
   string card_number = 10;
@@ -671,6 +674,13 @@ message Sale {
   bool voided = 13;
   string voided_at = 14;  // RFC3339
   string created_at = 15; // RFC3339
+  // A discount on the whole sale, the same shape a work order uses: discount_value is tiyin
+  // (fixed) or basis points (percent, 100 = 1%), and discount_amount is the resulting
+  // reduction, already taken off total.
+  int64 subtotal = 16;    // sum of unit_price * quantity, before the discount
+  DiscountKind discount_kind = 17;
+  int64 discount_value = 18;
+  int64 discount_amount = 19;
 }
 
 // CreateSaleRequest sells stock. Only variant_id, quantity and unit_price are read from
@@ -683,6 +693,12 @@ message CreateSaleRequest {
   string card_id = 5;
   string card_number = 6;
   string note = 7;
+  // A discount on the whole basket. discount_value is tiyin (fixed) or basis points (percent).
+  DiscountKind discount_kind = 8;
+  int64 discount_value = 9;
+  // Set by the gateway from the caller's role: an owner may go past the shop's discount cap,
+  // a worker on the counter may not. Never trusted from the request body.
+  bool allow_discount_override = 10;
 }
 message ListSalesRequest {
   string shop_id = 1;
