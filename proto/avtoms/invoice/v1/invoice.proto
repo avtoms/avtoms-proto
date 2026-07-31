@@ -13,6 +13,9 @@ service InvoiceService {
   // must be reachable with nothing but the token.
   rpc GetInvoiceByToken(GetInvoiceByTokenRequest) returns (Invoice);
   rpc MarkPaid(MarkPaidRequest) returns (Invoice);
+  // Settle an invoice with SEVERAL payments at once — part cash, part card, part nasiya.
+  // MarkPaid is the one-part case and stays; this is what a split goes through.
+  rpc PayInvoice(PayInvoiceRequest) returns (Invoice);
   rpc VoidReceipt(VoidReceiptRequest) returns (Invoice);
   rpc ResendReceipt(ResendReceiptRequest) returns (Invoice);
   rpc ListInvoices(ListInvoicesRequest) returns (ListInvoicesResponse);
@@ -75,6 +78,30 @@ message Invoice {
   // It is what the QR on the check encodes and what the customer's link carries, so
   // the invoice id itself never has to become public. Minted at generation time.
   string public_token = 13;
+  // Every payment recorded against this invoice, oldest first. A bill settled with one
+  // method has exactly one; part cash and part card has two.
+  //
+  // payment_method and card_* above describe the FIRST payment, and are kept so that
+  // anything reading a single method off an invoice keeps working. Where the real
+  // question is "how was this paid", read these.
+  repeated InvoicePayment payments = 14;
+  // Sum of the payments. `paid` is paid_amount >= total; a bill that is part settled has
+  // a positive paid_amount and paid = false, which is what makes a deposit expressible.
+  int64 paid_amount = 15;
+}
+
+// InvoicePayment is one part of settling a bill: an amount, how it arrived, and — for a
+// card — which card it landed on.
+message InvoicePayment {
+  string id = 1;
+  string invoice_id = 2;
+  int64 amount = 3;      // tiyin, always positive
+  PaymentMethod method = 4;
+  string card_id = 5;
+  string card_number = 6;
+  string card_label = 7; // resolved from the saved card at payment time, for reporting
+  string staff_id = 8;   // who took it, from the token at the gateway
+  string paid_at = 9;    // RFC3339
 }
 
 // ShopCard is one of a shop's own receiving cards. A customer paying by card
@@ -109,6 +136,24 @@ message MarkPaidRequest {
   // number was typed ad-hoc, or as a snapshot of the chosen saved card.
   string card_number = 4;
 }
+// PayInvoiceRequest settles a bill with one or more payments, recorded together.
+//
+// The parts are applied atomically: either the whole split is recorded or none of it is,
+// because a half-applied split would leave the shop's takings wrong in a way nobody would
+// notice until the day's cash was counted.
+message PayInvoiceRequest {
+  string id = 1;
+  repeated PaymentPart payments = 2;
+  string staff_id = 3; // from the token, at the gateway
+}
+
+message PaymentPart {
+  int64 amount = 1;    // tiyin, must be positive
+  PaymentMethod method = 2;
+  string card_id = 3;
+  string card_number = 4;
+}
+
 message VoidReceiptRequest {
   string id = 1;
 }

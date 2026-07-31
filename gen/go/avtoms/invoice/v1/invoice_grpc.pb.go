@@ -23,6 +23,7 @@ const (
 	InvoiceService_GetInvoice_FullMethodName        = "/avtoms.invoice.v1.InvoiceService/GetInvoice"
 	InvoiceService_GetInvoiceByToken_FullMethodName = "/avtoms.invoice.v1.InvoiceService/GetInvoiceByToken"
 	InvoiceService_MarkPaid_FullMethodName          = "/avtoms.invoice.v1.InvoiceService/MarkPaid"
+	InvoiceService_PayInvoice_FullMethodName        = "/avtoms.invoice.v1.InvoiceService/PayInvoice"
 	InvoiceService_VoidReceipt_FullMethodName       = "/avtoms.invoice.v1.InvoiceService/VoidReceipt"
 	InvoiceService_ResendReceipt_FullMethodName     = "/avtoms.invoice.v1.InvoiceService/ResendReceipt"
 	InvoiceService_ListInvoices_FullMethodName      = "/avtoms.invoice.v1.InvoiceService/ListInvoices"
@@ -45,6 +46,9 @@ type InvoiceServiceClient interface {
 	// must be reachable with nothing but the token.
 	GetInvoiceByToken(ctx context.Context, in *GetInvoiceByTokenRequest, opts ...grpc.CallOption) (*Invoice, error)
 	MarkPaid(ctx context.Context, in *MarkPaidRequest, opts ...grpc.CallOption) (*Invoice, error)
+	// Settle an invoice with SEVERAL payments at once — part cash, part card, part nasiya.
+	// MarkPaid is the one-part case and stays; this is what a split goes through.
+	PayInvoice(ctx context.Context, in *PayInvoiceRequest, opts ...grpc.CallOption) (*Invoice, error)
 	VoidReceipt(ctx context.Context, in *VoidReceiptRequest, opts ...grpc.CallOption) (*Invoice, error)
 	ResendReceipt(ctx context.Context, in *ResendReceiptRequest, opts ...grpc.CallOption) (*Invoice, error)
 	ListInvoices(ctx context.Context, in *ListInvoicesRequest, opts ...grpc.CallOption) (*ListInvoicesResponse, error)
@@ -98,6 +102,16 @@ func (c *invoiceServiceClient) MarkPaid(ctx context.Context, in *MarkPaidRequest
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(Invoice)
 	err := c.cc.Invoke(ctx, InvoiceService_MarkPaid_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *invoiceServiceClient) PayInvoice(ctx context.Context, in *PayInvoiceRequest, opts ...grpc.CallOption) (*Invoice, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Invoice)
+	err := c.cc.Invoke(ctx, InvoiceService_PayInvoice_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -187,6 +201,9 @@ type InvoiceServiceServer interface {
 	// must be reachable with nothing but the token.
 	GetInvoiceByToken(context.Context, *GetInvoiceByTokenRequest) (*Invoice, error)
 	MarkPaid(context.Context, *MarkPaidRequest) (*Invoice, error)
+	// Settle an invoice with SEVERAL payments at once — part cash, part card, part nasiya.
+	// MarkPaid is the one-part case and stays; this is what a split goes through.
+	PayInvoice(context.Context, *PayInvoiceRequest) (*Invoice, error)
 	VoidReceipt(context.Context, *VoidReceiptRequest) (*Invoice, error)
 	ResendReceipt(context.Context, *ResendReceiptRequest) (*Invoice, error)
 	ListInvoices(context.Context, *ListInvoicesRequest) (*ListInvoicesResponse, error)
@@ -217,6 +234,9 @@ func (UnimplementedInvoiceServiceServer) GetInvoiceByToken(context.Context, *Get
 }
 func (UnimplementedInvoiceServiceServer) MarkPaid(context.Context, *MarkPaidRequest) (*Invoice, error) {
 	return nil, status.Error(codes.Unimplemented, "method MarkPaid not implemented")
+}
+func (UnimplementedInvoiceServiceServer) PayInvoice(context.Context, *PayInvoiceRequest) (*Invoice, error) {
+	return nil, status.Error(codes.Unimplemented, "method PayInvoice not implemented")
 }
 func (UnimplementedInvoiceServiceServer) VoidReceipt(context.Context, *VoidReceiptRequest) (*Invoice, error) {
 	return nil, status.Error(codes.Unimplemented, "method VoidReceipt not implemented")
@@ -328,6 +348,24 @@ func _InvoiceService_MarkPaid_Handler(srv interface{}, ctx context.Context, dec 
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(InvoiceServiceServer).MarkPaid(ctx, req.(*MarkPaidRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _InvoiceService_PayInvoice_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(PayInvoiceRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(InvoiceServiceServer).PayInvoice(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: InvoiceService_PayInvoice_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(InvoiceServiceServer).PayInvoice(ctx, req.(*PayInvoiceRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -480,6 +518,10 @@ var InvoiceService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "MarkPaid",
 			Handler:    _InvoiceService_MarkPaid_Handler,
+		},
+		{
+			MethodName: "PayInvoice",
+			Handler:    _InvoiceService_PayInvoice_Handler,
 		},
 		{
 			MethodName: "VoidReceipt",
