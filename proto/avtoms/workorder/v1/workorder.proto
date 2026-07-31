@@ -19,6 +19,11 @@ service WorkOrderService {
   // SetWorkOrderNotes replaces the order's free-text note. The note is internal to the
   // shop: it is not printed on the customer's check.
   rpc SetWorkOrderNotes(SetWorkOrderNotesRequest) returns (WorkOrder);
+  // The odometer reading taken at this visit. Separate from creation because the reading is
+  // often taken later — when the car is on the ramp, or when it is handed back.
+  rpc SetWorkOrderOdometer(SetWorkOrderOdometerRequest) returns (WorkOrder);
+  // The car's service book: every visit, what was done, and how far it had gone by then.
+  rpc GetServiceBook(GetServiceBookRequest) returns (ServiceBook);
 
   rpc StartTimer(StartTimerRequest) returns (TimeEntry);
   rpc StopTimer(StopTimerRequest) returns (TimeEntry);
@@ -1221,9 +1226,69 @@ message WorkOrder {
   // otherwise cost the caller two extra round trips to find.
   string customer_id = 24;
   string customer_phone = 25;
+  // The odometer READING RECORDED FOR THIS VISIT, in km. Distinct from `mileage` below,
+  // which is what the car reads today: this one is history and never changes once the visit
+  // is over, which is exactly what makes a service book worth keeping.
+  int64 odometer = 27;
   // The odometer reading on the vehicle, so a reminder set at closing time can be dated
   // "10 000 km from here" without a separate lookup.
   int64 mileage = 26;
+}
+
+// ── service book ────────────────────────────────────────────────────────────────────
+// A car's history, the way a paper "сервисная книжка" reads: one line per visit, in order,
+// saying how far the car had gone, what was done to it, and what it cost.
+//
+// Assembled here rather than in the browser because the interesting parts are differences
+// between consecutive visits — how many kilometres and how many days since the last one —
+// and those must be computed once, from the full ordered history, rather than three times
+// over whatever subset a screen happens to have loaded.
+message ServiceBookItem {
+  string description = 1;
+  LineItemKind kind = 2;
+  double quantity = 3;
+  int64 unit_price = 4;
+  int64 total = 5;       // unit_price * quantity, rounded
+}
+
+message ServiceBookEntry {
+  string work_order_id = 1;
+  int64 order_no = 2;
+  WorkOrderState state = 3;
+  string occurred_at = 4;   // RFC3339: when the visit happened
+  // The reading recorded at this visit, in km. 0 means nobody wrote it down — the screen
+  // shows a gap rather than a number the shop cannot stand behind.
+  int64 odometer = 5;
+  // Distance since the previous visit that HAS a reading, in km. 0 when this is the first
+  // such visit, or when either end of the comparison is missing.
+  int64 odometer_delta = 6;
+  int32 days_since_previous = 7;
+  repeated ServiceBookItem items = 8;
+  int64 total = 9;          // what the visit was charged, net of any discount
+  string mechanic_id = 10;
+  string mechanic_name = 11; // filled in by the gateway
+  string notes = 12;
+}
+
+message ServiceBook {
+  string vehicle_id = 1;
+  repeated ServiceBookEntry entries = 2;  // newest first
+  int32 visits = 3;
+  int64 total_spent = 4;
+  string first_visit = 5;   // RFC3339
+  string last_visit = 6;
+  // The latest recorded reading, which is the best answer to "how far has it gone" that the
+  // shop's own records can give.
+  int64 last_odometer = 7;
+  // Average kilometres between visits, over the pairs where both readings exist. 0 when
+  // there are not two such visits yet.
+  int64 avg_km_between = 8;
+  int32 avg_days_between = 9;
+}
+
+message GetServiceBookRequest {
+  string shop_id = 1;
+  string vehicle_id = 2;
 }
 
 // DiscountKind selects how a whole-order discount is expressed.
@@ -1273,6 +1338,13 @@ message MenuItem {
 message CreateWorkOrderRequest {
   string shop_id = 1;
   string vehicle_id = 2;
+  // Odometer reading taken at intake, in km. Optional: 0 means nobody wrote it down, and the
+  // service book shows a gap rather than inventing a number.
+  int64 odometer = 3;
+}
+message SetWorkOrderOdometerRequest {
+  string id = 1;
+  int64 odometer = 2;
 }
 message GetWorkOrderRequest {
   string id = 1;
