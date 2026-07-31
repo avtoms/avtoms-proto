@@ -1443,6 +1443,10 @@ message UpdateMenuItemRequest {
   int32 estimated_minutes = 8;
   bool active = 9;
   repeated MenuMaterial materials = 10;
+  // Who is making the edit, set by the gateway from the token. Recorded on the price-history
+  // row when the price or cost actually changes, so a price list says who moved a number
+  // and not only that it moved.
+  string staff_id = 11;
 }
 
 // MenuPriceChange is one entry in a menu item's price/cost change log.
@@ -1454,6 +1458,10 @@ message MenuPriceChange {
   int64 old_cost = 5;
   int64 new_cost = 6;
   string changed_at = 7; // RFC3339
+  // Who made the change. Empty for rows recorded before this was kept, and for any edit the
+  // caller did not attribute — the screen then shows the change without an author rather
+  // than naming the wrong person.
+  string changed_by = 8;
 }
 message ListMenuPriceHistoryRequest {
   string menu_item_id = 1;

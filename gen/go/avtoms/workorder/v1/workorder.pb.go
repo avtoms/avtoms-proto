@@ -10970,8 +10970,12 @@ type UpdateMenuItemRequest struct {
 	EstimatedMinutes int32                  `protobuf:"varint,8,opt,name=estimated_minutes,json=estimatedMinutes,proto3" json:"estimated_minutes,omitempty"`
 	Active           bool                   `protobuf:"varint,9,opt,name=active,proto3" json:"active,omitempty"`
 	Materials        []*MenuMaterial        `protobuf:"bytes,10,rep,name=materials,proto3" json:"materials,omitempty"`
-	unknownFields    protoimpl.UnknownFields
-	sizeCache        protoimpl.SizeCache
+	// Who is making the edit, set by the gateway from the token. Recorded on the price-history
+	// row when the price or cost actually changes, so a price list says who moved a number
+	// and not only that it moved.
+	StaffId       string `protobuf:"bytes,11,opt,name=staff_id,json=staffId,proto3" json:"staff_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *UpdateMenuItemRequest) Reset() {
@@ -11074,16 +11078,27 @@ func (x *UpdateMenuItemRequest) GetMaterials() []*MenuMaterial {
 	return nil
 }
 
+func (x *UpdateMenuItemRequest) GetStaffId() string {
+	if x != nil {
+		return x.StaffId
+	}
+	return ""
+}
+
 // MenuPriceChange is one entry in a menu item's price/cost change log.
 type MenuPriceChange struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	MenuItemId    string                 `protobuf:"bytes,2,opt,name=menu_item_id,json=menuItemId,proto3" json:"menu_item_id,omitempty"`
-	OldPrice      int64                  `protobuf:"varint,3,opt,name=old_price,json=oldPrice,proto3" json:"old_price,omitempty"`
-	NewPrice      int64                  `protobuf:"varint,4,opt,name=new_price,json=newPrice,proto3" json:"new_price,omitempty"`
-	OldCost       int64                  `protobuf:"varint,5,opt,name=old_cost,json=oldCost,proto3" json:"old_cost,omitempty"`
-	NewCost       int64                  `protobuf:"varint,6,opt,name=new_cost,json=newCost,proto3" json:"new_cost,omitempty"`
-	ChangedAt     string                 `protobuf:"bytes,7,opt,name=changed_at,json=changedAt,proto3" json:"changed_at,omitempty"` // RFC3339
+	state      protoimpl.MessageState `protogen:"open.v1"`
+	Id         string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	MenuItemId string                 `protobuf:"bytes,2,opt,name=menu_item_id,json=menuItemId,proto3" json:"menu_item_id,omitempty"`
+	OldPrice   int64                  `protobuf:"varint,3,opt,name=old_price,json=oldPrice,proto3" json:"old_price,omitempty"`
+	NewPrice   int64                  `protobuf:"varint,4,opt,name=new_price,json=newPrice,proto3" json:"new_price,omitempty"`
+	OldCost    int64                  `protobuf:"varint,5,opt,name=old_cost,json=oldCost,proto3" json:"old_cost,omitempty"`
+	NewCost    int64                  `protobuf:"varint,6,opt,name=new_cost,json=newCost,proto3" json:"new_cost,omitempty"`
+	ChangedAt  string                 `protobuf:"bytes,7,opt,name=changed_at,json=changedAt,proto3" json:"changed_at,omitempty"` // RFC3339
+	// Who made the change. Empty for rows recorded before this was kept, and for any edit the
+	// caller did not attribute — the screen then shows the change without an author rather
+	// than naming the wrong person.
+	ChangedBy     string `protobuf:"bytes,8,opt,name=changed_by,json=changedBy,proto3" json:"changed_by,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -11163,6 +11178,13 @@ func (x *MenuPriceChange) GetNewCost() int64 {
 func (x *MenuPriceChange) GetChangedAt() string {
 	if x != nil {
 		return x.ChangedAt
+	}
+	return ""
+}
+
+func (x *MenuPriceChange) GetChangedBy() string {
+	if x != nil {
+		return x.ChangedBy
 	}
 	return ""
 }
@@ -12206,7 +12228,7 @@ const file_avtoms_workorder_v1_workorder_proto_rawDesc = "" +
 	"\fdefault_cost\x18\x06 \x01(\x03R\vdefaultCost\x12\x1a\n" +
 	"\bcategory\x18\a \x01(\tR\bcategory\x12+\n" +
 	"\x11estimated_minutes\x18\b \x01(\x05R\x10estimatedMinutes\x12?\n" +
-	"\tmaterials\x18\t \x03(\v2!.avtoms.workorder.v1.MenuMaterialR\tmaterials\"\xee\x02\n" +
+	"\tmaterials\x18\t \x03(\v2!.avtoms.workorder.v1.MenuMaterialR\tmaterials\"\x89\x03\n" +
 	"\x15UpdateMenuItemRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12 \n" +
 	"\fname_uz_latn\x18\x02 \x01(\tR\n" +
@@ -12220,7 +12242,8 @@ const file_avtoms_workorder_v1_workorder_proto_rawDesc = "" +
 	"\x11estimated_minutes\x18\b \x01(\x05R\x10estimatedMinutes\x12\x16\n" +
 	"\x06active\x18\t \x01(\bR\x06active\x12?\n" +
 	"\tmaterials\x18\n" +
-	" \x03(\v2!.avtoms.workorder.v1.MenuMaterialR\tmaterials\"\xd2\x01\n" +
+	" \x03(\v2!.avtoms.workorder.v1.MenuMaterialR\tmaterials\x12\x19\n" +
+	"\bstaff_id\x18\v \x01(\tR\astaffId\"\xf1\x01\n" +
 	"\x0fMenuPriceChange\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12 \n" +
 	"\fmenu_item_id\x18\x02 \x01(\tR\n" +
@@ -12230,7 +12253,9 @@ const file_avtoms_workorder_v1_workorder_proto_rawDesc = "" +
 	"\bold_cost\x18\x05 \x01(\x03R\aoldCost\x12\x19\n" +
 	"\bnew_cost\x18\x06 \x01(\x03R\anewCost\x12\x1d\n" +
 	"\n" +
-	"changed_at\x18\a \x01(\tR\tchangedAt\"?\n" +
+	"changed_at\x18\a \x01(\tR\tchangedAt\x12\x1d\n" +
+	"\n" +
+	"changed_by\x18\b \x01(\tR\tchangedBy\"?\n" +
 	"\x1bListMenuPriceHistoryRequest\x12 \n" +
 	"\fmenu_item_id\x18\x01 \x01(\tR\n" +
 	"menuItemId\"^\n" +
