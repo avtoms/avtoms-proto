@@ -713,6 +713,16 @@ message Sale {
   // Optional: who bought it. A walk-in leaves this empty and sells exactly as before —
   // it exists so a counter sale has somewhere to send the receipt.
   string customer_id = 20;
+  // How much of this sale was taken on credit, when only part of it was: a customer paying
+  // 300 000 in cash and leaving 200 000 on their account has credit_amount = 200000 and
+  // payment_method = CASH. This is what goes on their account, not total.
+  //
+  // Zero with payment_method = CREDIT means the whole sale was on credit, which is what every
+  // sale recorded before splitting existed was.
+  //
+  // How the paid part was actually split lives on the invoice, which owns the money. The sale
+  // keeps only what it needs to bill the right person the right amount.
+  int64 credit_amount = 21;
 }
 
 // CreateSaleRequest sells stock. Only variant_id, quantity and unit_price are read from
@@ -732,6 +742,9 @@ message CreateSaleRequest {
   // a worker on the counter may not. Never trusted from the request body.
   bool allow_discount_override = 10;
   string customer_id = 11; // optional; set to send this sale's receipt to a customer
+  // The credit part of a split payment, in tiyin. Requires customer_id, exactly as a wholly
+  // credit sale does — goods leaving against nobody's name is a hole in the till.
+  int64 credit_amount = 12;
 }
 message ListSalesRequest {
   string shop_id = 1;

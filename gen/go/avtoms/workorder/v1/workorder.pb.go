@@ -5153,7 +5153,17 @@ type Sale struct {
 	DiscountAmount int64        `protobuf:"varint,19,opt,name=discount_amount,json=discountAmount,proto3" json:"discount_amount,omitempty"`
 	// Optional: who bought it. A walk-in leaves this empty and sells exactly as before —
 	// it exists so a counter sale has somewhere to send the receipt.
-	CustomerId    string `protobuf:"bytes,20,opt,name=customer_id,json=customerId,proto3" json:"customer_id,omitempty"`
+	CustomerId string `protobuf:"bytes,20,opt,name=customer_id,json=customerId,proto3" json:"customer_id,omitempty"`
+	// How much of this sale was taken on credit, when only part of it was: a customer paying
+	// 300 000 in cash and leaving 200 000 on their account has credit_amount = 200000 and
+	// payment_method = CASH. This is what goes on their account, not total.
+	//
+	// Zero with payment_method = CREDIT means the whole sale was on credit, which is what every
+	// sale recorded before splitting existed was.
+	//
+	// How the paid part was actually split lives on the invoice, which owns the money. The sale
+	// keeps only what it needs to bill the right person the right amount.
+	CreditAmount  int64 `protobuf:"varint,21,opt,name=credit_amount,json=creditAmount,proto3" json:"credit_amount,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -5328,6 +5338,13 @@ func (x *Sale) GetCustomerId() string {
 	return ""
 }
 
+func (x *Sale) GetCreditAmount() int64 {
+	if x != nil {
+		return x.CreditAmount
+	}
+	return 0
+}
+
 // CreateSaleRequest sells stock. Only variant_id, quantity and unit_price are read from
 // each item — description, sku and unit_cost are taken from the warehouse, not the caller.
 type CreateSaleRequest struct {
@@ -5346,8 +5363,11 @@ type CreateSaleRequest struct {
 	// a worker on the counter may not. Never trusted from the request body.
 	AllowDiscountOverride bool   `protobuf:"varint,10,opt,name=allow_discount_override,json=allowDiscountOverride,proto3" json:"allow_discount_override,omitempty"`
 	CustomerId            string `protobuf:"bytes,11,opt,name=customer_id,json=customerId,proto3" json:"customer_id,omitempty"` // optional; set to send this sale's receipt to a customer
-	unknownFields         protoimpl.UnknownFields
-	sizeCache             protoimpl.SizeCache
+	// The credit part of a split payment, in tiyin. Requires customer_id, exactly as a wholly
+	// credit sale does — goods leaving against nobody's name is a hole in the till.
+	CreditAmount  int64 `protobuf:"varint,12,opt,name=credit_amount,json=creditAmount,proto3" json:"credit_amount,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *CreateSaleRequest) Reset() {
@@ -5455,6 +5475,13 @@ func (x *CreateSaleRequest) GetCustomerId() string {
 		return x.CustomerId
 	}
 	return ""
+}
+
+func (x *CreateSaleRequest) GetCreditAmount() int64 {
+	if x != nil {
+		return x.CreditAmount
+	}
+	return 0
 }
 
 type ListSalesRequest struct {
@@ -11709,7 +11736,7 @@ const file_avtoms_workorder_v1_workorder_proto_rawDesc = "" +
 	"\n" +
 	"unit_price\x18\x05 \x01(\x03R\tunitPrice\x12\x1b\n" +
 	"\tunit_cost\x18\x06 \x01(\x03R\bunitCost\x12\x10\n" +
-	"\x03sku\x18\a \x01(\tR\x03sku\"\xae\x05\n" +
+	"\x03sku\x18\a \x01(\tR\x03sku\"\xd3\x05\n" +
 	"\x04Sale\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x17\n" +
 	"\ashop_id\x18\x02 \x01(\tR\x06shopId\x12\x17\n" +
@@ -11736,7 +11763,8 @@ const file_avtoms_workorder_v1_workorder_proto_rawDesc = "" +
 	"\x0ediscount_value\x18\x12 \x01(\x03R\rdiscountValue\x12'\n" +
 	"\x0fdiscount_amount\x18\x13 \x01(\x03R\x0ediscountAmount\x12\x1f\n" +
 	"\vcustomer_id\x18\x14 \x01(\tR\n" +
-	"customerId\"\xdd\x03\n" +
+	"customerId\x12#\n" +
+	"\rcredit_amount\x18\x15 \x01(\x03R\fcreditAmount\"\x82\x04\n" +
 	"\x11CreateSaleRequest\x12\x17\n" +
 	"\ashop_id\x18\x01 \x01(\tR\x06shopId\x12\x19\n" +
 	"\bstaff_id\x18\x02 \x01(\tR\astaffId\x123\n" +
@@ -11751,7 +11779,8 @@ const file_avtoms_workorder_v1_workorder_proto_rawDesc = "" +
 	"\x17allow_discount_override\x18\n" +
 	" \x01(\bR\x15allowDiscountOverride\x12\x1f\n" +
 	"\vcustomer_id\x18\v \x01(\tR\n" +
-	"customerId\"O\n" +
+	"customerId\x12#\n" +
+	"\rcredit_amount\x18\f \x01(\x03R\fcreditAmount\"O\n" +
 	"\x10ListSalesRequest\x12\x17\n" +
 	"\ashop_id\x18\x01 \x01(\tR\x06shopId\x12\x12\n" +
 	"\x04from\x18\x02 \x01(\tR\x04from\x12\x0e\n" +
