@@ -644,6 +644,16 @@ message StockMovement {
   string staff_id = 7;       // who recorded it (resolve name from the staff list)
   string contragent_id = 8;  // supplier who delivered (income); resolve name from contragents
   int64 unit_cost = 9;       // purchase price per unit for this receipt, tiyin
+
+  // Which document moved the stock. "The oil went out on a job" is only half an answer: a
+  // shelf that no longer matches the count is traced by opening the job it went out on.
+  //
+  // Empty on a movement that has no document behind it — opening stock, a hand-made
+  // adjustment — and on work-order movements recorded before this was kept, since nothing
+  // links those rows to an order after the fact.
+  string source_kind = 10;   // "work_order" | "sale" | "" (none)
+  string source_id = 11;     // the work order or sale, for opening it
+  string source_no = 12;     // what it is called on screen: "Z-0013", "S-0003"
 }
 message ListStockMovementsRequest {
   string variant_id = 1;
@@ -1037,6 +1047,9 @@ message CustomerLedgerEntry {
   string occurred_at = 12;   // RFC3339 — when it happened, not when it was typed
   string note = 13;
   string created_at = 14;
+  // What the sale or order above is called on screen: "S-0042", "Z-0013". Resolved on read
+  // rather than stored, so a row written before this existed still names its document.
+  string source_no = 15;
 }
 
 // CustomerBalance is one client's account. balance = charged − paid; positive means the

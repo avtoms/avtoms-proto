@@ -4834,16 +4834,25 @@ func (x *AdjustVariantStockRequest) GetPaidAmount() int64 {
 
 // StockMovement is one entry in a variant's income/outcome ledger.
 type StockMovement struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	VariantId     string                 `protobuf:"bytes,2,opt,name=variant_id,json=variantId,proto3" json:"variant_id,omitempty"`
-	Delta         float64                `protobuf:"fixed64,3,opt,name=delta,proto3" json:"delta,omitempty"` // positive = income (received), negative = outcome (consumed)
-	Reason        string                 `protobuf:"bytes,4,opt,name=reason,proto3" json:"reason,omitempty"`
-	BalanceAfter  float64                `protobuf:"fixed64,5,opt,name=balance_after,json=balanceAfter,proto3" json:"balance_after,omitempty"` // on-hand quantity right after this movement
-	CreatedAt     string                 `protobuf:"bytes,6,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`            // RFC3339
-	StaffId       string                 `protobuf:"bytes,7,opt,name=staff_id,json=staffId,proto3" json:"staff_id,omitempty"`                  // who recorded it (resolve name from the staff list)
-	ContragentId  string                 `protobuf:"bytes,8,opt,name=contragent_id,json=contragentId,proto3" json:"contragent_id,omitempty"`   // supplier who delivered (income); resolve name from contragents
-	UnitCost      int64                  `protobuf:"varint,9,opt,name=unit_cost,json=unitCost,proto3" json:"unit_cost,omitempty"`              // purchase price per unit for this receipt, tiyin
+	state        protoimpl.MessageState `protogen:"open.v1"`
+	Id           string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	VariantId    string                 `protobuf:"bytes,2,opt,name=variant_id,json=variantId,proto3" json:"variant_id,omitempty"`
+	Delta        float64                `protobuf:"fixed64,3,opt,name=delta,proto3" json:"delta,omitempty"` // positive = income (received), negative = outcome (consumed)
+	Reason       string                 `protobuf:"bytes,4,opt,name=reason,proto3" json:"reason,omitempty"`
+	BalanceAfter float64                `protobuf:"fixed64,5,opt,name=balance_after,json=balanceAfter,proto3" json:"balance_after,omitempty"` // on-hand quantity right after this movement
+	CreatedAt    string                 `protobuf:"bytes,6,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`            // RFC3339
+	StaffId      string                 `protobuf:"bytes,7,opt,name=staff_id,json=staffId,proto3" json:"staff_id,omitempty"`                  // who recorded it (resolve name from the staff list)
+	ContragentId string                 `protobuf:"bytes,8,opt,name=contragent_id,json=contragentId,proto3" json:"contragent_id,omitempty"`   // supplier who delivered (income); resolve name from contragents
+	UnitCost     int64                  `protobuf:"varint,9,opt,name=unit_cost,json=unitCost,proto3" json:"unit_cost,omitempty"`              // purchase price per unit for this receipt, tiyin
+	// Which document moved the stock. "The oil went out on a job" is only half an answer: a
+	// shelf that no longer matches the count is traced by opening the job it went out on.
+	//
+	// Empty on a movement that has no document behind it — opening stock, a hand-made
+	// adjustment — and on work-order movements recorded before this was kept, since nothing
+	// links those rows to an order after the fact.
+	SourceKind    string `protobuf:"bytes,10,opt,name=source_kind,json=sourceKind,proto3" json:"source_kind,omitempty"` // "work_order" | "sale" | "" (none)
+	SourceId      string `protobuf:"bytes,11,opt,name=source_id,json=sourceId,proto3" json:"source_id,omitempty"`       // the work order or sale, for opening it
+	SourceNo      string `protobuf:"bytes,12,opt,name=source_no,json=sourceNo,proto3" json:"source_no,omitempty"`       // what it is called on screen: "Z-0013", "S-0003"
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -4939,6 +4948,27 @@ func (x *StockMovement) GetUnitCost() int64 {
 		return x.UnitCost
 	}
 	return 0
+}
+
+func (x *StockMovement) GetSourceKind() string {
+	if x != nil {
+		return x.SourceKind
+	}
+	return ""
+}
+
+func (x *StockMovement) GetSourceId() string {
+	if x != nil {
+		return x.SourceId
+	}
+	return ""
+}
+
+func (x *StockMovement) GetSourceNo() string {
+	if x != nil {
+		return x.SourceNo
+	}
+	return ""
 }
 
 type ListStockMovementsRequest struct {
@@ -7827,21 +7857,24 @@ func (x *DeleteContragentEntryRequest) GetId() string {
 }
 
 type CustomerLedgerEntry struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	ShopId        string                 `protobuf:"bytes,2,opt,name=shop_id,json=shopId,proto3" json:"shop_id,omitempty"`
-	CustomerId    string                 `protobuf:"bytes,3,opt,name=customer_id,json=customerId,proto3" json:"customer_id,omitempty"`
-	Kind          CustomerEntryKind      `protobuf:"varint,4,opt,name=kind,proto3,enum=avtoms.workorder.v1.CustomerEntryKind" json:"kind,omitempty"`
-	Amount        int64                  `protobuf:"varint,5,opt,name=amount,proto3" json:"amount,omitempty"`                               // tiyin, always positive
-	Description   string                 `protobuf:"bytes,6,opt,name=description,proto3" json:"description,omitempty"`                      // snapshot, e.g. "S-0042 · 3 dona"
-	SaleId        string                 `protobuf:"bytes,7,opt,name=sale_id,json=saleId,proto3" json:"sale_id,omitempty"`                  // the counter sale a charge came from, when it had one
-	WorkOrderId   string                 `protobuf:"bytes,8,opt,name=work_order_id,json=workOrderId,proto3" json:"work_order_id,omitempty"` // the order a charge came from, when it had one
-	InvoiceId     string                 `protobuf:"bytes,9,opt,name=invoice_id,json=invoiceId,proto3" json:"invoice_id,omitempty"`
-	Method        PaymentMethod          `protobuf:"varint,10,opt,name=method,proto3,enum=avtoms.workorder.v1.PaymentMethod" json:"method,omitempty"` // how a repayment arrived; payments only
-	StaffId       string                 `protobuf:"bytes,11,opt,name=staff_id,json=staffId,proto3" json:"staff_id,omitempty"`
-	OccurredAt    string                 `protobuf:"bytes,12,opt,name=occurred_at,json=occurredAt,proto3" json:"occurred_at,omitempty"` // RFC3339 — when it happened, not when it was typed
-	Note          string                 `protobuf:"bytes,13,opt,name=note,proto3" json:"note,omitempty"`
-	CreatedAt     string                 `protobuf:"bytes,14,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	state       protoimpl.MessageState `protogen:"open.v1"`
+	Id          string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	ShopId      string                 `protobuf:"bytes,2,opt,name=shop_id,json=shopId,proto3" json:"shop_id,omitempty"`
+	CustomerId  string                 `protobuf:"bytes,3,opt,name=customer_id,json=customerId,proto3" json:"customer_id,omitempty"`
+	Kind        CustomerEntryKind      `protobuf:"varint,4,opt,name=kind,proto3,enum=avtoms.workorder.v1.CustomerEntryKind" json:"kind,omitempty"`
+	Amount      int64                  `protobuf:"varint,5,opt,name=amount,proto3" json:"amount,omitempty"`                               // tiyin, always positive
+	Description string                 `protobuf:"bytes,6,opt,name=description,proto3" json:"description,omitempty"`                      // snapshot, e.g. "S-0042 · 3 dona"
+	SaleId      string                 `protobuf:"bytes,7,opt,name=sale_id,json=saleId,proto3" json:"sale_id,omitempty"`                  // the counter sale a charge came from, when it had one
+	WorkOrderId string                 `protobuf:"bytes,8,opt,name=work_order_id,json=workOrderId,proto3" json:"work_order_id,omitempty"` // the order a charge came from, when it had one
+	InvoiceId   string                 `protobuf:"bytes,9,opt,name=invoice_id,json=invoiceId,proto3" json:"invoice_id,omitempty"`
+	Method      PaymentMethod          `protobuf:"varint,10,opt,name=method,proto3,enum=avtoms.workorder.v1.PaymentMethod" json:"method,omitempty"` // how a repayment arrived; payments only
+	StaffId     string                 `protobuf:"bytes,11,opt,name=staff_id,json=staffId,proto3" json:"staff_id,omitempty"`
+	OccurredAt  string                 `protobuf:"bytes,12,opt,name=occurred_at,json=occurredAt,proto3" json:"occurred_at,omitempty"` // RFC3339 — when it happened, not when it was typed
+	Note        string                 `protobuf:"bytes,13,opt,name=note,proto3" json:"note,omitempty"`
+	CreatedAt   string                 `protobuf:"bytes,14,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	// What the sale or order above is called on screen: "S-0042", "Z-0013". Resolved on read
+	// rather than stored, so a row written before this existed still names its document.
+	SourceNo      string `protobuf:"bytes,15,opt,name=source_no,json=sourceNo,proto3" json:"source_no,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -7970,6 +8003,13 @@ func (x *CustomerLedgerEntry) GetNote() string {
 func (x *CustomerLedgerEntry) GetCreatedAt() string {
 	if x != nil {
 		return x.CreatedAt
+	}
+	return ""
+}
+
+func (x *CustomerLedgerEntry) GetSourceNo() string {
+	if x != nil {
+		return x.SourceNo
 	}
 	return ""
 }
@@ -11840,7 +11880,7 @@ const file_avtoms_workorder_v1_workorder_proto_rawDesc = "" +
 	"\rcontragent_id\x18\x05 \x01(\tR\fcontragentId\x12\x1b\n" +
 	"\tunit_cost\x18\x06 \x01(\x03R\bunitCost\x12\x1f\n" +
 	"\vpaid_amount\x18\a \x01(\x03R\n" +
-	"paidAmount\"\x8d\x02\n" +
+	"paidAmount\"\xe8\x02\n" +
 	"\rStockMovement\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1d\n" +
 	"\n" +
@@ -11852,7 +11892,12 @@ const file_avtoms_workorder_v1_workorder_proto_rawDesc = "" +
 	"created_at\x18\x06 \x01(\tR\tcreatedAt\x12\x19\n" +
 	"\bstaff_id\x18\a \x01(\tR\astaffId\x12#\n" +
 	"\rcontragent_id\x18\b \x01(\tR\fcontragentId\x12\x1b\n" +
-	"\tunit_cost\x18\t \x01(\x03R\bunitCost\":\n" +
+	"\tunit_cost\x18\t \x01(\x03R\bunitCost\x12\x1f\n" +
+	"\vsource_kind\x18\n" +
+	" \x01(\tR\n" +
+	"sourceKind\x12\x1b\n" +
+	"\tsource_id\x18\v \x01(\tR\bsourceId\x12\x1b\n" +
+	"\tsource_no\x18\f \x01(\tR\bsourceNo\":\n" +
 	"\x19ListStockMovementsRequest\x12\x1d\n" +
 	"\n" +
 	"variant_id\x18\x01 \x01(\tR\tvariantId\"^\n" +
@@ -12092,7 +12137,7 @@ const file_avtoms_workorder_v1_workorder_proto_rawDesc = "" +
 	"\bstaff_id\x18\a \x01(\tR\astaffId\x12 \n" +
 	"\vdescription\x18\b \x01(\tR\vdescription\".\n" +
 	"\x1cDeleteContragentEntryRequest\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\"\xdc\x03\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\"\xf9\x03\n" +
 	"\x13CustomerLedgerEntry\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x17\n" +
 	"\ashop_id\x18\x02 \x01(\tR\x06shopId\x12\x1f\n" +
@@ -12112,7 +12157,8 @@ const file_avtoms_workorder_v1_workorder_proto_rawDesc = "" +
 	"occurredAt\x12\x12\n" +
 	"\x04note\x18\r \x01(\tR\x04note\x12\x1d\n" +
 	"\n" +
-	"created_at\x18\x0e \x01(\tR\tcreatedAt\"\xd7\x01\n" +
+	"created_at\x18\x0e \x01(\tR\tcreatedAt\x12\x1b\n" +
+	"\tsource_no\x18\x0f \x01(\tR\bsourceNo\"\xd7\x01\n" +
 	"\x0fCustomerBalance\x12\x1f\n" +
 	"\vcustomer_id\x18\x01 \x01(\tR\n" +
 	"customerId\x12\x18\n" +
