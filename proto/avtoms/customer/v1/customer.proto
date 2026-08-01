@@ -116,6 +116,13 @@ message TelegramLink {
   string phone = 2;
   avtoms.common.v1.Language language = 3;
   bool linked = 4; // false when no link exists for the queried chat
+  // Whether this phone belongs to a client the shop has actually registered.
+  //
+  // The link itself always succeeds — the chat and the phone are stored either way, and a
+  // client registered later is picked up automatically. But if nobody is holding that number
+  // yet, no order or invoice will ever be addressed to this chat, and saying "linked" alone
+  // would leave a customer waiting for notifications that cannot arrive.
+  bool customer_known = 5;
 }
 message LinkTelegramRequest {
   string chat_id = 1;

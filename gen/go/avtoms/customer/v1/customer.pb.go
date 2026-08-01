@@ -855,11 +855,18 @@ func (x *Customer) GetBirthday() string {
 
 // TelegramLink maps a verified phone to a Telegram chat + preferred language.
 type TelegramLink struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	ChatId        string                 `protobuf:"bytes,1,opt,name=chat_id,json=chatId,proto3" json:"chat_id,omitempty"`
-	Phone         string                 `protobuf:"bytes,2,opt,name=phone,proto3" json:"phone,omitempty"`
-	Language      v1.Language            `protobuf:"varint,3,opt,name=language,proto3,enum=avtoms.common.v1.Language" json:"language,omitempty"`
-	Linked        bool                   `protobuf:"varint,4,opt,name=linked,proto3" json:"linked,omitempty"` // false when no link exists for the queried chat
+	state    protoimpl.MessageState `protogen:"open.v1"`
+	ChatId   string                 `protobuf:"bytes,1,opt,name=chat_id,json=chatId,proto3" json:"chat_id,omitempty"`
+	Phone    string                 `protobuf:"bytes,2,opt,name=phone,proto3" json:"phone,omitempty"`
+	Language v1.Language            `protobuf:"varint,3,opt,name=language,proto3,enum=avtoms.common.v1.Language" json:"language,omitempty"`
+	Linked   bool                   `protobuf:"varint,4,opt,name=linked,proto3" json:"linked,omitempty"` // false when no link exists for the queried chat
+	// Whether this phone belongs to a client the shop has actually registered.
+	//
+	// The link itself always succeeds — the chat and the phone are stored either way, and a
+	// client registered later is picked up automatically. But if nobody is holding that number
+	// yet, no order or invoice will ever be addressed to this chat, and saying "linked" alone
+	// would leave a customer waiting for notifications that cannot arrive.
+	CustomerKnown bool `protobuf:"varint,5,opt,name=customer_known,json=customerKnown,proto3" json:"customer_known,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -918,6 +925,13 @@ func (x *TelegramLink) GetLanguage() v1.Language {
 func (x *TelegramLink) GetLinked() bool {
 	if x != nil {
 		return x.Linked
+	}
+	return false
+}
+
+func (x *TelegramLink) GetCustomerKnown() bool {
+	if x != nil {
+		return x.CustomerKnown
 	}
 	return false
 }
@@ -2215,12 +2229,13 @@ const file_avtoms_customer_v1_customer_proto_rawDesc = "" +
 	"\x05notes\x18\v \x01(\tR\x05notes\x12\x14\n" +
 	"\x05email\x18\f \x01(\tR\x05email\x12\x18\n" +
 	"\aaddress\x18\r \x01(\tR\aaddress\x12\x1a\n" +
-	"\bbirthday\x18\x0e \x01(\tR\bbirthday\"\x8d\x01\n" +
+	"\bbirthday\x18\x0e \x01(\tR\bbirthday\"\xb4\x01\n" +
 	"\fTelegramLink\x12\x17\n" +
 	"\achat_id\x18\x01 \x01(\tR\x06chatId\x12\x14\n" +
 	"\x05phone\x18\x02 \x01(\tR\x05phone\x126\n" +
 	"\blanguage\x18\x03 \x01(\x0e2\x1a.avtoms.common.v1.LanguageR\blanguage\x12\x16\n" +
-	"\x06linked\x18\x04 \x01(\bR\x06linked\"|\n" +
+	"\x06linked\x18\x04 \x01(\bR\x06linked\x12%\n" +
+	"\x0ecustomer_known\x18\x05 \x01(\bR\rcustomerKnown\"|\n" +
 	"\x13LinkTelegramRequest\x12\x17\n" +
 	"\achat_id\x18\x01 \x01(\tR\x06chatId\x12\x14\n" +
 	"\x05phone\x18\x02 \x01(\tR\x05phone\x126\n" +
