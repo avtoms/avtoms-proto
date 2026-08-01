@@ -148,8 +148,9 @@ type WorkOrderServiceClient interface {
 	CreateSale(ctx context.Context, in *CreateSaleRequest, opts ...grpc.CallOption) (*Sale, error)
 	ListSales(ctx context.Context, in *ListSalesRequest, opts ...grpc.CallOption) (*ListSalesResponse, error)
 	GetSale(ctx context.Context, in *GetSaleRequest, opts ...grpc.CallOption) (*Sale, error)
-	// VoidSale puts the stock back on the shelf and marks the sale reversed. Idempotent:
-	// voiding an already-voided sale returns it unchanged rather than double-restocking.
+	// VoidSale puts the stock back on the shelf and marks the sale reversed — all of it, or
+	// the part the buyer actually brought back (see material_settlement). Idempotent: voiding
+	// an already-voided sale returns it unchanged rather than double-restocking.
 	VoidSale(ctx context.Context, in *VoidSaleRequest, opts ...grpc.CallOption) (*Sale, error)
 	// SetSaleInvoice links the invoice the gateway generated back to the sale.
 	SetSaleInvoice(ctx context.Context, in *SetSaleInvoiceRequest, opts ...grpc.CallOption) (*Sale, error)
@@ -1030,8 +1031,9 @@ type WorkOrderServiceServer interface {
 	CreateSale(context.Context, *CreateSaleRequest) (*Sale, error)
 	ListSales(context.Context, *ListSalesRequest) (*ListSalesResponse, error)
 	GetSale(context.Context, *GetSaleRequest) (*Sale, error)
-	// VoidSale puts the stock back on the shelf and marks the sale reversed. Idempotent:
-	// voiding an already-voided sale returns it unchanged rather than double-restocking.
+	// VoidSale puts the stock back on the shelf and marks the sale reversed — all of it, or
+	// the part the buyer actually brought back (see material_settlement). Idempotent: voiding
+	// an already-voided sale returns it unchanged rather than double-restocking.
 	VoidSale(context.Context, *VoidSaleRequest) (*Sale, error)
 	// SetSaleInvoice links the invoice the gateway generated back to the sale.
 	SetSaleInvoice(context.Context, *SetSaleInvoiceRequest) (*Sale, error)

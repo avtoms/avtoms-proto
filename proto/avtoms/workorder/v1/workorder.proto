@@ -58,8 +58,9 @@ service WorkOrderService {
   rpc CreateSale(CreateSaleRequest) returns (Sale);
   rpc ListSales(ListSalesRequest) returns (ListSalesResponse);
   rpc GetSale(GetSaleRequest) returns (Sale);
-  // VoidSale puts the stock back on the shelf and marks the sale reversed. Idempotent:
-  // voiding an already-voided sale returns it unchanged rather than double-restocking.
+  // VoidSale puts the stock back on the shelf and marks the sale reversed — all of it, or
+  // the part the buyer actually brought back (see material_settlement). Idempotent: voiding
+  // an already-voided sale returns it unchanged rather than double-restocking.
   rpc VoidSale(VoidSaleRequest) returns (Sale);
   // SetSaleInvoice links the invoice the gateway generated back to the sale.
   rpc SetSaleInvoice(SetSaleInvoiceRequest) returns (Sale);
@@ -760,6 +761,10 @@ message GetSaleRequest {
 message VoidSaleRequest {
   string id = 1;
   string staff_id = 2;
+  // What the buyer actually brought back. Absent restocks the whole sale, which is what
+  // voiding has always done — goods that were never returned, or came back damaged, need
+  // this field to say so.
+  MaterialSettlement material_settlement = 3;
 }
 message SetSaleInvoiceRequest {
   string id = 1;
@@ -1386,9 +1391,35 @@ message RemoveLineItemRequest {
   string work_order_id = 1;
   string line_item_id = 2;
 }
+// MaterialReturn is one line's worth of stock coming back off a job that is being called
+// off. quantity is in the variant's own unit and may be fractional, because half a job is
+// half a bottle: four of the five litres booked out can come back sealed while one is
+// already in the engine.
+message MaterialReturn {
+  // The line the material was drawn on — a work order's line_item id, or a sale_item id.
+  string line_id = 1;
+  // How much goes back on the shelf. 0 leaves it written off; more than was drawn is
+  // clamped to what was drawn, since a cancellation cannot create stock.
+  double quantity = 2;
+}
+
+// MaterialSettlement is the shop's answer to "was this used or is it still on the shelf?",
+// asked at the moment of cancelling because only the person standing there knows.
+//
+// Its absence and its emptiness mean different things, which is why it is a message and not
+// a bare repeated field: absent means nobody was asked and each caller keeps the behaviour
+// it had before this existed, while present-and-empty is a deliberate "none of it came
+// back". Proto3 cannot tell those apart on a repeated field.
+message MaterialSettlement {
+  repeated MaterialReturn returns = 1;
+}
+
 message TransitionStateRequest {
   string work_order_id = 1;
   WorkOrderState target = 2;
+  // Honoured only when target is CANCELED. Absent leaves the materials written off against
+  // the abandoned job, which is what cancelling has always done.
+  MaterialSettlement material_settlement = 3;
 }
 message AssignMechanicRequest {
   string work_order_id = 1;
