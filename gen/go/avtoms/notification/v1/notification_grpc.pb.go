@@ -35,6 +35,7 @@ const (
 	NotificationService_ListLeads_FullMethodName            = "/avtoms.notification.v1.NotificationService/ListLeads"
 	NotificationService_UpdateLead_FullMethodName           = "/avtoms.notification.v1.NotificationService/UpdateLead"
 	NotificationService_DeleteLead_FullMethodName           = "/avtoms.notification.v1.NotificationService/DeleteLead"
+	NotificationService_RecordShopLead_FullMethodName       = "/avtoms.notification.v1.NotificationService/RecordShopLead"
 	NotificationService_ListAiConversations_FullMethodName  = "/avtoms.notification.v1.NotificationService/ListAiConversations"
 	NotificationService_GetAiConversation_FullMethodName    = "/avtoms.notification.v1.NotificationService/GetAiConversation"
 	NotificationService_AppendAiMessages_FullMethodName     = "/avtoms.notification.v1.NotificationService/AppendAiMessages"
@@ -76,6 +77,16 @@ type NotificationServiceClient interface {
 	ListLeads(ctx context.Context, in *ListLeadsRequest, opts ...grpc.CallOption) (*ListLeadsResponse, error)
 	UpdateLead(ctx context.Context, in *UpdateLeadRequest, opts ...grpc.CallOption) (*Lead, error)
 	DeleteLead(ctx context.Context, in *DeleteLeadRequest, opts ...grpc.CallOption) (*DeleteLeadResponse, error)
+	// RecordShopLead puts a registered service on the sales board, called by the gateway the
+	// moment a service is registered. The pipeline it belongs to ends in a signed customer, and
+	// that end was the one stage nobody was writing down: a shop the operator sold, registered
+	// and started billing never appeared on the board, so the win rate and the won value counted
+	// only deals somebody retyped by hand.
+	//
+	// Deliberately an upsert, not a create: the same company usually arrives from the landing
+	// page first, and a board that shows it twice — once as a lead being worked, once as a
+	// customer — is worse than one that never showed it at all.
+	RecordShopLead(ctx context.Context, in *RecordShopLeadRequest, opts ...grpc.CallOption) (*Lead, error)
 	// Persisted AI-assistant conversations (owner / super-admin chat history), scoped
 	// to the staff member who owns them so threads follow the user across devices.
 	ListAiConversations(ctx context.Context, in *ListAiConversationsRequest, opts ...grpc.CallOption) (*ListAiConversationsResponse, error)
@@ -252,6 +263,16 @@ func (c *notificationServiceClient) DeleteLead(ctx context.Context, in *DeleteLe
 	return out, nil
 }
 
+func (c *notificationServiceClient) RecordShopLead(ctx context.Context, in *RecordShopLeadRequest, opts ...grpc.CallOption) (*Lead, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Lead)
+	err := c.cc.Invoke(ctx, NotificationService_RecordShopLead_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *notificationServiceClient) ListAiConversations(ctx context.Context, in *ListAiConversationsRequest, opts ...grpc.CallOption) (*ListAiConversationsResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(ListAiConversationsResponse)
@@ -327,6 +348,16 @@ type NotificationServiceServer interface {
 	ListLeads(context.Context, *ListLeadsRequest) (*ListLeadsResponse, error)
 	UpdateLead(context.Context, *UpdateLeadRequest) (*Lead, error)
 	DeleteLead(context.Context, *DeleteLeadRequest) (*DeleteLeadResponse, error)
+	// RecordShopLead puts a registered service on the sales board, called by the gateway the
+	// moment a service is registered. The pipeline it belongs to ends in a signed customer, and
+	// that end was the one stage nobody was writing down: a shop the operator sold, registered
+	// and started billing never appeared on the board, so the win rate and the won value counted
+	// only deals somebody retyped by hand.
+	//
+	// Deliberately an upsert, not a create: the same company usually arrives from the landing
+	// page first, and a board that shows it twice — once as a lead being worked, once as a
+	// customer — is worse than one that never showed it at all.
+	RecordShopLead(context.Context, *RecordShopLeadRequest) (*Lead, error)
 	// Persisted AI-assistant conversations (owner / super-admin chat history), scoped
 	// to the staff member who owns them so threads follow the user across devices.
 	ListAiConversations(context.Context, *ListAiConversationsRequest) (*ListAiConversationsResponse, error)
@@ -390,6 +421,9 @@ func (UnimplementedNotificationServiceServer) UpdateLead(context.Context, *Updat
 }
 func (UnimplementedNotificationServiceServer) DeleteLead(context.Context, *DeleteLeadRequest) (*DeleteLeadResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method DeleteLead not implemented")
+}
+func (UnimplementedNotificationServiceServer) RecordShopLead(context.Context, *RecordShopLeadRequest) (*Lead, error) {
+	return nil, status.Error(codes.Unimplemented, "method RecordShopLead not implemented")
 }
 func (UnimplementedNotificationServiceServer) ListAiConversations(context.Context, *ListAiConversationsRequest) (*ListAiConversationsResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method ListAiConversations not implemented")
@@ -712,6 +746,24 @@ func _NotificationService_DeleteLead_Handler(srv interface{}, ctx context.Contex
 	return interceptor(ctx, in, info, handler)
 }
 
+func _NotificationService_RecordShopLead_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RecordShopLeadRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(NotificationServiceServer).RecordShopLead(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: NotificationService_RecordShopLead_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(NotificationServiceServer).RecordShopLead(ctx, req.(*RecordShopLeadRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _NotificationService_ListAiConversations_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ListAiConversationsRequest)
 	if err := dec(in); err != nil {
@@ -854,6 +906,10 @@ var NotificationService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteLead",
 			Handler:    _NotificationService_DeleteLead_Handler,
+		},
+		{
+			MethodName: "RecordShopLead",
+			Handler:    _NotificationService_RecordShopLead_Handler,
 		},
 		{
 			MethodName: "ListAiConversations",

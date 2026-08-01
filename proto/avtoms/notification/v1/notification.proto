@@ -40,6 +40,16 @@ service NotificationService {
   rpc ListLeads(ListLeadsRequest) returns (ListLeadsResponse);
   rpc UpdateLead(UpdateLeadRequest) returns (Lead);
   rpc DeleteLead(DeleteLeadRequest) returns (DeleteLeadResponse);
+  // RecordShopLead puts a registered service on the sales board, called by the gateway the
+  // moment a service is registered. The pipeline it belongs to ends in a signed customer, and
+  // that end was the one stage nobody was writing down: a shop the operator sold, registered
+  // and started billing never appeared on the board, so the win rate and the won value counted
+  // only deals somebody retyped by hand.
+  //
+  // Deliberately an upsert, not a create: the same company usually arrives from the landing
+  // page first, and a board that shows it twice — once as a lead being worked, once as a
+  // customer — is worse than one that never showed it at all.
+  rpc RecordShopLead(RecordShopLeadRequest) returns (Lead);
 
   // Persisted AI-assistant conversations (owner / super-admin chat history), scoped
   // to the staff member who owns them so threads follow the user across devices.
@@ -66,6 +76,10 @@ message Lead {
   string notes = 12;
   string created_at = 13;
   string updated_at = 14;
+  // The registered service this lead became, once it became one. Empty for a lead still being
+  // worked. Set by RecordShopLead and never by the editor, so moving a card around the board
+  // cannot detach a customer from the service it signed up as.
+  string shop_id = 15;
 }
 message CreateLeadRequest {
   string name = 1;
@@ -103,6 +117,23 @@ message DeleteLeadRequest {
 }
 message DeleteLeadResponse {
   bool ok = 1;
+}
+
+// RecordShopLeadRequest describes a service that has just been registered, in the terms the
+// sales board uses: the company is the service, the person is its owner.
+message RecordShopLeadRequest {
+  string shop_id = 1;
+  string company = 2; // the service's name
+  string name = 3;    // the owner — who the operator actually talks to
+  string phone = 4;   // the owner's phone
+  // The service's own public number. Not stored on the lead — the lead's phone is the person's
+  // — but matched against, because whoever filled in the landing form months ago may well have
+  // left the shop's number rather than their own.
+  string shop_phone = 5;
+  string city = 6;
+  string address = 7;
+  // Where on the board to put it. Blank means "won", which is what registering a service is.
+  string status = 8;
 }
 
 // AiConversation is one saved assistant chat thread belonging to a staff member.
