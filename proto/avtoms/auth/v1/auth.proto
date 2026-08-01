@@ -177,6 +177,7 @@ message SetStaffRoleRequest {
 //   orders.create      open a new work order
 //   orders.edit        change an order: line items, notes, odometer, status, timers
 //   orders.assign      put an order, or a line on it, on a particular mechanic
+//   sales.view         see counter sales and what they took
 //   sales.manage       sell over the counter and void a sale
 //   warehouse.view     see products, stock levels and movements
 //   warehouse.manage   create and price products, adjust stock
