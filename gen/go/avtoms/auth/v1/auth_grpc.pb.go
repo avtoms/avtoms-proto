@@ -22,6 +22,8 @@ const (
 	AuthService_RequestOtp_FullMethodName          = "/avtoms.auth.v1.AuthService/RequestOtp"
 	AuthService_VerifyOtp_FullMethodName           = "/avtoms.auth.v1.AuthService/VerifyOtp"
 	AuthService_RefreshToken_FullMethodName        = "/avtoms.auth.v1.AuthService/RefreshToken"
+	AuthService_SignIn_FullMethodName              = "/avtoms.auth.v1.AuthService/SignIn"
+	AuthService_SetStaffPassword_FullMethodName    = "/avtoms.auth.v1.AuthService/SetStaffPassword"
 	AuthService_VerifyClientOtp_FullMethodName     = "/avtoms.auth.v1.AuthService/VerifyClientOtp"
 	AuthService_Authenticate_FullMethodName        = "/avtoms.auth.v1.AuthService/Authenticate"
 	AuthService_InviteMechanic_FullMethodName      = "/avtoms.auth.v1.AuthService/InviteMechanic"
@@ -33,6 +35,9 @@ const (
 	AuthService_ListAllStaff_FullMethodName        = "/avtoms.auth.v1.AuthService/ListAllStaff"
 	AuthService_SetStaffActive_FullMethodName      = "/avtoms.auth.v1.AuthService/SetStaffActive"
 	AuthService_SetStaffRole_FullMethodName        = "/avtoms.auth.v1.AuthService/SetStaffRole"
+	AuthService_RegisterShop_FullMethodName        = "/avtoms.auth.v1.AuthService/RegisterShop"
+	AuthService_ListShops_FullMethodName           = "/avtoms.auth.v1.AuthService/ListShops"
+	AuthService_UpdateShop_FullMethodName          = "/avtoms.auth.v1.AuthService/UpdateShop"
 )
 
 // AuthServiceClient is the client API for AuthService service.
@@ -46,6 +51,13 @@ type AuthServiceClient interface {
 	RequestOtp(ctx context.Context, in *RequestOtpRequest, opts ...grpc.CallOption) (*RequestOtpResponse, error)
 	VerifyOtp(ctx context.Context, in *VerifyOtpRequest, opts ...grpc.CallOption) (*TokenPair, error)
 	RefreshToken(ctx context.Context, in *RefreshTokenRequest, opts ...grpc.CallOption) (*TokenPair, error)
+	// SignIn exchanges a login and password for the same token pair OTP returns. The way in
+	// for staff who were given an account rather than discovered by their phone number: the
+	// shop is decided when the account is created, so signing in only proves who is asking.
+	SignIn(ctx context.Context, in *SignInRequest, opts ...grpc.CallOption) (*TokenPair, error)
+	// SetStaffPassword sets or replaces a staff member's login and password. Admin-scoped at
+	// the gateway; it is also how a forgotten password is reset, since nothing can read one back.
+	SetStaffPassword(ctx context.Context, in *SetStaffPasswordRequest, opts ...grpc.CallOption) (*Staff, error)
 	// VerifyClientOtp verifies an OTP for a CUSTOMER (not staff) and returns a long-lived
 	// ROLE_CLIENT token (subject = phone, no shop). Unlike VerifyOtp it never creates a staff
 	// record. Used by the customer mobile app; OTP is requested via the normal RequestOtp.
@@ -66,6 +78,12 @@ type AuthServiceClient interface {
 	ListAllStaff(ctx context.Context, in *ListAllStaffRequest, opts ...grpc.CallOption) (*ListStaffResponse, error)
 	SetStaffActive(ctx context.Context, in *SetStaffActiveRequest, opts ...grpc.CallOption) (*Staff, error)
 	SetStaffRole(ctx context.Context, in *SetStaffRoleRequest, opts ...grpc.CallOption) (*Staff, error)
+	// Super-admin shop registry (admin-only). A shop and its owner are created together by
+	// RegisterShop, because neither is usable alone: a shop nobody can sign in to is dead
+	// weight, and an owner with no shop has nowhere to work.
+	RegisterShop(ctx context.Context, in *RegisterShopRequest, opts ...grpc.CallOption) (*RegisterShopResponse, error)
+	ListShops(ctx context.Context, in *ListShopsRequest, opts ...grpc.CallOption) (*ListShopsResponse, error)
+	UpdateShop(ctx context.Context, in *UpdateShopRequest, opts ...grpc.CallOption) (*Shop, error)
 }
 
 type authServiceClient struct {
@@ -100,6 +118,26 @@ func (c *authServiceClient) RefreshToken(ctx context.Context, in *RefreshTokenRe
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(TokenPair)
 	err := c.cc.Invoke(ctx, AuthService_RefreshToken_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *authServiceClient) SignIn(ctx context.Context, in *SignInRequest, opts ...grpc.CallOption) (*TokenPair, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(TokenPair)
+	err := c.cc.Invoke(ctx, AuthService_SignIn_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *authServiceClient) SetStaffPassword(ctx context.Context, in *SetStaffPasswordRequest, opts ...grpc.CallOption) (*Staff, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Staff)
+	err := c.cc.Invoke(ctx, AuthService_SetStaffPassword_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -216,6 +254,36 @@ func (c *authServiceClient) SetStaffRole(ctx context.Context, in *SetStaffRoleRe
 	return out, nil
 }
 
+func (c *authServiceClient) RegisterShop(ctx context.Context, in *RegisterShopRequest, opts ...grpc.CallOption) (*RegisterShopResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(RegisterShopResponse)
+	err := c.cc.Invoke(ctx, AuthService_RegisterShop_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *authServiceClient) ListShops(ctx context.Context, in *ListShopsRequest, opts ...grpc.CallOption) (*ListShopsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListShopsResponse)
+	err := c.cc.Invoke(ctx, AuthService_ListShops_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *authServiceClient) UpdateShop(ctx context.Context, in *UpdateShopRequest, opts ...grpc.CallOption) (*Shop, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Shop)
+	err := c.cc.Invoke(ctx, AuthService_UpdateShop_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AuthServiceServer is the server API for AuthService service.
 // All implementations must embed UnimplementedAuthServiceServer
 // for forward compatibility.
@@ -227,6 +295,13 @@ type AuthServiceServer interface {
 	RequestOtp(context.Context, *RequestOtpRequest) (*RequestOtpResponse, error)
 	VerifyOtp(context.Context, *VerifyOtpRequest) (*TokenPair, error)
 	RefreshToken(context.Context, *RefreshTokenRequest) (*TokenPair, error)
+	// SignIn exchanges a login and password for the same token pair OTP returns. The way in
+	// for staff who were given an account rather than discovered by their phone number: the
+	// shop is decided when the account is created, so signing in only proves who is asking.
+	SignIn(context.Context, *SignInRequest) (*TokenPair, error)
+	// SetStaffPassword sets or replaces a staff member's login and password. Admin-scoped at
+	// the gateway; it is also how a forgotten password is reset, since nothing can read one back.
+	SetStaffPassword(context.Context, *SetStaffPasswordRequest) (*Staff, error)
 	// VerifyClientOtp verifies an OTP for a CUSTOMER (not staff) and returns a long-lived
 	// ROLE_CLIENT token (subject = phone, no shop). Unlike VerifyOtp it never creates a staff
 	// record. Used by the customer mobile app; OTP is requested via the normal RequestOtp.
@@ -247,6 +322,12 @@ type AuthServiceServer interface {
 	ListAllStaff(context.Context, *ListAllStaffRequest) (*ListStaffResponse, error)
 	SetStaffActive(context.Context, *SetStaffActiveRequest) (*Staff, error)
 	SetStaffRole(context.Context, *SetStaffRoleRequest) (*Staff, error)
+	// Super-admin shop registry (admin-only). A shop and its owner are created together by
+	// RegisterShop, because neither is usable alone: a shop nobody can sign in to is dead
+	// weight, and an owner with no shop has nowhere to work.
+	RegisterShop(context.Context, *RegisterShopRequest) (*RegisterShopResponse, error)
+	ListShops(context.Context, *ListShopsRequest) (*ListShopsResponse, error)
+	UpdateShop(context.Context, *UpdateShopRequest) (*Shop, error)
 	mustEmbedUnimplementedAuthServiceServer()
 }
 
@@ -265,6 +346,12 @@ func (UnimplementedAuthServiceServer) VerifyOtp(context.Context, *VerifyOtpReque
 }
 func (UnimplementedAuthServiceServer) RefreshToken(context.Context, *RefreshTokenRequest) (*TokenPair, error) {
 	return nil, status.Error(codes.Unimplemented, "method RefreshToken not implemented")
+}
+func (UnimplementedAuthServiceServer) SignIn(context.Context, *SignInRequest) (*TokenPair, error) {
+	return nil, status.Error(codes.Unimplemented, "method SignIn not implemented")
+}
+func (UnimplementedAuthServiceServer) SetStaffPassword(context.Context, *SetStaffPasswordRequest) (*Staff, error) {
+	return nil, status.Error(codes.Unimplemented, "method SetStaffPassword not implemented")
 }
 func (UnimplementedAuthServiceServer) VerifyClientOtp(context.Context, *VerifyClientOtpRequest) (*TokenPair, error) {
 	return nil, status.Error(codes.Unimplemented, "method VerifyClientOtp not implemented")
@@ -298,6 +385,15 @@ func (UnimplementedAuthServiceServer) SetStaffActive(context.Context, *SetStaffA
 }
 func (UnimplementedAuthServiceServer) SetStaffRole(context.Context, *SetStaffRoleRequest) (*Staff, error) {
 	return nil, status.Error(codes.Unimplemented, "method SetStaffRole not implemented")
+}
+func (UnimplementedAuthServiceServer) RegisterShop(context.Context, *RegisterShopRequest) (*RegisterShopResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method RegisterShop not implemented")
+}
+func (UnimplementedAuthServiceServer) ListShops(context.Context, *ListShopsRequest) (*ListShopsResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListShops not implemented")
+}
+func (UnimplementedAuthServiceServer) UpdateShop(context.Context, *UpdateShopRequest) (*Shop, error) {
+	return nil, status.Error(codes.Unimplemented, "method UpdateShop not implemented")
 }
 func (UnimplementedAuthServiceServer) mustEmbedUnimplementedAuthServiceServer() {}
 func (UnimplementedAuthServiceServer) testEmbeddedByValue()                     {}
@@ -370,6 +466,42 @@ func _AuthService_RefreshToken_Handler(srv interface{}, ctx context.Context, dec
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(AuthServiceServer).RefreshToken(ctx, req.(*RefreshTokenRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AuthService_SignIn_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SignInRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServiceServer).SignIn(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AuthService_SignIn_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServiceServer).SignIn(ctx, req.(*SignInRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AuthService_SetStaffPassword_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SetStaffPasswordRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServiceServer).SetStaffPassword(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AuthService_SetStaffPassword_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServiceServer).SetStaffPassword(ctx, req.(*SetStaffPasswordRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -572,6 +704,60 @@ func _AuthService_SetStaffRole_Handler(srv interface{}, ctx context.Context, dec
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AuthService_RegisterShop_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RegisterShopRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServiceServer).RegisterShop(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AuthService_RegisterShop_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServiceServer).RegisterShop(ctx, req.(*RegisterShopRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AuthService_ListShops_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListShopsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServiceServer).ListShops(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AuthService_ListShops_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServiceServer).ListShops(ctx, req.(*ListShopsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AuthService_UpdateShop_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateShopRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServiceServer).UpdateShop(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AuthService_UpdateShop_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServiceServer).UpdateShop(ctx, req.(*UpdateShopRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // AuthService_ServiceDesc is the grpc.ServiceDesc for AuthService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -590,6 +776,14 @@ var AuthService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "RefreshToken",
 			Handler:    _AuthService_RefreshToken_Handler,
+		},
+		{
+			MethodName: "SignIn",
+			Handler:    _AuthService_SignIn_Handler,
+		},
+		{
+			MethodName: "SetStaffPassword",
+			Handler:    _AuthService_SetStaffPassword_Handler,
 		},
 		{
 			MethodName: "VerifyClientOtp",
@@ -634,6 +828,18 @@ var AuthService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "SetStaffRole",
 			Handler:    _AuthService_SetStaffRole_Handler,
+		},
+		{
+			MethodName: "RegisterShop",
+			Handler:    _AuthService_RegisterShop_Handler,
+		},
+		{
+			MethodName: "ListShops",
+			Handler:    _AuthService_ListShops_Handler,
+		},
+		{
+			MethodName: "UpdateShop",
+			Handler:    _AuthService_UpdateShop_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

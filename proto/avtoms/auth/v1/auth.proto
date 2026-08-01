@@ -12,6 +12,14 @@ service AuthService {
   rpc VerifyOtp(VerifyOtpRequest) returns (TokenPair);
   rpc RefreshToken(RefreshTokenRequest) returns (TokenPair);
 
+  // SignIn exchanges a login and password for the same token pair OTP returns. The way in
+  // for staff who were given an account rather than discovered by their phone number: the
+  // shop is decided when the account is created, so signing in only proves who is asking.
+  rpc SignIn(SignInRequest) returns (TokenPair);
+  // SetStaffPassword sets or replaces a staff member's login and password. Admin-scoped at
+  // the gateway; it is also how a forgotten password is reset, since nothing can read one back.
+  rpc SetStaffPassword(SetStaffPasswordRequest) returns (Staff);
+
   // VerifyClientOtp verifies an OTP for a CUSTOMER (not staff) and returns a long-lived
   // ROLE_CLIENT token (subject = phone, no shop). Unlike VerifyOtp it never creates a staff
   // record. Used by the customer mobile app; OTP is requested via the normal RequestOtp.
@@ -36,6 +44,84 @@ service AuthService {
   rpc ListAllStaff(ListAllStaffRequest) returns (ListStaffResponse);
   rpc SetStaffActive(SetStaffActiveRequest) returns (Staff);
   rpc SetStaffRole(SetStaffRoleRequest) returns (Staff);
+
+  // Super-admin shop registry (admin-only). A shop and its owner are created together by
+  // RegisterShop, because neither is usable alone: a shop nobody can sign in to is dead
+  // weight, and an owner with no shop has nowhere to work.
+  rpc RegisterShop(RegisterShopRequest) returns (RegisterShopResponse);
+  rpc ListShops(ListShopsRequest) returns (ListShopsResponse);
+  rpc UpdateShop(UpdateShopRequest) returns (Shop);
+}
+
+// Shop is a registered service — the tenant every staff record, order and invoice hangs off.
+// Until this existed a shop_id was a bare UUID nobody could put a name to, so the admin
+// console listed shops by the first eight characters of their id.
+message Shop {
+  string id = 1;
+  string name = 2;
+  // What the place actually does — full service, oil change, body work, tyres. Free text
+  // rather than an enum: the trade names its own specialities and they differ by region.
+  string service_type = 3;
+  // How many people work there, as stated at registration. A rough sizing figure for the
+  // operator, deliberately not derived from the staff records — most shops are registered
+  // before their workers have accounts.
+  int32 staff_count = 4;
+  string location = 5;
+  // The service's own public number, which is not the owner's: it goes on the customer's
+  // check, and the owner's personal phone should not.
+  string phone = 6;
+  bool active = 7;
+  string created_at = 8;
+  // Staff records currently attached to this shop. Read-only; see staff_count for the
+  // figure the shop gave for itself.
+  int32 members = 9;
+}
+
+message RegisterShopRequest {
+  // ── the company ──
+  string name = 1;
+  string service_type = 2;
+  int32 staff_count = 3;
+  string location = 4;
+  string phone = 5;
+  // ── its owner, created in the same transaction ──
+  string owner_name = 6;
+  string owner_phone = 7;
+  string owner_login = 8;
+  string owner_password = 9;
+}
+
+message RegisterShopResponse {
+  Shop shop = 1;
+  Staff owner = 2;
+}
+
+message ListShopsRequest {}
+message ListShopsResponse {
+  repeated Shop shops = 1;
+}
+
+message UpdateShopRequest {
+  string id = 1;
+  string name = 2;
+  string service_type = 3;
+  int32 staff_count = 4;
+  string location = 5;
+  string phone = 6;
+  bool active = 7;
+}
+
+message SignInRequest {
+  string login = 1;
+  string password = 2;
+}
+
+message SetStaffPasswordRequest {
+  string staff_id = 1;
+  // Empty keeps the login the staff member already has, so a password can be reset without
+  // renaming the account.
+  string login = 2;
+  string password = 3;
 }
 
 message ListAllStaffRequest {}
@@ -67,6 +153,12 @@ message Staff {
   string avatar_url = 8; // profile photo URL (object storage), may be empty
   // Extra capability granted by the owner: a mechanic with this set may create work orders.
   bool can_create_orders = 9;
+  // The name this person signs in with. Empty for an account that predates passwords and
+  // still arrives by phone. The password itself is never carried on this message.
+  string login = 10;
+  // The shop's registered name, filled by services that have the registry to hand. Saves
+  // every caller joining staff to shops just to show who somebody works for.
+  string shop_name = 11;
 }
 
 message UpdateStaffRequest {
