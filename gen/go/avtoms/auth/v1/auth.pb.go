@@ -836,6 +836,556 @@ func (x *SetStaffRoleRequest) GetRole() Role {
 	return Role_ROLE_UNSPECIFIED
 }
 
+// ShopRole is a named bundle of permissions belonging to one shop.
+type ShopRole struct {
+	state       protoimpl.MessageState `protogen:"open.v1"`
+	Id          string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	ShopId      string                 `protobuf:"bytes,2,opt,name=shop_id,json=shopId,proto3" json:"shop_id,omitempty"`
+	Name        string                 `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
+	Permissions []string               `protobuf:"bytes,4,rep,name=permissions,proto3" json:"permissions,omitempty"`
+	// How many staff currently hold this role. Read-only, and the reason deleting one is worth
+	// thinking about: the people holding it do not stop existing, they stop being able to work.
+	Members       int32  `protobuf:"varint,5,opt,name=members,proto3" json:"members,omitempty"`
+	CreatedAt     string `protobuf:"bytes,6,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	UpdatedAt     string `protobuf:"bytes,7,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ShopRole) Reset() {
+	*x = ShopRole{}
+	mi := &file_avtoms_auth_v1_auth_proto_msgTypes[11]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ShopRole) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ShopRole) ProtoMessage() {}
+
+func (x *ShopRole) ProtoReflect() protoreflect.Message {
+	mi := &file_avtoms_auth_v1_auth_proto_msgTypes[11]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ShopRole.ProtoReflect.Descriptor instead.
+func (*ShopRole) Descriptor() ([]byte, []int) {
+	return file_avtoms_auth_v1_auth_proto_rawDescGZIP(), []int{11}
+}
+
+func (x *ShopRole) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *ShopRole) GetShopId() string {
+	if x != nil {
+		return x.ShopId
+	}
+	return ""
+}
+
+func (x *ShopRole) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *ShopRole) GetPermissions() []string {
+	if x != nil {
+		return x.Permissions
+	}
+	return nil
+}
+
+func (x *ShopRole) GetMembers() int32 {
+	if x != nil {
+		return x.Members
+	}
+	return 0
+}
+
+func (x *ShopRole) GetCreatedAt() string {
+	if x != nil {
+		return x.CreatedAt
+	}
+	return ""
+}
+
+func (x *ShopRole) GetUpdatedAt() string {
+	if x != nil {
+		return x.UpdatedAt
+	}
+	return ""
+}
+
+type ListRolesRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	ShopId        string                 `protobuf:"bytes,1,opt,name=shop_id,json=shopId,proto3" json:"shop_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListRolesRequest) Reset() {
+	*x = ListRolesRequest{}
+	mi := &file_avtoms_auth_v1_auth_proto_msgTypes[12]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListRolesRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListRolesRequest) ProtoMessage() {}
+
+func (x *ListRolesRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_avtoms_auth_v1_auth_proto_msgTypes[12]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListRolesRequest.ProtoReflect.Descriptor instead.
+func (*ListRolesRequest) Descriptor() ([]byte, []int) {
+	return file_avtoms_auth_v1_auth_proto_rawDescGZIP(), []int{12}
+}
+
+func (x *ListRolesRequest) GetShopId() string {
+	if x != nil {
+		return x.ShopId
+	}
+	return ""
+}
+
+type ListRolesResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Roles         []*ShopRole            `protobuf:"bytes,1,rep,name=roles,proto3" json:"roles,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListRolesResponse) Reset() {
+	*x = ListRolesResponse{}
+	mi := &file_avtoms_auth_v1_auth_proto_msgTypes[13]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListRolesResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListRolesResponse) ProtoMessage() {}
+
+func (x *ListRolesResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_avtoms_auth_v1_auth_proto_msgTypes[13]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListRolesResponse.ProtoReflect.Descriptor instead.
+func (*ListRolesResponse) Descriptor() ([]byte, []int) {
+	return file_avtoms_auth_v1_auth_proto_rawDescGZIP(), []int{13}
+}
+
+func (x *ListRolesResponse) GetRoles() []*ShopRole {
+	if x != nil {
+		return x.Roles
+	}
+	return nil
+}
+
+type CreateRoleRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	ShopId        string                 `protobuf:"bytes,1,opt,name=shop_id,json=shopId,proto3" json:"shop_id,omitempty"`
+	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	Permissions   []string               `protobuf:"bytes,3,rep,name=permissions,proto3" json:"permissions,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CreateRoleRequest) Reset() {
+	*x = CreateRoleRequest{}
+	mi := &file_avtoms_auth_v1_auth_proto_msgTypes[14]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CreateRoleRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateRoleRequest) ProtoMessage() {}
+
+func (x *CreateRoleRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_avtoms_auth_v1_auth_proto_msgTypes[14]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateRoleRequest.ProtoReflect.Descriptor instead.
+func (*CreateRoleRequest) Descriptor() ([]byte, []int) {
+	return file_avtoms_auth_v1_auth_proto_rawDescGZIP(), []int{14}
+}
+
+func (x *CreateRoleRequest) GetShopId() string {
+	if x != nil {
+		return x.ShopId
+	}
+	return ""
+}
+
+func (x *CreateRoleRequest) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *CreateRoleRequest) GetPermissions() []string {
+	if x != nil {
+		return x.Permissions
+	}
+	return nil
+}
+
+type UpdateRoleRequest struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	Id    string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Name  string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	// Replaces the role's permissions wholesale. A role is edited by ticking boxes and saving
+	// the result, so the message that arrives is the whole answer, not a change to apply.
+	Permissions   []string `protobuf:"bytes,3,rep,name=permissions,proto3" json:"permissions,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdateRoleRequest) Reset() {
+	*x = UpdateRoleRequest{}
+	mi := &file_avtoms_auth_v1_auth_proto_msgTypes[15]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateRoleRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateRoleRequest) ProtoMessage() {}
+
+func (x *UpdateRoleRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_avtoms_auth_v1_auth_proto_msgTypes[15]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateRoleRequest.ProtoReflect.Descriptor instead.
+func (*UpdateRoleRequest) Descriptor() ([]byte, []int) {
+	return file_avtoms_auth_v1_auth_proto_rawDescGZIP(), []int{15}
+}
+
+func (x *UpdateRoleRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *UpdateRoleRequest) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *UpdateRoleRequest) GetPermissions() []string {
+	if x != nil {
+		return x.Permissions
+	}
+	return nil
+}
+
+type DeleteRoleRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DeleteRoleRequest) Reset() {
+	*x = DeleteRoleRequest{}
+	mi := &file_avtoms_auth_v1_auth_proto_msgTypes[16]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeleteRoleRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteRoleRequest) ProtoMessage() {}
+
+func (x *DeleteRoleRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_avtoms_auth_v1_auth_proto_msgTypes[16]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteRoleRequest.ProtoReflect.Descriptor instead.
+func (*DeleteRoleRequest) Descriptor() ([]byte, []int) {
+	return file_avtoms_auth_v1_auth_proto_rawDescGZIP(), []int{16}
+}
+
+func (x *DeleteRoleRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+type DeleteRoleResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Ok            bool                   `protobuf:"varint,1,opt,name=ok,proto3" json:"ok,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DeleteRoleResponse) Reset() {
+	*x = DeleteRoleResponse{}
+	mi := &file_avtoms_auth_v1_auth_proto_msgTypes[17]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeleteRoleResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteRoleResponse) ProtoMessage() {}
+
+func (x *DeleteRoleResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_avtoms_auth_v1_auth_proto_msgTypes[17]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteRoleResponse.ProtoReflect.Descriptor instead.
+func (*DeleteRoleResponse) Descriptor() ([]byte, []int) {
+	return file_avtoms_auth_v1_auth_proto_rawDescGZIP(), []int{17}
+}
+
+func (x *DeleteRoleResponse) GetOk() bool {
+	if x != nil {
+		return x.Ok
+	}
+	return false
+}
+
+type CreateStaffRequest struct {
+	state    protoimpl.MessageState `protogen:"open.v1"`
+	ShopId   string                 `protobuf:"bytes,1,opt,name=shop_id,json=shopId,proto3" json:"shop_id,omitempty"`
+	Name     string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	Phone    string                 `protobuf:"bytes,3,opt,name=phone,proto3" json:"phone,omitempty"`
+	Login    string                 `protobuf:"bytes,4,opt,name=login,proto3" json:"login,omitempty"`
+	Password string                 `protobuf:"bytes,5,opt,name=password,proto3" json:"password,omitempty"`
+	// The role this person starts with. Optional: a worker with no role and no grants can sign
+	// in and see nothing, which is a safe place to start and an obvious one to fix.
+	RoleId string `protobuf:"bytes,6,opt,name=role_id,json=roleId,proto3" json:"role_id,omitempty"`
+	// Grants held on top of the role — the one-off "and they also do the ordering" that does not
+	// deserve a role of its own.
+	Permissions   []string `protobuf:"bytes,7,rep,name=permissions,proto3" json:"permissions,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CreateStaffRequest) Reset() {
+	*x = CreateStaffRequest{}
+	mi := &file_avtoms_auth_v1_auth_proto_msgTypes[18]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CreateStaffRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateStaffRequest) ProtoMessage() {}
+
+func (x *CreateStaffRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_avtoms_auth_v1_auth_proto_msgTypes[18]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateStaffRequest.ProtoReflect.Descriptor instead.
+func (*CreateStaffRequest) Descriptor() ([]byte, []int) {
+	return file_avtoms_auth_v1_auth_proto_rawDescGZIP(), []int{18}
+}
+
+func (x *CreateStaffRequest) GetShopId() string {
+	if x != nil {
+		return x.ShopId
+	}
+	return ""
+}
+
+func (x *CreateStaffRequest) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *CreateStaffRequest) GetPhone() string {
+	if x != nil {
+		return x.Phone
+	}
+	return ""
+}
+
+func (x *CreateStaffRequest) GetLogin() string {
+	if x != nil {
+		return x.Login
+	}
+	return ""
+}
+
+func (x *CreateStaffRequest) GetPassword() string {
+	if x != nil {
+		return x.Password
+	}
+	return ""
+}
+
+func (x *CreateStaffRequest) GetRoleId() string {
+	if x != nil {
+		return x.RoleId
+	}
+	return ""
+}
+
+func (x *CreateStaffRequest) GetPermissions() []string {
+	if x != nil {
+		return x.Permissions
+	}
+	return nil
+}
+
+type SetStaffAccessRequest struct {
+	state   protoimpl.MessageState `protogen:"open.v1"`
+	StaffId string                 `protobuf:"bytes,1,opt,name=staff_id,json=staffId,proto3" json:"staff_id,omitempty"`
+	// Empty removes the role, leaving only the direct grants below.
+	RoleId        string   `protobuf:"bytes,2,opt,name=role_id,json=roleId,proto3" json:"role_id,omitempty"`
+	Permissions   []string `protobuf:"bytes,3,rep,name=permissions,proto3" json:"permissions,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SetStaffAccessRequest) Reset() {
+	*x = SetStaffAccessRequest{}
+	mi := &file_avtoms_auth_v1_auth_proto_msgTypes[19]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SetStaffAccessRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SetStaffAccessRequest) ProtoMessage() {}
+
+func (x *SetStaffAccessRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_avtoms_auth_v1_auth_proto_msgTypes[19]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SetStaffAccessRequest.ProtoReflect.Descriptor instead.
+func (*SetStaffAccessRequest) Descriptor() ([]byte, []int) {
+	return file_avtoms_auth_v1_auth_proto_rawDescGZIP(), []int{19}
+}
+
+func (x *SetStaffAccessRequest) GetStaffId() string {
+	if x != nil {
+		return x.StaffId
+	}
+	return ""
+}
+
+func (x *SetStaffAccessRequest) GetRoleId() string {
+	if x != nil {
+		return x.RoleId
+	}
+	return ""
+}
+
+func (x *SetStaffAccessRequest) GetPermissions() []string {
+	if x != nil {
+		return x.Permissions
+	}
+	return nil
+}
+
 type Staff struct {
 	state     protoimpl.MessageState `protogen:"open.v1"`
 	Id        string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
@@ -846,21 +1396,37 @@ type Staff struct {
 	Active    bool                   `protobuf:"varint,6,opt,name=active,proto3" json:"active,omitempty"`
 	CreatedAt string                 `protobuf:"bytes,7,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
 	AvatarUrl string                 `protobuf:"bytes,8,opt,name=avatar_url,json=avatarUrl,proto3" json:"avatar_url,omitempty"` // profile photo URL (object storage), may be empty
-	// Extra capability granted by the owner: a mechanic with this set may create work orders.
+	// Whether this person may create work orders. Superseded by the permission catalogue and
+	// now derived from it — true exactly when effective_permissions contains "orders.create".
+	// Kept because the mechanic app reads it, and a field that still answers the same question
+	// correctly is not worth a coordinated client release to remove.
 	CanCreateOrders bool `protobuf:"varint,9,opt,name=can_create_orders,json=canCreateOrders,proto3" json:"can_create_orders,omitempty"`
 	// The name this person signs in with. Empty for an account that predates passwords and
 	// still arrives by phone. The password itself is never carried on this message.
 	Login string `protobuf:"bytes,10,opt,name=login,proto3" json:"login,omitempty"`
 	// The shop's registered name, filled by services that have the registry to hand. Saves
 	// every caller joining staff to shops just to show who somebody works for.
-	ShopName      string `protobuf:"bytes,11,opt,name=shop_name,json=shopName,proto3" json:"shop_name,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	ShopName string `protobuf:"bytes,11,opt,name=shop_name,json=shopName,proto3" json:"shop_name,omitempty"`
+	// The role this person holds, if any, and its name so a caller listing staff need not also
+	// fetch the roles to render the column.
+	RoleId   string `protobuf:"bytes,12,opt,name=role_id,json=roleId,proto3" json:"role_id,omitempty"`
+	RoleName string `protobuf:"bytes,13,opt,name=role_name,json=roleName,proto3" json:"role_name,omitempty"`
+	// Grants held directly, on top of whatever the role carries. Separate from the effective
+	// set below because an editor has to show what was ticked for this person specifically —
+	// merging the two would make revoking a role's permission look possible on the staff form
+	// when it is not.
+	Permissions []string `protobuf:"bytes,14,rep,name=permissions,proto3" json:"permissions,omitempty"`
+	// Everything this person can actually do: the role's permissions, their own grants, and for
+	// an owner or super-admin the whole catalogue. This is the field to check; the two above
+	// describe how it was arrived at.
+	EffectivePermissions []string `protobuf:"bytes,15,rep,name=effective_permissions,json=effectivePermissions,proto3" json:"effective_permissions,omitempty"`
+	unknownFields        protoimpl.UnknownFields
+	sizeCache            protoimpl.SizeCache
 }
 
 func (x *Staff) Reset() {
 	*x = Staff{}
-	mi := &file_avtoms_auth_v1_auth_proto_msgTypes[11]
+	mi := &file_avtoms_auth_v1_auth_proto_msgTypes[20]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -872,7 +1438,7 @@ func (x *Staff) String() string {
 func (*Staff) ProtoMessage() {}
 
 func (x *Staff) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_auth_v1_auth_proto_msgTypes[11]
+	mi := &file_avtoms_auth_v1_auth_proto_msgTypes[20]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -885,7 +1451,7 @@ func (x *Staff) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Staff.ProtoReflect.Descriptor instead.
 func (*Staff) Descriptor() ([]byte, []int) {
-	return file_avtoms_auth_v1_auth_proto_rawDescGZIP(), []int{11}
+	return file_avtoms_auth_v1_auth_proto_rawDescGZIP(), []int{20}
 }
 
 func (x *Staff) GetId() string {
@@ -965,6 +1531,34 @@ func (x *Staff) GetShopName() string {
 	return ""
 }
 
+func (x *Staff) GetRoleId() string {
+	if x != nil {
+		return x.RoleId
+	}
+	return ""
+}
+
+func (x *Staff) GetRoleName() string {
+	if x != nil {
+		return x.RoleName
+	}
+	return ""
+}
+
+func (x *Staff) GetPermissions() []string {
+	if x != nil {
+		return x.Permissions
+	}
+	return nil
+}
+
+func (x *Staff) GetEffectivePermissions() []string {
+	if x != nil {
+		return x.EffectivePermissions
+	}
+	return nil
+}
+
 type UpdateStaffRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	StaffId       string                 `protobuf:"bytes,1,opt,name=staff_id,json=staffId,proto3" json:"staff_id,omitempty"`
@@ -977,7 +1571,7 @@ type UpdateStaffRequest struct {
 
 func (x *UpdateStaffRequest) Reset() {
 	*x = UpdateStaffRequest{}
-	mi := &file_avtoms_auth_v1_auth_proto_msgTypes[12]
+	mi := &file_avtoms_auth_v1_auth_proto_msgTypes[21]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -989,7 +1583,7 @@ func (x *UpdateStaffRequest) String() string {
 func (*UpdateStaffRequest) ProtoMessage() {}
 
 func (x *UpdateStaffRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_auth_v1_auth_proto_msgTypes[12]
+	mi := &file_avtoms_auth_v1_auth_proto_msgTypes[21]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1002,7 +1596,7 @@ func (x *UpdateStaffRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateStaffRequest.ProtoReflect.Descriptor instead.
 func (*UpdateStaffRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_auth_v1_auth_proto_rawDescGZIP(), []int{12}
+	return file_avtoms_auth_v1_auth_proto_rawDescGZIP(), []int{21}
 }
 
 func (x *UpdateStaffRequest) GetStaffId() string {
@@ -1042,7 +1636,7 @@ type GetMeRequest struct {
 
 func (x *GetMeRequest) Reset() {
 	*x = GetMeRequest{}
-	mi := &file_avtoms_auth_v1_auth_proto_msgTypes[13]
+	mi := &file_avtoms_auth_v1_auth_proto_msgTypes[22]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1054,7 +1648,7 @@ func (x *GetMeRequest) String() string {
 func (*GetMeRequest) ProtoMessage() {}
 
 func (x *GetMeRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_auth_v1_auth_proto_msgTypes[13]
+	mi := &file_avtoms_auth_v1_auth_proto_msgTypes[22]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1067,7 +1661,7 @@ func (x *GetMeRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetMeRequest.ProtoReflect.Descriptor instead.
 func (*GetMeRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_auth_v1_auth_proto_rawDescGZIP(), []int{13}
+	return file_avtoms_auth_v1_auth_proto_rawDescGZIP(), []int{22}
 }
 
 func (x *GetMeRequest) GetStaffId() string {
@@ -1087,7 +1681,7 @@ type SetStaffPermissionsRequest struct {
 
 func (x *SetStaffPermissionsRequest) Reset() {
 	*x = SetStaffPermissionsRequest{}
-	mi := &file_avtoms_auth_v1_auth_proto_msgTypes[14]
+	mi := &file_avtoms_auth_v1_auth_proto_msgTypes[23]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1099,7 +1693,7 @@ func (x *SetStaffPermissionsRequest) String() string {
 func (*SetStaffPermissionsRequest) ProtoMessage() {}
 
 func (x *SetStaffPermissionsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_auth_v1_auth_proto_msgTypes[14]
+	mi := &file_avtoms_auth_v1_auth_proto_msgTypes[23]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1112,7 +1706,7 @@ func (x *SetStaffPermissionsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SetStaffPermissionsRequest.ProtoReflect.Descriptor instead.
 func (*SetStaffPermissionsRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_auth_v1_auth_proto_rawDescGZIP(), []int{14}
+	return file_avtoms_auth_v1_auth_proto_rawDescGZIP(), []int{23}
 }
 
 func (x *SetStaffPermissionsRequest) GetStaffId() string {
@@ -1138,7 +1732,7 @@ type RequestOtpRequest struct {
 
 func (x *RequestOtpRequest) Reset() {
 	*x = RequestOtpRequest{}
-	mi := &file_avtoms_auth_v1_auth_proto_msgTypes[15]
+	mi := &file_avtoms_auth_v1_auth_proto_msgTypes[24]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1150,7 +1744,7 @@ func (x *RequestOtpRequest) String() string {
 func (*RequestOtpRequest) ProtoMessage() {}
 
 func (x *RequestOtpRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_auth_v1_auth_proto_msgTypes[15]
+	mi := &file_avtoms_auth_v1_auth_proto_msgTypes[24]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1163,7 +1757,7 @@ func (x *RequestOtpRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RequestOtpRequest.ProtoReflect.Descriptor instead.
 func (*RequestOtpRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_auth_v1_auth_proto_rawDescGZIP(), []int{15}
+	return file_avtoms_auth_v1_auth_proto_rawDescGZIP(), []int{24}
 }
 
 func (x *RequestOtpRequest) GetPhone() string {
@@ -1183,7 +1777,7 @@ type RequestOtpResponse struct {
 
 func (x *RequestOtpResponse) Reset() {
 	*x = RequestOtpResponse{}
-	mi := &file_avtoms_auth_v1_auth_proto_msgTypes[16]
+	mi := &file_avtoms_auth_v1_auth_proto_msgTypes[25]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1195,7 +1789,7 @@ func (x *RequestOtpResponse) String() string {
 func (*RequestOtpResponse) ProtoMessage() {}
 
 func (x *RequestOtpResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_auth_v1_auth_proto_msgTypes[16]
+	mi := &file_avtoms_auth_v1_auth_proto_msgTypes[25]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1208,7 +1802,7 @@ func (x *RequestOtpResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RequestOtpResponse.ProtoReflect.Descriptor instead.
 func (*RequestOtpResponse) Descriptor() ([]byte, []int) {
-	return file_avtoms_auth_v1_auth_proto_rawDescGZIP(), []int{16}
+	return file_avtoms_auth_v1_auth_proto_rawDescGZIP(), []int{25}
 }
 
 func (x *RequestOtpResponse) GetChallengeId() string {
@@ -1235,7 +1829,7 @@ type VerifyOtpRequest struct {
 
 func (x *VerifyOtpRequest) Reset() {
 	*x = VerifyOtpRequest{}
-	mi := &file_avtoms_auth_v1_auth_proto_msgTypes[17]
+	mi := &file_avtoms_auth_v1_auth_proto_msgTypes[26]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1247,7 +1841,7 @@ func (x *VerifyOtpRequest) String() string {
 func (*VerifyOtpRequest) ProtoMessage() {}
 
 func (x *VerifyOtpRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_auth_v1_auth_proto_msgTypes[17]
+	mi := &file_avtoms_auth_v1_auth_proto_msgTypes[26]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1260,7 +1854,7 @@ func (x *VerifyOtpRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use VerifyOtpRequest.ProtoReflect.Descriptor instead.
 func (*VerifyOtpRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_auth_v1_auth_proto_rawDescGZIP(), []int{17}
+	return file_avtoms_auth_v1_auth_proto_rawDescGZIP(), []int{26}
 }
 
 func (x *VerifyOtpRequest) GetChallengeId() string {
@@ -1287,7 +1881,7 @@ type VerifyClientOtpRequest struct {
 
 func (x *VerifyClientOtpRequest) Reset() {
 	*x = VerifyClientOtpRequest{}
-	mi := &file_avtoms_auth_v1_auth_proto_msgTypes[18]
+	mi := &file_avtoms_auth_v1_auth_proto_msgTypes[27]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1299,7 +1893,7 @@ func (x *VerifyClientOtpRequest) String() string {
 func (*VerifyClientOtpRequest) ProtoMessage() {}
 
 func (x *VerifyClientOtpRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_auth_v1_auth_proto_msgTypes[18]
+	mi := &file_avtoms_auth_v1_auth_proto_msgTypes[27]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1312,7 +1906,7 @@ func (x *VerifyClientOtpRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use VerifyClientOtpRequest.ProtoReflect.Descriptor instead.
 func (*VerifyClientOtpRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_auth_v1_auth_proto_rawDescGZIP(), []int{18}
+	return file_avtoms_auth_v1_auth_proto_rawDescGZIP(), []int{27}
 }
 
 func (x *VerifyClientOtpRequest) GetChallengeId() string {
@@ -1338,7 +1932,7 @@ type RefreshTokenRequest struct {
 
 func (x *RefreshTokenRequest) Reset() {
 	*x = RefreshTokenRequest{}
-	mi := &file_avtoms_auth_v1_auth_proto_msgTypes[19]
+	mi := &file_avtoms_auth_v1_auth_proto_msgTypes[28]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1350,7 +1944,7 @@ func (x *RefreshTokenRequest) String() string {
 func (*RefreshTokenRequest) ProtoMessage() {}
 
 func (x *RefreshTokenRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_auth_v1_auth_proto_msgTypes[19]
+	mi := &file_avtoms_auth_v1_auth_proto_msgTypes[28]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1363,7 +1957,7 @@ func (x *RefreshTokenRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RefreshTokenRequest.ProtoReflect.Descriptor instead.
 func (*RefreshTokenRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_auth_v1_auth_proto_rawDescGZIP(), []int{19}
+	return file_avtoms_auth_v1_auth_proto_rawDescGZIP(), []int{28}
 }
 
 func (x *RefreshTokenRequest) GetRefreshToken() string {
@@ -1385,7 +1979,7 @@ type TokenPair struct {
 
 func (x *TokenPair) Reset() {
 	*x = TokenPair{}
-	mi := &file_avtoms_auth_v1_auth_proto_msgTypes[20]
+	mi := &file_avtoms_auth_v1_auth_proto_msgTypes[29]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1397,7 +1991,7 @@ func (x *TokenPair) String() string {
 func (*TokenPair) ProtoMessage() {}
 
 func (x *TokenPair) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_auth_v1_auth_proto_msgTypes[20]
+	mi := &file_avtoms_auth_v1_auth_proto_msgTypes[29]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1410,7 +2004,7 @@ func (x *TokenPair) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TokenPair.ProtoReflect.Descriptor instead.
 func (*TokenPair) Descriptor() ([]byte, []int) {
-	return file_avtoms_auth_v1_auth_proto_rawDescGZIP(), []int{20}
+	return file_avtoms_auth_v1_auth_proto_rawDescGZIP(), []int{29}
 }
 
 func (x *TokenPair) GetAccessToken() string {
@@ -1450,7 +2044,7 @@ type AuthenticateRequest struct {
 
 func (x *AuthenticateRequest) Reset() {
 	*x = AuthenticateRequest{}
-	mi := &file_avtoms_auth_v1_auth_proto_msgTypes[21]
+	mi := &file_avtoms_auth_v1_auth_proto_msgTypes[30]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1462,7 +2056,7 @@ func (x *AuthenticateRequest) String() string {
 func (*AuthenticateRequest) ProtoMessage() {}
 
 func (x *AuthenticateRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_auth_v1_auth_proto_msgTypes[21]
+	mi := &file_avtoms_auth_v1_auth_proto_msgTypes[30]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1475,7 +2069,7 @@ func (x *AuthenticateRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AuthenticateRequest.ProtoReflect.Descriptor instead.
 func (*AuthenticateRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_auth_v1_auth_proto_rawDescGZIP(), []int{21}
+	return file_avtoms_auth_v1_auth_proto_rawDescGZIP(), []int{30}
 }
 
 func (x *AuthenticateRequest) GetAccessToken() string {
@@ -1493,13 +2087,17 @@ type AuthenticateResponse struct {
 	// Live capability flag so the gateway can authorize actions (e.g. creating work orders)
 	// immediately after an owner grants them, without waiting for the token to be re-issued.
 	CanCreateOrders bool `protobuf:"varint,4,opt,name=can_create_orders,json=canCreateOrders,proto3" json:"can_create_orders,omitempty"`
-	unknownFields   protoimpl.UnknownFields
-	sizeCache       protoimpl.SizeCache
+	// Everything the caller may do, resolved from their role and grants on this request. Read
+	// live rather than carried in the token on purpose: an owner who has just taken away access
+	// to the till expects that to be true now, not in fifteen minutes when the token expires.
+	Permissions   []string `protobuf:"bytes,5,rep,name=permissions,proto3" json:"permissions,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *AuthenticateResponse) Reset() {
 	*x = AuthenticateResponse{}
-	mi := &file_avtoms_auth_v1_auth_proto_msgTypes[22]
+	mi := &file_avtoms_auth_v1_auth_proto_msgTypes[31]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1511,7 +2109,7 @@ func (x *AuthenticateResponse) String() string {
 func (*AuthenticateResponse) ProtoMessage() {}
 
 func (x *AuthenticateResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_auth_v1_auth_proto_msgTypes[22]
+	mi := &file_avtoms_auth_v1_auth_proto_msgTypes[31]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1524,7 +2122,7 @@ func (x *AuthenticateResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AuthenticateResponse.ProtoReflect.Descriptor instead.
 func (*AuthenticateResponse) Descriptor() ([]byte, []int) {
-	return file_avtoms_auth_v1_auth_proto_rawDescGZIP(), []int{22}
+	return file_avtoms_auth_v1_auth_proto_rawDescGZIP(), []int{31}
 }
 
 func (x *AuthenticateResponse) GetStaffId() string {
@@ -1555,6 +2153,13 @@ func (x *AuthenticateResponse) GetCanCreateOrders() bool {
 	return false
 }
 
+func (x *AuthenticateResponse) GetPermissions() []string {
+	if x != nil {
+		return x.Permissions
+	}
+	return nil
+}
+
 type InviteMechanicRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	ShopId        string                 `protobuf:"bytes,1,opt,name=shop_id,json=shopId,proto3" json:"shop_id,omitempty"`
@@ -1566,7 +2171,7 @@ type InviteMechanicRequest struct {
 
 func (x *InviteMechanicRequest) Reset() {
 	*x = InviteMechanicRequest{}
-	mi := &file_avtoms_auth_v1_auth_proto_msgTypes[23]
+	mi := &file_avtoms_auth_v1_auth_proto_msgTypes[32]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1578,7 +2183,7 @@ func (x *InviteMechanicRequest) String() string {
 func (*InviteMechanicRequest) ProtoMessage() {}
 
 func (x *InviteMechanicRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_auth_v1_auth_proto_msgTypes[23]
+	mi := &file_avtoms_auth_v1_auth_proto_msgTypes[32]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1591,7 +2196,7 @@ func (x *InviteMechanicRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use InviteMechanicRequest.ProtoReflect.Descriptor instead.
 func (*InviteMechanicRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_auth_v1_auth_proto_rawDescGZIP(), []int{23}
+	return file_avtoms_auth_v1_auth_proto_rawDescGZIP(), []int{32}
 }
 
 func (x *InviteMechanicRequest) GetShopId() string {
@@ -1624,7 +2229,7 @@ type DeactivateStaffRequest struct {
 
 func (x *DeactivateStaffRequest) Reset() {
 	*x = DeactivateStaffRequest{}
-	mi := &file_avtoms_auth_v1_auth_proto_msgTypes[24]
+	mi := &file_avtoms_auth_v1_auth_proto_msgTypes[33]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1636,7 +2241,7 @@ func (x *DeactivateStaffRequest) String() string {
 func (*DeactivateStaffRequest) ProtoMessage() {}
 
 func (x *DeactivateStaffRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_auth_v1_auth_proto_msgTypes[24]
+	mi := &file_avtoms_auth_v1_auth_proto_msgTypes[33]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1649,7 +2254,7 @@ func (x *DeactivateStaffRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeactivateStaffRequest.ProtoReflect.Descriptor instead.
 func (*DeactivateStaffRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_auth_v1_auth_proto_rawDescGZIP(), []int{24}
+	return file_avtoms_auth_v1_auth_proto_rawDescGZIP(), []int{33}
 }
 
 func (x *DeactivateStaffRequest) GetStaffId() string {
@@ -1668,7 +2273,7 @@ type ListStaffRequest struct {
 
 func (x *ListStaffRequest) Reset() {
 	*x = ListStaffRequest{}
-	mi := &file_avtoms_auth_v1_auth_proto_msgTypes[25]
+	mi := &file_avtoms_auth_v1_auth_proto_msgTypes[34]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1680,7 +2285,7 @@ func (x *ListStaffRequest) String() string {
 func (*ListStaffRequest) ProtoMessage() {}
 
 func (x *ListStaffRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_auth_v1_auth_proto_msgTypes[25]
+	mi := &file_avtoms_auth_v1_auth_proto_msgTypes[34]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1693,7 +2298,7 @@ func (x *ListStaffRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListStaffRequest.ProtoReflect.Descriptor instead.
 func (*ListStaffRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_auth_v1_auth_proto_rawDescGZIP(), []int{25}
+	return file_avtoms_auth_v1_auth_proto_rawDescGZIP(), []int{34}
 }
 
 func (x *ListStaffRequest) GetShopId() string {
@@ -1712,7 +2317,7 @@ type ListStaffResponse struct {
 
 func (x *ListStaffResponse) Reset() {
 	*x = ListStaffResponse{}
-	mi := &file_avtoms_auth_v1_auth_proto_msgTypes[26]
+	mi := &file_avtoms_auth_v1_auth_proto_msgTypes[35]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1724,7 +2329,7 @@ func (x *ListStaffResponse) String() string {
 func (*ListStaffResponse) ProtoMessage() {}
 
 func (x *ListStaffResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_auth_v1_auth_proto_msgTypes[26]
+	mi := &file_avtoms_auth_v1_auth_proto_msgTypes[35]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1737,7 +2342,7 @@ func (x *ListStaffResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListStaffResponse.ProtoReflect.Descriptor instead.
 func (*ListStaffResponse) Descriptor() ([]byte, []int) {
-	return file_avtoms_auth_v1_auth_proto_rawDescGZIP(), []int{26}
+	return file_avtoms_auth_v1_auth_proto_rawDescGZIP(), []int{35}
 }
 
 func (x *ListStaffResponse) GetStaff() []*Staff {
@@ -1814,7 +2419,45 @@ const file_avtoms_auth_v1_auth_proto_rawDesc = "" +
 	"\x06active\x18\x02 \x01(\bR\x06active\"Z\n" +
 	"\x13SetStaffRoleRequest\x12\x19\n" +
 	"\bstaff_id\x18\x01 \x01(\tR\astaffId\x12(\n" +
-	"\x04role\x18\x02 \x01(\x0e2\x14.avtoms.auth.v1.RoleR\x04role\"\xb9\x02\n" +
+	"\x04role\x18\x02 \x01(\x0e2\x14.avtoms.auth.v1.RoleR\x04role\"\xc1\x01\n" +
+	"\bShopRole\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x17\n" +
+	"\ashop_id\x18\x02 \x01(\tR\x06shopId\x12\x12\n" +
+	"\x04name\x18\x03 \x01(\tR\x04name\x12 \n" +
+	"\vpermissions\x18\x04 \x03(\tR\vpermissions\x12\x18\n" +
+	"\amembers\x18\x05 \x01(\x05R\amembers\x12\x1d\n" +
+	"\n" +
+	"created_at\x18\x06 \x01(\tR\tcreatedAt\x12\x1d\n" +
+	"\n" +
+	"updated_at\x18\a \x01(\tR\tupdatedAt\"+\n" +
+	"\x10ListRolesRequest\x12\x17\n" +
+	"\ashop_id\x18\x01 \x01(\tR\x06shopId\"C\n" +
+	"\x11ListRolesResponse\x12.\n" +
+	"\x05roles\x18\x01 \x03(\v2\x18.avtoms.auth.v1.ShopRoleR\x05roles\"b\n" +
+	"\x11CreateRoleRequest\x12\x17\n" +
+	"\ashop_id\x18\x01 \x01(\tR\x06shopId\x12\x12\n" +
+	"\x04name\x18\x02 \x01(\tR\x04name\x12 \n" +
+	"\vpermissions\x18\x03 \x03(\tR\vpermissions\"Y\n" +
+	"\x11UpdateRoleRequest\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
+	"\x04name\x18\x02 \x01(\tR\x04name\x12 \n" +
+	"\vpermissions\x18\x03 \x03(\tR\vpermissions\"#\n" +
+	"\x11DeleteRoleRequest\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\"$\n" +
+	"\x12DeleteRoleResponse\x12\x0e\n" +
+	"\x02ok\x18\x01 \x01(\bR\x02ok\"\xc4\x01\n" +
+	"\x12CreateStaffRequest\x12\x17\n" +
+	"\ashop_id\x18\x01 \x01(\tR\x06shopId\x12\x12\n" +
+	"\x04name\x18\x02 \x01(\tR\x04name\x12\x14\n" +
+	"\x05phone\x18\x03 \x01(\tR\x05phone\x12\x14\n" +
+	"\x05login\x18\x04 \x01(\tR\x05login\x12\x1a\n" +
+	"\bpassword\x18\x05 \x01(\tR\bpassword\x12\x17\n" +
+	"\arole_id\x18\x06 \x01(\tR\x06roleId\x12 \n" +
+	"\vpermissions\x18\a \x03(\tR\vpermissions\"m\n" +
+	"\x15SetStaffAccessRequest\x12\x19\n" +
+	"\bstaff_id\x18\x01 \x01(\tR\astaffId\x12\x17\n" +
+	"\arole_id\x18\x02 \x01(\tR\x06roleId\x12 \n" +
+	"\vpermissions\x18\x03 \x03(\tR\vpermissions\"\xc6\x03\n" +
 	"\x05Staff\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x17\n" +
 	"\ashop_id\x18\x02 \x01(\tR\x06shopId\x12\x14\n" +
@@ -1829,7 +2472,11 @@ const file_avtoms_auth_v1_auth_proto_rawDesc = "" +
 	"\x11can_create_orders\x18\t \x01(\bR\x0fcanCreateOrders\x12\x14\n" +
 	"\x05login\x18\n" +
 	" \x01(\tR\x05login\x12\x1b\n" +
-	"\tshop_name\x18\v \x01(\tR\bshopName\"x\n" +
+	"\tshop_name\x18\v \x01(\tR\bshopName\x12\x17\n" +
+	"\arole_id\x18\f \x01(\tR\x06roleId\x12\x1b\n" +
+	"\trole_name\x18\r \x01(\tR\broleName\x12 \n" +
+	"\vpermissions\x18\x0e \x03(\tR\vpermissions\x123\n" +
+	"\x15effective_permissions\x18\x0f \x03(\tR\x14effectivePermissions\"x\n" +
 	"\x12UpdateStaffRequest\x12\x19\n" +
 	"\bstaff_id\x18\x01 \x01(\tR\astaffId\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x14\n" +
@@ -1861,12 +2508,13 @@ const file_avtoms_auth_v1_auth_proto_rawDesc = "" +
 	"expires_in\x18\x03 \x01(\x03R\texpiresIn\x12+\n" +
 	"\x05staff\x18\x04 \x01(\v2\x15.avtoms.auth.v1.StaffR\x05staff\"8\n" +
 	"\x13AuthenticateRequest\x12!\n" +
-	"\faccess_token\x18\x01 \x01(\tR\vaccessToken\"\xa0\x01\n" +
+	"\faccess_token\x18\x01 \x01(\tR\vaccessToken\"\xc2\x01\n" +
 	"\x14AuthenticateResponse\x12\x19\n" +
 	"\bstaff_id\x18\x01 \x01(\tR\astaffId\x12\x17\n" +
 	"\ashop_id\x18\x02 \x01(\tR\x06shopId\x12(\n" +
 	"\x04role\x18\x03 \x01(\x0e2\x14.avtoms.auth.v1.RoleR\x04role\x12*\n" +
-	"\x11can_create_orders\x18\x04 \x01(\bR\x0fcanCreateOrders\"Z\n" +
+	"\x11can_create_orders\x18\x04 \x01(\bR\x0fcanCreateOrders\x12 \n" +
+	"\vpermissions\x18\x05 \x03(\tR\vpermissions\"Z\n" +
 	"\x15InviteMechanicRequest\x12\x17\n" +
 	"\ashop_id\x18\x01 \x01(\tR\x06shopId\x12\x14\n" +
 	"\x05phone\x18\x02 \x01(\tR\x05phone\x12\x12\n" +
@@ -1884,7 +2532,7 @@ const file_avtoms_auth_v1_auth_proto_rawDesc = "" +
 	"\rROLE_MECHANIC\x10\x02\x12\x0e\n" +
 	"\n" +
 	"ROLE_ADMIN\x10\x03\x12\x0f\n" +
-	"\vROLE_CLIENT\x10\x042\x83\f\n" +
+	"\vROLE_CLIENT\x10\x042\xda\x0f\n" +
 	"\vAuthService\x12S\n" +
 	"\n" +
 	"RequestOtp\x12!.avtoms.auth.v1.RequestOtpRequest\x1a\".avtoms.auth.v1.RequestOtpResponse\x12H\n" +
@@ -1899,7 +2547,16 @@ const file_avtoms_auth_v1_auth_proto_rawDesc = "" +
 	"\vUpdateStaff\x12\".avtoms.auth.v1.UpdateStaffRequest\x1a\x15.avtoms.auth.v1.Staff\x12P\n" +
 	"\tListStaff\x12 .avtoms.auth.v1.ListStaffRequest\x1a!.avtoms.auth.v1.ListStaffResponse\x12<\n" +
 	"\x05GetMe\x12\x1c.avtoms.auth.v1.GetMeRequest\x1a\x15.avtoms.auth.v1.Staff\x12X\n" +
-	"\x13SetStaffPermissions\x12*.avtoms.auth.v1.SetStaffPermissionsRequest\x1a\x15.avtoms.auth.v1.Staff\x12V\n" +
+	"\x13SetStaffPermissions\x12*.avtoms.auth.v1.SetStaffPermissionsRequest\x1a\x15.avtoms.auth.v1.Staff\x12P\n" +
+	"\tListRoles\x12 .avtoms.auth.v1.ListRolesRequest\x1a!.avtoms.auth.v1.ListRolesResponse\x12I\n" +
+	"\n" +
+	"CreateRole\x12!.avtoms.auth.v1.CreateRoleRequest\x1a\x18.avtoms.auth.v1.ShopRole\x12I\n" +
+	"\n" +
+	"UpdateRole\x12!.avtoms.auth.v1.UpdateRoleRequest\x1a\x18.avtoms.auth.v1.ShopRole\x12S\n" +
+	"\n" +
+	"DeleteRole\x12!.avtoms.auth.v1.DeleteRoleRequest\x1a\".avtoms.auth.v1.DeleteRoleResponse\x12H\n" +
+	"\vCreateStaff\x12\".avtoms.auth.v1.CreateStaffRequest\x1a\x15.avtoms.auth.v1.Staff\x12N\n" +
+	"\x0eSetStaffAccess\x12%.avtoms.auth.v1.SetStaffAccessRequest\x1a\x15.avtoms.auth.v1.Staff\x12V\n" +
 	"\fListAllStaff\x12#.avtoms.auth.v1.ListAllStaffRequest\x1a!.avtoms.auth.v1.ListStaffResponse\x12N\n" +
 	"\x0eSetStaffActive\x12%.avtoms.auth.v1.SetStaffActiveRequest\x1a\x15.avtoms.auth.v1.Staff\x12J\n" +
 	"\fSetStaffRole\x12#.avtoms.auth.v1.SetStaffRoleRequest\x1a\x15.avtoms.auth.v1.Staff\x12Y\n" +
@@ -1921,7 +2578,7 @@ func file_avtoms_auth_v1_auth_proto_rawDescGZIP() []byte {
 }
 
 var file_avtoms_auth_v1_auth_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_avtoms_auth_v1_auth_proto_msgTypes = make([]protoimpl.MessageInfo, 27)
+var file_avtoms_auth_v1_auth_proto_msgTypes = make([]protoimpl.MessageInfo, 36)
 var file_avtoms_auth_v1_auth_proto_goTypes = []any{
 	(Role)(0),                          // 0: avtoms.auth.v1.Role
 	(*Shop)(nil),                       // 1: avtoms.auth.v1.Shop
@@ -1935,75 +2592,97 @@ var file_avtoms_auth_v1_auth_proto_goTypes = []any{
 	(*ListAllStaffRequest)(nil),        // 9: avtoms.auth.v1.ListAllStaffRequest
 	(*SetStaffActiveRequest)(nil),      // 10: avtoms.auth.v1.SetStaffActiveRequest
 	(*SetStaffRoleRequest)(nil),        // 11: avtoms.auth.v1.SetStaffRoleRequest
-	(*Staff)(nil),                      // 12: avtoms.auth.v1.Staff
-	(*UpdateStaffRequest)(nil),         // 13: avtoms.auth.v1.UpdateStaffRequest
-	(*GetMeRequest)(nil),               // 14: avtoms.auth.v1.GetMeRequest
-	(*SetStaffPermissionsRequest)(nil), // 15: avtoms.auth.v1.SetStaffPermissionsRequest
-	(*RequestOtpRequest)(nil),          // 16: avtoms.auth.v1.RequestOtpRequest
-	(*RequestOtpResponse)(nil),         // 17: avtoms.auth.v1.RequestOtpResponse
-	(*VerifyOtpRequest)(nil),           // 18: avtoms.auth.v1.VerifyOtpRequest
-	(*VerifyClientOtpRequest)(nil),     // 19: avtoms.auth.v1.VerifyClientOtpRequest
-	(*RefreshTokenRequest)(nil),        // 20: avtoms.auth.v1.RefreshTokenRequest
-	(*TokenPair)(nil),                  // 21: avtoms.auth.v1.TokenPair
-	(*AuthenticateRequest)(nil),        // 22: avtoms.auth.v1.AuthenticateRequest
-	(*AuthenticateResponse)(nil),       // 23: avtoms.auth.v1.AuthenticateResponse
-	(*InviteMechanicRequest)(nil),      // 24: avtoms.auth.v1.InviteMechanicRequest
-	(*DeactivateStaffRequest)(nil),     // 25: avtoms.auth.v1.DeactivateStaffRequest
-	(*ListStaffRequest)(nil),           // 26: avtoms.auth.v1.ListStaffRequest
-	(*ListStaffResponse)(nil),          // 27: avtoms.auth.v1.ListStaffResponse
+	(*ShopRole)(nil),                   // 12: avtoms.auth.v1.ShopRole
+	(*ListRolesRequest)(nil),           // 13: avtoms.auth.v1.ListRolesRequest
+	(*ListRolesResponse)(nil),          // 14: avtoms.auth.v1.ListRolesResponse
+	(*CreateRoleRequest)(nil),          // 15: avtoms.auth.v1.CreateRoleRequest
+	(*UpdateRoleRequest)(nil),          // 16: avtoms.auth.v1.UpdateRoleRequest
+	(*DeleteRoleRequest)(nil),          // 17: avtoms.auth.v1.DeleteRoleRequest
+	(*DeleteRoleResponse)(nil),         // 18: avtoms.auth.v1.DeleteRoleResponse
+	(*CreateStaffRequest)(nil),         // 19: avtoms.auth.v1.CreateStaffRequest
+	(*SetStaffAccessRequest)(nil),      // 20: avtoms.auth.v1.SetStaffAccessRequest
+	(*Staff)(nil),                      // 21: avtoms.auth.v1.Staff
+	(*UpdateStaffRequest)(nil),         // 22: avtoms.auth.v1.UpdateStaffRequest
+	(*GetMeRequest)(nil),               // 23: avtoms.auth.v1.GetMeRequest
+	(*SetStaffPermissionsRequest)(nil), // 24: avtoms.auth.v1.SetStaffPermissionsRequest
+	(*RequestOtpRequest)(nil),          // 25: avtoms.auth.v1.RequestOtpRequest
+	(*RequestOtpResponse)(nil),         // 26: avtoms.auth.v1.RequestOtpResponse
+	(*VerifyOtpRequest)(nil),           // 27: avtoms.auth.v1.VerifyOtpRequest
+	(*VerifyClientOtpRequest)(nil),     // 28: avtoms.auth.v1.VerifyClientOtpRequest
+	(*RefreshTokenRequest)(nil),        // 29: avtoms.auth.v1.RefreshTokenRequest
+	(*TokenPair)(nil),                  // 30: avtoms.auth.v1.TokenPair
+	(*AuthenticateRequest)(nil),        // 31: avtoms.auth.v1.AuthenticateRequest
+	(*AuthenticateResponse)(nil),       // 32: avtoms.auth.v1.AuthenticateResponse
+	(*InviteMechanicRequest)(nil),      // 33: avtoms.auth.v1.InviteMechanicRequest
+	(*DeactivateStaffRequest)(nil),     // 34: avtoms.auth.v1.DeactivateStaffRequest
+	(*ListStaffRequest)(nil),           // 35: avtoms.auth.v1.ListStaffRequest
+	(*ListStaffResponse)(nil),          // 36: avtoms.auth.v1.ListStaffResponse
 }
 var file_avtoms_auth_v1_auth_proto_depIdxs = []int32{
 	1,  // 0: avtoms.auth.v1.RegisterShopResponse.shop:type_name -> avtoms.auth.v1.Shop
-	12, // 1: avtoms.auth.v1.RegisterShopResponse.owner:type_name -> avtoms.auth.v1.Staff
+	21, // 1: avtoms.auth.v1.RegisterShopResponse.owner:type_name -> avtoms.auth.v1.Staff
 	1,  // 2: avtoms.auth.v1.ListShopsResponse.shops:type_name -> avtoms.auth.v1.Shop
 	0,  // 3: avtoms.auth.v1.SetStaffRoleRequest.role:type_name -> avtoms.auth.v1.Role
-	0,  // 4: avtoms.auth.v1.Staff.role:type_name -> avtoms.auth.v1.Role
-	12, // 5: avtoms.auth.v1.TokenPair.staff:type_name -> avtoms.auth.v1.Staff
-	0,  // 6: avtoms.auth.v1.AuthenticateResponse.role:type_name -> avtoms.auth.v1.Role
-	12, // 7: avtoms.auth.v1.ListStaffResponse.staff:type_name -> avtoms.auth.v1.Staff
-	16, // 8: avtoms.auth.v1.AuthService.RequestOtp:input_type -> avtoms.auth.v1.RequestOtpRequest
-	18, // 9: avtoms.auth.v1.AuthService.VerifyOtp:input_type -> avtoms.auth.v1.VerifyOtpRequest
-	20, // 10: avtoms.auth.v1.AuthService.RefreshToken:input_type -> avtoms.auth.v1.RefreshTokenRequest
-	7,  // 11: avtoms.auth.v1.AuthService.SignIn:input_type -> avtoms.auth.v1.SignInRequest
-	8,  // 12: avtoms.auth.v1.AuthService.SetStaffPassword:input_type -> avtoms.auth.v1.SetStaffPasswordRequest
-	19, // 13: avtoms.auth.v1.AuthService.VerifyClientOtp:input_type -> avtoms.auth.v1.VerifyClientOtpRequest
-	22, // 14: avtoms.auth.v1.AuthService.Authenticate:input_type -> avtoms.auth.v1.AuthenticateRequest
-	24, // 15: avtoms.auth.v1.AuthService.InviteMechanic:input_type -> avtoms.auth.v1.InviteMechanicRequest
-	25, // 16: avtoms.auth.v1.AuthService.DeactivateStaff:input_type -> avtoms.auth.v1.DeactivateStaffRequest
-	13, // 17: avtoms.auth.v1.AuthService.UpdateStaff:input_type -> avtoms.auth.v1.UpdateStaffRequest
-	26, // 18: avtoms.auth.v1.AuthService.ListStaff:input_type -> avtoms.auth.v1.ListStaffRequest
-	14, // 19: avtoms.auth.v1.AuthService.GetMe:input_type -> avtoms.auth.v1.GetMeRequest
-	15, // 20: avtoms.auth.v1.AuthService.SetStaffPermissions:input_type -> avtoms.auth.v1.SetStaffPermissionsRequest
-	9,  // 21: avtoms.auth.v1.AuthService.ListAllStaff:input_type -> avtoms.auth.v1.ListAllStaffRequest
-	10, // 22: avtoms.auth.v1.AuthService.SetStaffActive:input_type -> avtoms.auth.v1.SetStaffActiveRequest
-	11, // 23: avtoms.auth.v1.AuthService.SetStaffRole:input_type -> avtoms.auth.v1.SetStaffRoleRequest
-	2,  // 24: avtoms.auth.v1.AuthService.RegisterShop:input_type -> avtoms.auth.v1.RegisterShopRequest
-	4,  // 25: avtoms.auth.v1.AuthService.ListShops:input_type -> avtoms.auth.v1.ListShopsRequest
-	6,  // 26: avtoms.auth.v1.AuthService.UpdateShop:input_type -> avtoms.auth.v1.UpdateShopRequest
-	17, // 27: avtoms.auth.v1.AuthService.RequestOtp:output_type -> avtoms.auth.v1.RequestOtpResponse
-	21, // 28: avtoms.auth.v1.AuthService.VerifyOtp:output_type -> avtoms.auth.v1.TokenPair
-	21, // 29: avtoms.auth.v1.AuthService.RefreshToken:output_type -> avtoms.auth.v1.TokenPair
-	21, // 30: avtoms.auth.v1.AuthService.SignIn:output_type -> avtoms.auth.v1.TokenPair
-	12, // 31: avtoms.auth.v1.AuthService.SetStaffPassword:output_type -> avtoms.auth.v1.Staff
-	21, // 32: avtoms.auth.v1.AuthService.VerifyClientOtp:output_type -> avtoms.auth.v1.TokenPair
-	23, // 33: avtoms.auth.v1.AuthService.Authenticate:output_type -> avtoms.auth.v1.AuthenticateResponse
-	12, // 34: avtoms.auth.v1.AuthService.InviteMechanic:output_type -> avtoms.auth.v1.Staff
-	12, // 35: avtoms.auth.v1.AuthService.DeactivateStaff:output_type -> avtoms.auth.v1.Staff
-	12, // 36: avtoms.auth.v1.AuthService.UpdateStaff:output_type -> avtoms.auth.v1.Staff
-	27, // 37: avtoms.auth.v1.AuthService.ListStaff:output_type -> avtoms.auth.v1.ListStaffResponse
-	12, // 38: avtoms.auth.v1.AuthService.GetMe:output_type -> avtoms.auth.v1.Staff
-	12, // 39: avtoms.auth.v1.AuthService.SetStaffPermissions:output_type -> avtoms.auth.v1.Staff
-	27, // 40: avtoms.auth.v1.AuthService.ListAllStaff:output_type -> avtoms.auth.v1.ListStaffResponse
-	12, // 41: avtoms.auth.v1.AuthService.SetStaffActive:output_type -> avtoms.auth.v1.Staff
-	12, // 42: avtoms.auth.v1.AuthService.SetStaffRole:output_type -> avtoms.auth.v1.Staff
-	3,  // 43: avtoms.auth.v1.AuthService.RegisterShop:output_type -> avtoms.auth.v1.RegisterShopResponse
-	5,  // 44: avtoms.auth.v1.AuthService.ListShops:output_type -> avtoms.auth.v1.ListShopsResponse
-	1,  // 45: avtoms.auth.v1.AuthService.UpdateShop:output_type -> avtoms.auth.v1.Shop
-	27, // [27:46] is the sub-list for method output_type
-	8,  // [8:27] is the sub-list for method input_type
-	8,  // [8:8] is the sub-list for extension type_name
-	8,  // [8:8] is the sub-list for extension extendee
-	0,  // [0:8] is the sub-list for field type_name
+	12, // 4: avtoms.auth.v1.ListRolesResponse.roles:type_name -> avtoms.auth.v1.ShopRole
+	0,  // 5: avtoms.auth.v1.Staff.role:type_name -> avtoms.auth.v1.Role
+	21, // 6: avtoms.auth.v1.TokenPair.staff:type_name -> avtoms.auth.v1.Staff
+	0,  // 7: avtoms.auth.v1.AuthenticateResponse.role:type_name -> avtoms.auth.v1.Role
+	21, // 8: avtoms.auth.v1.ListStaffResponse.staff:type_name -> avtoms.auth.v1.Staff
+	25, // 9: avtoms.auth.v1.AuthService.RequestOtp:input_type -> avtoms.auth.v1.RequestOtpRequest
+	27, // 10: avtoms.auth.v1.AuthService.VerifyOtp:input_type -> avtoms.auth.v1.VerifyOtpRequest
+	29, // 11: avtoms.auth.v1.AuthService.RefreshToken:input_type -> avtoms.auth.v1.RefreshTokenRequest
+	7,  // 12: avtoms.auth.v1.AuthService.SignIn:input_type -> avtoms.auth.v1.SignInRequest
+	8,  // 13: avtoms.auth.v1.AuthService.SetStaffPassword:input_type -> avtoms.auth.v1.SetStaffPasswordRequest
+	28, // 14: avtoms.auth.v1.AuthService.VerifyClientOtp:input_type -> avtoms.auth.v1.VerifyClientOtpRequest
+	31, // 15: avtoms.auth.v1.AuthService.Authenticate:input_type -> avtoms.auth.v1.AuthenticateRequest
+	33, // 16: avtoms.auth.v1.AuthService.InviteMechanic:input_type -> avtoms.auth.v1.InviteMechanicRequest
+	34, // 17: avtoms.auth.v1.AuthService.DeactivateStaff:input_type -> avtoms.auth.v1.DeactivateStaffRequest
+	22, // 18: avtoms.auth.v1.AuthService.UpdateStaff:input_type -> avtoms.auth.v1.UpdateStaffRequest
+	35, // 19: avtoms.auth.v1.AuthService.ListStaff:input_type -> avtoms.auth.v1.ListStaffRequest
+	23, // 20: avtoms.auth.v1.AuthService.GetMe:input_type -> avtoms.auth.v1.GetMeRequest
+	24, // 21: avtoms.auth.v1.AuthService.SetStaffPermissions:input_type -> avtoms.auth.v1.SetStaffPermissionsRequest
+	13, // 22: avtoms.auth.v1.AuthService.ListRoles:input_type -> avtoms.auth.v1.ListRolesRequest
+	15, // 23: avtoms.auth.v1.AuthService.CreateRole:input_type -> avtoms.auth.v1.CreateRoleRequest
+	16, // 24: avtoms.auth.v1.AuthService.UpdateRole:input_type -> avtoms.auth.v1.UpdateRoleRequest
+	17, // 25: avtoms.auth.v1.AuthService.DeleteRole:input_type -> avtoms.auth.v1.DeleteRoleRequest
+	19, // 26: avtoms.auth.v1.AuthService.CreateStaff:input_type -> avtoms.auth.v1.CreateStaffRequest
+	20, // 27: avtoms.auth.v1.AuthService.SetStaffAccess:input_type -> avtoms.auth.v1.SetStaffAccessRequest
+	9,  // 28: avtoms.auth.v1.AuthService.ListAllStaff:input_type -> avtoms.auth.v1.ListAllStaffRequest
+	10, // 29: avtoms.auth.v1.AuthService.SetStaffActive:input_type -> avtoms.auth.v1.SetStaffActiveRequest
+	11, // 30: avtoms.auth.v1.AuthService.SetStaffRole:input_type -> avtoms.auth.v1.SetStaffRoleRequest
+	2,  // 31: avtoms.auth.v1.AuthService.RegisterShop:input_type -> avtoms.auth.v1.RegisterShopRequest
+	4,  // 32: avtoms.auth.v1.AuthService.ListShops:input_type -> avtoms.auth.v1.ListShopsRequest
+	6,  // 33: avtoms.auth.v1.AuthService.UpdateShop:input_type -> avtoms.auth.v1.UpdateShopRequest
+	26, // 34: avtoms.auth.v1.AuthService.RequestOtp:output_type -> avtoms.auth.v1.RequestOtpResponse
+	30, // 35: avtoms.auth.v1.AuthService.VerifyOtp:output_type -> avtoms.auth.v1.TokenPair
+	30, // 36: avtoms.auth.v1.AuthService.RefreshToken:output_type -> avtoms.auth.v1.TokenPair
+	30, // 37: avtoms.auth.v1.AuthService.SignIn:output_type -> avtoms.auth.v1.TokenPair
+	21, // 38: avtoms.auth.v1.AuthService.SetStaffPassword:output_type -> avtoms.auth.v1.Staff
+	30, // 39: avtoms.auth.v1.AuthService.VerifyClientOtp:output_type -> avtoms.auth.v1.TokenPair
+	32, // 40: avtoms.auth.v1.AuthService.Authenticate:output_type -> avtoms.auth.v1.AuthenticateResponse
+	21, // 41: avtoms.auth.v1.AuthService.InviteMechanic:output_type -> avtoms.auth.v1.Staff
+	21, // 42: avtoms.auth.v1.AuthService.DeactivateStaff:output_type -> avtoms.auth.v1.Staff
+	21, // 43: avtoms.auth.v1.AuthService.UpdateStaff:output_type -> avtoms.auth.v1.Staff
+	36, // 44: avtoms.auth.v1.AuthService.ListStaff:output_type -> avtoms.auth.v1.ListStaffResponse
+	21, // 45: avtoms.auth.v1.AuthService.GetMe:output_type -> avtoms.auth.v1.Staff
+	21, // 46: avtoms.auth.v1.AuthService.SetStaffPermissions:output_type -> avtoms.auth.v1.Staff
+	14, // 47: avtoms.auth.v1.AuthService.ListRoles:output_type -> avtoms.auth.v1.ListRolesResponse
+	12, // 48: avtoms.auth.v1.AuthService.CreateRole:output_type -> avtoms.auth.v1.ShopRole
+	12, // 49: avtoms.auth.v1.AuthService.UpdateRole:output_type -> avtoms.auth.v1.ShopRole
+	18, // 50: avtoms.auth.v1.AuthService.DeleteRole:output_type -> avtoms.auth.v1.DeleteRoleResponse
+	21, // 51: avtoms.auth.v1.AuthService.CreateStaff:output_type -> avtoms.auth.v1.Staff
+	21, // 52: avtoms.auth.v1.AuthService.SetStaffAccess:output_type -> avtoms.auth.v1.Staff
+	36, // 53: avtoms.auth.v1.AuthService.ListAllStaff:output_type -> avtoms.auth.v1.ListStaffResponse
+	21, // 54: avtoms.auth.v1.AuthService.SetStaffActive:output_type -> avtoms.auth.v1.Staff
+	21, // 55: avtoms.auth.v1.AuthService.SetStaffRole:output_type -> avtoms.auth.v1.Staff
+	3,  // 56: avtoms.auth.v1.AuthService.RegisterShop:output_type -> avtoms.auth.v1.RegisterShopResponse
+	5,  // 57: avtoms.auth.v1.AuthService.ListShops:output_type -> avtoms.auth.v1.ListShopsResponse
+	1,  // 58: avtoms.auth.v1.AuthService.UpdateShop:output_type -> avtoms.auth.v1.Shop
+	34, // [34:59] is the sub-list for method output_type
+	9,  // [9:34] is the sub-list for method input_type
+	9,  // [9:9] is the sub-list for extension type_name
+	9,  // [9:9] is the sub-list for extension extendee
+	0,  // [0:9] is the sub-list for field type_name
 }
 
 func init() { file_avtoms_auth_v1_auth_proto_init() }
@@ -2017,7 +2696,7 @@ func file_avtoms_auth_v1_auth_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_avtoms_auth_v1_auth_proto_rawDesc), len(file_avtoms_auth_v1_auth_proto_rawDesc)),
 			NumEnums:      1,
-			NumMessages:   27,
+			NumMessages:   36,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

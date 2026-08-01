@@ -40,6 +40,28 @@ service AuthService {
   // (e.g. creating work orders). Owner-scoped at the gateway.
   rpc SetStaffPermissions(SetStaffPermissionsRequest) returns (Staff);
 
+  // ── Shop-defined roles and worker accounts ──
+  //
+  // A shop's staff are not two kinds of person. Between the owner, who can do everything, and
+  // the mechanic, who could reach almost everything because nothing stopped them, sit the jobs
+  // a service actually has: a cashier who takes money but must not see the month's profit, a
+  // storekeeper who receives parts but does not price them, a foreman who assigns work.
+  //
+  // A role is a named bundle of permission keys, owned by one shop and composed by its owner —
+  // there is no fixed list of roles, because no two services divide the work the same way.
+  rpc ListRoles(ListRolesRequest) returns (ListRolesResponse);
+  rpc CreateRole(CreateRoleRequest) returns (ShopRole);
+  rpc UpdateRole(UpdateRoleRequest) returns (ShopRole);
+  rpc DeleteRole(DeleteRoleRequest) returns (DeleteRoleResponse);
+
+  // CreateStaff adds a worker with a login and password, rather than waiting for them to be
+  // discovered by their phone number. A shop hires someone on Monday and wants them working on
+  // Monday; InviteMechanic's SMS round-trip cannot promise that, and it cannot give the person
+  // a role at the moment they are created either.
+  rpc CreateStaff(CreateStaffRequest) returns (Staff);
+  // SetStaffAccess assigns a role and any grants held on top of it. Owner-scoped at the gateway.
+  rpc SetStaffAccess(SetStaffAccessRequest) returns (Staff);
+
   // Super-admin user management (admin-only, across all shops).
   rpc ListAllStaff(ListAllStaffRequest) returns (ListStaffResponse);
   rpc SetStaffActive(SetStaffActiveRequest) returns (Staff);
@@ -144,6 +166,95 @@ message SetStaffRoleRequest {
   Role role = 2;
 }
 
+// ── Permissions ──
+//
+// A permission is a plain string key. The authoritative catalogue is this list; the auth
+// service rejects any key not on it, so a typo cannot be granted and then silently never
+// checked. Keys are `area.verb` and deliberately coarse — one per thing a person is or is not
+// trusted with, not one per endpoint, because an owner ticking boxes is describing a job.
+//
+//   orders.view        see the work-order board and any order on it
+//   orders.create      open a new work order
+//   orders.edit        change an order: line items, notes, odometer, status, timers
+//   orders.assign      put an order, or a line on it, on a particular mechanic
+//   sales.manage       sell over the counter and void a sale
+//   warehouse.view     see products, stock levels and movements
+//   warehouse.manage   create and price products, adjust stock
+//   customers.manage   create and edit customers and their vehicles
+//   catalog.manage     the service menu and its prices
+//   finance.view       money as a total: dashboard figures, statistics, reports, profit & loss
+//   finance.manage     money as a transaction: expenses, invoices, payments, debts, ledgers
+//   staff.manage       add workers, set their passwords, build roles and assign them
+//   settings.manage    the shop's own settings
+//   ai.use             the assistant, which can read across everything above
+//
+// Owners and super-admins are not granted these; they hold all of them by virtue of being the
+// owner. A permission system that can lock an owner out of their own shop is a support ticket
+// waiting to happen, and there would be nobody left who could fix it.
+//
+// The labels a person reads are not here. They belong to the clients, which already translate
+// into three languages; a key travelling with its own English name would be a fourth wording
+// nobody maintains.
+
+// ShopRole is a named bundle of permissions belonging to one shop.
+message ShopRole {
+  string id = 1;
+  string shop_id = 2;
+  string name = 3;
+  repeated string permissions = 4;
+  // How many staff currently hold this role. Read-only, and the reason deleting one is worth
+  // thinking about: the people holding it do not stop existing, they stop being able to work.
+  int32 members = 5;
+  string created_at = 6;
+  string updated_at = 7;
+}
+
+message ListRolesRequest {
+  string shop_id = 1;
+}
+message ListRolesResponse {
+  repeated ShopRole roles = 1;
+}
+message CreateRoleRequest {
+  string shop_id = 1;
+  string name = 2;
+  repeated string permissions = 3;
+}
+message UpdateRoleRequest {
+  string id = 1;
+  string name = 2;
+  // Replaces the role's permissions wholesale. A role is edited by ticking boxes and saving
+  // the result, so the message that arrives is the whole answer, not a change to apply.
+  repeated string permissions = 3;
+}
+message DeleteRoleRequest {
+  string id = 1;
+}
+message DeleteRoleResponse {
+  bool ok = 1;
+}
+
+message CreateStaffRequest {
+  string shop_id = 1;
+  string name = 2;
+  string phone = 3;
+  string login = 4;
+  string password = 5;
+  // The role this person starts with. Optional: a worker with no role and no grants can sign
+  // in and see nothing, which is a safe place to start and an obvious one to fix.
+  string role_id = 6;
+  // Grants held on top of the role — the one-off "and they also do the ordering" that does not
+  // deserve a role of its own.
+  repeated string permissions = 7;
+}
+
+message SetStaffAccessRequest {
+  string staff_id = 1;
+  // Empty removes the role, leaving only the direct grants below.
+  string role_id = 2;
+  repeated string permissions = 3;
+}
+
 enum Role {
   ROLE_UNSPECIFIED = 0;
   ROLE_OWNER = 1;
@@ -161,7 +272,10 @@ message Staff {
   bool active = 6;
   string created_at = 7;
   string avatar_url = 8; // profile photo URL (object storage), may be empty
-  // Extra capability granted by the owner: a mechanic with this set may create work orders.
+  // Whether this person may create work orders. Superseded by the permission catalogue and
+  // now derived from it — true exactly when effective_permissions contains "orders.create".
+  // Kept because the mechanic app reads it, and a field that still answers the same question
+  // correctly is not worth a coordinated client release to remove.
   bool can_create_orders = 9;
   // The name this person signs in with. Empty for an account that predates passwords and
   // still arrives by phone. The password itself is never carried on this message.
@@ -169,6 +283,19 @@ message Staff {
   // The shop's registered name, filled by services that have the registry to hand. Saves
   // every caller joining staff to shops just to show who somebody works for.
   string shop_name = 11;
+  // The role this person holds, if any, and its name so a caller listing staff need not also
+  // fetch the roles to render the column.
+  string role_id = 12;
+  string role_name = 13;
+  // Grants held directly, on top of whatever the role carries. Separate from the effective
+  // set below because an editor has to show what was ticked for this person specifically —
+  // merging the two would make revoking a role's permission look possible on the staff form
+  // when it is not.
+  repeated string permissions = 14;
+  // Everything this person can actually do: the role's permissions, their own grants, and for
+  // an owner or super-admin the whole catalogue. This is the field to check; the two above
+  // describe how it was arrived at.
+  repeated string effective_permissions = 15;
 }
 
 message UpdateStaffRequest {
@@ -226,6 +353,10 @@ message AuthenticateResponse {
   // Live capability flag so the gateway can authorize actions (e.g. creating work orders)
   // immediately after an owner grants them, without waiting for the token to be re-issued.
   bool can_create_orders = 4;
+  // Everything the caller may do, resolved from their role and grants on this request. Read
+  // live rather than carried in the token on purpose: an owner who has just taken away access
+  // to the till expects that to be true now, not in fifteen minutes when the token expires.
+  repeated string permissions = 5;
 }
 
 message InviteMechanicRequest {

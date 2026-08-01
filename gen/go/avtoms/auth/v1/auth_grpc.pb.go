@@ -32,6 +32,12 @@ const (
 	AuthService_ListStaff_FullMethodName           = "/avtoms.auth.v1.AuthService/ListStaff"
 	AuthService_GetMe_FullMethodName               = "/avtoms.auth.v1.AuthService/GetMe"
 	AuthService_SetStaffPermissions_FullMethodName = "/avtoms.auth.v1.AuthService/SetStaffPermissions"
+	AuthService_ListRoles_FullMethodName           = "/avtoms.auth.v1.AuthService/ListRoles"
+	AuthService_CreateRole_FullMethodName          = "/avtoms.auth.v1.AuthService/CreateRole"
+	AuthService_UpdateRole_FullMethodName          = "/avtoms.auth.v1.AuthService/UpdateRole"
+	AuthService_DeleteRole_FullMethodName          = "/avtoms.auth.v1.AuthService/DeleteRole"
+	AuthService_CreateStaff_FullMethodName         = "/avtoms.auth.v1.AuthService/CreateStaff"
+	AuthService_SetStaffAccess_FullMethodName      = "/avtoms.auth.v1.AuthService/SetStaffAccess"
 	AuthService_ListAllStaff_FullMethodName        = "/avtoms.auth.v1.AuthService/ListAllStaff"
 	AuthService_SetStaffActive_FullMethodName      = "/avtoms.auth.v1.AuthService/SetStaffActive"
 	AuthService_SetStaffRole_FullMethodName        = "/avtoms.auth.v1.AuthService/SetStaffRole"
@@ -74,6 +80,26 @@ type AuthServiceClient interface {
 	// SetStaffPermissions lets an owner grant/revoke a worker's extra capabilities
 	// (e.g. creating work orders). Owner-scoped at the gateway.
 	SetStaffPermissions(ctx context.Context, in *SetStaffPermissionsRequest, opts ...grpc.CallOption) (*Staff, error)
+	// ── Shop-defined roles and worker accounts ──
+	//
+	// A shop's staff are not two kinds of person. Between the owner, who can do everything, and
+	// the mechanic, who could reach almost everything because nothing stopped them, sit the jobs
+	// a service actually has: a cashier who takes money but must not see the month's profit, a
+	// storekeeper who receives parts but does not price them, a foreman who assigns work.
+	//
+	// A role is a named bundle of permission keys, owned by one shop and composed by its owner —
+	// there is no fixed list of roles, because no two services divide the work the same way.
+	ListRoles(ctx context.Context, in *ListRolesRequest, opts ...grpc.CallOption) (*ListRolesResponse, error)
+	CreateRole(ctx context.Context, in *CreateRoleRequest, opts ...grpc.CallOption) (*ShopRole, error)
+	UpdateRole(ctx context.Context, in *UpdateRoleRequest, opts ...grpc.CallOption) (*ShopRole, error)
+	DeleteRole(ctx context.Context, in *DeleteRoleRequest, opts ...grpc.CallOption) (*DeleteRoleResponse, error)
+	// CreateStaff adds a worker with a login and password, rather than waiting for them to be
+	// discovered by their phone number. A shop hires someone on Monday and wants them working on
+	// Monday; InviteMechanic's SMS round-trip cannot promise that, and it cannot give the person
+	// a role at the moment they are created either.
+	CreateStaff(ctx context.Context, in *CreateStaffRequest, opts ...grpc.CallOption) (*Staff, error)
+	// SetStaffAccess assigns a role and any grants held on top of it. Owner-scoped at the gateway.
+	SetStaffAccess(ctx context.Context, in *SetStaffAccessRequest, opts ...grpc.CallOption) (*Staff, error)
 	// Super-admin user management (admin-only, across all shops).
 	ListAllStaff(ctx context.Context, in *ListAllStaffRequest, opts ...grpc.CallOption) (*ListStaffResponse, error)
 	SetStaffActive(ctx context.Context, in *SetStaffActiveRequest, opts ...grpc.CallOption) (*Staff, error)
@@ -224,6 +250,66 @@ func (c *authServiceClient) SetStaffPermissions(ctx context.Context, in *SetStaf
 	return out, nil
 }
 
+func (c *authServiceClient) ListRoles(ctx context.Context, in *ListRolesRequest, opts ...grpc.CallOption) (*ListRolesResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListRolesResponse)
+	err := c.cc.Invoke(ctx, AuthService_ListRoles_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *authServiceClient) CreateRole(ctx context.Context, in *CreateRoleRequest, opts ...grpc.CallOption) (*ShopRole, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ShopRole)
+	err := c.cc.Invoke(ctx, AuthService_CreateRole_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *authServiceClient) UpdateRole(ctx context.Context, in *UpdateRoleRequest, opts ...grpc.CallOption) (*ShopRole, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ShopRole)
+	err := c.cc.Invoke(ctx, AuthService_UpdateRole_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *authServiceClient) DeleteRole(ctx context.Context, in *DeleteRoleRequest, opts ...grpc.CallOption) (*DeleteRoleResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(DeleteRoleResponse)
+	err := c.cc.Invoke(ctx, AuthService_DeleteRole_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *authServiceClient) CreateStaff(ctx context.Context, in *CreateStaffRequest, opts ...grpc.CallOption) (*Staff, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Staff)
+	err := c.cc.Invoke(ctx, AuthService_CreateStaff_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *authServiceClient) SetStaffAccess(ctx context.Context, in *SetStaffAccessRequest, opts ...grpc.CallOption) (*Staff, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Staff)
+	err := c.cc.Invoke(ctx, AuthService_SetStaffAccess_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *authServiceClient) ListAllStaff(ctx context.Context, in *ListAllStaffRequest, opts ...grpc.CallOption) (*ListStaffResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(ListStaffResponse)
@@ -318,6 +404,26 @@ type AuthServiceServer interface {
 	// SetStaffPermissions lets an owner grant/revoke a worker's extra capabilities
 	// (e.g. creating work orders). Owner-scoped at the gateway.
 	SetStaffPermissions(context.Context, *SetStaffPermissionsRequest) (*Staff, error)
+	// ── Shop-defined roles and worker accounts ──
+	//
+	// A shop's staff are not two kinds of person. Between the owner, who can do everything, and
+	// the mechanic, who could reach almost everything because nothing stopped them, sit the jobs
+	// a service actually has: a cashier who takes money but must not see the month's profit, a
+	// storekeeper who receives parts but does not price them, a foreman who assigns work.
+	//
+	// A role is a named bundle of permission keys, owned by one shop and composed by its owner —
+	// there is no fixed list of roles, because no two services divide the work the same way.
+	ListRoles(context.Context, *ListRolesRequest) (*ListRolesResponse, error)
+	CreateRole(context.Context, *CreateRoleRequest) (*ShopRole, error)
+	UpdateRole(context.Context, *UpdateRoleRequest) (*ShopRole, error)
+	DeleteRole(context.Context, *DeleteRoleRequest) (*DeleteRoleResponse, error)
+	// CreateStaff adds a worker with a login and password, rather than waiting for them to be
+	// discovered by their phone number. A shop hires someone on Monday and wants them working on
+	// Monday; InviteMechanic's SMS round-trip cannot promise that, and it cannot give the person
+	// a role at the moment they are created either.
+	CreateStaff(context.Context, *CreateStaffRequest) (*Staff, error)
+	// SetStaffAccess assigns a role and any grants held on top of it. Owner-scoped at the gateway.
+	SetStaffAccess(context.Context, *SetStaffAccessRequest) (*Staff, error)
 	// Super-admin user management (admin-only, across all shops).
 	ListAllStaff(context.Context, *ListAllStaffRequest) (*ListStaffResponse, error)
 	SetStaffActive(context.Context, *SetStaffActiveRequest) (*Staff, error)
@@ -376,6 +482,24 @@ func (UnimplementedAuthServiceServer) GetMe(context.Context, *GetMeRequest) (*St
 }
 func (UnimplementedAuthServiceServer) SetStaffPermissions(context.Context, *SetStaffPermissionsRequest) (*Staff, error) {
 	return nil, status.Error(codes.Unimplemented, "method SetStaffPermissions not implemented")
+}
+func (UnimplementedAuthServiceServer) ListRoles(context.Context, *ListRolesRequest) (*ListRolesResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListRoles not implemented")
+}
+func (UnimplementedAuthServiceServer) CreateRole(context.Context, *CreateRoleRequest) (*ShopRole, error) {
+	return nil, status.Error(codes.Unimplemented, "method CreateRole not implemented")
+}
+func (UnimplementedAuthServiceServer) UpdateRole(context.Context, *UpdateRoleRequest) (*ShopRole, error) {
+	return nil, status.Error(codes.Unimplemented, "method UpdateRole not implemented")
+}
+func (UnimplementedAuthServiceServer) DeleteRole(context.Context, *DeleteRoleRequest) (*DeleteRoleResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method DeleteRole not implemented")
+}
+func (UnimplementedAuthServiceServer) CreateStaff(context.Context, *CreateStaffRequest) (*Staff, error) {
+	return nil, status.Error(codes.Unimplemented, "method CreateStaff not implemented")
+}
+func (UnimplementedAuthServiceServer) SetStaffAccess(context.Context, *SetStaffAccessRequest) (*Staff, error) {
+	return nil, status.Error(codes.Unimplemented, "method SetStaffAccess not implemented")
 }
 func (UnimplementedAuthServiceServer) ListAllStaff(context.Context, *ListAllStaffRequest) (*ListStaffResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method ListAllStaff not implemented")
@@ -650,6 +774,114 @@ func _AuthService_SetStaffPermissions_Handler(srv interface{}, ctx context.Conte
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AuthService_ListRoles_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListRolesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServiceServer).ListRoles(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AuthService_ListRoles_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServiceServer).ListRoles(ctx, req.(*ListRolesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AuthService_CreateRole_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateRoleRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServiceServer).CreateRole(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AuthService_CreateRole_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServiceServer).CreateRole(ctx, req.(*CreateRoleRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AuthService_UpdateRole_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateRoleRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServiceServer).UpdateRole(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AuthService_UpdateRole_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServiceServer).UpdateRole(ctx, req.(*UpdateRoleRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AuthService_DeleteRole_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteRoleRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServiceServer).DeleteRole(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AuthService_DeleteRole_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServiceServer).DeleteRole(ctx, req.(*DeleteRoleRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AuthService_CreateStaff_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateStaffRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServiceServer).CreateStaff(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AuthService_CreateStaff_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServiceServer).CreateStaff(ctx, req.(*CreateStaffRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AuthService_SetStaffAccess_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SetStaffAccessRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServiceServer).SetStaffAccess(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AuthService_SetStaffAccess_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServiceServer).SetStaffAccess(ctx, req.(*SetStaffAccessRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _AuthService_ListAllStaff_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ListAllStaffRequest)
 	if err := dec(in); err != nil {
@@ -816,6 +1048,30 @@ var AuthService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "SetStaffPermissions",
 			Handler:    _AuthService_SetStaffPermissions_Handler,
+		},
+		{
+			MethodName: "ListRoles",
+			Handler:    _AuthService_ListRoles_Handler,
+		},
+		{
+			MethodName: "CreateRole",
+			Handler:    _AuthService_CreateRole_Handler,
+		},
+		{
+			MethodName: "UpdateRole",
+			Handler:    _AuthService_UpdateRole_Handler,
+		},
+		{
+			MethodName: "DeleteRole",
+			Handler:    _AuthService_DeleteRole_Handler,
+		},
+		{
+			MethodName: "CreateStaff",
+			Handler:    _AuthService_CreateStaff_Handler,
+		},
+		{
+			MethodName: "SetStaffAccess",
+			Handler:    _AuthService_SetStaffAccess_Handler,
 		},
 		{
 			MethodName: "ListAllStaff",
