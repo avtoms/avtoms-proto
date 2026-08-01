@@ -89,8 +89,14 @@ type Shop struct {
 	// How many people work there, as stated at registration. A rough sizing figure for the
 	// operator, deliberately not derived from the staff records — most shops are registered
 	// before their workers have accounts.
-	StaffCount int32  `protobuf:"varint,4,opt,name=staff_count,json=staffCount,proto3" json:"staff_count,omitempty"`
-	Location   string `protobuf:"bytes,5,opt,name=location,proto3" json:"location,omitempty"`
+	StaffCount int32 `protobuf:"varint,4,opt,name=staff_count,json=staffCount,proto3" json:"staff_count,omitempty"`
+	// The address as a person reads it — this is what goes on the customer's check.
+	Location string `protobuf:"bytes,5,opt,name=location,proto3" json:"location,omitempty"`
+	// Where the service actually is. 0/0 means nobody has placed it on the map: the Gulf of
+	// Guinea is not in Uzbekistan, so it is a safe "unset" for these two and saves an extra
+	// has_location flag.
+	Latitude  float64 `protobuf:"fixed64,10,opt,name=latitude,proto3" json:"latitude,omitempty"`
+	Longitude float64 `protobuf:"fixed64,11,opt,name=longitude,proto3" json:"longitude,omitempty"`
 	// The service's own public number, which is not the owner's: it goes on the customer's
 	// check, and the owner's personal phone should not.
 	Phone     string `protobuf:"bytes,6,opt,name=phone,proto3" json:"phone,omitempty"`
@@ -168,6 +174,20 @@ func (x *Shop) GetLocation() string {
 	return ""
 }
 
+func (x *Shop) GetLatitude() float64 {
+	if x != nil {
+		return x.Latitude
+	}
+	return 0
+}
+
+func (x *Shop) GetLongitude() float64 {
+	if x != nil {
+		return x.Longitude
+	}
+	return 0
+}
+
 func (x *Shop) GetPhone() string {
 	if x != nil {
 		return x.Phone
@@ -199,11 +219,13 @@ func (x *Shop) GetMembers() int32 {
 type RegisterShopRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// ── the company ──
-	Name        string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	ServiceType string `protobuf:"bytes,2,opt,name=service_type,json=serviceType,proto3" json:"service_type,omitempty"`
-	StaffCount  int32  `protobuf:"varint,3,opt,name=staff_count,json=staffCount,proto3" json:"staff_count,omitempty"`
-	Location    string `protobuf:"bytes,4,opt,name=location,proto3" json:"location,omitempty"`
-	Phone       string `protobuf:"bytes,5,opt,name=phone,proto3" json:"phone,omitempty"`
+	Name        string  `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	ServiceType string  `protobuf:"bytes,2,opt,name=service_type,json=serviceType,proto3" json:"service_type,omitempty"`
+	StaffCount  int32   `protobuf:"varint,3,opt,name=staff_count,json=staffCount,proto3" json:"staff_count,omitempty"`
+	Location    string  `protobuf:"bytes,4,opt,name=location,proto3" json:"location,omitempty"`
+	Phone       string  `protobuf:"bytes,5,opt,name=phone,proto3" json:"phone,omitempty"`
+	Latitude    float64 `protobuf:"fixed64,10,opt,name=latitude,proto3" json:"latitude,omitempty"`
+	Longitude   float64 `protobuf:"fixed64,11,opt,name=longitude,proto3" json:"longitude,omitempty"`
 	// ── its owner, created in the same transaction ──
 	OwnerName     string `protobuf:"bytes,6,opt,name=owner_name,json=ownerName,proto3" json:"owner_name,omitempty"`
 	OwnerPhone    string `protobuf:"bytes,7,opt,name=owner_phone,json=ownerPhone,proto3" json:"owner_phone,omitempty"`
@@ -276,6 +298,20 @@ func (x *RegisterShopRequest) GetPhone() string {
 		return x.Phone
 	}
 	return ""
+}
+
+func (x *RegisterShopRequest) GetLatitude() float64 {
+	if x != nil {
+		return x.Latitude
+	}
+	return 0
+}
+
+func (x *RegisterShopRequest) GetLongitude() float64 {
+	if x != nil {
+		return x.Longitude
+	}
+	return 0
 }
 
 func (x *RegisterShopRequest) GetOwnerName() string {
@@ -447,6 +483,8 @@ type UpdateShopRequest struct {
 	Location      string                 `protobuf:"bytes,5,opt,name=location,proto3" json:"location,omitempty"`
 	Phone         string                 `protobuf:"bytes,6,opt,name=phone,proto3" json:"phone,omitempty"`
 	Active        bool                   `protobuf:"varint,7,opt,name=active,proto3" json:"active,omitempty"`
+	Latitude      float64                `protobuf:"fixed64,8,opt,name=latitude,proto3" json:"latitude,omitempty"`
+	Longitude     float64                `protobuf:"fixed64,9,opt,name=longitude,proto3" json:"longitude,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -528,6 +566,20 @@ func (x *UpdateShopRequest) GetActive() bool {
 		return x.Active
 	}
 	return false
+}
+
+func (x *UpdateShopRequest) GetLatitude() float64 {
+	if x != nil {
+		return x.Latitude
+	}
+	return 0
+}
+
+func (x *UpdateShopRequest) GetLongitude() float64 {
+	if x != nil {
+		return x.Longitude
+	}
+	return 0
 }
 
 type SignInRequest struct {
@@ -1699,26 +1751,32 @@ var File_avtoms_auth_v1_auth_proto protoreflect.FileDescriptor
 
 const file_avtoms_auth_v1_auth_proto_rawDesc = "" +
 	"\n" +
-	"\x19avtoms/auth/v1/auth.proto\x12\x0eavtoms.auth.v1\"\xf1\x01\n" +
+	"\x19avtoms/auth/v1/auth.proto\x12\x0eavtoms.auth.v1\"\xab\x02\n" +
 	"\x04Shop\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12!\n" +
 	"\fservice_type\x18\x03 \x01(\tR\vserviceType\x12\x1f\n" +
 	"\vstaff_count\x18\x04 \x01(\x05R\n" +
 	"staffCount\x12\x1a\n" +
-	"\blocation\x18\x05 \x01(\tR\blocation\x12\x14\n" +
+	"\blocation\x18\x05 \x01(\tR\blocation\x12\x1a\n" +
+	"\blatitude\x18\n" +
+	" \x01(\x01R\blatitude\x12\x1c\n" +
+	"\tlongitude\x18\v \x01(\x01R\tlongitude\x12\x14\n" +
 	"\x05phone\x18\x06 \x01(\tR\x05phone\x12\x16\n" +
 	"\x06active\x18\a \x01(\bR\x06active\x12\x1d\n" +
 	"\n" +
 	"created_at\x18\b \x01(\tR\tcreatedAt\x12\x18\n" +
-	"\amembers\x18\t \x01(\x05R\amembers\"\xa7\x02\n" +
+	"\amembers\x18\t \x01(\x05R\amembers\"\xe1\x02\n" +
 	"\x13RegisterShopRequest\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12!\n" +
 	"\fservice_type\x18\x02 \x01(\tR\vserviceType\x12\x1f\n" +
 	"\vstaff_count\x18\x03 \x01(\x05R\n" +
 	"staffCount\x12\x1a\n" +
 	"\blocation\x18\x04 \x01(\tR\blocation\x12\x14\n" +
-	"\x05phone\x18\x05 \x01(\tR\x05phone\x12\x1d\n" +
+	"\x05phone\x18\x05 \x01(\tR\x05phone\x12\x1a\n" +
+	"\blatitude\x18\n" +
+	" \x01(\x01R\blatitude\x12\x1c\n" +
+	"\tlongitude\x18\v \x01(\x01R\tlongitude\x12\x1d\n" +
 	"\n" +
 	"owner_name\x18\x06 \x01(\tR\townerName\x12\x1f\n" +
 	"\vowner_phone\x18\a \x01(\tR\n" +
@@ -1731,7 +1789,7 @@ const file_avtoms_auth_v1_auth_proto_rawDesc = "" +
 	"\x05owner\x18\x02 \x01(\v2\x15.avtoms.auth.v1.StaffR\x05owner\"\x12\n" +
 	"\x10ListShopsRequest\"?\n" +
 	"\x11ListShopsResponse\x12*\n" +
-	"\x05shops\x18\x01 \x03(\v2\x14.avtoms.auth.v1.ShopR\x05shops\"\xc5\x01\n" +
+	"\x05shops\x18\x01 \x03(\v2\x14.avtoms.auth.v1.ShopR\x05shops\"\xff\x01\n" +
 	"\x11UpdateShopRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12!\n" +
@@ -1740,7 +1798,9 @@ const file_avtoms_auth_v1_auth_proto_rawDesc = "" +
 	"staffCount\x12\x1a\n" +
 	"\blocation\x18\x05 \x01(\tR\blocation\x12\x14\n" +
 	"\x05phone\x18\x06 \x01(\tR\x05phone\x12\x16\n" +
-	"\x06active\x18\a \x01(\bR\x06active\"A\n" +
+	"\x06active\x18\a \x01(\bR\x06active\x12\x1a\n" +
+	"\blatitude\x18\b \x01(\x01R\blatitude\x12\x1c\n" +
+	"\tlongitude\x18\t \x01(\x01R\tlongitude\"A\n" +
 	"\rSignInRequest\x12\x14\n" +
 	"\x05login\x18\x01 \x01(\tR\x05login\x12\x1a\n" +
 	"\bpassword\x18\x02 \x01(\tR\bpassword\"f\n" +

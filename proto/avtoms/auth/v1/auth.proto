@@ -66,7 +66,13 @@ message Shop {
   // operator, deliberately not derived from the staff records — most shops are registered
   // before their workers have accounts.
   int32 staff_count = 4;
+  // The address as a person reads it — this is what goes on the customer's check.
   string location = 5;
+  // Where the service actually is. 0/0 means nobody has placed it on the map: the Gulf of
+  // Guinea is not in Uzbekistan, so it is a safe "unset" for these two and saves an extra
+  // has_location flag.
+  double latitude = 10;
+  double longitude = 11;
   // The service's own public number, which is not the owner's: it goes on the customer's
   // check, and the owner's personal phone should not.
   string phone = 6;
@@ -84,6 +90,8 @@ message RegisterShopRequest {
   int32 staff_count = 3;
   string location = 4;
   string phone = 5;
+  double latitude = 10;
+  double longitude = 11;
   // ── its owner, created in the same transaction ──
   string owner_name = 6;
   string owner_phone = 7;
@@ -109,6 +117,8 @@ message UpdateShopRequest {
   string location = 5;
   string phone = 6;
   bool active = 7;
+  double latitude = 8;
+  double longitude = 9;
 }
 
 message SignInRequest {
