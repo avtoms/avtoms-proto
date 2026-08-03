@@ -1217,6 +1217,11 @@ message LineItem {
   // fractional (e.g. 4.5 litres) and is independent of the billing `quantity`. This is what
   // adding the line deducts (and removing restores). 0 when the line consumes no stock.
   double consumed_qty = 12;
+  // Which option of the menu item was sold (empty for a service with no options, and for a
+  // line that did not come from the price list). The description carries the option's name for
+  // reading; this carries the link, so renaming an option later cannot orphan the record of
+  // what was actually sold.
+  string menu_option_id = 13;
 }
 
 message WorkOrder {
@@ -1348,6 +1353,29 @@ message MenuMaterial {
   string variant_id = 6; // warehouse variant this material is drawn from (empty for ad-hoc)
 }
 
+// MenuItemOption is one way a service can be performed, at its own price: an oil change is
+// the same job on a hatchback and on a jeep, and a different amount of money.
+//
+// A shop was modelling this by listing the same service several times ("Moy almashtirish —
+// yengil", "Moy almashtirish — jip"), which reads as four services, sorts as four services,
+// and reports as four services. One service with four options says what is actually true.
+//
+// The name is a single free-text field rather than the three the service itself carries. It is
+// the shop's own words about its own price list — the same as a product name, a supplier or an
+// expense category — and asking somebody to type "Krossover / Кроссовер / Кроссовер" for every
+// option of every service produces empty fields, not translations.
+message MenuItemOption {
+  string id = 1;
+  string name = 2;
+  int64 price = 3;              // what this option sells for, in tiyin
+  int64 cost = 4;               // the shop's expense for it, in tiyin (0 = not tracked)
+  // Labour time for this option. 0 means "same as the service" rather than "instant" — a jeep
+  // taking longer than a hatchback is exactly the sort of thing an option exists to say.
+  int32 estimated_minutes = 5;
+  int32 position = 6;           // the order the shop wants them listed in
+  bool active = 7;
+}
+
 message MenuItem {
   string id = 1;
   string shop_id = 2;
@@ -1364,6 +1392,9 @@ message MenuItem {
   string category = 9;
   int32 estimated_minutes = 10;
   repeated MenuMaterial materials = 11;
+  // Named ways to perform this service, each with its own price. Empty for a service that is
+  // simply one price, which is most of them and stays exactly as it was.
+  repeated MenuItemOption options = 12;
 }
 
 message CreateWorkOrderRequest {
@@ -1484,6 +1515,7 @@ message CreateMenuItemRequest {
   string category = 7;
   int32 estimated_minutes = 8;
   repeated MenuMaterial materials = 9; // materials this service is expected to need
+  repeated MenuItemOption options = 10; // named ways to perform it, each priced
 }
 
 // UpdateMenuItem edits an existing price-list item. A price or cost change is recorded in
@@ -1504,6 +1536,9 @@ message UpdateMenuItemRequest {
   // row when the price or cost actually changes, so a price list says who moved a number
   // and not only that it moved.
   string staff_id = 11;
+  // The full set of options after the edit. An option missing from the list is retired rather
+  // than deleted, because line items already sold under it point at it.
+  repeated MenuItemOption options = 12;
 }
 
 // MenuPriceChange is one entry in a menu item's price/cost change log.
