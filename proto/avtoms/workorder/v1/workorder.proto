@@ -222,6 +222,15 @@ message ShopExpense {
   string staff_id = 8;    // optional: the worker this cost is for (e.g. whose salary)
   string payee = 9;       // optional: receiver/recipient of the payment (e.g. landlord, vendor)
   string paid_by = 10;    // optional: staff id of the person who made the payment
+
+  // How the money left the shop. `method` and card_* describe the first part; `parts` carries
+  // the whole split, and holds exactly one entry when the expense was paid a single way.
+  // Rows written before any of this existed carry PAYMENT_METHOD_UNSPECIFIED and no parts,
+  // which reads on screen as "not recorded" rather than as a guess.
+  PaymentMethod method = 11;
+  string card_id = 12;
+  string card_number = 13;
+  repeated PaymentPart parts = 14;
 }
 message ListShopExpensesRequest {
   string shop_id = 1;
@@ -240,6 +249,13 @@ message CreateShopExpenseRequest {
   string staff_id = 6; // optional: worker this expense is for
   string payee = 7;    // optional: receiver/recipient
   string paid_by = 8;  // optional: staff id of the paying person
+
+  // Either a single method (with card_id/card_number when it is CARD), or parts summing to
+  // amount. Sending both is fine — parts win, and method is derived from the first of them.
+  PaymentMethod method = 9;
+  string card_id = 10;
+  string card_number = 11;
+  repeated PaymentPart parts = 12;
 }
 message DeleteShopExpenseRequest {
   string id = 1;
@@ -682,6 +698,21 @@ enum PaymentMethod {
   PAYMENT_METHOD_CREDIT = 4;
 }
 
+// PaymentPart is one leg of a payment that arrived, or left, in more than one form: part
+// cash and part card. It is deliberately the same shape as invoice.v1.PaymentPart, because
+// a shop settling a bill and a shop paying its landlord are answering the same question and
+// should not have to learn two answers.
+//
+// Anywhere it appears, the row it hangs off keeps a single `method` as well, describing the
+// FIRST part. That is what lets everything already reading one method off a row keep working
+// while the parts carry the truth.
+message PaymentPart {
+  int64 amount = 1;      // tiyin, always positive
+  PaymentMethod method = 2;
+  string card_id = 3;    // for CARD: the shop card the money moved through
+  string card_number = 4;
+}
+
 // SaleItem is one line of a counter sale: a warehouse variant, how much of it left, and
 // what it was actually sold for. Description, sku and unit_cost are snapshots taken at
 // sale time, so renaming or repricing the product later cannot rewrite history.
@@ -960,6 +991,10 @@ message ContragentLedgerEntry {
   string occurred_at = 10;  // RFC3339 — when it happened, which may not be when it was typed
   string note = 11;
   string created_at = 12;
+
+  string card_id = 13;    // for CARD payments: the shop card the money moved through
+  string card_number = 14;
+  repeated PaymentPart parts = 15; // the whole split; one entry when paid a single way
 }
 
 // ContragentBalance is one counterparty's account. balance = purchased + received
@@ -1008,6 +1043,10 @@ message RecordContragentEntryRequest {
   string occurred_at = 6; // RFC3339; empty means now
   string staff_id = 7;    // from the token, at the gateway
   string description = 8;
+
+  string card_id = 9;
+  string card_number = 10;
+  repeated PaymentPart parts = 11; // parts summing to amount; method is taken from the first
 }
 message DeleteContragentEntryRequest {
   string id = 1;
@@ -1050,6 +1089,10 @@ message CustomerLedgerEntry {
   // What the sale or order above is called on screen: "S-0042", "Z-0013". Resolved on read
   // rather than stored, so a row written before this existed still names its document.
   string source_no = 15;
+
+  string card_id = 16;    // for CARD repayments: the shop card the money landed on
+  string card_number = 17;
+  repeated PaymentPart parts = 18; // the whole split; one entry when paid a single way
 }
 
 // CustomerBalance is one client's account. balance = charged − paid; positive means the
@@ -1103,6 +1146,10 @@ message RecordCustomerEntryRequest {
   // that order can find its entry again instead of leaving a duplicate debt behind.
   string work_order_id = 10;
   string invoice_id = 11;
+
+  string card_id = 12;
+  string card_number = 13;
+  repeated PaymentPart parts = 14; // parts summing to amount; method is taken from the first
 }
 message DeleteCustomerEntryRequest {
   string id = 1;
