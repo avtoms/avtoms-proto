@@ -9625,12 +9625,15 @@ func (x *WorkOrder) GetMileage() int64 {
 // and those must be computed once, from the full ordered history, rather than three times
 // over whatever subset a screen happens to have loaded.
 type ServiceBookItem struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Description   string                 `protobuf:"bytes,1,opt,name=description,proto3" json:"description,omitempty"`
-	Kind          LineItemKind           `protobuf:"varint,2,opt,name=kind,proto3,enum=avtoms.workorder.v1.LineItemKind" json:"kind,omitempty"`
-	Quantity      float64                `protobuf:"fixed64,3,opt,name=quantity,proto3" json:"quantity,omitempty"`
-	UnitPrice     int64                  `protobuf:"varint,4,opt,name=unit_price,json=unitPrice,proto3" json:"unit_price,omitempty"`
-	Total         int64                  `protobuf:"varint,5,opt,name=total,proto3" json:"total,omitempty"` // unit_price * quantity, rounded
+	state       protoimpl.MessageState `protogen:"open.v1"`
+	Description string                 `protobuf:"bytes,1,opt,name=description,proto3" json:"description,omitempty"`
+	Kind        LineItemKind           `protobuf:"varint,2,opt,name=kind,proto3,enum=avtoms.workorder.v1.LineItemKind" json:"kind,omitempty"`
+	Quantity    float64                `protobuf:"fixed64,3,opt,name=quantity,proto3" json:"quantity,omitempty"`
+	UnitPrice   int64                  `protobuf:"varint,4,opt,name=unit_price,json=unitPrice,proto3" json:"unit_price,omitempty"`
+	Total       int64                  `protobuf:"varint,5,opt,name=total,proto3" json:"total,omitempty"` // unit_price * quantity, rounded
+	// The line's unit of measure, as a symbol. See LineItem.unit: it travels beside the
+	// description so the service book can say "4 l" or "4 л" to whoever is reading it.
+	Unit          string `protobuf:"bytes,6,opt,name=unit,proto3" json:"unit,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -9698,6 +9701,13 @@ func (x *ServiceBookItem) GetTotal() int64 {
 		return x.Total
 	}
 	return 0
+}
+
+func (x *ServiceBookItem) GetUnit() string {
+	if x != nil {
+		return x.Unit
+	}
+	return ""
 }
 
 type ServiceBookEntry struct {
@@ -12723,14 +12733,15 @@ const file_avtoms_workorder_v1_workorder_proto_rawDesc = "" +
 	"customerId\x12%\n" +
 	"\x0ecustomer_phone\x18\x19 \x01(\tR\rcustomerPhone\x12\x1a\n" +
 	"\bodometer\x18\x1b \x01(\x03R\bodometer\x12\x18\n" +
-	"\amileage\x18\x1a \x01(\x03R\amileage\"\xbb\x01\n" +
+	"\amileage\x18\x1a \x01(\x03R\amileage\"\xcf\x01\n" +
 	"\x0fServiceBookItem\x12 \n" +
 	"\vdescription\x18\x01 \x01(\tR\vdescription\x125\n" +
 	"\x04kind\x18\x02 \x01(\x0e2!.avtoms.workorder.v1.LineItemKindR\x04kind\x12\x1a\n" +
 	"\bquantity\x18\x03 \x01(\x01R\bquantity\x12\x1d\n" +
 	"\n" +
 	"unit_price\x18\x04 \x01(\x03R\tunitPrice\x12\x14\n" +
-	"\x05total\x18\x05 \x01(\x03R\x05total\"\xce\x03\n" +
+	"\x05total\x18\x05 \x01(\x03R\x05total\x12\x12\n" +
+	"\x04unit\x18\x06 \x01(\tR\x04unit\"\xce\x03\n" +
 	"\x10ServiceBookEntry\x12\"\n" +
 	"\rwork_order_id\x18\x01 \x01(\tR\vworkOrderId\x12\x19\n" +
 	"\border_no\x18\x02 \x01(\x03R\aorderNo\x129\n" +

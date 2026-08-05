@@ -1342,6 +1342,9 @@ message ServiceBookItem {
   double quantity = 3;
   int64 unit_price = 4;
   int64 total = 5;       // unit_price * quantity, rounded
+  // The line's unit of measure, as a symbol. See LineItem.unit: it travels beside the
+  // description so the service book can say "4 l" or "4 л" to whoever is reading it.
+  string unit = 6;
 }
 
 message ServiceBookEntry {
