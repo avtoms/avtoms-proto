@@ -1269,6 +1269,16 @@ message LineItem {
   // reading; this carries the link, so renaming an option later cannot orphan the record of
   // what was actually sold.
   string menu_option_id = 13;
+  // Unit of measure this line is billed in — the symbol, not a word: "pcs", "L", "kg".
+  // It is a snapshot of the product's unit at the moment the line was added, for the same
+  // reason default_price is: changing a product's unit later must not rewrite what an old
+  // order says was sold.
+  //
+  // It is a separate field rather than part of the description because the description is
+  // read in three languages and the unit has to be spelled the reader's way ("dona", "дона",
+  // "шт"). A unit written into the description can only ever be spelled one way.
+  // Empty means the unit was not recorded, and nothing is shown.
+  string unit = 14;
 }
 
 message WorkOrder {

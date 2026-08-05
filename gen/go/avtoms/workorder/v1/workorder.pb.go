@@ -9204,7 +9204,17 @@ type LineItem struct {
 	// line that did not come from the price list). The description carries the option's name for
 	// reading; this carries the link, so renaming an option later cannot orphan the record of
 	// what was actually sold.
-	MenuOptionId  string `protobuf:"bytes,13,opt,name=menu_option_id,json=menuOptionId,proto3" json:"menu_option_id,omitempty"`
+	MenuOptionId string `protobuf:"bytes,13,opt,name=menu_option_id,json=menuOptionId,proto3" json:"menu_option_id,omitempty"`
+	// Unit of measure this line is billed in — the symbol, not a word: "pcs", "L", "kg".
+	// It is a snapshot of the product's unit at the moment the line was added, for the same
+	// reason default_price is: changing a product's unit later must not rewrite what an old
+	// order says was sold.
+	//
+	// It is a separate field rather than part of the description because the description is
+	// read in three languages and the unit has to be spelled the reader's way ("dona", "дона",
+	// "шт"). A unit written into the description can only ever be spelled one way.
+	// Empty means the unit was not recorded, and nothing is shown.
+	Unit          string `protobuf:"bytes,14,opt,name=unit,proto3" json:"unit,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -9326,6 +9336,13 @@ func (x *LineItem) GetConsumedQty() float64 {
 func (x *LineItem) GetMenuOptionId() string {
 	if x != nil {
 		return x.MenuOptionId
+	}
+	return ""
+}
+
+func (x *LineItem) GetUnit() string {
+	if x != nil {
+		return x.Unit
 	}
 	return ""
 }
@@ -12653,7 +12670,7 @@ const file_avtoms_workorder_v1_workorder_proto_rawDesc = "" +
 	"vehicle_id\x18\x04 \x01(\tR\tvehicleId\"Y\n" +
 	"\x16ListWorkOrdersResponse\x12?\n" +
 	"\vwork_orders\x18\x01 \x03(\v2\x1e.avtoms.workorder.v1.WorkOrderR\n" +
-	"workOrders\"\xe0\x03\n" +
+	"workOrders\"\xf4\x03\n" +
 	"\bLineItem\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x125\n" +
 	"\x04kind\x18\x02 \x01(\x0e2!.avtoms.workorder.v1.LineItemKindR\x04kind\x12 \n" +
@@ -12671,7 +12688,8 @@ const file_avtoms_workorder_v1_workorder_proto_rawDesc = "" +
 	"\n" +
 	"variant_id\x18\v \x01(\tR\tvariantId\x12!\n" +
 	"\fconsumed_qty\x18\f \x01(\x01R\vconsumedQty\x12$\n" +
-	"\x0emenu_option_id\x18\r \x01(\tR\fmenuOptionId\"\xb2\a\n" +
+	"\x0emenu_option_id\x18\r \x01(\tR\fmenuOptionId\x12\x12\n" +
+	"\x04unit\x18\x0e \x01(\tR\x04unit\"\xb2\a\n" +
 	"\tWorkOrder\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x17\n" +
 	"\ashop_id\x18\x02 \x01(\tR\x06shopId\x12\x1d\n" +
