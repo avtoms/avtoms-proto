@@ -84,6 +84,10 @@ service WorkOrderService {
   rpc ListCurrencies(ListCurrenciesRequest) returns (ListCurrenciesResponse);
   rpc UpsertCurrency(UpsertCurrencyRequest) returns (Currency);
   rpc ListCurrencyRateHistory(ListCurrencyRateHistoryRequest) returns (ListCurrencyRateHistoryResponse);
+  // A shop's own rate for a currency, overriding the platform's. Set from the shop's
+  // settings, not the admin panel: the super admin says which currencies exist, the shop
+  // says what it actually buys them at.
+  rpc SetShopCurrencyRate(SetShopCurrencyRateRequest) returns (Currency);
 
   // Contragents: counterparties the shop transacts with — chiefly suppliers
   // ("yetkazib beruvchi") that products are bought from. Shop-scoped; used as the
@@ -983,11 +987,23 @@ message Currency {
   bool active = 6;        // offered in the shop's currency picker
   int32 position = 7;
   string updated_at = 8;  // RFC3339, when the rate last moved
+
+  // This shop's own rate, 0 when it has not set one. Only filled on the shop-scoped read;
+  // the admin panel sees it zero, because the platform rate is the only one it edits.
+  int64 shop_rate_micros = 9;
+  // The rate this shop's forms prefill with: its own if it set one, the platform's
+  // otherwise. This is the number that matters at the till, computed once here rather than
+  // re-derived by every caller.
+  int64 effective_rate_micros = 10;
 }
 message ListCurrenciesRequest {
   // The admin panel passes true to see currencies it has not switched on yet. A shop omits
   // it and gets exactly the list it is allowed to price in.
   bool include_inactive = 1;
+  // Set by the gateway from the token on a shop's read, so each currency comes back with
+  // that shop's own rate folded in. Empty on the admin panel's read, which edits the
+  // platform rate and has no shop to fold in.
+  string shop_id = 2;
 }
 message ListCurrenciesResponse {
   repeated Currency currencies = 1;
@@ -1014,9 +1030,30 @@ message CurrencyRateChange {
   int64 new_rate_micros = 4;
   string changed_by = 5;   // super admin id; empty for the seeded opening row
   string changed_at = 6;   // RFC3339
+  // Empty when this is the platform's published rate, set when it is one shop's own. The
+  // shop's settings screen shows both and labels them apart.
+  string shop_id = 7;
+}
+
+// SetShopCurrencyRate records what a shop actually buys a currency at. A rate of zero
+// CLEARS the override and returns the shop to the published rate — "use whatever the
+// platform says" is a real answer, and the one wanted after a correction.
+//
+// Only the rate. Which currencies exist, which are switched on and how many decimal places
+// they have stay the super admin's; a shop re-denominating a currency is not a correction.
+message SetShopCurrencyRateRequest {
+  string shop_id = 1;      // from the token, at the gateway
+  string code = 2;         // required; must be a currency the admin has switched on
+  int64 rate_micros = 3;   // so'm for one whole unit, x1e6; 0 clears the override
+  string actor_id = 4;     // who changed it (from JWT), recorded on the rate change
 }
 message ListCurrencyRateHistoryRequest {
   string code = 1;         // required
+  // Empty is the admin panel's read: the platform's own history alone, so one shop's
+  // corrections never look like the published rate moving. Set is a shop's read, and
+  // returns its overrides AND the platform changes — the question behind that screen is
+  // "what rate was in force", which neither history answers by itself.
+  string shop_id = 2;
 }
 message ListCurrencyRateHistoryResponse {
   repeated CurrencyRateChange changes = 1;

@@ -63,6 +63,7 @@ const (
 	WorkOrderService_ListCurrencies_FullMethodName           = "/avtoms.workorder.v1.WorkOrderService/ListCurrencies"
 	WorkOrderService_UpsertCurrency_FullMethodName           = "/avtoms.workorder.v1.WorkOrderService/UpsertCurrency"
 	WorkOrderService_ListCurrencyRateHistory_FullMethodName  = "/avtoms.workorder.v1.WorkOrderService/ListCurrencyRateHistory"
+	WorkOrderService_SetShopCurrencyRate_FullMethodName      = "/avtoms.workorder.v1.WorkOrderService/SetShopCurrencyRate"
 	WorkOrderService_ListContragents_FullMethodName          = "/avtoms.workorder.v1.WorkOrderService/ListContragents"
 	WorkOrderService_CreateContragent_FullMethodName         = "/avtoms.workorder.v1.WorkOrderService/CreateContragent"
 	WorkOrderService_UpdateContragent_FullMethodName         = "/avtoms.workorder.v1.WorkOrderService/UpdateContragent"
@@ -174,6 +175,10 @@ type WorkOrderServiceClient interface {
 	ListCurrencies(ctx context.Context, in *ListCurrenciesRequest, opts ...grpc.CallOption) (*ListCurrenciesResponse, error)
 	UpsertCurrency(ctx context.Context, in *UpsertCurrencyRequest, opts ...grpc.CallOption) (*Currency, error)
 	ListCurrencyRateHistory(ctx context.Context, in *ListCurrencyRateHistoryRequest, opts ...grpc.CallOption) (*ListCurrencyRateHistoryResponse, error)
+	// A shop's own rate for a currency, overriding the platform's. Set from the shop's
+	// settings, not the admin panel: the super admin says which currencies exist, the shop
+	// says what it actually buys them at.
+	SetShopCurrencyRate(ctx context.Context, in *SetShopCurrencyRateRequest, opts ...grpc.CallOption) (*Currency, error)
 	// Contragents: counterparties the shop transacts with — chiefly suppliers
 	// ("yetkazib beruvchi") that products are bought from. Shop-scoped; used as the
 	// supplier dropdown on the product form.
@@ -678,6 +683,16 @@ func (c *workOrderServiceClient) ListCurrencyRateHistory(ctx context.Context, in
 	return out, nil
 }
 
+func (c *workOrderServiceClient) SetShopCurrencyRate(ctx context.Context, in *SetShopCurrencyRateRequest, opts ...grpc.CallOption) (*Currency, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Currency)
+	err := c.cc.Invoke(ctx, WorkOrderService_SetShopCurrencyRate_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *workOrderServiceClient) ListContragents(ctx context.Context, in *ListContragentsRequest, opts ...grpc.CallOption) (*ListContragentsResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(ListContragentsResponse)
@@ -1093,6 +1108,10 @@ type WorkOrderServiceServer interface {
 	ListCurrencies(context.Context, *ListCurrenciesRequest) (*ListCurrenciesResponse, error)
 	UpsertCurrency(context.Context, *UpsertCurrencyRequest) (*Currency, error)
 	ListCurrencyRateHistory(context.Context, *ListCurrencyRateHistoryRequest) (*ListCurrencyRateHistoryResponse, error)
+	// A shop's own rate for a currency, overriding the platform's. Set from the shop's
+	// settings, not the admin panel: the super admin says which currencies exist, the shop
+	// says what it actually buys them at.
+	SetShopCurrencyRate(context.Context, *SetShopCurrencyRateRequest) (*Currency, error)
 	// Contragents: counterparties the shop transacts with — chiefly suppliers
 	// ("yetkazib beruvchi") that products are bought from. Shop-scoped; used as the
 	// supplier dropdown on the product form.
@@ -1288,6 +1307,9 @@ func (UnimplementedWorkOrderServiceServer) UpsertCurrency(context.Context, *Upse
 }
 func (UnimplementedWorkOrderServiceServer) ListCurrencyRateHistory(context.Context, *ListCurrencyRateHistoryRequest) (*ListCurrencyRateHistoryResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method ListCurrencyRateHistory not implemented")
+}
+func (UnimplementedWorkOrderServiceServer) SetShopCurrencyRate(context.Context, *SetShopCurrencyRateRequest) (*Currency, error) {
+	return nil, status.Error(codes.Unimplemented, "method SetShopCurrencyRate not implemented")
 }
 func (UnimplementedWorkOrderServiceServer) ListContragents(context.Context, *ListContragentsRequest) (*ListContragentsResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method ListContragents not implemented")
@@ -2204,6 +2226,24 @@ func _WorkOrderService_ListCurrencyRateHistory_Handler(srv interface{}, ctx cont
 	return interceptor(ctx, in, info, handler)
 }
 
+func _WorkOrderService_SetShopCurrencyRate_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SetShopCurrencyRateRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WorkOrderServiceServer).SetShopCurrencyRate(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: WorkOrderService_SetShopCurrencyRate_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WorkOrderServiceServer).SetShopCurrencyRate(ctx, req.(*SetShopCurrencyRateRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _WorkOrderService_ListContragents_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ListContragentsRequest)
 	if err := dec(in); err != nil {
@@ -2998,6 +3038,10 @@ var WorkOrderService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ListCurrencyRateHistory",
 			Handler:    _WorkOrderService_ListCurrencyRateHistory_Handler,
+		},
+		{
+			MethodName: "SetShopCurrencyRate",
+			Handler:    _WorkOrderService_SetShopCurrencyRate_Handler,
 		},
 		{
 			MethodName: "ListContragents",
