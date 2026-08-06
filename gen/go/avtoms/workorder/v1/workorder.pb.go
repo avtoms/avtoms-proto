@@ -4733,10 +4733,14 @@ type UpdateProductRequest struct {
 	Brand       string                 `protobuf:"bytes,10,opt,name=brand,proto3" json:"brand,omitempty"`
 	SupplierId  string                 `protobuf:"bytes,11,opt,name=supplier_id,json=supplierId,proto3" json:"supplier_id,omitempty"`
 	// Raising a variant's quantity here is a delivery, settled the same way as on create.
-	PaidAmount    int64     `protobuf:"varint,12,opt,name=paid_amount,json=paidAmount,proto3" json:"paid_amount,omitempty"`
-	SkipDebt      bool      `protobuf:"varint,13,opt,name=skip_debt,json=skipDebt,proto3" json:"skip_debt,omitempty"`
-	StaffId       string    `protobuf:"bytes,14,opt,name=staff_id,json=staffId,proto3" json:"staff_id,omitempty"`                  // who saved this (from JWT), recorded on any movement it writes
-	FxPaidAmount  *FxAmount `protobuf:"bytes,15,opt,name=fx_paid_amount,json=fxPaidAmount,proto3" json:"fx_paid_amount,omitempty"` // what was handed over, when that was not in so'm
+	PaidAmount   int64     `protobuf:"varint,12,opt,name=paid_amount,json=paidAmount,proto3" json:"paid_amount,omitempty"`
+	SkipDebt     bool      `protobuf:"varint,13,opt,name=skip_debt,json=skipDebt,proto3" json:"skip_debt,omitempty"`
+	StaffId      string    `protobuf:"bytes,14,opt,name=staff_id,json=staffId,proto3" json:"staff_id,omitempty"`                  // who saved this (from JWT), recorded on any movement it writes
+	FxPaidAmount *FxAmount `protobuf:"bytes,15,opt,name=fx_paid_amount,json=fxPaidAmount,proto3" json:"fx_paid_amount,omitempty"` // what was handed over, when that was not in so'm
+	// Set by the gateway from the token. Used only to pick the exchange rate: a shop may hold
+	// its own rate, and without knowing which shop is asking there is nothing to look it up
+	// by. Never trusted from the body.
+	ShopId        string `protobuf:"bytes,16,opt,name=shop_id,json=shopId,proto3" json:"shop_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -4876,6 +4880,13 @@ func (x *UpdateProductRequest) GetFxPaidAmount() *FxAmount {
 	return nil
 }
 
+func (x *UpdateProductRequest) GetShopId() string {
+	if x != nil {
+		return x.ShopId
+	}
+	return ""
+}
+
 type AdjustVariantStockRequest struct {
 	state        protoimpl.MessageState `protogen:"open.v1"`
 	VariantId    string                 `protobuf:"bytes,1,opt,name=variant_id,json=variantId,proto3" json:"variant_id,omitempty"`
@@ -4892,8 +4903,12 @@ type AdjustVariantStockRequest struct {
 	// above; see FxAmount. Two stamps rather than one because a shop can perfectly well agree
 	// a price in dollars and settle part of it in so'm, and each amount has to say for itself
 	// which it was.
-	FxUnitCost    *FxAmount `protobuf:"bytes,8,opt,name=fx_unit_cost,json=fxUnitCost,proto3" json:"fx_unit_cost,omitempty"`
-	FxPaidAmount  *FxAmount `protobuf:"bytes,9,opt,name=fx_paid_amount,json=fxPaidAmount,proto3" json:"fx_paid_amount,omitempty"`
+	FxUnitCost   *FxAmount `protobuf:"bytes,8,opt,name=fx_unit_cost,json=fxUnitCost,proto3" json:"fx_unit_cost,omitempty"`
+	FxPaidAmount *FxAmount `protobuf:"bytes,9,opt,name=fx_paid_amount,json=fxPaidAmount,proto3" json:"fx_paid_amount,omitempty"`
+	// Set by the gateway from the token. Used only to pick the exchange rate: a shop may hold
+	// its own rate, and without knowing which shop is asking there is nothing to look it up
+	// by. Never trusted from the body.
+	ShopId        string `protobuf:"bytes,10,opt,name=shop_id,json=shopId,proto3" json:"shop_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -4989,6 +5004,13 @@ func (x *AdjustVariantStockRequest) GetFxPaidAmount() *FxAmount {
 		return x.FxPaidAmount
 	}
 	return nil
+}
+
+func (x *AdjustVariantStockRequest) GetShopId() string {
+	if x != nil {
+		return x.ShopId
+	}
+	return ""
 }
 
 // StockMovement is one entry in a variant's income/outcome ledger.
@@ -8686,7 +8708,11 @@ type RecordContragentEntryRequest struct {
 	Parts        []*PaymentPart         `protobuf:"bytes,11,rep,name=parts,proto3" json:"parts,omitempty"` // parts summing to amount; method is taken from the first
 	// Set when the amount was agreed or paid in another currency. The server converts it and
 	// stores the so'm result, overriding `amount` above; see FxAmount.
-	FxAmount      *FxAmount `protobuf:"bytes,12,opt,name=fx_amount,json=fxAmount,proto3" json:"fx_amount,omitempty"`
+	FxAmount *FxAmount `protobuf:"bytes,12,opt,name=fx_amount,json=fxAmount,proto3" json:"fx_amount,omitempty"`
+	// Set by the gateway from the token. Used only to pick the exchange rate: a shop may hold
+	// its own rate, and without knowing which shop is asking there is nothing to look it up
+	// by. Never trusted from the body.
+	ShopId        string `protobuf:"bytes,13,opt,name=shop_id,json=shopId,proto3" json:"shop_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -8803,6 +8829,13 @@ func (x *RecordContragentEntryRequest) GetFxAmount() *FxAmount {
 		return x.FxAmount
 	}
 	return nil
+}
+
+func (x *RecordContragentEntryRequest) GetShopId() string {
+	if x != nil {
+		return x.ShopId
+	}
+	return ""
 }
 
 type DeleteContragentEntryRequest struct {
@@ -13101,7 +13134,7 @@ const file_avtoms_workorder_v1_workorder_proto_rawDesc = "" +
 	"paidAmount\x12\x1b\n" +
 	"\tskip_debt\x18\f \x01(\bR\bskipDebt\x12\x19\n" +
 	"\bstaff_id\x18\r \x01(\tR\astaffId\x12C\n" +
-	"\x0efx_paid_amount\x18\x0e \x01(\v2\x1d.avtoms.workorder.v1.FxAmountR\ffxPaidAmount\"\x9c\x04\n" +
+	"\x0efx_paid_amount\x18\x0e \x01(\v2\x1d.avtoms.workorder.v1.FxAmountR\ffxPaidAmount\"\xb5\x04\n" +
 	"\x14UpdateProductRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12 \n" +
@@ -13122,7 +13155,8 @@ const file_avtoms_workorder_v1_workorder_proto_rawDesc = "" +
 	"paidAmount\x12\x1b\n" +
 	"\tskip_debt\x18\r \x01(\bR\bskipDebt\x12\x19\n" +
 	"\bstaff_id\x18\x0e \x01(\tR\astaffId\x12C\n" +
-	"\x0efx_paid_amount\x18\x0f \x01(\v2\x1d.avtoms.workorder.v1.FxAmountR\ffxPaidAmount\"\xec\x02\n" +
+	"\x0efx_paid_amount\x18\x0f \x01(\v2\x1d.avtoms.workorder.v1.FxAmountR\ffxPaidAmount\x12\x17\n" +
+	"\ashop_id\x18\x10 \x01(\tR\x06shopId\"\x85\x03\n" +
 	"\x19AdjustVariantStockRequest\x12\x1d\n" +
 	"\n" +
 	"variant_id\x18\x01 \x01(\tR\tvariantId\x12\x14\n" +
@@ -13135,7 +13169,9 @@ const file_avtoms_workorder_v1_workorder_proto_rawDesc = "" +
 	"paidAmount\x12?\n" +
 	"\ffx_unit_cost\x18\b \x01(\v2\x1d.avtoms.workorder.v1.FxAmountR\n" +
 	"fxUnitCost\x12C\n" +
-	"\x0efx_paid_amount\x18\t \x01(\v2\x1d.avtoms.workorder.v1.FxAmountR\ffxPaidAmount\"\xa9\x03\n" +
+	"\x0efx_paid_amount\x18\t \x01(\v2\x1d.avtoms.workorder.v1.FxAmountR\ffxPaidAmount\x12\x17\n" +
+	"\ashop_id\x18\n" +
+	" \x01(\tR\x06shopId\"\xa9\x03\n" +
 	"\rStockMovement\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1d\n" +
 	"\n" +
@@ -13452,7 +13488,7 @@ const file_avtoms_workorder_v1_workorder_proto_rawDesc = "" +
 	"\x02to\x18\x03 \x01(\tR\x02to\"\xa6\x01\n" +
 	"\x1cListContragentLedgerResponse\x12D\n" +
 	"\aentries\x18\x01 \x03(\v2*.avtoms.workorder.v1.ContragentLedgerEntryR\aentries\x12@\n" +
-	"\asummary\x18\x02 \x01(\v2&.avtoms.workorder.v1.ContragentBalanceR\asummary\"\xf5\x03\n" +
+	"\asummary\x18\x02 \x01(\v2&.avtoms.workorder.v1.ContragentBalanceR\asummary\"\x8e\x04\n" +
 	"\x1cRecordContragentEntryRequest\x12#\n" +
 	"\rcontragent_id\x18\x01 \x01(\tR\fcontragentId\x12<\n" +
 	"\x04kind\x18\x02 \x01(\x0e2(.avtoms.workorder.v1.ContragentEntryKindR\x04kind\x12\x16\n" +
@@ -13468,7 +13504,8 @@ const file_avtoms_workorder_v1_workorder_proto_rawDesc = "" +
 	" \x01(\tR\n" +
 	"cardNumber\x126\n" +
 	"\x05parts\x18\v \x03(\v2 .avtoms.workorder.v1.PaymentPartR\x05parts\x12:\n" +
-	"\tfx_amount\x18\f \x01(\v2\x1d.avtoms.workorder.v1.FxAmountR\bfxAmount\".\n" +
+	"\tfx_amount\x18\f \x01(\v2\x1d.avtoms.workorder.v1.FxAmountR\bfxAmount\x12\x17\n" +
+	"\ashop_id\x18\r \x01(\tR\x06shopId\".\n" +
 	"\x1cDeleteContragentEntryRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\"\xa7\x05\n" +
 	"\x13CustomerLedgerEntry\x12\x0e\n" +

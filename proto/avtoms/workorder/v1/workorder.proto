@@ -676,6 +676,10 @@ message UpdateProductRequest {
   bool skip_debt = 13;
   string staff_id = 14;  // who saved this (from JWT), recorded on any movement it writes
   FxAmount fx_paid_amount = 15; // what was handed over, when that was not in so'm
+  // Set by the gateway from the token. Used only to pick the exchange rate: a shop may hold
+  // its own rate, and without knowing which shop is asking there is nothing to look it up
+  // by. Never trusted from the body.
+  string shop_id = 16;
 }
 message AdjustVariantStockRequest {
   string variant_id = 1;
@@ -695,6 +699,10 @@ message AdjustVariantStockRequest {
   // which it was.
   FxAmount fx_unit_cost = 8;
   FxAmount fx_paid_amount = 9;
+  // Set by the gateway from the token. Used only to pick the exchange rate: a shop may hold
+  // its own rate, and without knowing which shop is asking there is nothing to look it up
+  // by. Never trusted from the body.
+  string shop_id = 10;
 }
 
 // StockMovement is one entry in a variant's income/outcome ledger.
@@ -1219,6 +1227,10 @@ message RecordContragentEntryRequest {
   // Set when the amount was agreed or paid in another currency. The server converts it and
   // stores the so'm result, overriding `amount` above; see FxAmount.
   FxAmount fx_amount = 12;
+  // Set by the gateway from the token. Used only to pick the exchange rate: a shop may hold
+  // its own rate, and without knowing which shop is asking there is nothing to look it up
+  // by. Never trusted from the body.
+  string shop_id = 13;
 }
 message DeleteContragentEntryRequest {
   string id = 1;
