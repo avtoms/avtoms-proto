@@ -78,6 +78,13 @@ service WorkOrderService {
   rpc UpdateCatalogTerm(UpdateCatalogTermRequest) returns (CatalogTerm);
   rpc DeleteCatalogTerm(DeleteCatalogTermRequest) returns (DeleteCatalogTermResponse);
 
+  // Currencies and the so'm rates that convert them. Platform data like the term lists
+  // above: the super admin publishes the rate, every shop reads it and prices against it.
+  // What a shop then does with a rate is FxAmount — see that message.
+  rpc ListCurrencies(ListCurrenciesRequest) returns (ListCurrenciesResponse);
+  rpc UpsertCurrency(UpsertCurrencyRequest) returns (Currency);
+  rpc ListCurrencyRateHistory(ListCurrencyRateHistoryRequest) returns (ListCurrencyRateHistoryResponse);
+
   // Contragents: counterparties the shop transacts with — chiefly suppliers
   // ("yetkazib beruvchi") that products are bought from. Shop-scoped; used as the
   // supplier dropdown on the product form.
@@ -231,6 +238,10 @@ message ShopExpense {
   string card_id = 12;
   string card_number = 13;
   repeated PaymentPart parts = 14;
+
+  // What the cost was in, when it was not so'm — rent agreed in dollars is the usual case.
+  // Explains `amount`, which stays the so'm figure the P&L sums.
+  FxAmount fx_amount = 15;
 }
 message ListShopExpensesRequest {
   string shop_id = 1;
@@ -256,6 +267,10 @@ message CreateShopExpenseRequest {
   string card_id = 10;
   string card_number = 11;
   repeated PaymentPart parts = 12;
+
+  // Set when the cost was agreed or paid in another currency. The server converts it and
+  // stores the so'm result, overriding `amount` above; see FxAmount.
+  FxAmount fx_amount = 13;
 }
 message DeleteShopExpenseRequest {
   string id = 1;
@@ -584,6 +599,17 @@ message ProductVariant {
   int64 unit_price = 7;       // sell price per unit (tiyin)
   bool active = 8;
   repeated VariantAttribute attributes = 9; // {property:"Size", value:"M"}
+
+  // What the shop typed on the product form when it priced this variant in another
+  // currency. On the way in they are the input and win over unit_cost/unit_price above;
+  // on the way out they are what the form shows again, so reopening a product the shop
+  // priced at $12 shows $12 rather than the so'm it became.
+  //
+  // Per variant rather than per product because one form can perfectly well hold a filter
+  // bought in dollars and a gasket bought in so'm, and the price list should not force
+  // them into the same currency.
+  FxAmount fx_unit_cost = 10;
+  FxAmount fx_unit_price = 11;
 }
 
 // VariantAttribute records which value a variant has for one property.
@@ -647,6 +673,14 @@ message AdjustVariantStockRequest {
   // How much of this delivery was settled on the spot, tiyin (income only). The rest becomes
   // debt on the supplier's account. Zero means the whole delivery was taken on credit.
   int64 paid_amount = 7;
+
+  // The delivery as it was agreed, when that was not in so'm — "250 dollar at 12 700".
+  // Set either and the server converts it and stores the so'm result, overriding the field
+  // above; see FxAmount. Two stamps rather than one because a shop can perfectly well agree
+  // a price in dollars and settle part of it in so'm, and each amount has to say for itself
+  // which it was.
+  FxAmount fx_unit_cost = 8;
+  FxAmount fx_paid_amount = 9;
 }
 
 // StockMovement is one entry in a variant's income/outcome ledger.
@@ -670,6 +704,10 @@ message StockMovement {
   string source_kind = 10;   // "work_order" | "sale" | "" (none)
   string source_id = 11;     // the work order or sale, for opening it
   string source_no = 12;     // what it is called on screen: "Z-0013", "S-0003"
+
+  // What was agreed, when the delivery was not priced in so'm. Per unit, like unit_cost
+  // above, which it explains. Empty currency on everything bought in so'm.
+  FxAmount fx_unit_cost = 13;
 }
 message ListStockMovementsRequest {
   string variant_id = 1;
@@ -917,6 +955,85 @@ message DeleteCatalogTermResponse {
   bool ok = 1;
 }
 
+// ── Currencies ──────────────────────────────────────────────────────────────────────
+// Currency is one entry in the super admin's rate list.
+//
+// rate_micros is so'm for ONE WHOLE unit, times a million: $1 = 12 700 so'm is
+// 12 700 000 000. Integer because a rate is money arithmetic, and micros because a rouble
+// is worth 158.5 so'm and not 158.
+//
+// minor_units is how many digits the currency's minor unit has — 2 for a dollar's cents,
+// 0 for so'm. It is what tells a client that a typed "250.50" is 25050 in amount_minor.
+message Currency {
+  string code = 1;        // ISO 4217: 'UZS', 'USD', 'RUB'
+  string name = 2;
+  string symbol = 3;
+  int64 rate_micros = 4;
+  int32 minor_units = 5;
+  bool active = 6;        // offered in the shop's currency picker
+  int32 position = 7;
+  string updated_at = 8;  // RFC3339, when the rate last moved
+}
+message ListCurrenciesRequest {
+  // The admin panel passes true to see currencies it has not switched on yet. A shop omits
+  // it and gets exactly the list it is allowed to price in.
+  bool include_inactive = 1;
+}
+message ListCurrenciesResponse {
+  repeated Currency currencies = 1;
+}
+// UpsertCurrency publishes a rate, renames a currency, or switches one on and off. Creates
+// the row if the code is new, so the admin can add a currency the seed never listed.
+message UpsertCurrencyRequest {
+  string code = 1;         // required
+  string name = 2;
+  string symbol = 3;
+  int64 rate_micros = 4;
+  int32 minor_units = 5;
+  bool active = 6;
+  int32 position = 7;
+  string actor_id = 8;     // the super admin (from JWT), recorded on the rate change
+}
+// CurrencyRateChange is one published rate, kept because the receipts written under a rate
+// outlive it: an owner asking in November why a June delivery was costed the way it was
+// needs the answer to still exist.
+message CurrencyRateChange {
+  string id = 1;
+  string code = 2;
+  int64 old_rate_micros = 3;
+  int64 new_rate_micros = 4;
+  string changed_by = 5;   // super admin id; empty for the seeded opening row
+  string changed_at = 6;   // RFC3339
+}
+message ListCurrencyRateHistoryRequest {
+  string code = 1;         // required
+}
+message ListCurrencyRateHistoryResponse {
+  repeated CurrencyRateChange changes = 1;
+}
+
+// FxAmount is an amount as it was actually typed, before it became so'm.
+//
+// The ledger is not multi-currency and is not becoming so: every amount this service
+// stores is so'm, so every balance, report and P&L keeps working untouched. What FxAmount
+// adds is the explanation — "$250 at 12 700" rather than a bare 3 175 000 that nobody can
+// account for six months later.
+//
+// On a request it is the INPUT and it wins: the server converts amount_minor at
+// rate_micros and stores the result, ignoring whatever so'm figure the client also sent.
+// The screen and the ledger therefore cannot disagree about the arithmetic, because only
+// one of them does it. Leave currency empty and the so'm field is used as before, which is
+// what every existing caller does.
+//
+// rate_micros is the rate the shop ACTUALLY DEALT AT, not necessarily the published one:
+// dollars are bought at the bazaar, and a receipt has to record what happened rather than
+// what should have. The published rate merely prefills it.
+message FxAmount {
+  string currency = 1;     // 'USD'; empty means the amount was typed in so'm
+  int64 amount_minor = 2;  // what was typed, in the currency's minor unit: $250.50 -> 25050
+  int64 rate_micros = 3;   // so'm for one whole unit, x1e6
+}
+
 // Contragent is a counterparty the shop transacts with — chiefly a supplier
 // ("yetkazib beruvchi") that products are bought from. Shop-scoped so each shop
 // keeps its own supplier list.
@@ -995,6 +1112,10 @@ message ContragentLedgerEntry {
   string card_id = 13;    // for CARD payments: the shop card the money moved through
   string card_number = 14;
   repeated PaymentPart parts = 15; // the whole split; one entry when paid a single way
+
+  // What was agreed or handed over, when it was not so'm — "$200 at 12 750". Explains
+  // `amount`, which stays the so'm figure the balance is summed from.
+  FxAmount fx_amount = 16;
 }
 
 // ContragentBalance is one counterparty's account. balance = purchased + received
@@ -1047,6 +1168,10 @@ message RecordContragentEntryRequest {
   string card_id = 9;
   string card_number = 10;
   repeated PaymentPart parts = 11; // parts summing to amount; method is taken from the first
+
+  // Set when the amount was agreed or paid in another currency. The server converts it and
+  // stores the so'm result, overriding `amount` above; see FxAmount.
+  FxAmount fx_amount = 12;
 }
 message DeleteContragentEntryRequest {
   string id = 1;
@@ -1093,6 +1218,10 @@ message CustomerLedgerEntry {
   string card_id = 16;    // for CARD repayments: the shop card the money landed on
   string card_number = 17;
   repeated PaymentPart parts = 18; // the whole split; one entry when paid a single way
+
+  // What the client actually handed over, when it was not so'm. Explains `amount`, which
+  // stays the so'm figure the debt is summed from.
+  FxAmount fx_amount = 19;
 }
 
 // CustomerBalance is one client's account. balance = charged − paid; positive means the
@@ -1150,6 +1279,10 @@ message RecordCustomerEntryRequest {
   string card_id = 12;
   string card_number = 13;
   repeated PaymentPart parts = 14; // parts summing to amount; method is taken from the first
+
+  // Set when the amount was agreed or paid in another currency. The server converts it and
+  // stores the so'm result, overriding `amount` above; see FxAmount.
+  FxAmount fx_amount = 15;
 }
 message DeleteCustomerEntryRequest {
   string id = 1;
