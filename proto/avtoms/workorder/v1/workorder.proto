@@ -600,14 +600,22 @@ message ProductVariant {
   bool active = 8;
   repeated VariantAttribute attributes = 9; // {property:"Size", value:"M"}
 
-  // What the shop typed on the product form when it priced this variant in another
-  // currency. On the way in they are the input and win over unit_cost/unit_price above;
-  // on the way out they are what the form shows again, so reopening a product the shop
-  // priced at $12 shows $12 rather than the so'm it became.
+  // What the shop typed when it priced this variant in another currency. On the way in
+  // both are the input and win over unit_cost/unit_price above.
   //
   // Per variant rather than per product because one form can perfectly well hold a filter
   // bought in dollars and a gasket bought in so'm, and the price list should not force
   // them into the same currency.
+  //
+  // fx_unit_price round-trips: it is stored, and reopening a product the shop priced at
+  // $12 shows $12 again rather than the so'm it became.
+  //
+  // fx_unit_cost is INPUT ONLY and always comes back empty. unit_cost is not a price
+  // anybody typed — it is a moving weighted average, rolled forward on every priced
+  // receipt (see Repository.AdjustVariantStock), so a currency stamp on it would be a lie
+  // the moment the second delivery landed. What the shop typed here is stamped on the
+  // stock movement the save produces, which is where a purchase price actually belongs and
+  // where the variant's history shows it.
   FxAmount fx_unit_cost = 10;
   FxAmount fx_unit_price = 11;
 }
@@ -645,6 +653,7 @@ message CreateProductRequest {
   int64 paid_amount = 11;
   bool skip_debt = 12;
   string staff_id = 13;  // who saved this (from JWT), recorded on any movement it writes
+  FxAmount fx_paid_amount = 14; // what was handed over, when that was not in so'm
 }
 message UpdateProductRequest {
   string id = 1;
@@ -662,6 +671,7 @@ message UpdateProductRequest {
   int64 paid_amount = 12;
   bool skip_debt = 13;
   string staff_id = 14;  // who saved this (from JWT), recorded on any movement it writes
+  FxAmount fx_paid_amount = 15; // what was handed over, when that was not in so'm
 }
 message AdjustVariantStockRequest {
   string variant_id = 1;
