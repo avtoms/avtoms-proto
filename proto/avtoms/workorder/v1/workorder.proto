@@ -658,6 +658,13 @@ message CreateProductRequest {
   bool skip_debt = 12;
   string staff_id = 13;  // who saved this (from JWT), recorded on any movement it writes
   FxAmount fx_paid_amount = 14; // what was handed over, when that was not in so'm
+  // How that settlement left the shop — cash, card, or a transfer to the supplier's account.
+  // See AdjustVariantStockRequest, which asks the same question on the receive form.
+  PaymentMethod payment_method = 15;
+  string card_id = 16;
+  string card_number = 17;
+  repeated PaymentPart parts = 18;
+  string transfer_ref = 19;
 }
 message UpdateProductRequest {
   string id = 1;
@@ -680,6 +687,13 @@ message UpdateProductRequest {
   // its own rate, and without knowing which shop is asking there is nothing to look it up
   // by. Never trusted from the body.
   string shop_id = 16;
+  // How that settlement left the shop — cash, card, or a transfer to the supplier's account.
+  // See AdjustVariantStockRequest, which asks the same question on the receive form.
+  PaymentMethod payment_method = 17;
+  string card_id = 18;
+  string card_number = 19;
+  repeated PaymentPart parts = 20;
+  string transfer_ref = 21;
 }
 message AdjustVariantStockRequest {
   string variant_id = 1;
@@ -703,6 +717,20 @@ message AdjustVariantStockRequest {
   // its own rate, and without knowing which shop is asking there is nothing to look it up
   // by. Never trusted from the body.
   string shop_id = 10;
+
+  // HOW the settled part left the shop. paid_amount above says how much; this says by what
+  // route, and for a supplier that is an MCHJ the route is normally a payment order from the
+  // shop's account to theirs — which a delivery had no way to record before, so every
+  // supplier payment made at the moment of receiving looked the same as cash.
+  //
+  // parts carries a split (some cash now, the rest transferred); a payment made a single way
+  // sends one part, or just payment_method. Both are optional, and a receipt that names
+  // neither is recorded exactly as it was before, with the method left unsaid.
+  PaymentMethod payment_method = 11;
+  string card_id = 12;
+  string card_number = 13;
+  repeated PaymentPart parts = 14;
+  string transfer_ref = 15;
 }
 
 // StockMovement is one entry in a variant's income/outcome ledger.
@@ -756,6 +784,15 @@ enum PaymentMethod {
   // Kept numerically identical to invoice.v1.PaymentMethod: the gateway casts one to the
   // other when it issues a sale's receipt, so the two enums must never drift apart.
   PAYMENT_METHOD_CREDIT = 4;
+  // Bank transfer, account to account ("pul o'tkazma" / перечисление) — how one legal entity
+  // settles with another. An MCHJ buying from an MCHJ hands over neither cash nor a card: it
+  // sends a payment order from its hisob raqami to theirs, and the order's number is what
+  // proves it happened.
+  //
+  // Its own method rather than folded into OTHER because the two answer different questions.
+  // OTHER means "some way we did not list"; TRANSFER means "it went bank to bank, and here is
+  // the reference" — which is exactly what a shop reconciling with a supplier needs to see.
+  PAYMENT_METHOD_TRANSFER = 5;
 }
 
 // PaymentPart is one leg of a payment that arrived, or left, in more than one form: part
@@ -771,6 +808,11 @@ message PaymentPart {
   PaymentMethod method = 2;
   string card_id = 3;    // for CARD: the shop card the money moved through
   string card_number = 4;
+  // For TRANSFER: the payment order this leg went out on ("to'lov topshiriqnomasi №"). It is
+  // the only handle the bank statement and this row have in common, so a transfer without it
+  // can be seen but not reconciled. Free text — a shop may key the order number, the date, or
+  // both, and inventing a format for it would only be a format to work around.
+  string transfer_ref = 5;
 }
 
 // SaleItem is one line of a counter sale: a warehouse variant, how much of it left, and
@@ -1089,6 +1131,42 @@ message FxAmount {
   int64 rate_micros = 3;   // so'm for one whole unit, x1e6
 }
 
+// What kind of counterparty this is in law. It decides what the rest of the card means: a
+// market trader has a phone and a name and nothing else to hold, while an MCHJ has a STIR, a
+// bank account and a director who signs — and money reaches the two by completely different
+// routes (cash in a hand, versus a payment order between two accounts).
+//
+// UNSPECIFIED is not "unknown company"; it is every supplier that existed before any of this
+// was asked for, and it must keep behaving exactly as it did.
+enum ContragentEntityType {
+  CONTRAGENT_ENTITY_TYPE_UNSPECIFIED = 0;
+  CONTRAGENT_ENTITY_TYPE_INDIVIDUAL = 1;   // jismoniy shaxs — a private person
+  CONTRAGENT_ENTITY_TYPE_SOLE_TRADER = 2;  // YaTT / ИП — a registered individual entrepreneur
+  CONTRAGENT_ENTITY_TYPE_LLC = 3;          // MCHJ / ООО — a limited liability company
+  CONTRAGENT_ENTITY_TYPE_JSC = 4;          // AJ / АО — a joint-stock company
+}
+
+// CompanyDetails is who a counterparty is on paper, and where money reaches them. Kept as
+// its own message rather than nine loose fields because it is one thing — the requisites
+// block a shop copies off a contract — and because the shop's own side of a transfer needs
+// exactly the same shape (see ShopSettings).
+//
+// Every field is optional. A shop that buys cash-in-hand from the bazaar fills in none of it
+// and loses nothing; a shop paying an MCHJ by bank transfer fills it in once and never types
+// an account number again.
+message CompanyDetails {
+  ContragentEntityType entity_type = 1;
+  string tin = 2;            // STIR / ИНН — 9 digits
+  string vat_code = 3;       // NDS registration code — 12 digits, when registered for VAT
+  string director = 4;       // who signs, as named on the contract
+  string legal_address = 5;  // the registered address, which is often not where the goods come from
+  string bank_name = 6;      // the servicing bank and branch
+  string bank_mfo = 7;       // MFO / БИК — 5 digits, the branch's code
+  string bank_account = 8;   // hisob raqami — 20 digits
+  string contract_no = 9;    // the supply contract this account runs under
+  string contract_date = 10; // when it was signed, YYYY-MM-DD; empty when not recorded
+}
+
 // Contragent is a counterparty the shop transacts with — chiefly a supplier
 // ("yetkazib beruvchi") that products are bought from. Shop-scoped so each shop
 // keeps its own supplier list.
@@ -1101,6 +1179,9 @@ message Contragent {
   string notes = 6;
   bool active = 7;
   string brand = 8;  // optional brand this supplier is tied to (matches Product.brand by name)
+  // Who they are in law, and the account a transfer to them goes to. Absent on every
+  // counterparty a shop never had to pay by bank.
+  CompanyDetails company = 9;
 }
 message ListContragentsRequest {
   string shop_id = 1;
@@ -1116,6 +1197,7 @@ message CreateContragentRequest {
   string address = 4;
   string notes = 5;
   string brand = 6;
+  CompanyDetails company = 7;
 }
 message UpdateContragentRequest {
   string id = 1;
@@ -1125,6 +1207,7 @@ message UpdateContragentRequest {
   string notes = 5;
   bool active = 6;
   string brand = 7;
+  CompanyDetails company = 8;
 }
 message DeleteContragentRequest {
   string id = 1;
@@ -1171,6 +1254,10 @@ message ContragentLedgerEntry {
   // What was agreed or handed over, when it was not so'm — "$200 at 12 750". Explains
   // `amount`, which stays the so'm figure the balance is summed from.
   FxAmount fx_amount = 16;
+
+  // For TRANSFER payments: the payment order the money went out on. Mirrors the first part,
+  // exactly as card_number does, so a statement row shows its reference without a join.
+  string transfer_ref = 17;
 }
 
 // ContragentBalance is one counterparty's account. balance = purchased + received
@@ -1231,6 +1318,9 @@ message RecordContragentEntryRequest {
   // its own rate, and without knowing which shop is asking there is nothing to look it up
   // by. Never trusted from the body.
   string shop_id = 13;
+  // For a TRANSFER: the payment order number. Taken from the first part when the payment was
+  // split, so a caller sending parts need not repeat it.
+  string transfer_ref = 14;
 }
 message DeleteContragentEntryRequest {
   string id = 1;
@@ -1372,6 +1462,16 @@ message ShopSettings {
   string tin = 6;     // STIR / INN
   string phone = 7;
   string hours = 8;   // opening hours, as printed on the check
+  // The shop's own side of a bank transfer. A payment order names two accounts, and until
+  // this existed the system knew only the supplier's — so it could record that money was
+  // sent but never say what it was sent FROM.
+  //
+  // The same shape as a contragent's, deliberately: the shop is a counterparty too, seen
+  // from the other side of the contract. entity_type, tin and legal_address overlap with
+  // name/address/tin above, which stay as they are — those are what a customer's receipt
+  // prints, and this is what a bank needs; the two are filled in by different people and one
+  // of them being blank must never blank the other.
+  CompanyDetails company = 9;
 }
 message GetShopSettingsRequest {
   string shop_id = 1;
@@ -1385,6 +1485,7 @@ message UpdateShopSettingsRequest {
   string tin = 6;
   string phone = 7;
   string hours = 8;
+  CompanyDetails company = 9;
 }
 
 message ListWorkOrdersRequest {

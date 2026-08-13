@@ -55,6 +55,10 @@ enum PaymentMethod {
   // Numerically identical to workorder.v1.PaymentMethod, which the gateway casts to this
   // one when a counter sale's receipt is issued. The two must never drift apart.
   PAYMENT_METHOD_CREDIT = 4;
+  // Bank transfer, account to account ("pul o'tkazma" / перечисление): how a customer that is
+  // itself a company settles a bill, and how the shop pays its own suppliers. Carried here so
+  // a receipt issued for a transferred payment says so instead of calling it "other".
+  PAYMENT_METHOD_TRANSFER = 5;
 }
 
 message Invoice {
