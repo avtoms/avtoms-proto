@@ -68,6 +68,10 @@ const (
 	WorkOrderService_CreateContragent_FullMethodName         = "/avtoms.workorder.v1.WorkOrderService/CreateContragent"
 	WorkOrderService_UpdateContragent_FullMethodName         = "/avtoms.workorder.v1.WorkOrderService/UpdateContragent"
 	WorkOrderService_DeleteContragent_FullMethodName         = "/avtoms.workorder.v1.WorkOrderService/DeleteContragent"
+	WorkOrderService_ListBankAccounts_FullMethodName         = "/avtoms.workorder.v1.WorkOrderService/ListBankAccounts"
+	WorkOrderService_CreateBankAccount_FullMethodName        = "/avtoms.workorder.v1.WorkOrderService/CreateBankAccount"
+	WorkOrderService_UpdateBankAccount_FullMethodName        = "/avtoms.workorder.v1.WorkOrderService/UpdateBankAccount"
+	WorkOrderService_DeleteBankAccount_FullMethodName        = "/avtoms.workorder.v1.WorkOrderService/DeleteBankAccount"
 	WorkOrderService_ListContragentBalances_FullMethodName   = "/avtoms.workorder.v1.WorkOrderService/ListContragentBalances"
 	WorkOrderService_ListContragentLedger_FullMethodName     = "/avtoms.workorder.v1.WorkOrderService/ListContragentLedger"
 	WorkOrderService_RecordContragentEntry_FullMethodName    = "/avtoms.workorder.v1.WorkOrderService/RecordContragentEntry"
@@ -186,6 +190,14 @@ type WorkOrderServiceClient interface {
 	CreateContragent(ctx context.Context, in *CreateContragentRequest, opts ...grpc.CallOption) (*Contragent, error)
 	UpdateContragent(ctx context.Context, in *UpdateContragentRequest, opts ...grpc.CallOption) (*Contragent, error)
 	DeleteContragent(ctx context.Context, in *DeleteContragentRequest, opts ...grpc.CallOption) (*DeleteContragentResponse, error)
+	// Bank accounts, for either side of a transfer: the shop's own, and a counterparty's.
+	// A company rarely has exactly one — an MCHJ keeps a so'm account and a currency account,
+	// sometimes at different banks — so the account a payment moves through is CHOSEN rather
+	// than assumed, the same way a card payment picks which card the money landed on.
+	ListBankAccounts(ctx context.Context, in *ListBankAccountsRequest, opts ...grpc.CallOption) (*ListBankAccountsResponse, error)
+	CreateBankAccount(ctx context.Context, in *CreateBankAccountRequest, opts ...grpc.CallOption) (*BankAccount, error)
+	UpdateBankAccount(ctx context.Context, in *UpdateBankAccountRequest, opts ...grpc.CallOption) (*BankAccount, error)
+	DeleteBankAccount(ctx context.Context, in *DeleteBankAccountRequest, opts ...grpc.CallOption) (*DeleteBankAccountResponse, error)
 	// Contragent accounts: what the shop owes a counterparty and what it has settled.
 	// Buying stock already recorded who supplied it and what it cost; this turns that into a
 	// running account, and adds the two things it was missing — paying a supplier without
@@ -733,6 +745,46 @@ func (c *workOrderServiceClient) DeleteContragent(ctx context.Context, in *Delet
 	return out, nil
 }
 
+func (c *workOrderServiceClient) ListBankAccounts(ctx context.Context, in *ListBankAccountsRequest, opts ...grpc.CallOption) (*ListBankAccountsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListBankAccountsResponse)
+	err := c.cc.Invoke(ctx, WorkOrderService_ListBankAccounts_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *workOrderServiceClient) CreateBankAccount(ctx context.Context, in *CreateBankAccountRequest, opts ...grpc.CallOption) (*BankAccount, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(BankAccount)
+	err := c.cc.Invoke(ctx, WorkOrderService_CreateBankAccount_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *workOrderServiceClient) UpdateBankAccount(ctx context.Context, in *UpdateBankAccountRequest, opts ...grpc.CallOption) (*BankAccount, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(BankAccount)
+	err := c.cc.Invoke(ctx, WorkOrderService_UpdateBankAccount_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *workOrderServiceClient) DeleteBankAccount(ctx context.Context, in *DeleteBankAccountRequest, opts ...grpc.CallOption) (*DeleteBankAccountResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(DeleteBankAccountResponse)
+	err := c.cc.Invoke(ctx, WorkOrderService_DeleteBankAccount_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *workOrderServiceClient) ListContragentBalances(ctx context.Context, in *ListContragentBalancesRequest, opts ...grpc.CallOption) (*ListContragentBalancesResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(ListContragentBalancesResponse)
@@ -1119,6 +1171,14 @@ type WorkOrderServiceServer interface {
 	CreateContragent(context.Context, *CreateContragentRequest) (*Contragent, error)
 	UpdateContragent(context.Context, *UpdateContragentRequest) (*Contragent, error)
 	DeleteContragent(context.Context, *DeleteContragentRequest) (*DeleteContragentResponse, error)
+	// Bank accounts, for either side of a transfer: the shop's own, and a counterparty's.
+	// A company rarely has exactly one — an MCHJ keeps a so'm account and a currency account,
+	// sometimes at different banks — so the account a payment moves through is CHOSEN rather
+	// than assumed, the same way a card payment picks which card the money landed on.
+	ListBankAccounts(context.Context, *ListBankAccountsRequest) (*ListBankAccountsResponse, error)
+	CreateBankAccount(context.Context, *CreateBankAccountRequest) (*BankAccount, error)
+	UpdateBankAccount(context.Context, *UpdateBankAccountRequest) (*BankAccount, error)
+	DeleteBankAccount(context.Context, *DeleteBankAccountRequest) (*DeleteBankAccountResponse, error)
 	// Contragent accounts: what the shop owes a counterparty and what it has settled.
 	// Buying stock already recorded who supplied it and what it cost; this turns that into a
 	// running account, and adds the two things it was missing — paying a supplier without
@@ -1322,6 +1382,18 @@ func (UnimplementedWorkOrderServiceServer) UpdateContragent(context.Context, *Up
 }
 func (UnimplementedWorkOrderServiceServer) DeleteContragent(context.Context, *DeleteContragentRequest) (*DeleteContragentResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method DeleteContragent not implemented")
+}
+func (UnimplementedWorkOrderServiceServer) ListBankAccounts(context.Context, *ListBankAccountsRequest) (*ListBankAccountsResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListBankAccounts not implemented")
+}
+func (UnimplementedWorkOrderServiceServer) CreateBankAccount(context.Context, *CreateBankAccountRequest) (*BankAccount, error) {
+	return nil, status.Error(codes.Unimplemented, "method CreateBankAccount not implemented")
+}
+func (UnimplementedWorkOrderServiceServer) UpdateBankAccount(context.Context, *UpdateBankAccountRequest) (*BankAccount, error) {
+	return nil, status.Error(codes.Unimplemented, "method UpdateBankAccount not implemented")
+}
+func (UnimplementedWorkOrderServiceServer) DeleteBankAccount(context.Context, *DeleteBankAccountRequest) (*DeleteBankAccountResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method DeleteBankAccount not implemented")
 }
 func (UnimplementedWorkOrderServiceServer) ListContragentBalances(context.Context, *ListContragentBalancesRequest) (*ListContragentBalancesResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method ListContragentBalances not implemented")
@@ -2316,6 +2388,78 @@ func _WorkOrderService_DeleteContragent_Handler(srv interface{}, ctx context.Con
 	return interceptor(ctx, in, info, handler)
 }
 
+func _WorkOrderService_ListBankAccounts_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListBankAccountsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WorkOrderServiceServer).ListBankAccounts(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: WorkOrderService_ListBankAccounts_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WorkOrderServiceServer).ListBankAccounts(ctx, req.(*ListBankAccountsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _WorkOrderService_CreateBankAccount_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateBankAccountRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WorkOrderServiceServer).CreateBankAccount(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: WorkOrderService_CreateBankAccount_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WorkOrderServiceServer).CreateBankAccount(ctx, req.(*CreateBankAccountRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _WorkOrderService_UpdateBankAccount_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateBankAccountRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WorkOrderServiceServer).UpdateBankAccount(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: WorkOrderService_UpdateBankAccount_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WorkOrderServiceServer).UpdateBankAccount(ctx, req.(*UpdateBankAccountRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _WorkOrderService_DeleteBankAccount_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteBankAccountRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WorkOrderServiceServer).DeleteBankAccount(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: WorkOrderService_DeleteBankAccount_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WorkOrderServiceServer).DeleteBankAccount(ctx, req.(*DeleteBankAccountRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _WorkOrderService_ListContragentBalances_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ListContragentBalancesRequest)
 	if err := dec(in); err != nil {
@@ -3058,6 +3202,22 @@ var WorkOrderService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteContragent",
 			Handler:    _WorkOrderService_DeleteContragent_Handler,
+		},
+		{
+			MethodName: "ListBankAccounts",
+			Handler:    _WorkOrderService_ListBankAccounts_Handler,
+		},
+		{
+			MethodName: "CreateBankAccount",
+			Handler:    _WorkOrderService_CreateBankAccount_Handler,
+		},
+		{
+			MethodName: "UpdateBankAccount",
+			Handler:    _WorkOrderService_UpdateBankAccount_Handler,
+		},
+		{
+			MethodName: "DeleteBankAccount",
+			Handler:    _WorkOrderService_DeleteBankAccount_Handler,
 		},
 		{
 			MethodName: "ListContragentBalances",

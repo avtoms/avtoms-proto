@@ -97,6 +97,15 @@ service WorkOrderService {
   rpc UpdateContragent(UpdateContragentRequest) returns (Contragent);
   rpc DeleteContragent(DeleteContragentRequest) returns (DeleteContragentResponse);
 
+  // Bank accounts, for either side of a transfer: the shop's own, and a counterparty's.
+  // A company rarely has exactly one — an MCHJ keeps a so'm account and a currency account,
+  // sometimes at different banks — so the account a payment moves through is CHOSEN rather
+  // than assumed, the same way a card payment picks which card the money landed on.
+  rpc ListBankAccounts(ListBankAccountsRequest) returns (ListBankAccountsResponse);
+  rpc CreateBankAccount(CreateBankAccountRequest) returns (BankAccount);
+  rpc UpdateBankAccount(UpdateBankAccountRequest) returns (BankAccount);
+  rpc DeleteBankAccount(DeleteBankAccountRequest) returns (DeleteBankAccountResponse);
+
   // Contragent accounts: what the shop owes a counterparty and what it has settled.
   // Buying stock already recorded who supplied it and what it cost; this turns that into a
   // running account, and adds the two things it was missing — paying a supplier without
@@ -665,6 +674,9 @@ message CreateProductRequest {
   string card_number = 17;
   repeated PaymentPart parts = 18;
   string transfer_ref = 19;
+  string bank_account_id = 20;
+  string bank_account_number = 21;
+  string counterparty_account = 22;
 }
 message UpdateProductRequest {
   string id = 1;
@@ -694,6 +706,9 @@ message UpdateProductRequest {
   string card_number = 19;
   repeated PaymentPart parts = 20;
   string transfer_ref = 21;
+  string bank_account_id = 22;
+  string bank_account_number = 23;
+  string counterparty_account = 24;
 }
 message AdjustVariantStockRequest {
   string variant_id = 1;
@@ -731,6 +746,9 @@ message AdjustVariantStockRequest {
   string card_number = 13;
   repeated PaymentPart parts = 14;
   string transfer_ref = 15;
+  string bank_account_id = 16;
+  string bank_account_number = 17;
+  string counterparty_account = 18;
 }
 
 // StockMovement is one entry in a variant's income/outcome ledger.
@@ -813,6 +831,19 @@ message PaymentPart {
   // can be seen but not reconciled. Free text — a shop may key the order number, the date, or
   // both, and inventing a format for it would only be a format to work around.
   string transfer_ref = 5;
+
+  // Which accounts the money moved between. bank_account_id is the SHOP's own account — the
+  // exact counterpart of card_id, which names the shop card a payment landed on — with its
+  // number snapshotted beside it so a statement reads without a join and cannot be rewritten
+  // by someone editing the account later.
+  //
+  // counterparty_account is the other side: the supplier's hisob raqami this leg was sent to,
+  // or the client's it arrived from. Kept as a number rather than an id because the ledger row
+  // already names the party, and what a reconciliation needs is the twenty digits that appear
+  // on the bank statement.
+  string bank_account_id = 6;
+  string bank_account_number = 7;
+  string counterparty_account = 8;
 }
 
 // SaleItem is one line of a counter sale: a warehouse variant, how much of it left, and
@@ -1167,6 +1198,72 @@ message CompanyDetails {
   string contract_date = 10; // when it was signed, YYYY-MM-DD; empty when not recorded
 }
 
+// Whose account this is. One list serves both sides of a transfer because a payment order
+// names two accounts of exactly the same shape, and a screen that sends money has to offer
+// both: which of ours it leaves from, and which of theirs it lands in.
+enum BankAccountOwner {
+  BANK_ACCOUNT_OWNER_UNSPECIFIED = 0;
+  BANK_ACCOUNT_OWNER_SHOP = 1;        // owner_id is the shop
+  BANK_ACCOUNT_OWNER_CONTRAGENT = 2;  // owner_id is a contragent
+}
+
+// BankAccount is one hisob raqami money can move through.
+//
+// A company rarely has exactly one: a so'm account and a currency account, often at different
+// banks, and a supplier who changes bank does not stop being owed on the old one. So this is a
+// list per owner rather than a field on them, and a payment says which of them it used —
+// exactly as a card payment says which card the money landed on.
+message BankAccount {
+  string id = 1;
+  string shop_id = 2;          // whose books this belongs to, for both owner kinds
+  BankAccountOwner owner_kind = 3;
+  string owner_id = 4;         // the shop, or the contragent
+  string label = 5;            // what the shop calls it: "asosiy", "valyuta"
+  string bank_name = 6;
+  string bank_mfo = 7;         // 5 digits
+  string account_number = 8;   // 20 digits
+  // The one offered first, and the one a payment uses when nobody chose. Exactly one account
+  // per owner is primary; making another primary stands the old one down.
+  bool is_primary = 9;
+  bool active = 10;            // a closed account stops being offered and keeps its history
+  string created_at = 11;
+}
+
+message ListBankAccountsRequest {
+  BankAccountOwner owner_kind = 1;
+  string owner_id = 2;       // empty with owner_kind SHOP means "the shop from the token"
+  string shop_id = 3;        // set by the gateway from the token; never trusted from the body
+  bool include_inactive = 4; // the management screen passes true; a payment form does not
+}
+message ListBankAccountsResponse {
+  repeated BankAccount accounts = 1; // primary first, then by label
+}
+message CreateBankAccountRequest {
+  BankAccountOwner owner_kind = 1;
+  string owner_id = 2;
+  string shop_id = 3;
+  string label = 4;
+  string bank_name = 5;
+  string bank_mfo = 6;
+  string account_number = 7;
+  bool is_primary = 8;
+}
+message UpdateBankAccountRequest {
+  string id = 1;
+  string label = 2;
+  string bank_name = 3;
+  string bank_mfo = 4;
+  string account_number = 5;
+  bool is_primary = 6;
+  bool active = 7;
+}
+message DeleteBankAccountRequest {
+  string id = 1;
+}
+message DeleteBankAccountResponse {
+  bool ok = 1;
+}
+
 // Contragent is a counterparty the shop transacts with — chiefly a supplier
 // ("yetkazib beruvchi") that products are bought from. Shop-scoped so each shop
 // keeps its own supplier list.
@@ -1255,9 +1352,13 @@ message ContragentLedgerEntry {
   // `amount`, which stays the so'm figure the balance is summed from.
   FxAmount fx_amount = 16;
 
-  // For TRANSFER payments: the payment order the money went out on. Mirrors the first part,
-  // exactly as card_number does, so a statement row shows its reference without a join.
+  // For TRANSFER payments: the payment order the money went out on, and the two accounts it
+  // moved between. All three mirror the first part, exactly as card_number does, so a
+  // statement row reads without a join.
   string transfer_ref = 17;
+  string bank_account_id = 18;
+  string bank_account_number = 19;
+  string counterparty_account = 20;
 }
 
 // ContragentBalance is one counterparty's account. balance = purchased + received
@@ -1318,9 +1419,12 @@ message RecordContragentEntryRequest {
   // its own rate, and without knowing which shop is asking there is nothing to look it up
   // by. Never trusted from the body.
   string shop_id = 13;
-  // For a TRANSFER: the payment order number. Taken from the first part when the payment was
-  // split, so a caller sending parts need not repeat it.
+  // For a TRANSFER: the payment order number and the accounts it moved between. Taken from
+  // the first part when the payment was split, so a caller sending parts need not repeat them.
   string transfer_ref = 14;
+  string bank_account_id = 15;
+  string bank_account_number = 16;
+  string counterparty_account = 17;
 }
 message DeleteContragentEntryRequest {
   string id = 1;
