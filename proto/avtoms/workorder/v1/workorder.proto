@@ -72,6 +72,16 @@ service WorkOrderService {
   rpc UpdatePropertyDefinition(UpdatePropertyDefinitionRequest) returns (PropertyDefinition);
   rpc DeletePropertyDefinition(DeletePropertyDefinitionRequest) returns (DeletePropertyDefinitionResponse);
 
+  // Ready-made products the super admin authors once for every shop: a name, a picture,
+  // the properties that matter for that kind of goods, and the variants worth stocking.
+  // A shop adds one by ticking the variants it carries and typing a price and a count —
+  // everything else is already filled in. Any authenticated user may list them (the
+  // warehouse form needs them); only admins mutate them.
+  rpc ListProductTemplates(ListProductTemplatesRequest) returns (ListProductTemplatesResponse);
+  rpc CreateProductTemplate(CreateProductTemplateRequest) returns (ProductTemplate);
+  rpc UpdateProductTemplate(UpdateProductTemplateRequest) returns (ProductTemplate);
+  rpc DeleteProductTemplate(DeleteProductTemplateRequest) returns (DeleteProductTemplateResponse);
+
   // Simple admin-managed term lists (brands, product categories) used as dropdowns.
   rpc ListCatalogTerms(ListCatalogTermsRequest) returns (ListCatalogTermsResponse);
   rpc CreateCatalogTerm(CreateCatalogTermRequest) returns (CatalogTerm);
@@ -591,6 +601,11 @@ message Product {
   repeated ProductVariant variants = 10;    // each combination, own price/stock
   string brand = 11;          // brand this product belongs to (e.g. "Bosch", "Shell")
   string supplier_id = 12;    // linked contragent (supplier) id; empty if free-typed only
+  // Which ProductTemplate this was stocked from, empty for a hand-typed product. Kept so the
+  // catalogue can say what a shop already carries, and so the warehouse list can show the
+  // admin's picture of the goods — held on the template rather than copied onto every shop's
+  // row, because replacing a bad photo should fix it everywhere at once.
+  string template_id = 13;
 }
 
 // ProductProperty is a named option that defines variants, with its allowed values.
@@ -677,6 +692,9 @@ message CreateProductRequest {
   string bank_account_id = 20;
   string bank_account_number = 21;
   string counterparty_account = 22;
+  // The catalogue entry this was stocked from, when it came from one. Stamped on the product
+  // (and on the existing product, when this save folds into one) — never on the variants.
+  string template_id = 23;
 }
 message UpdateProductRequest {
   string id = 1;
@@ -1012,6 +1030,96 @@ message DeletePropertyDefinitionRequest {
   string id = 1;
 }
 message DeletePropertyDefinitionResponse {
+  bool ok = 1;
+}
+
+// ── Product templates ───────────────────────────────────────────────────────────────
+// ProductTemplate is a ready-made product the super admin authors once and every shop can
+// stock from: "Shell Helix Ultra 5W-40", its category, its picture, and the variants worth
+// carrying (1 L, 4 L, 20 L).
+//
+// It is a blueprint, not stock. Nothing here is per-shop and nothing here is countable or
+// priced — a shop adds it by picking the variants it actually sells and typing what it paid
+// and what it charges, which is the only part a template cannot know.
+//
+// The variants are stored explicitly rather than derived from the properties below, because
+// a real catalogue is not a full cartesian product: 5W-40 comes in 1 L and 4 L, 0W-20 only in
+// 4 L, and generating the combinations would offer shops bottles that do not exist. The admin
+// generates the grid in the constructor and then removes what nobody sells.
+message ProductTemplate {
+  string id = 1;
+  string category = 2;        // a CatalogTerm of type "category" — what the shop picks first
+  string brand = 3;           // a CatalogTerm of type "brand"; may be empty (unbranded goods)
+  // Canonical name and the stable identifier. Display uses the translations below, falling
+  // back to this when a translation is blank — the same rule PropertyDefinition follows.
+  string name = 4;
+  string name_uz_latn = 5;
+  string name_uz_cyrl = 6;
+  string name_ru = 7;
+  string description = 8;
+  string unit = 9;            // unit of measure the product is counted in: dona, litr, kg
+  string image_url = 10;      // superadmin-uploaded photo; the card grid falls back without it
+  int32 position = 11;
+  bool active = 12;
+  // Which properties this kind of goods varies by, and the values the template offers. Names
+  // reference PropertyDefinition.name, so the shop's form can show swatches and translations
+  // for them exactly as it does for a hand-built product.
+  repeated ProductProperty properties = 13;
+  repeated ProductTemplateVariant variants = 14;
+}
+
+// ProductTemplateVariant is one combination the admin says is worth stocking.
+//
+// It carries no quantity and no cost: what a shop paid for a bottle of oil is between the
+// shop and its supplier. suggested_price is a starting point for the shop's own price field,
+// nothing more — it is prefilled, always editable, and never stored on the product as though
+// the platform had set it.
+message ProductTemplateVariant {
+  string id = 1;
+  string sku = 2;                 // manufacturer article number, when the admin knows it
+  int64 suggested_price = 3;      // recommended sell price, tiyin; 0 = none suggested
+  repeated VariantAttribute attributes = 4;
+}
+
+message ListProductTemplatesRequest {
+  string category = 1;         // optional filter; empty returns every category
+  bool include_inactive = 2;   // admin panel passes true; the warehouse form omits it
+}
+message ListProductTemplatesResponse {
+  repeated ProductTemplate templates = 1;
+}
+message CreateProductTemplateRequest {
+  string category = 1;
+  string brand = 2;
+  string name = 3;
+  string name_uz_latn = 4;
+  string name_uz_cyrl = 5;
+  string name_ru = 6;
+  string description = 7;
+  string unit = 8;
+  string image_url = 9;
+  repeated ProductProperty properties = 10;
+  repeated ProductTemplateVariant variants = 11;
+}
+message UpdateProductTemplateRequest {
+  string id = 1;
+  string category = 2;
+  string brand = 3;
+  string name = 4;
+  string name_uz_latn = 5;
+  string name_uz_cyrl = 6;
+  string name_ru = 7;
+  string description = 8;
+  string unit = 9;
+  string image_url = 10;
+  bool active = 11;
+  repeated ProductProperty properties = 12;
+  repeated ProductTemplateVariant variants = 13;
+}
+message DeleteProductTemplateRequest {
+  string id = 1;
+}
+message DeleteProductTemplateResponse {
   bool ok = 1;
 }
 

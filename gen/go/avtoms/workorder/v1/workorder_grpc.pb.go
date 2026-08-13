@@ -56,6 +56,10 @@ const (
 	WorkOrderService_CreatePropertyDefinition_FullMethodName = "/avtoms.workorder.v1.WorkOrderService/CreatePropertyDefinition"
 	WorkOrderService_UpdatePropertyDefinition_FullMethodName = "/avtoms.workorder.v1.WorkOrderService/UpdatePropertyDefinition"
 	WorkOrderService_DeletePropertyDefinition_FullMethodName = "/avtoms.workorder.v1.WorkOrderService/DeletePropertyDefinition"
+	WorkOrderService_ListProductTemplates_FullMethodName     = "/avtoms.workorder.v1.WorkOrderService/ListProductTemplates"
+	WorkOrderService_CreateProductTemplate_FullMethodName    = "/avtoms.workorder.v1.WorkOrderService/CreateProductTemplate"
+	WorkOrderService_UpdateProductTemplate_FullMethodName    = "/avtoms.workorder.v1.WorkOrderService/UpdateProductTemplate"
+	WorkOrderService_DeleteProductTemplate_FullMethodName    = "/avtoms.workorder.v1.WorkOrderService/DeleteProductTemplate"
 	WorkOrderService_ListCatalogTerms_FullMethodName         = "/avtoms.workorder.v1.WorkOrderService/ListCatalogTerms"
 	WorkOrderService_CreateCatalogTerm_FullMethodName        = "/avtoms.workorder.v1.WorkOrderService/CreateCatalogTerm"
 	WorkOrderService_UpdateCatalogTerm_FullMethodName        = "/avtoms.workorder.v1.WorkOrderService/UpdateCatalogTerm"
@@ -168,6 +172,15 @@ type WorkOrderServiceClient interface {
 	CreatePropertyDefinition(ctx context.Context, in *CreatePropertyDefinitionRequest, opts ...grpc.CallOption) (*PropertyDefinition, error)
 	UpdatePropertyDefinition(ctx context.Context, in *UpdatePropertyDefinitionRequest, opts ...grpc.CallOption) (*PropertyDefinition, error)
 	DeletePropertyDefinition(ctx context.Context, in *DeletePropertyDefinitionRequest, opts ...grpc.CallOption) (*DeletePropertyDefinitionResponse, error)
+	// Ready-made products the super admin authors once for every shop: a name, a picture,
+	// the properties that matter for that kind of goods, and the variants worth stocking.
+	// A shop adds one by ticking the variants it carries and typing a price and a count —
+	// everything else is already filled in. Any authenticated user may list them (the
+	// warehouse form needs them); only admins mutate them.
+	ListProductTemplates(ctx context.Context, in *ListProductTemplatesRequest, opts ...grpc.CallOption) (*ListProductTemplatesResponse, error)
+	CreateProductTemplate(ctx context.Context, in *CreateProductTemplateRequest, opts ...grpc.CallOption) (*ProductTemplate, error)
+	UpdateProductTemplate(ctx context.Context, in *UpdateProductTemplateRequest, opts ...grpc.CallOption) (*ProductTemplate, error)
+	DeleteProductTemplate(ctx context.Context, in *DeleteProductTemplateRequest, opts ...grpc.CallOption) (*DeleteProductTemplateResponse, error)
 	// Simple admin-managed term lists (brands, product categories) used as dropdowns.
 	ListCatalogTerms(ctx context.Context, in *ListCatalogTermsRequest, opts ...grpc.CallOption) (*ListCatalogTermsResponse, error)
 	CreateCatalogTerm(ctx context.Context, in *CreateCatalogTermRequest, opts ...grpc.CallOption) (*CatalogTerm, error)
@@ -619,6 +632,46 @@ func (c *workOrderServiceClient) DeletePropertyDefinition(ctx context.Context, i
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(DeletePropertyDefinitionResponse)
 	err := c.cc.Invoke(ctx, WorkOrderService_DeletePropertyDefinition_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *workOrderServiceClient) ListProductTemplates(ctx context.Context, in *ListProductTemplatesRequest, opts ...grpc.CallOption) (*ListProductTemplatesResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListProductTemplatesResponse)
+	err := c.cc.Invoke(ctx, WorkOrderService_ListProductTemplates_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *workOrderServiceClient) CreateProductTemplate(ctx context.Context, in *CreateProductTemplateRequest, opts ...grpc.CallOption) (*ProductTemplate, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ProductTemplate)
+	err := c.cc.Invoke(ctx, WorkOrderService_CreateProductTemplate_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *workOrderServiceClient) UpdateProductTemplate(ctx context.Context, in *UpdateProductTemplateRequest, opts ...grpc.CallOption) (*ProductTemplate, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ProductTemplate)
+	err := c.cc.Invoke(ctx, WorkOrderService_UpdateProductTemplate_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *workOrderServiceClient) DeleteProductTemplate(ctx context.Context, in *DeleteProductTemplateRequest, opts ...grpc.CallOption) (*DeleteProductTemplateResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(DeleteProductTemplateResponse)
+	err := c.cc.Invoke(ctx, WorkOrderService_DeleteProductTemplate_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -1149,6 +1202,15 @@ type WorkOrderServiceServer interface {
 	CreatePropertyDefinition(context.Context, *CreatePropertyDefinitionRequest) (*PropertyDefinition, error)
 	UpdatePropertyDefinition(context.Context, *UpdatePropertyDefinitionRequest) (*PropertyDefinition, error)
 	DeletePropertyDefinition(context.Context, *DeletePropertyDefinitionRequest) (*DeletePropertyDefinitionResponse, error)
+	// Ready-made products the super admin authors once for every shop: a name, a picture,
+	// the properties that matter for that kind of goods, and the variants worth stocking.
+	// A shop adds one by ticking the variants it carries and typing a price and a count —
+	// everything else is already filled in. Any authenticated user may list them (the
+	// warehouse form needs them); only admins mutate them.
+	ListProductTemplates(context.Context, *ListProductTemplatesRequest) (*ListProductTemplatesResponse, error)
+	CreateProductTemplate(context.Context, *CreateProductTemplateRequest) (*ProductTemplate, error)
+	UpdateProductTemplate(context.Context, *UpdateProductTemplateRequest) (*ProductTemplate, error)
+	DeleteProductTemplate(context.Context, *DeleteProductTemplateRequest) (*DeleteProductTemplateResponse, error)
 	// Simple admin-managed term lists (brands, product categories) used as dropdowns.
 	ListCatalogTerms(context.Context, *ListCatalogTermsRequest) (*ListCatalogTermsResponse, error)
 	CreateCatalogTerm(context.Context, *CreateCatalogTermRequest) (*CatalogTerm, error)
@@ -1346,6 +1408,18 @@ func (UnimplementedWorkOrderServiceServer) UpdatePropertyDefinition(context.Cont
 }
 func (UnimplementedWorkOrderServiceServer) DeletePropertyDefinition(context.Context, *DeletePropertyDefinitionRequest) (*DeletePropertyDefinitionResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method DeletePropertyDefinition not implemented")
+}
+func (UnimplementedWorkOrderServiceServer) ListProductTemplates(context.Context, *ListProductTemplatesRequest) (*ListProductTemplatesResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListProductTemplates not implemented")
+}
+func (UnimplementedWorkOrderServiceServer) CreateProductTemplate(context.Context, *CreateProductTemplateRequest) (*ProductTemplate, error) {
+	return nil, status.Error(codes.Unimplemented, "method CreateProductTemplate not implemented")
+}
+func (UnimplementedWorkOrderServiceServer) UpdateProductTemplate(context.Context, *UpdateProductTemplateRequest) (*ProductTemplate, error) {
+	return nil, status.Error(codes.Unimplemented, "method UpdateProductTemplate not implemented")
+}
+func (UnimplementedWorkOrderServiceServer) DeleteProductTemplate(context.Context, *DeleteProductTemplateRequest) (*DeleteProductTemplateResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method DeleteProductTemplate not implemented")
 }
 func (UnimplementedWorkOrderServiceServer) ListCatalogTerms(context.Context, *ListCatalogTermsRequest) (*ListCatalogTermsResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method ListCatalogTerms not implemented")
@@ -2168,6 +2242,78 @@ func _WorkOrderService_DeletePropertyDefinition_Handler(srv interface{}, ctx con
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(WorkOrderServiceServer).DeletePropertyDefinition(ctx, req.(*DeletePropertyDefinitionRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _WorkOrderService_ListProductTemplates_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListProductTemplatesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WorkOrderServiceServer).ListProductTemplates(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: WorkOrderService_ListProductTemplates_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WorkOrderServiceServer).ListProductTemplates(ctx, req.(*ListProductTemplatesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _WorkOrderService_CreateProductTemplate_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateProductTemplateRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WorkOrderServiceServer).CreateProductTemplate(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: WorkOrderService_CreateProductTemplate_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WorkOrderServiceServer).CreateProductTemplate(ctx, req.(*CreateProductTemplateRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _WorkOrderService_UpdateProductTemplate_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateProductTemplateRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WorkOrderServiceServer).UpdateProductTemplate(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: WorkOrderService_UpdateProductTemplate_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WorkOrderServiceServer).UpdateProductTemplate(ctx, req.(*UpdateProductTemplateRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _WorkOrderService_DeleteProductTemplate_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteProductTemplateRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WorkOrderServiceServer).DeleteProductTemplate(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: WorkOrderService_DeleteProductTemplate_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WorkOrderServiceServer).DeleteProductTemplate(ctx, req.(*DeleteProductTemplateRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -3154,6 +3300,22 @@ var WorkOrderService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeletePropertyDefinition",
 			Handler:    _WorkOrderService_DeletePropertyDefinition_Handler,
+		},
+		{
+			MethodName: "ListProductTemplates",
+			Handler:    _WorkOrderService_ListProductTemplates_Handler,
+		},
+		{
+			MethodName: "CreateProductTemplate",
+			Handler:    _WorkOrderService_CreateProductTemplate_Handler,
+		},
+		{
+			MethodName: "UpdateProductTemplate",
+			Handler:    _WorkOrderService_UpdateProductTemplate_Handler,
+		},
+		{
+			MethodName: "DeleteProductTemplate",
+			Handler:    _WorkOrderService_DeleteProductTemplate_Handler,
 		},
 		{
 			MethodName: "ListCatalogTerms",
