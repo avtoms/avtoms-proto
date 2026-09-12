@@ -606,6 +606,15 @@ message Product {
   // admin's picture of the goods — held on the template rather than copied onto every shop's
   // row, because replacing a bad photo should fix it everywhere at once.
   string template_id = 13;
+  // The tax classifier (MXIK / ИКПУ, tasnif.soliq.uz) entry this product is sold under, and
+  // the package unit code a fiscal receipt must carry with it. Per product rather than per
+  // variant: sizes of one filter share a classification, and the shop picks it once. The
+  // names are snapshots of what the classifier said when it was picked, so the form can show
+  // the choice without a round trip to a government API that is often slow.
+  string mxik_code = 14;      // 17 digits, empty when not yet classified
+  string mxik_name = 15;
+  string package_code = 16;   // packageNames[].code from the classifier
+  string package_name = 17;
 }
 
 // ProductProperty is a named option that defines variants, with its allowed values.
@@ -646,6 +655,13 @@ message ProductVariant {
   // where the variant's history shows it.
   FxAmount fx_unit_cost = 10;
   FxAmount fx_unit_price = 11;
+  // The printed EAN/UPC barcode (GTIN), empty when unknown. Per variant because a 1 L and a
+  // 4 L can of the same oil carry different barcodes. Unique among a shop's live variants, so
+  // a scan finds exactly one.
+  //
+  // optional for presence on the way in: a form that predates the field posts no barcode at
+  // all, and that must leave the stored one alone rather than wipe it. An explicit "" clears.
+  optional string barcode = 12;
 }
 
 // VariantAttribute records which value a variant has for one property.
@@ -695,6 +711,11 @@ message CreateProductRequest {
   // The catalogue entry this was stocked from, when it came from one. Stamped on the product
   // (and on the existing product, when this save folds into one) — never on the variants.
   string template_id = 23;
+  // Tax classification, see Product.mxik_code.
+  string mxik_code = 24;
+  string mxik_name = 25;
+  string package_code = 26;
+  string package_name = 27;
 }
 message UpdateProductRequest {
   string id = 1;
@@ -727,6 +748,13 @@ message UpdateProductRequest {
   string bank_account_id = 22;
   string bank_account_number = 23;
   string counterparty_account = 24;
+  // Tax classification, see Product.mxik_code. The presence of mxik_code decides: absent (a
+  // form that predates the field) keeps all four as stored; present — even "" — replaces all
+  // four, so an empty mxik_code clears the classification.
+  optional string mxik_code = 25;
+  string mxik_name = 26;
+  string package_code = 27;
+  string package_name = 28;
 }
 message AdjustVariantStockRequest {
   string variant_id = 1;

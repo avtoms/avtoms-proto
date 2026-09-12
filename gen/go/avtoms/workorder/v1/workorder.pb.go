@@ -4190,7 +4190,16 @@ type Product struct {
 	// catalogue can say what a shop already carries, and so the warehouse list can show the
 	// admin's picture of the goods — held on the template rather than copied onto every shop's
 	// row, because replacing a bad photo should fix it everywhere at once.
-	TemplateId    string `protobuf:"bytes,13,opt,name=template_id,json=templateId,proto3" json:"template_id,omitempty"`
+	TemplateId string `protobuf:"bytes,13,opt,name=template_id,json=templateId,proto3" json:"template_id,omitempty"`
+	// The tax classifier (MXIK / ИКПУ, tasnif.soliq.uz) entry this product is sold under, and
+	// the package unit code a fiscal receipt must carry with it. Per product rather than per
+	// variant: sizes of one filter share a classification, and the shop picks it once. The
+	// names are snapshots of what the classifier said when it was picked, so the form can show
+	// the choice without a round trip to a government API that is often slow.
+	MxikCode      string `protobuf:"bytes,14,opt,name=mxik_code,json=mxikCode,proto3" json:"mxik_code,omitempty"` // 17 digits, empty when not yet classified
+	MxikName      string `protobuf:"bytes,15,opt,name=mxik_name,json=mxikName,proto3" json:"mxik_name,omitempty"`
+	PackageCode   string `protobuf:"bytes,16,opt,name=package_code,json=packageCode,proto3" json:"package_code,omitempty"` // packageNames[].code from the classifier
+	PackageName   string `protobuf:"bytes,17,opt,name=package_name,json=packageName,proto3" json:"package_name,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -4316,6 +4325,34 @@ func (x *Product) GetTemplateId() string {
 	return ""
 }
 
+func (x *Product) GetMxikCode() string {
+	if x != nil {
+		return x.MxikCode
+	}
+	return ""
+}
+
+func (x *Product) GetMxikName() string {
+	if x != nil {
+		return x.MxikName
+	}
+	return ""
+}
+
+func (x *Product) GetPackageCode() string {
+	if x != nil {
+		return x.PackageCode
+	}
+	return ""
+}
+
+func (x *Product) GetPackageName() string {
+	if x != nil {
+		return x.PackageName
+	}
+	return ""
+}
+
 // ProductProperty is a named option that defines variants, with its allowed values.
 type ProductProperty struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
@@ -4406,8 +4443,15 @@ type ProductVariant struct {
 	// the moment the second delivery landed. What the shop typed here is stamped on the
 	// stock movement the save produces, which is where a purchase price actually belongs and
 	// where the variant's history shows it.
-	FxUnitCost    *FxAmount `protobuf:"bytes,10,opt,name=fx_unit_cost,json=fxUnitCost,proto3" json:"fx_unit_cost,omitempty"`
-	FxUnitPrice   *FxAmount `protobuf:"bytes,11,opt,name=fx_unit_price,json=fxUnitPrice,proto3" json:"fx_unit_price,omitempty"`
+	FxUnitCost  *FxAmount `protobuf:"bytes,10,opt,name=fx_unit_cost,json=fxUnitCost,proto3" json:"fx_unit_cost,omitempty"`
+	FxUnitPrice *FxAmount `protobuf:"bytes,11,opt,name=fx_unit_price,json=fxUnitPrice,proto3" json:"fx_unit_price,omitempty"`
+	// The printed EAN/UPC barcode (GTIN), empty when unknown. Per variant because a 1 L and a
+	// 4 L can of the same oil carry different barcodes. Unique among a shop's live variants, so
+	// a scan finds exactly one.
+	//
+	// optional for presence on the way in: a form that predates the field posts no barcode at
+	// all, and that must leave the stored one alone rather than wipe it. An explicit "" clears.
+	Barcode       *string `protobuf:"bytes,12,opt,name=barcode,proto3,oneof" json:"barcode,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -4517,6 +4561,13 @@ func (x *ProductVariant) GetFxUnitPrice() *FxAmount {
 		return x.FxUnitPrice
 	}
 	return nil
+}
+
+func (x *ProductVariant) GetBarcode() string {
+	if x != nil && x.Barcode != nil {
+		return *x.Barcode
+	}
+	return ""
 }
 
 // VariantAttribute records which value a variant has for one property.
@@ -4736,7 +4787,12 @@ type CreateProductRequest struct {
 	CounterpartyAccount string         `protobuf:"bytes,22,opt,name=counterparty_account,json=counterpartyAccount,proto3" json:"counterparty_account,omitempty"`
 	// The catalogue entry this was stocked from, when it came from one. Stamped on the product
 	// (and on the existing product, when this save folds into one) — never on the variants.
-	TemplateId    string `protobuf:"bytes,23,opt,name=template_id,json=templateId,proto3" json:"template_id,omitempty"`
+	TemplateId string `protobuf:"bytes,23,opt,name=template_id,json=templateId,proto3" json:"template_id,omitempty"`
+	// Tax classification, see Product.mxik_code.
+	MxikCode      string `protobuf:"bytes,24,opt,name=mxik_code,json=mxikCode,proto3" json:"mxik_code,omitempty"`
+	MxikName      string `protobuf:"bytes,25,opt,name=mxik_name,json=mxikName,proto3" json:"mxik_name,omitempty"`
+	PackageCode   string `protobuf:"bytes,26,opt,name=package_code,json=packageCode,proto3" json:"package_code,omitempty"`
+	PackageName   string `protobuf:"bytes,27,opt,name=package_name,json=packageName,proto3" json:"package_name,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -4932,6 +4988,34 @@ func (x *CreateProductRequest) GetTemplateId() string {
 	return ""
 }
 
+func (x *CreateProductRequest) GetMxikCode() string {
+	if x != nil {
+		return x.MxikCode
+	}
+	return ""
+}
+
+func (x *CreateProductRequest) GetMxikName() string {
+	if x != nil {
+		return x.MxikName
+	}
+	return ""
+}
+
+func (x *CreateProductRequest) GetPackageCode() string {
+	if x != nil {
+		return x.PackageCode
+	}
+	return ""
+}
+
+func (x *CreateProductRequest) GetPackageName() string {
+	if x != nil {
+		return x.PackageName
+	}
+	return ""
+}
+
 type UpdateProductRequest struct {
 	state       protoimpl.MessageState `protogen:"open.v1"`
 	Id          string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
@@ -4964,8 +5048,15 @@ type UpdateProductRequest struct {
 	BankAccountId       string         `protobuf:"bytes,22,opt,name=bank_account_id,json=bankAccountId,proto3" json:"bank_account_id,omitempty"`
 	BankAccountNumber   string         `protobuf:"bytes,23,opt,name=bank_account_number,json=bankAccountNumber,proto3" json:"bank_account_number,omitempty"`
 	CounterpartyAccount string         `protobuf:"bytes,24,opt,name=counterparty_account,json=counterpartyAccount,proto3" json:"counterparty_account,omitempty"`
-	unknownFields       protoimpl.UnknownFields
-	sizeCache           protoimpl.SizeCache
+	// Tax classification, see Product.mxik_code. The presence of mxik_code decides: absent (a
+	// form that predates the field) keeps all four as stored; present — even "" — replaces all
+	// four, so an empty mxik_code clears the classification.
+	MxikCode      *string `protobuf:"bytes,25,opt,name=mxik_code,json=mxikCode,proto3,oneof" json:"mxik_code,omitempty"`
+	MxikName      string  `protobuf:"bytes,26,opt,name=mxik_name,json=mxikName,proto3" json:"mxik_name,omitempty"`
+	PackageCode   string  `protobuf:"bytes,27,opt,name=package_code,json=packageCode,proto3" json:"package_code,omitempty"`
+	PackageName   string  `protobuf:"bytes,28,opt,name=package_name,json=packageName,proto3" json:"package_name,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *UpdateProductRequest) Reset() {
@@ -5162,6 +5253,34 @@ func (x *UpdateProductRequest) GetBankAccountNumber() string {
 func (x *UpdateProductRequest) GetCounterpartyAccount() string {
 	if x != nil {
 		return x.CounterpartyAccount
+	}
+	return ""
+}
+
+func (x *UpdateProductRequest) GetMxikCode() string {
+	if x != nil && x.MxikCode != nil {
+		return *x.MxikCode
+	}
+	return ""
+}
+
+func (x *UpdateProductRequest) GetMxikName() string {
+	if x != nil {
+		return x.MxikName
+	}
+	return ""
+}
+
+func (x *UpdateProductRequest) GetPackageCode() string {
+	if x != nil {
+		return x.PackageCode
+	}
+	return ""
+}
+
+func (x *UpdateProductRequest) GetPackageName() string {
+	if x != nil {
+		return x.PackageName
 	}
 	return ""
 }
@@ -14918,7 +15037,7 @@ const file_avtoms_workorder_v1_workorder_proto_rawDesc = "" +
 	" \x01(\tR\x05notes\"i\n" +
 	"\x1aSetAppointmentStateRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12;\n" +
-	"\x05state\x18\x02 \x01(\x0e2%.avtoms.workorder.v1.AppointmentStateR\x05state\"\xab\x03\n" +
+	"\x05state\x18\x02 \x01(\x0e2%.avtoms.workorder.v1.AppointmentStateR\x05state\"\xab\x04\n" +
 	"\aProduct\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x17\n" +
 	"\ashop_id\x18\x02 \x01(\tR\x06shopId\x12\x12\n" +
@@ -14937,11 +15056,15 @@ const file_avtoms_workorder_v1_workorder_proto_rawDesc = "" +
 	"\vsupplier_id\x18\f \x01(\tR\n" +
 	"supplierId\x12\x1f\n" +
 	"\vtemplate_id\x18\r \x01(\tR\n" +
-	"templateId\"M\n" +
+	"templateId\x12\x1b\n" +
+	"\tmxik_code\x18\x0e \x01(\tR\bmxikCode\x12\x1b\n" +
+	"\tmxik_name\x18\x0f \x01(\tR\bmxikName\x12!\n" +
+	"\fpackage_code\x18\x10 \x01(\tR\vpackageCode\x12!\n" +
+	"\fpackage_name\x18\x11 \x01(\tR\vpackageName\"M\n" +
 	"\x0fProductProperty\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x16\n" +
-	"\x06values\x18\x03 \x03(\tR\x06values\"\xbf\x03\n" +
+	"\x06values\x18\x03 \x03(\tR\x06values\"\xea\x03\n" +
 	"\x0eProductVariant\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1d\n" +
 	"\n" +
@@ -14959,7 +15082,10 @@ const file_avtoms_workorder_v1_workorder_proto_rawDesc = "" +
 	"\ffx_unit_cost\x18\n" +
 	" \x01(\v2\x1d.avtoms.workorder.v1.FxAmountR\n" +
 	"fxUnitCost\x12A\n" +
-	"\rfx_unit_price\x18\v \x01(\v2\x1d.avtoms.workorder.v1.FxAmountR\vfxUnitPrice\"D\n" +
+	"\rfx_unit_price\x18\v \x01(\v2\x1d.avtoms.workorder.v1.FxAmountR\vfxUnitPrice\x12\x1d\n" +
+	"\abarcode\x18\f \x01(\tH\x00R\abarcode\x88\x01\x01B\n" +
+	"\n" +
+	"\b_barcode\"D\n" +
 	"\x10VariantAttribute\x12\x1a\n" +
 	"\bproperty\x18\x01 \x01(\tR\bproperty\x12\x14\n" +
 	"\x05value\x18\x02 \x01(\tR\x05value\".\n" +
@@ -14968,7 +15094,7 @@ const file_avtoms_workorder_v1_workorder_proto_rawDesc = "" +
 	"\x14ListProductsResponse\x128\n" +
 	"\bproducts\x18\x01 \x03(\v2\x1c.avtoms.workorder.v1.ProductR\bproducts\"#\n" +
 	"\x11GetProductRequest\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\"\x99\a\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\"\x99\b\n" +
 	"\x14CreateProductRequest\x12\x17\n" +
 	"\ashop_id\x18\x01 \x01(\tR\x06shopId\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12 \n" +
@@ -14999,7 +15125,11 @@ const file_avtoms_workorder_v1_workorder_proto_rawDesc = "" +
 	"\x13bank_account_number\x18\x15 \x01(\tR\x11bankAccountNumber\x121\n" +
 	"\x14counterparty_account\x18\x16 \x01(\tR\x13counterpartyAccount\x12\x1f\n" +
 	"\vtemplate_id\x18\x17 \x01(\tR\n" +
-	"templateId\"\xa0\a\n" +
+	"templateId\x12\x1b\n" +
+	"\tmxik_code\x18\x18 \x01(\tR\bmxikCode\x12\x1b\n" +
+	"\tmxik_name\x18\x19 \x01(\tR\bmxikName\x12!\n" +
+	"\fpackage_code\x18\x1a \x01(\tR\vpackageCode\x12!\n" +
+	"\fpackage_name\x18\x1b \x01(\tR\vpackageName\"\xb3\b\n" +
 	"\x14UpdateProductRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12 \n" +
@@ -15030,7 +15160,13 @@ const file_avtoms_workorder_v1_workorder_proto_rawDesc = "" +
 	"\ftransfer_ref\x18\x15 \x01(\tR\vtransferRef\x12&\n" +
 	"\x0fbank_account_id\x18\x16 \x01(\tR\rbankAccountId\x12.\n" +
 	"\x13bank_account_number\x18\x17 \x01(\tR\x11bankAccountNumber\x121\n" +
-	"\x14counterparty_account\x18\x18 \x01(\tR\x13counterpartyAccount\"\xf0\x05\n" +
+	"\x14counterparty_account\x18\x18 \x01(\tR\x13counterpartyAccount\x12 \n" +
+	"\tmxik_code\x18\x19 \x01(\tH\x00R\bmxikCode\x88\x01\x01\x12\x1b\n" +
+	"\tmxik_name\x18\x1a \x01(\tR\bmxikName\x12!\n" +
+	"\fpackage_code\x18\x1b \x01(\tR\vpackageCode\x12!\n" +
+	"\fpackage_name\x18\x1c \x01(\tR\vpackageNameB\f\n" +
+	"\n" +
+	"_mxik_code\"\xf0\x05\n" +
 	"\x19AdjustVariantStockRequest\x12\x1d\n" +
 	"\n" +
 	"variant_id\x18\x01 \x01(\tR\tvariantId\x12\x14\n" +
@@ -16577,6 +16713,8 @@ func file_avtoms_workorder_v1_workorder_proto_init() {
 	if File_avtoms_workorder_v1_workorder_proto != nil {
 		return
 	}
+	file_avtoms_workorder_v1_workorder_proto_msgTypes[46].OneofWrappers = []any{}
+	file_avtoms_workorder_v1_workorder_proto_msgTypes[52].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
