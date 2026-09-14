@@ -47,6 +47,7 @@ const (
 	WorkOrderService_UpdateProduct_FullMethodName            = "/avtoms.workorder.v1.WorkOrderService/UpdateProduct"
 	WorkOrderService_AdjustVariantStock_FullMethodName       = "/avtoms.workorder.v1.WorkOrderService/AdjustVariantStock"
 	WorkOrderService_ListStockMovements_FullMethodName       = "/avtoms.workorder.v1.WorkOrderService/ListStockMovements"
+	WorkOrderService_ListShopStockMovements_FullMethodName   = "/avtoms.workorder.v1.WorkOrderService/ListShopStockMovements"
 	WorkOrderService_CreateSale_FullMethodName               = "/avtoms.workorder.v1.WorkOrderService/CreateSale"
 	WorkOrderService_ListSales_FullMethodName                = "/avtoms.workorder.v1.WorkOrderService/ListSales"
 	WorkOrderService_GetSale_FullMethodName                  = "/avtoms.workorder.v1.WorkOrderService/GetSale"
@@ -153,6 +154,10 @@ type WorkOrderServiceClient interface {
 	AdjustVariantStock(ctx context.Context, in *AdjustVariantStockRequest, opts ...grpc.CallOption) (*ProductVariant, error)
 	// Stock ledger (income/outcome) for one variant, newest first.
 	ListStockMovements(ctx context.Context, in *ListStockMovementsRequest, opts ...grpc.CallOption) (*ListStockMovementsResponse, error)
+	// ListShopStockMovements is the whole warehouse's ledger over a window, oldest first — the
+	// movement report, and the consumption rates the warehouse screen shows. from/to take
+	// RFC3339 or a bare YYYY-MM-DD (read in the shop's time zone); empty is open-ended.
+	ListShopStockMovements(ctx context.Context, in *ListShopStockMovementsRequest, opts ...grpc.CallOption) (*ListStockMovementsResponse, error)
 	// Counter sales: stock sold straight over the counter, with no work order, no
 	// vehicle and no customer. Sales live here because this service owns the warehouse —
 	// the stock leaves through the same movement ledger a work order uses, so a variant's
@@ -546,6 +551,16 @@ func (c *workOrderServiceClient) ListStockMovements(ctx context.Context, in *Lis
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(ListStockMovementsResponse)
 	err := c.cc.Invoke(ctx, WorkOrderService_ListStockMovements_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *workOrderServiceClient) ListShopStockMovements(ctx context.Context, in *ListShopStockMovementsRequest, opts ...grpc.CallOption) (*ListStockMovementsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListStockMovementsResponse)
+	err := c.cc.Invoke(ctx, WorkOrderService_ListShopStockMovements_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -1196,6 +1211,10 @@ type WorkOrderServiceServer interface {
 	AdjustVariantStock(context.Context, *AdjustVariantStockRequest) (*ProductVariant, error)
 	// Stock ledger (income/outcome) for one variant, newest first.
 	ListStockMovements(context.Context, *ListStockMovementsRequest) (*ListStockMovementsResponse, error)
+	// ListShopStockMovements is the whole warehouse's ledger over a window, oldest first — the
+	// movement report, and the consumption rates the warehouse screen shows. from/to take
+	// RFC3339 or a bare YYYY-MM-DD (read in the shop's time zone); empty is open-ended.
+	ListShopStockMovements(context.Context, *ListShopStockMovementsRequest) (*ListStockMovementsResponse, error)
 	// Counter sales: stock sold straight over the counter, with no work order, no
 	// vehicle and no customer. Sales live here because this service owns the warehouse —
 	// the stock leaves through the same movement ledger a work order uses, so a variant's
@@ -1398,6 +1417,9 @@ func (UnimplementedWorkOrderServiceServer) AdjustVariantStock(context.Context, *
 }
 func (UnimplementedWorkOrderServiceServer) ListStockMovements(context.Context, *ListStockMovementsRequest) (*ListStockMovementsResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method ListStockMovements not implemented")
+}
+func (UnimplementedWorkOrderServiceServer) ListShopStockMovements(context.Context, *ListShopStockMovementsRequest) (*ListStockMovementsResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListShopStockMovements not implemented")
 }
 func (UnimplementedWorkOrderServiceServer) CreateSale(context.Context, *CreateSaleRequest) (*Sale, error) {
 	return nil, status.Error(codes.Unimplemented, "method CreateSale not implemented")
@@ -2100,6 +2122,24 @@ func _WorkOrderService_ListStockMovements_Handler(srv interface{}, ctx context.C
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(WorkOrderServiceServer).ListStockMovements(ctx, req.(*ListStockMovementsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _WorkOrderService_ListShopStockMovements_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListShopStockMovementsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WorkOrderServiceServer).ListShopStockMovements(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: WorkOrderService_ListShopStockMovements_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WorkOrderServiceServer).ListShopStockMovements(ctx, req.(*ListShopStockMovementsRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -3302,6 +3342,10 @@ var WorkOrderService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ListStockMovements",
 			Handler:    _WorkOrderService_ListStockMovements_Handler,
+		},
+		{
+			MethodName: "ListShopStockMovements",
+			Handler:    _WorkOrderService_ListShopStockMovements_Handler,
 		},
 		{
 			MethodName: "CreateSale",

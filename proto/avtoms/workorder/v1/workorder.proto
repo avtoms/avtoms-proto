@@ -49,6 +49,10 @@ service WorkOrderService {
   rpc AdjustVariantStock(AdjustVariantStockRequest) returns (ProductVariant);
   // Stock ledger (income/outcome) for one variant, newest first.
   rpc ListStockMovements(ListStockMovementsRequest) returns (ListStockMovementsResponse);
+  // ListShopStockMovements is the whole warehouse's ledger over a window, oldest first — the
+  // movement report, and the consumption rates the warehouse screen shows. from/to take
+  // RFC3339 or a bare YYYY-MM-DD (read in the shop's time zone); empty is open-ended.
+  rpc ListShopStockMovements(ListShopStockMovementsRequest) returns (ListStockMovementsResponse);
 
   // Counter sales: stock sold straight over the counter, with no work order, no
   // vehicle and no customer. Sales live here because this service owns the warehouse —
@@ -846,6 +850,11 @@ message ListStockMovementsRequest {
 }
 message ListStockMovementsResponse {
   repeated StockMovement movements = 1;
+}
+message ListShopStockMovementsRequest {
+  string shop_id = 1;
+  string from = 2;
+  string to = 3;
 }
 
 // ── Counter sales ───────────────────────────────────────────────────────────────────
