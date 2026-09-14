@@ -98,6 +98,7 @@ const (
 	WorkOrderService_ListShopExpenses_FullMethodName         = "/avtoms.workorder.v1.WorkOrderService/ListShopExpenses"
 	WorkOrderService_CreateShopExpense_FullMethodName        = "/avtoms.workorder.v1.WorkOrderService/CreateShopExpense"
 	WorkOrderService_DeleteShopExpense_FullMethodName        = "/avtoms.workorder.v1.WorkOrderService/DeleteShopExpense"
+	WorkOrderService_PurgeDemoData_FullMethodName            = "/avtoms.workorder.v1.WorkOrderService/PurgeDemoData"
 	WorkOrderService_GetProfitAndLoss_FullMethodName         = "/avtoms.workorder.v1.WorkOrderService/GetProfitAndLoss"
 	WorkOrderService_GetStatistics_FullMethodName            = "/avtoms.workorder.v1.WorkOrderService/GetStatistics"
 	WorkOrderService_ListWarranties_FullMethodName           = "/avtoms.workorder.v1.WorkOrderService/ListWarranties"
@@ -243,6 +244,9 @@ type WorkOrderServiceClient interface {
 	ListShopExpenses(ctx context.Context, in *ListShopExpensesRequest, opts ...grpc.CallOption) (*ListShopExpensesResponse, error)
 	CreateShopExpense(ctx context.Context, in *CreateShopExpenseRequest, opts ...grpc.CallOption) (*ShopExpense, error)
 	DeleteShopExpense(ctx context.Context, in *DeleteShopExpenseRequest, opts ...grpc.CallOption) (*DeleteShopExpenseResponse, error)
+	// PurgeDemoData removes, for good, what the onboarding tour made for practice: its order,
+	// its service and its part. Refused for anything a real record depends on.
+	PurgeDemoData(ctx context.Context, in *PurgeDemoDataRequest, opts ...grpc.CallOption) (*PurgeDemoDataResponse, error)
 	GetProfitAndLoss(ctx context.Context, in *GetProfitAndLossRequest, opts ...grpc.CallOption) (*ProfitAndLoss, error)
 	// GetStatistics answers the whole analytics screen in one call, computed live from this
 	// service's own tables rather than from a projected read model — so it covers the shop's
@@ -1058,6 +1062,16 @@ func (c *workOrderServiceClient) DeleteShopExpense(ctx context.Context, in *Dele
 	return out, nil
 }
 
+func (c *workOrderServiceClient) PurgeDemoData(ctx context.Context, in *PurgeDemoDataRequest, opts ...grpc.CallOption) (*PurgeDemoDataResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(PurgeDemoDataResponse)
+	err := c.cc.Invoke(ctx, WorkOrderService_PurgeDemoData_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *workOrderServiceClient) GetProfitAndLoss(ctx context.Context, in *GetProfitAndLossRequest, opts ...grpc.CallOption) (*ProfitAndLoss, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(ProfitAndLoss)
@@ -1273,6 +1287,9 @@ type WorkOrderServiceServer interface {
 	ListShopExpenses(context.Context, *ListShopExpensesRequest) (*ListShopExpensesResponse, error)
 	CreateShopExpense(context.Context, *CreateShopExpenseRequest) (*ShopExpense, error)
 	DeleteShopExpense(context.Context, *DeleteShopExpenseRequest) (*DeleteShopExpenseResponse, error)
+	// PurgeDemoData removes, for good, what the onboarding tour made for practice: its order,
+	// its service and its part. Refused for anything a real record depends on.
+	PurgeDemoData(context.Context, *PurgeDemoDataRequest) (*PurgeDemoDataResponse, error)
 	GetProfitAndLoss(context.Context, *GetProfitAndLossRequest) (*ProfitAndLoss, error)
 	// GetStatistics answers the whole analytics screen in one call, computed live from this
 	// service's own tables rather than from a projected read model — so it covers the shop's
@@ -1534,6 +1551,9 @@ func (UnimplementedWorkOrderServiceServer) CreateShopExpense(context.Context, *C
 }
 func (UnimplementedWorkOrderServiceServer) DeleteShopExpense(context.Context, *DeleteShopExpenseRequest) (*DeleteShopExpenseResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method DeleteShopExpense not implemented")
+}
+func (UnimplementedWorkOrderServiceServer) PurgeDemoData(context.Context, *PurgeDemoDataRequest) (*PurgeDemoDataResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method PurgeDemoData not implemented")
 }
 func (UnimplementedWorkOrderServiceServer) GetProfitAndLoss(context.Context, *GetProfitAndLossRequest) (*ProfitAndLoss, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetProfitAndLoss not implemented")
@@ -3002,6 +3022,24 @@ func _WorkOrderService_DeleteShopExpense_Handler(srv interface{}, ctx context.Co
 	return interceptor(ctx, in, info, handler)
 }
 
+func _WorkOrderService_PurgeDemoData_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(PurgeDemoDataRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WorkOrderServiceServer).PurgeDemoData(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: WorkOrderService_PurgeDemoData_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WorkOrderServiceServer).PurgeDemoData(ctx, req.(*PurgeDemoDataRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _WorkOrderService_GetProfitAndLoss_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetProfitAndLossRequest)
 	if err := dec(in); err != nil {
@@ -3468,6 +3506,10 @@ var WorkOrderService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteShopExpense",
 			Handler:    _WorkOrderService_DeleteShopExpense_Handler,
+		},
+		{
+			MethodName: "PurgeDemoData",
+			Handler:    _WorkOrderService_PurgeDemoData_Handler,
 		},
 		{
 			MethodName: "GetProfitAndLoss",

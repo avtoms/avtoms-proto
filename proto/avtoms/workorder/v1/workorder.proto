@@ -154,6 +154,9 @@ service WorkOrderService {
   rpc ListShopExpenses(ListShopExpensesRequest) returns (ListShopExpensesResponse);
   rpc CreateShopExpense(CreateShopExpenseRequest) returns (ShopExpense);
   rpc DeleteShopExpense(DeleteShopExpenseRequest) returns (DeleteShopExpenseResponse);
+  // PurgeDemoData removes, for good, what the onboarding tour made for practice: its order,
+  // its service and its part. Refused for anything a real record depends on.
+  rpc PurgeDemoData(PurgeDemoDataRequest) returns (PurgeDemoDataResponse);
   rpc GetProfitAndLoss(GetProfitAndLossRequest) returns (ProfitAndLoss);
   // GetStatistics answers the whole analytics screen in one call, computed live from this
   // service's own tables rather than from a projected read model — so it covers the shop's
@@ -300,6 +303,21 @@ message DeleteShopExpenseRequest {
 }
 message DeleteShopExpenseResponse {
   bool deleted = 1;
+}
+
+// PurgeDemoDataRequest names what the onboarding tour created. Every id must belong to shop_id.
+// An order is refused once it has been billed; a service or part is refused while an order,
+// sale or service outside this request still uses it.
+message PurgeDemoDataRequest {
+  string shop_id = 1;
+  repeated string work_order_ids = 2;
+  repeated string menu_item_ids = 3;
+  repeated string product_ids = 4;
+}
+message PurgeDemoDataResponse {
+  int32 work_orders = 1;
+  int32 menu_items = 2;
+  int32 products = 3;
 }
 
 // ExpenseBucket is one category's total in a P&L.
