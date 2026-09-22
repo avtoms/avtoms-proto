@@ -4042,18 +4042,24 @@ func (x *FuelStation) GetDemo() bool {
 
 // MapPoint is a pin: either a provider or a filling station, flattened for the map screen.
 type MapPoint struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	Kind          MapPointKind           `protobuf:"varint,2,opt,name=kind,proto3,enum=avtoms.b2c.v1.MapPointKind" json:"kind,omitempty"`
-	Name          string                 `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
-	Latitude      float64                `protobuf:"fixed64,4,opt,name=latitude,proto3" json:"latitude,omitempty"`
-	Longitude     float64                `protobuf:"fixed64,5,opt,name=longitude,proto3" json:"longitude,omitempty"`
-	Subtitle      string                 `protobuf:"bytes,6,opt,name=subtitle,proto3" json:"subtitle,omitempty"`
-	PriceLabel    string                 `protobuf:"bytes,7,opt,name=price_label,json=priceLabel,proto3" json:"price_label,omitempty"`
-	OpenNow       bool                   `protobuf:"varint,8,opt,name=open_now,json=openNow,proto3" json:"open_now,omitempty"`
-	Target        string                 `protobuf:"bytes,9,opt,name=target,proto3" json:"target,omitempty"` // in-app route for the bubble
-	CategoryId    string                 `protobuf:"bytes,10,opt,name=category_id,json=categoryId,proto3" json:"category_id,omitempty"`
-	DistanceKm    float64                `protobuf:"fixed64,11,opt,name=distance_km,json=distanceKm,proto3" json:"distance_km,omitempty"`
+	state     protoimpl.MessageState `protogen:"open.v1"`
+	Id        string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Kind      MapPointKind           `protobuf:"varint,2,opt,name=kind,proto3,enum=avtoms.b2c.v1.MapPointKind" json:"kind,omitempty"`
+	Name      string                 `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
+	Latitude  float64                `protobuf:"fixed64,4,opt,name=latitude,proto3" json:"latitude,omitempty"`
+	Longitude float64                `protobuf:"fixed64,5,opt,name=longitude,proto3" json:"longitude,omitempty"`
+	Subtitle  string                 `protobuf:"bytes,6,opt,name=subtitle,proto3" json:"subtitle,omitempty"`
+	// A label the client shows as it stands, used for a filling station's headline grade
+	// ("AI-92 9800"). A service centre's price is price_from instead, because "from 120 000
+	// so'm" is a sentence in two languages and belongs to the app, not to this service.
+	PriceLabel    string  `protobuf:"bytes,7,opt,name=price_label,json=priceLabel,proto3" json:"price_label,omitempty"`
+	OpenNow       bool    `protobuf:"varint,8,opt,name=open_now,json=openNow,proto3" json:"open_now,omitempty"`
+	Target        string  `protobuf:"bytes,9,opt,name=target,proto3" json:"target,omitempty"` // in-app route for the bubble
+	CategoryId    string  `protobuf:"bytes,10,opt,name=category_id,json=categoryId,proto3" json:"category_id,omitempty"`
+	DistanceKm    float64 `protobuf:"fixed64,11,opt,name=distance_km,json=distanceKm,proto3" json:"distance_km,omitempty"`
+	PriceFrom     int64   `protobuf:"varint,12,opt,name=price_from,json=priceFrom,proto3" json:"price_from,omitempty"`   // cheapest service, so'm; service centres only
+	PromoLabel    string  `protobuf:"bytes,13,opt,name=promo_label,json=promoLabel,proto3" json:"promo_label,omitempty"` // "-20%" ribbon, when the shop is running a campaign
+	FuelCode      string  `protobuf:"bytes,14,opt,name=fuel_code,json=fuelCode,proto3" json:"fuel_code,omitempty"`       // the grade price_label quotes; filling stations only
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -4163,6 +4169,27 @@ func (x *MapPoint) GetDistanceKm() float64 {
 		return x.DistanceKm
 	}
 	return 0
+}
+
+func (x *MapPoint) GetPriceFrom() int64 {
+	if x != nil {
+		return x.PriceFrom
+	}
+	return 0
+}
+
+func (x *MapPoint) GetPromoLabel() string {
+	if x != nil {
+		return x.PromoLabel
+	}
+	return ""
+}
+
+func (x *MapPoint) GetFuelCode() string {
+	if x != nil {
+		return x.FuelCode
+	}
+	return ""
 }
 
 type GetProfileRequest struct {
@@ -11111,7 +11138,7 @@ const file_avtoms_b2c_v1_b2c_proto_rawDesc = "" +
 	"\vdistance_km\x18\r \x01(\x01R\n" +
 	"distanceKm\x12\x19\n" +
 	"\bopen_now\x18\x0e \x01(\bR\aopenNow\x12\x12\n" +
-	"\x04demo\x18\x0f \x01(\bR\x04demo\"\xcb\x02\n" +
+	"\x04demo\x18\x0f \x01(\bR\x04demo\"\xa8\x03\n" +
 	"\bMapPoint\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12/\n" +
 	"\x04kind\x18\x02 \x01(\x0e2\x1b.avtoms.b2c.v1.MapPointKindR\x04kind\x12\x12\n" +
@@ -11127,7 +11154,12 @@ const file_avtoms_b2c_v1_b2c_proto_rawDesc = "" +
 	" \x01(\tR\n" +
 	"categoryId\x12\x1f\n" +
 	"\vdistance_km\x18\v \x01(\x01R\n" +
-	"distanceKm\")\n" +
+	"distanceKm\x12\x1d\n" +
+	"\n" +
+	"price_from\x18\f \x01(\x03R\tpriceFrom\x12\x1f\n" +
+	"\vpromo_label\x18\r \x01(\tR\n" +
+	"promoLabel\x12\x1b\n" +
+	"\tfuel_code\x18\x0e \x01(\tR\bfuelCode\")\n" +
 	"\x11GetProfileRequest\x12\x14\n" +
 	"\x05phone\x18\x01 \x01(\tR\x05phone\"\xaf\x03\n" +
 	"\x14UpdateProfileRequest\x12\x14\n" +

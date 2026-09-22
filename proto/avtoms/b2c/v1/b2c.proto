@@ -689,11 +689,17 @@ message MapPoint {
   double latitude = 4;
   double longitude = 5;
   string subtitle = 6;
+  // A label the client shows as it stands, used for a filling station's headline grade
+  // ("AI-92 9800"). A service centre's price is price_from instead, because "from 120 000
+  // so'm" is a sentence in two languages and belongs to the app, not to this service.
   string price_label = 7;
   bool open_now = 8;
   string target = 9;              // in-app route for the bubble
   string category_id = 10;
   double distance_km = 11;
+  int64 price_from = 12;          // cheapest service, so'm; service centres only
+  string promo_label = 13;        // "-20%" ribbon, when the shop is running a campaign
+  string fuel_code = 14;          // the grade price_label quotes; filling stations only
 }
 
 // ── Profile ──────────────────────────────────────────────────────────────────────────
