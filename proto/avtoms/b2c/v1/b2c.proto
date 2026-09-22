@@ -107,6 +107,10 @@ service B2CService {
   // ── Cashback ───────────────────────────────────────────────────────────────────────
   rpc GetBonusAccount(GetBonusAccountRequest) returns (BonusAccount);
   rpc ListBonusEntries(ListBonusEntriesRequest) returns (ListBonusEntriesResponse);
+  // ApplyReferralCode records who invited this driver. The reward is paid to the inviter
+  // when the invited driver first pays for something — not here, because a bonus paid for
+  // signing up is a bonus paid for making accounts.
+  rpc ApplyReferralCode(ApplyReferralCodeRequest) returns (ApplyReferralCodeResponse);
 
   // ── Chats and support ──────────────────────────────────────────────────────────────
   rpc ListChats(ListChatsRequest) returns (ListChatsResponse);
@@ -224,6 +228,14 @@ enum MapPointKind {
   MAP_POINT_KIND_FUEL = 2;
 }
 
+// ReviewSort orders a provider's reviews: the app offers newest, best and worst.
+enum ReviewSort {
+  REVIEW_SORT_UNSPECIFIED = 0;
+  REVIEW_SORT_NEWEST = 1;
+  REVIEW_SORT_HIGHEST = 2;
+  REVIEW_SORT_LOWEST = 3;
+}
+
 // ProviderSort orders the directory. Distance needs the caller's coordinates; without them
 // the service falls back to rating so a list is never empty for want of a GPS fix.
 enum ProviderSort {
@@ -259,6 +271,7 @@ message AppUser {
   bool push_allowed = 12;
   string created_at = 13;        // RFC3339
   string referral_code = 14;     // the code they share; also the key friends type in
+  string referred_by = 15;       // the code they were invited with, if any
 }
 
 // Device is one installation that can receive a push.
@@ -432,6 +445,15 @@ message BookingItem {
   int32 duration_minutes = 5;
 }
 
+// BookingEvent is one step in a booking's life, kept so the order screen can draw the
+// timeline it shows — created, confirmed, in work, done — each with the time it happened.
+// The current state alone cannot say when the shop confirmed, only that it did.
+message BookingEvent {
+  BookingState state = 1;
+  string at = 2;                  // RFC3339
+  string note = 3;
+}
+
 // Booking is an appointment a driver made from the app.
 message Booking {
   string id = 1;
@@ -462,6 +484,8 @@ message Booking {
   string created_at = 25;
   string updated_at = 26;
   bool demo = 27;
+  // Every state this booking has been in, oldest first.
+  repeated BookingEvent history = 28;
 }
 
 // Slot is one bookable time on the booking screen.
@@ -896,6 +920,7 @@ message ListReviewsRequest {
   bool with_photos_only = 4;
   int32 limit = 5;
   int32 offset = 6;
+  ReviewSort sort = 7;
 }
 
 message ListReviewsResponse {
@@ -1065,6 +1090,9 @@ message ListBookingsRequest {
   bool active_only = 3;           // NEW, CONFIRMED, IN_WORK, READY
   int32 limit = 4;
   int32 offset = 5;
+  // One car's history, for the car page. Filtering here rather than in the app matters
+  // once a driver has years of visits: the page wants ten rows, not all of them.
+  string car_id = 6;
 }
 
 message ListBookingsResponse {
@@ -1208,6 +1236,19 @@ message MarkStorySeenRequest {
 
 message GetBonusAccountRequest {
   string phone = 1;
+}
+
+message ApplyReferralCodeRequest {
+  string phone = 1;
+  string code = 2;                // the inviter's referral_code
+}
+
+message ApplyReferralCodeResponse {
+  bool ok = 1;
+  // Why not, when it was refused: "unknown", "own_code", "already_referred", "has_bookings".
+  string reason = 2;
+  string inviter_name = 3;        // to say "invited by Bekzod" on the screen
+  int64 reward = 4;               // what the inviter will get once this driver pays
 }
 
 message ListBonusEntriesRequest {

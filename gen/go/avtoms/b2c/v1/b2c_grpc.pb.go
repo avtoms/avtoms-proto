@@ -70,6 +70,7 @@ const (
 	B2CService_MarkStorySeen_FullMethodName            = "/avtoms.b2c.v1.B2CService/MarkStorySeen"
 	B2CService_GetBonusAccount_FullMethodName          = "/avtoms.b2c.v1.B2CService/GetBonusAccount"
 	B2CService_ListBonusEntries_FullMethodName         = "/avtoms.b2c.v1.B2CService/ListBonusEntries"
+	B2CService_ApplyReferralCode_FullMethodName        = "/avtoms.b2c.v1.B2CService/ApplyReferralCode"
 	B2CService_ListChats_FullMethodName                = "/avtoms.b2c.v1.B2CService/ListChats"
 	B2CService_GetChat_FullMethodName                  = "/avtoms.b2c.v1.B2CService/GetChat"
 	B2CService_SendChatMessage_FullMethodName          = "/avtoms.b2c.v1.B2CService/SendChatMessage"
@@ -193,6 +194,10 @@ type B2CServiceClient interface {
 	// ── Cashback ───────────────────────────────────────────────────────────────────────
 	GetBonusAccount(ctx context.Context, in *GetBonusAccountRequest, opts ...grpc.CallOption) (*BonusAccount, error)
 	ListBonusEntries(ctx context.Context, in *ListBonusEntriesRequest, opts ...grpc.CallOption) (*ListBonusEntriesResponse, error)
+	// ApplyReferralCode records who invited this driver. The reward is paid to the inviter
+	// when the invited driver first pays for something — not here, because a bonus paid for
+	// signing up is a bonus paid for making accounts.
+	ApplyReferralCode(ctx context.Context, in *ApplyReferralCodeRequest, opts ...grpc.CallOption) (*ApplyReferralCodeResponse, error)
 	// ── Chats and support ──────────────────────────────────────────────────────────────
 	ListChats(ctx context.Context, in *ListChatsRequest, opts ...grpc.CallOption) (*ListChatsResponse, error)
 	GetChat(ctx context.Context, in *GetChatRequest, opts ...grpc.CallOption) (*GetChatResponse, error)
@@ -748,6 +753,16 @@ func (c *b2CServiceClient) ListBonusEntries(ctx context.Context, in *ListBonusEn
 	return out, nil
 }
 
+func (c *b2CServiceClient) ApplyReferralCode(ctx context.Context, in *ApplyReferralCodeRequest, opts ...grpc.CallOption) (*ApplyReferralCodeResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ApplyReferralCodeResponse)
+	err := c.cc.Invoke(ctx, B2CService_ApplyReferralCode_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *b2CServiceClient) ListChats(ctx context.Context, in *ListChatsRequest, opts ...grpc.CallOption) (*ListChatsResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(ListChatsResponse)
@@ -1094,6 +1109,10 @@ type B2CServiceServer interface {
 	// ── Cashback ───────────────────────────────────────────────────────────────────────
 	GetBonusAccount(context.Context, *GetBonusAccountRequest) (*BonusAccount, error)
 	ListBonusEntries(context.Context, *ListBonusEntriesRequest) (*ListBonusEntriesResponse, error)
+	// ApplyReferralCode records who invited this driver. The reward is paid to the inviter
+	// when the invited driver first pays for something — not here, because a bonus paid for
+	// signing up is a bonus paid for making accounts.
+	ApplyReferralCode(context.Context, *ApplyReferralCodeRequest) (*ApplyReferralCodeResponse, error)
 	// ── Chats and support ──────────────────────────────────────────────────────────────
 	ListChats(context.Context, *ListChatsRequest) (*ListChatsResponse, error)
 	GetChat(context.Context, *GetChatRequest) (*GetChatResponse, error)
@@ -1291,6 +1310,9 @@ func (UnimplementedB2CServiceServer) GetBonusAccount(context.Context, *GetBonusA
 }
 func (UnimplementedB2CServiceServer) ListBonusEntries(context.Context, *ListBonusEntriesRequest) (*ListBonusEntriesResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method ListBonusEntries not implemented")
+}
+func (UnimplementedB2CServiceServer) ApplyReferralCode(context.Context, *ApplyReferralCodeRequest) (*ApplyReferralCodeResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ApplyReferralCode not implemented")
 }
 func (UnimplementedB2CServiceServer) ListChats(context.Context, *ListChatsRequest) (*ListChatsResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method ListChats not implemented")
@@ -2306,6 +2328,24 @@ func _B2CService_ListBonusEntries_Handler(srv interface{}, ctx context.Context, 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _B2CService_ApplyReferralCode_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ApplyReferralCodeRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(B2CServiceServer).ApplyReferralCode(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: B2CService_ApplyReferralCode_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(B2CServiceServer).ApplyReferralCode(ctx, req.(*ApplyReferralCodeRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _B2CService_ListChats_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ListChatsRequest)
 	if err := dec(in); err != nil {
@@ -2966,6 +3006,10 @@ var B2CService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ListBonusEntries",
 			Handler:    _B2CService_ListBonusEntries_Handler,
+		},
+		{
+			MethodName: "ApplyReferralCode",
+			Handler:    _B2CService_ApplyReferralCode_Handler,
 		},
 		{
 			MethodName: "ListChats",

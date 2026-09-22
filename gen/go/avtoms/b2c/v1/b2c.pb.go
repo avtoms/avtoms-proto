@@ -472,6 +472,59 @@ func (MapPointKind) EnumDescriptor() ([]byte, []int) {
 	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{7}
 }
 
+// ReviewSort orders a provider's reviews: the app offers newest, best and worst.
+type ReviewSort int32
+
+const (
+	ReviewSort_REVIEW_SORT_UNSPECIFIED ReviewSort = 0
+	ReviewSort_REVIEW_SORT_NEWEST      ReviewSort = 1
+	ReviewSort_REVIEW_SORT_HIGHEST     ReviewSort = 2
+	ReviewSort_REVIEW_SORT_LOWEST      ReviewSort = 3
+)
+
+// Enum value maps for ReviewSort.
+var (
+	ReviewSort_name = map[int32]string{
+		0: "REVIEW_SORT_UNSPECIFIED",
+		1: "REVIEW_SORT_NEWEST",
+		2: "REVIEW_SORT_HIGHEST",
+		3: "REVIEW_SORT_LOWEST",
+	}
+	ReviewSort_value = map[string]int32{
+		"REVIEW_SORT_UNSPECIFIED": 0,
+		"REVIEW_SORT_NEWEST":      1,
+		"REVIEW_SORT_HIGHEST":     2,
+		"REVIEW_SORT_LOWEST":      3,
+	}
+)
+
+func (x ReviewSort) Enum() *ReviewSort {
+	p := new(ReviewSort)
+	*p = x
+	return p
+}
+
+func (x ReviewSort) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (ReviewSort) Descriptor() protoreflect.EnumDescriptor {
+	return file_avtoms_b2c_v1_b2c_proto_enumTypes[8].Descriptor()
+}
+
+func (ReviewSort) Type() protoreflect.EnumType {
+	return &file_avtoms_b2c_v1_b2c_proto_enumTypes[8]
+}
+
+func (x ReviewSort) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use ReviewSort.Descriptor instead.
+func (ReviewSort) EnumDescriptor() ([]byte, []int) {
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{8}
+}
+
 // ProviderSort orders the directory. Distance needs the caller's coordinates; without them
 // the service falls back to rating so a list is never empty for want of a GPS fix.
 type ProviderSort int32
@@ -513,11 +566,11 @@ func (x ProviderSort) String() string {
 }
 
 func (ProviderSort) Descriptor() protoreflect.EnumDescriptor {
-	return file_avtoms_b2c_v1_b2c_proto_enumTypes[8].Descriptor()
+	return file_avtoms_b2c_v1_b2c_proto_enumTypes[9].Descriptor()
 }
 
 func (ProviderSort) Type() protoreflect.EnumType {
-	return &file_avtoms_b2c_v1_b2c_proto_enumTypes[8]
+	return &file_avtoms_b2c_v1_b2c_proto_enumTypes[9]
 }
 
 func (x ProviderSort) Number() protoreflect.EnumNumber {
@@ -526,7 +579,7 @@ func (x ProviderSort) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use ProviderSort.Descriptor instead.
 func (ProviderSort) EnumDescriptor() ([]byte, []int) {
-	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{8}
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{9}
 }
 
 // DeleteResponse is the uniform answer for anything that removes or acknowledges.
@@ -593,6 +646,7 @@ type AppUser struct {
 	PushAllowed     bool                   `protobuf:"varint,12,opt,name=push_allowed,json=pushAllowed,proto3" json:"push_allowed,omitempty"`
 	CreatedAt       string                 `protobuf:"bytes,13,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`          // RFC3339
 	ReferralCode    string                 `protobuf:"bytes,14,opt,name=referral_code,json=referralCode,proto3" json:"referral_code,omitempty"` // the code they share; also the key friends type in
+	ReferredBy      string                 `protobuf:"bytes,15,opt,name=referred_by,json=referredBy,proto3" json:"referred_by,omitempty"`       // the code they were invited with, if any
 	unknownFields   protoimpl.UnknownFields
 	sizeCache       protoimpl.SizeCache
 }
@@ -721,6 +775,13 @@ func (x *AppUser) GetCreatedAt() string {
 func (x *AppUser) GetReferralCode() string {
 	if x != nil {
 		return x.ReferralCode
+	}
+	return ""
+}
+
+func (x *AppUser) GetReferredBy() string {
+	if x != nil {
+		return x.ReferredBy
 	}
 	return ""
 }
@@ -2064,6 +2125,69 @@ func (x *BookingItem) GetDurationMinutes() int32 {
 	return 0
 }
 
+// BookingEvent is one step in a booking's life, kept so the order screen can draw the
+// timeline it shows — created, confirmed, in work, done — each with the time it happened.
+// The current state alone cannot say when the shop confirmed, only that it did.
+type BookingEvent struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	State         BookingState           `protobuf:"varint,1,opt,name=state,proto3,enum=avtoms.b2c.v1.BookingState" json:"state,omitempty"`
+	At            string                 `protobuf:"bytes,2,opt,name=at,proto3" json:"at,omitempty"` // RFC3339
+	Note          string                 `protobuf:"bytes,3,opt,name=note,proto3" json:"note,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *BookingEvent) Reset() {
+	*x = BookingEvent{}
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[13]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *BookingEvent) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*BookingEvent) ProtoMessage() {}
+
+func (x *BookingEvent) ProtoReflect() protoreflect.Message {
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[13]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use BookingEvent.ProtoReflect.Descriptor instead.
+func (*BookingEvent) Descriptor() ([]byte, []int) {
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{13}
+}
+
+func (x *BookingEvent) GetState() BookingState {
+	if x != nil {
+		return x.State
+	}
+	return BookingState_BOOKING_STATE_UNSPECIFIED
+}
+
+func (x *BookingEvent) GetAt() string {
+	if x != nil {
+		return x.At
+	}
+	return ""
+}
+
+func (x *BookingEvent) GetNote() string {
+	if x != nil {
+		return x.Note
+	}
+	return ""
+}
+
 // Booking is an appointment a driver made from the app.
 type Booking struct {
 	state           protoimpl.MessageState `protogen:"open.v1"`
@@ -2095,13 +2219,15 @@ type Booking struct {
 	CreatedAt     string `protobuf:"bytes,25,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
 	UpdatedAt     string `protobuf:"bytes,26,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
 	Demo          bool   `protobuf:"varint,27,opt,name=demo,proto3" json:"demo,omitempty"`
+	// Every state this booking has been in, oldest first.
+	History       []*BookingEvent `protobuf:"bytes,28,rep,name=history,proto3" json:"history,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *Booking) Reset() {
 	*x = Booking{}
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[13]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[14]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2113,7 +2239,7 @@ func (x *Booking) String() string {
 func (*Booking) ProtoMessage() {}
 
 func (x *Booking) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[13]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[14]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2126,7 +2252,7 @@ func (x *Booking) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Booking.ProtoReflect.Descriptor instead.
 func (*Booking) Descriptor() ([]byte, []int) {
-	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{13}
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{14}
 }
 
 func (x *Booking) GetId() string {
@@ -2318,6 +2444,13 @@ func (x *Booking) GetDemo() bool {
 	return false
 }
 
+func (x *Booking) GetHistory() []*BookingEvent {
+	if x != nil {
+		return x.History
+	}
+	return nil
+}
+
 // Slot is one bookable time on the booking screen.
 type Slot struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
@@ -2329,7 +2462,7 @@ type Slot struct {
 
 func (x *Slot) Reset() {
 	*x = Slot{}
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[14]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[15]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2341,7 +2474,7 @@ func (x *Slot) String() string {
 func (*Slot) ProtoMessage() {}
 
 func (x *Slot) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[14]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[15]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2354,7 +2487,7 @@ func (x *Slot) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Slot.ProtoReflect.Descriptor instead.
 func (*Slot) Descriptor() ([]byte, []int) {
-	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{14}
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{15}
 }
 
 func (x *Slot) GetTime() string {
@@ -2394,7 +2527,7 @@ type Card struct {
 
 func (x *Card) Reset() {
 	*x = Card{}
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[15]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[16]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2406,7 +2539,7 @@ func (x *Card) String() string {
 func (*Card) ProtoMessage() {}
 
 func (x *Card) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[15]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[16]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2419,7 +2552,7 @@ func (x *Card) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Card.ProtoReflect.Descriptor instead.
 func (*Card) Descriptor() ([]byte, []int) {
-	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{15}
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{16}
 }
 
 func (x *Card) GetId() string {
@@ -2511,7 +2644,7 @@ type Payment struct {
 
 func (x *Payment) Reset() {
 	*x = Payment{}
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[16]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[17]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2523,7 +2656,7 @@ func (x *Payment) String() string {
 func (*Payment) ProtoMessage() {}
 
 func (x *Payment) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[16]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[17]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2536,7 +2669,7 @@ func (x *Payment) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Payment.ProtoReflect.Descriptor instead.
 func (*Payment) Descriptor() ([]byte, []int) {
-	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{16}
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{17}
 }
 
 func (x *Payment) GetId() string {
@@ -2670,7 +2803,7 @@ type Promo struct {
 
 func (x *Promo) Reset() {
 	*x = Promo{}
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[17]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[18]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2682,7 +2815,7 @@ func (x *Promo) String() string {
 func (*Promo) ProtoMessage() {}
 
 func (x *Promo) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[17]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[18]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2695,7 +2828,7 @@ func (x *Promo) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Promo.ProtoReflect.Descriptor instead.
 func (*Promo) Descriptor() ([]byte, []int) {
-	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{17}
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{18}
 }
 
 func (x *Promo) GetCode() string {
@@ -2839,7 +2972,7 @@ type Story struct {
 
 func (x *Story) Reset() {
 	*x = Story{}
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[18]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[19]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2851,7 +2984,7 @@ func (x *Story) String() string {
 func (*Story) ProtoMessage() {}
 
 func (x *Story) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[18]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[19]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2864,7 +2997,7 @@ func (x *Story) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Story.ProtoReflect.Descriptor instead.
 func (*Story) Descriptor() ([]byte, []int) {
-	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{18}
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{19}
 }
 
 func (x *Story) GetId() string {
@@ -2974,7 +3107,7 @@ type BonusAccount struct {
 
 func (x *BonusAccount) Reset() {
 	*x = BonusAccount{}
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[19]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[20]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2986,7 +3119,7 @@ func (x *BonusAccount) String() string {
 func (*BonusAccount) ProtoMessage() {}
 
 func (x *BonusAccount) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[19]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[20]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2999,7 +3132,7 @@ func (x *BonusAccount) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use BonusAccount.ProtoReflect.Descriptor instead.
 func (*BonusAccount) Descriptor() ([]byte, []int) {
-	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{19}
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{20}
 }
 
 func (x *BonusAccount) GetPhone() string {
@@ -3068,7 +3201,7 @@ type BonusEntry struct {
 
 func (x *BonusEntry) Reset() {
 	*x = BonusEntry{}
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[20]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[21]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3080,7 +3213,7 @@ func (x *BonusEntry) String() string {
 func (*BonusEntry) ProtoMessage() {}
 
 func (x *BonusEntry) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[20]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[21]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3093,7 +3226,7 @@ func (x *BonusEntry) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use BonusEntry.ProtoReflect.Descriptor instead.
 func (*BonusEntry) Descriptor() ([]byte, []int) {
-	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{20}
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{21}
 }
 
 func (x *BonusEntry) GetId() string {
@@ -3171,7 +3304,7 @@ type Chat struct {
 
 func (x *Chat) Reset() {
 	*x = Chat{}
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[21]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[22]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3183,7 +3316,7 @@ func (x *Chat) String() string {
 func (*Chat) ProtoMessage() {}
 
 func (x *Chat) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[21]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[22]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3196,7 +3329,7 @@ func (x *Chat) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Chat.ProtoReflect.Descriptor instead.
 func (*Chat) Descriptor() ([]byte, []int) {
-	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{21}
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{22}
 }
 
 func (x *Chat) GetId() string {
@@ -3288,7 +3421,7 @@ type ChatMessage struct {
 
 func (x *ChatMessage) Reset() {
 	*x = ChatMessage{}
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[22]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[23]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3300,7 +3433,7 @@ func (x *ChatMessage) String() string {
 func (*ChatMessage) ProtoMessage() {}
 
 func (x *ChatMessage) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[22]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[23]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3313,7 +3446,7 @@ func (x *ChatMessage) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ChatMessage.ProtoReflect.Descriptor instead.
 func (*ChatMessage) Descriptor() ([]byte, []int) {
-	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{22}
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{23}
 }
 
 func (x *ChatMessage) GetId() string {
@@ -3391,7 +3524,7 @@ type Notification struct {
 
 func (x *Notification) Reset() {
 	*x = Notification{}
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[23]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[24]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3403,7 +3536,7 @@ func (x *Notification) String() string {
 func (*Notification) ProtoMessage() {}
 
 func (x *Notification) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[23]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[24]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3416,7 +3549,7 @@ func (x *Notification) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Notification.ProtoReflect.Descriptor instead.
 func (*Notification) Descriptor() ([]byte, []int) {
-	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{23}
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{24}
 }
 
 func (x *Notification) GetId() string {
@@ -3507,7 +3640,7 @@ type EmergencyType struct {
 
 func (x *EmergencyType) Reset() {
 	*x = EmergencyType{}
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[24]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[25]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3519,7 +3652,7 @@ func (x *EmergencyType) String() string {
 func (*EmergencyType) ProtoMessage() {}
 
 func (x *EmergencyType) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[24]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[25]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3532,7 +3665,7 @@ func (x *EmergencyType) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use EmergencyType.ProtoReflect.Descriptor instead.
 func (*EmergencyType) Descriptor() ([]byte, []int) {
-	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{24}
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{25}
 }
 
 func (x *EmergencyType) GetCode() string {
@@ -3633,7 +3766,7 @@ type EmergencyRequest struct {
 
 func (x *EmergencyRequest) Reset() {
 	*x = EmergencyRequest{}
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[25]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[26]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3645,7 +3778,7 @@ func (x *EmergencyRequest) String() string {
 func (*EmergencyRequest) ProtoMessage() {}
 
 func (x *EmergencyRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[25]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[26]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3658,7 +3791,7 @@ func (x *EmergencyRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use EmergencyRequest.ProtoReflect.Descriptor instead.
 func (*EmergencyRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{25}
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{26}
 }
 
 func (x *EmergencyRequest) GetId() string {
@@ -3834,7 +3967,7 @@ type FuelPrice struct {
 
 func (x *FuelPrice) Reset() {
 	*x = FuelPrice{}
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[26]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[27]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3846,7 +3979,7 @@ func (x *FuelPrice) String() string {
 func (*FuelPrice) ProtoMessage() {}
 
 func (x *FuelPrice) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[26]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[27]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3859,7 +3992,7 @@ func (x *FuelPrice) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use FuelPrice.ProtoReflect.Descriptor instead.
 func (*FuelPrice) Descriptor() ([]byte, []int) {
-	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{26}
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{27}
 }
 
 func (x *FuelPrice) GetFuelCode() string {
@@ -3907,7 +4040,7 @@ type FuelStation struct {
 
 func (x *FuelStation) Reset() {
 	*x = FuelStation{}
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[27]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[28]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3919,7 +4052,7 @@ func (x *FuelStation) String() string {
 func (*FuelStation) ProtoMessage() {}
 
 func (x *FuelStation) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[27]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[28]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3932,7 +4065,7 @@ func (x *FuelStation) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use FuelStation.ProtoReflect.Descriptor instead.
 func (*FuelStation) Descriptor() ([]byte, []int) {
-	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{27}
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{28}
 }
 
 func (x *FuelStation) GetId() string {
@@ -4066,7 +4199,7 @@ type MapPoint struct {
 
 func (x *MapPoint) Reset() {
 	*x = MapPoint{}
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[28]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[29]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4078,7 +4211,7 @@ func (x *MapPoint) String() string {
 func (*MapPoint) ProtoMessage() {}
 
 func (x *MapPoint) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[28]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[29]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4091,7 +4224,7 @@ func (x *MapPoint) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MapPoint.ProtoReflect.Descriptor instead.
 func (*MapPoint) Descriptor() ([]byte, []int) {
-	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{28}
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{29}
 }
 
 func (x *MapPoint) GetId() string {
@@ -4201,7 +4334,7 @@ type GetProfileRequest struct {
 
 func (x *GetProfileRequest) Reset() {
 	*x = GetProfileRequest{}
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[29]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[30]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4213,7 +4346,7 @@ func (x *GetProfileRequest) String() string {
 func (*GetProfileRequest) ProtoMessage() {}
 
 func (x *GetProfileRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[29]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[30]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4226,7 +4359,7 @@ func (x *GetProfileRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetProfileRequest.ProtoReflect.Descriptor instead.
 func (*GetProfileRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{29}
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{30}
 }
 
 func (x *GetProfileRequest) GetPhone() string {
@@ -4261,7 +4394,7 @@ type UpdateProfileRequest struct {
 
 func (x *UpdateProfileRequest) Reset() {
 	*x = UpdateProfileRequest{}
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[30]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[31]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4273,7 +4406,7 @@ func (x *UpdateProfileRequest) String() string {
 func (*UpdateProfileRequest) ProtoMessage() {}
 
 func (x *UpdateProfileRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[30]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[31]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4286,7 +4419,7 @@ func (x *UpdateProfileRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateProfileRequest.ProtoReflect.Descriptor instead.
 func (*UpdateProfileRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{30}
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{31}
 }
 
 func (x *UpdateProfileRequest) GetPhone() string {
@@ -4389,7 +4522,7 @@ type DeleteProfileRequest struct {
 
 func (x *DeleteProfileRequest) Reset() {
 	*x = DeleteProfileRequest{}
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[31]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[32]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4401,7 +4534,7 @@ func (x *DeleteProfileRequest) String() string {
 func (*DeleteProfileRequest) ProtoMessage() {}
 
 func (x *DeleteProfileRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[31]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[32]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4414,7 +4547,7 @@ func (x *DeleteProfileRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteProfileRequest.ProtoReflect.Descriptor instead.
 func (*DeleteProfileRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{31}
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{32}
 }
 
 func (x *DeleteProfileRequest) GetPhone() string {
@@ -4437,7 +4570,7 @@ type RegisterDeviceRequest struct {
 
 func (x *RegisterDeviceRequest) Reset() {
 	*x = RegisterDeviceRequest{}
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[32]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[33]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4449,7 +4582,7 @@ func (x *RegisterDeviceRequest) String() string {
 func (*RegisterDeviceRequest) ProtoMessage() {}
 
 func (x *RegisterDeviceRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[32]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[33]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4462,7 +4595,7 @@ func (x *RegisterDeviceRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RegisterDeviceRequest.ProtoReflect.Descriptor instead.
 func (*RegisterDeviceRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{32}
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{33}
 }
 
 func (x *RegisterDeviceRequest) GetPhone() string {
@@ -4510,7 +4643,7 @@ type DeleteDeviceRequest struct {
 
 func (x *DeleteDeviceRequest) Reset() {
 	*x = DeleteDeviceRequest{}
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[33]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[34]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4522,7 +4655,7 @@ func (x *DeleteDeviceRequest) String() string {
 func (*DeleteDeviceRequest) ProtoMessage() {}
 
 func (x *DeleteDeviceRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[33]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[34]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4535,7 +4668,7 @@ func (x *DeleteDeviceRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteDeviceRequest.ProtoReflect.Descriptor instead.
 func (*DeleteDeviceRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{33}
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{34}
 }
 
 func (x *DeleteDeviceRequest) GetPhone() string {
@@ -4561,7 +4694,7 @@ type ListCitiesRequest struct {
 
 func (x *ListCitiesRequest) Reset() {
 	*x = ListCitiesRequest{}
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[34]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[35]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4573,7 +4706,7 @@ func (x *ListCitiesRequest) String() string {
 func (*ListCitiesRequest) ProtoMessage() {}
 
 func (x *ListCitiesRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[34]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[35]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4586,7 +4719,7 @@ func (x *ListCitiesRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListCitiesRequest.ProtoReflect.Descriptor instead.
 func (*ListCitiesRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{34}
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{35}
 }
 
 func (x *ListCitiesRequest) GetIncludeInactive() bool {
@@ -4605,7 +4738,7 @@ type ListCitiesResponse struct {
 
 func (x *ListCitiesResponse) Reset() {
 	*x = ListCitiesResponse{}
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[35]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[36]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4617,7 +4750,7 @@ func (x *ListCitiesResponse) String() string {
 func (*ListCitiesResponse) ProtoMessage() {}
 
 func (x *ListCitiesResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[35]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[36]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4630,7 +4763,7 @@ func (x *ListCitiesResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListCitiesResponse.ProtoReflect.Descriptor instead.
 func (*ListCitiesResponse) Descriptor() ([]byte, []int) {
-	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{35}
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{36}
 }
 
 func (x *ListCitiesResponse) GetCities() []*City {
@@ -4650,7 +4783,7 @@ type ListCategoriesRequest struct {
 
 func (x *ListCategoriesRequest) Reset() {
 	*x = ListCategoriesRequest{}
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[36]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[37]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4662,7 +4795,7 @@ func (x *ListCategoriesRequest) String() string {
 func (*ListCategoriesRequest) ProtoMessage() {}
 
 func (x *ListCategoriesRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[36]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[37]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4675,7 +4808,7 @@ func (x *ListCategoriesRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListCategoriesRequest.ProtoReflect.Descriptor instead.
 func (*ListCategoriesRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{36}
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{37}
 }
 
 func (x *ListCategoriesRequest) GetCityId() string {
@@ -4701,7 +4834,7 @@ type ListCategoriesResponse struct {
 
 func (x *ListCategoriesResponse) Reset() {
 	*x = ListCategoriesResponse{}
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[37]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[38]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4713,7 +4846,7 @@ func (x *ListCategoriesResponse) String() string {
 func (*ListCategoriesResponse) ProtoMessage() {}
 
 func (x *ListCategoriesResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[37]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[38]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4726,7 +4859,7 @@ func (x *ListCategoriesResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListCategoriesResponse.ProtoReflect.Descriptor instead.
 func (*ListCategoriesResponse) Descriptor() ([]byte, []int) {
-	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{37}
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{38}
 }
 
 func (x *ListCategoriesResponse) GetCategories() []*Category {
@@ -4762,7 +4895,7 @@ type ListProvidersRequest struct {
 
 func (x *ListProvidersRequest) Reset() {
 	*x = ListProvidersRequest{}
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[38]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[39]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4774,7 +4907,7 @@ func (x *ListProvidersRequest) String() string {
 func (*ListProvidersRequest) ProtoMessage() {}
 
 func (x *ListProvidersRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[38]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[39]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4787,7 +4920,7 @@ func (x *ListProvidersRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListProvidersRequest.ProtoReflect.Descriptor instead.
 func (*ListProvidersRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{38}
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{39}
 }
 
 func (x *ListProvidersRequest) GetCityId() string {
@@ -4919,7 +5052,7 @@ type ListProvidersResponse struct {
 
 func (x *ListProvidersResponse) Reset() {
 	*x = ListProvidersResponse{}
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[39]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[40]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4931,7 +5064,7 @@ func (x *ListProvidersResponse) String() string {
 func (*ListProvidersResponse) ProtoMessage() {}
 
 func (x *ListProvidersResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[39]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[40]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4944,7 +5077,7 @@ func (x *ListProvidersResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListProvidersResponse.ProtoReflect.Descriptor instead.
 func (*ListProvidersResponse) Descriptor() ([]byte, []int) {
-	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{39}
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{40}
 }
 
 func (x *ListProvidersResponse) GetProviders() []*Provider {
@@ -4973,7 +5106,7 @@ type GetProviderRequest struct {
 
 func (x *GetProviderRequest) Reset() {
 	*x = GetProviderRequest{}
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[40]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[41]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4985,7 +5118,7 @@ func (x *GetProviderRequest) String() string {
 func (*GetProviderRequest) ProtoMessage() {}
 
 func (x *GetProviderRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[40]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[41]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4998,7 +5131,7 @@ func (x *GetProviderRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetProviderRequest.ProtoReflect.Descriptor instead.
 func (*GetProviderRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{40}
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{41}
 }
 
 func (x *GetProviderRequest) GetId() string {
@@ -5039,7 +5172,7 @@ type ListProviderServicesRequest struct {
 
 func (x *ListProviderServicesRequest) Reset() {
 	*x = ListProviderServicesRequest{}
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[41]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[42]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5051,7 +5184,7 @@ func (x *ListProviderServicesRequest) String() string {
 func (*ListProviderServicesRequest) ProtoMessage() {}
 
 func (x *ListProviderServicesRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[41]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[42]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5064,7 +5197,7 @@ func (x *ListProviderServicesRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListProviderServicesRequest.ProtoReflect.Descriptor instead.
 func (*ListProviderServicesRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{41}
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{42}
 }
 
 func (x *ListProviderServicesRequest) GetProviderId() string {
@@ -5090,7 +5223,7 @@ type ListProviderServicesResponse struct {
 
 func (x *ListProviderServicesResponse) Reset() {
 	*x = ListProviderServicesResponse{}
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[42]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[43]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5102,7 +5235,7 @@ func (x *ListProviderServicesResponse) String() string {
 func (*ListProviderServicesResponse) ProtoMessage() {}
 
 func (x *ListProviderServicesResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[42]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[43]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5115,7 +5248,7 @@ func (x *ListProviderServicesResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListProviderServicesResponse.ProtoReflect.Descriptor instead.
 func (*ListProviderServicesResponse) Descriptor() ([]byte, []int) {
-	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{42}
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{43}
 }
 
 func (x *ListProviderServicesResponse) GetServices() []*ProviderService {
@@ -5141,7 +5274,7 @@ type ListMapPointsRequest struct {
 
 func (x *ListMapPointsRequest) Reset() {
 	*x = ListMapPointsRequest{}
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[43]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[44]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5153,7 +5286,7 @@ func (x *ListMapPointsRequest) String() string {
 func (*ListMapPointsRequest) ProtoMessage() {}
 
 func (x *ListMapPointsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[43]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[44]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5166,7 +5299,7 @@ func (x *ListMapPointsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListMapPointsRequest.ProtoReflect.Descriptor instead.
 func (*ListMapPointsRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{43}
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{44}
 }
 
 func (x *ListMapPointsRequest) GetCityId() string {
@@ -5234,7 +5367,7 @@ type ListMapPointsResponse struct {
 
 func (x *ListMapPointsResponse) Reset() {
 	*x = ListMapPointsResponse{}
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[44]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[45]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5246,7 +5379,7 @@ func (x *ListMapPointsResponse) String() string {
 func (*ListMapPointsResponse) ProtoMessage() {}
 
 func (x *ListMapPointsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[44]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[45]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5259,7 +5392,7 @@ func (x *ListMapPointsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListMapPointsResponse.ProtoReflect.Descriptor instead.
 func (*ListMapPointsResponse) Descriptor() ([]byte, []int) {
-	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{44}
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{45}
 }
 
 func (x *ListMapPointsResponse) GetPoints() []*MapPoint {
@@ -5282,7 +5415,7 @@ type ListFuelStationsRequest struct {
 
 func (x *ListFuelStationsRequest) Reset() {
 	*x = ListFuelStationsRequest{}
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[45]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[46]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5294,7 +5427,7 @@ func (x *ListFuelStationsRequest) String() string {
 func (*ListFuelStationsRequest) ProtoMessage() {}
 
 func (x *ListFuelStationsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[45]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[46]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5307,7 +5440,7 @@ func (x *ListFuelStationsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListFuelStationsRequest.ProtoReflect.Descriptor instead.
 func (*ListFuelStationsRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{45}
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{46}
 }
 
 func (x *ListFuelStationsRequest) GetCityId() string {
@@ -5354,7 +5487,7 @@ type ListFuelStationsResponse struct {
 
 func (x *ListFuelStationsResponse) Reset() {
 	*x = ListFuelStationsResponse{}
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[46]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[47]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5366,7 +5499,7 @@ func (x *ListFuelStationsResponse) String() string {
 func (*ListFuelStationsResponse) ProtoMessage() {}
 
 func (x *ListFuelStationsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[46]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[47]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5379,7 +5512,7 @@ func (x *ListFuelStationsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListFuelStationsResponse.ProtoReflect.Descriptor instead.
 func (*ListFuelStationsResponse) Descriptor() ([]byte, []int) {
-	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{46}
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{47}
 }
 
 func (x *ListFuelStationsResponse) GetStations() []*FuelStation {
@@ -5400,7 +5533,7 @@ type GetFuelStationRequest struct {
 
 func (x *GetFuelStationRequest) Reset() {
 	*x = GetFuelStationRequest{}
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[47]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[48]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5412,7 +5545,7 @@ func (x *GetFuelStationRequest) String() string {
 func (*GetFuelStationRequest) ProtoMessage() {}
 
 func (x *GetFuelStationRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[47]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[48]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5425,7 +5558,7 @@ func (x *GetFuelStationRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetFuelStationRequest.ProtoReflect.Descriptor instead.
 func (*GetFuelStationRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{47}
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{48}
 }
 
 func (x *GetFuelStationRequest) GetId() string {
@@ -5463,7 +5596,7 @@ type SearchRequest struct {
 
 func (x *SearchRequest) Reset() {
 	*x = SearchRequest{}
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[48]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[49]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5475,7 +5608,7 @@ func (x *SearchRequest) String() string {
 func (*SearchRequest) ProtoMessage() {}
 
 func (x *SearchRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[48]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[49]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5488,7 +5621,7 @@ func (x *SearchRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SearchRequest.ProtoReflect.Descriptor instead.
 func (*SearchRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{48}
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{49}
 }
 
 func (x *SearchRequest) GetQuery() string {
@@ -5545,7 +5678,7 @@ type SearchResponse struct {
 
 func (x *SearchResponse) Reset() {
 	*x = SearchResponse{}
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[49]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[50]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5557,7 +5690,7 @@ func (x *SearchResponse) String() string {
 func (*SearchResponse) ProtoMessage() {}
 
 func (x *SearchResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[49]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[50]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5570,7 +5703,7 @@ func (x *SearchResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SearchResponse.ProtoReflect.Descriptor instead.
 func (*SearchResponse) Descriptor() ([]byte, []int) {
-	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{49}
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{50}
 }
 
 func (x *SearchResponse) GetProviders() []*Provider {
@@ -5610,7 +5743,7 @@ type ClearSearchHistoryRequest struct {
 
 func (x *ClearSearchHistoryRequest) Reset() {
 	*x = ClearSearchHistoryRequest{}
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[50]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[51]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5622,7 +5755,7 @@ func (x *ClearSearchHistoryRequest) String() string {
 func (*ClearSearchHistoryRequest) ProtoMessage() {}
 
 func (x *ClearSearchHistoryRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[50]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[51]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5635,7 +5768,7 @@ func (x *ClearSearchHistoryRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ClearSearchHistoryRequest.ProtoReflect.Descriptor instead.
 func (*ClearSearchHistoryRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{50}
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{51}
 }
 
 func (x *ClearSearchHistoryRequest) GetPhone() string {
@@ -5657,7 +5790,7 @@ type GetHomeRequest struct {
 
 func (x *GetHomeRequest) Reset() {
 	*x = GetHomeRequest{}
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[51]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[52]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5669,7 +5802,7 @@ func (x *GetHomeRequest) String() string {
 func (*GetHomeRequest) ProtoMessage() {}
 
 func (x *GetHomeRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[51]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[52]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5682,7 +5815,7 @@ func (x *GetHomeRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetHomeRequest.ProtoReflect.Descriptor instead.
 func (*GetHomeRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{51}
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{52}
 }
 
 func (x *GetHomeRequest) GetPhone() string {
@@ -5737,7 +5870,7 @@ type HomeResponse struct {
 
 func (x *HomeResponse) Reset() {
 	*x = HomeResponse{}
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[52]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[53]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5749,7 +5882,7 @@ func (x *HomeResponse) String() string {
 func (*HomeResponse) ProtoMessage() {}
 
 func (x *HomeResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[52]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[53]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5762,7 +5895,7 @@ func (x *HomeResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use HomeResponse.ProtoReflect.Descriptor instead.
 func (*HomeResponse) Descriptor() ([]byte, []int) {
-	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{52}
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{53}
 }
 
 func (x *HomeResponse) GetCity() *City {
@@ -5857,13 +5990,14 @@ type ListReviewsRequest struct {
 	WithPhotosOnly bool                   `protobuf:"varint,4,opt,name=with_photos_only,json=withPhotosOnly,proto3" json:"with_photos_only,omitempty"`
 	Limit          int32                  `protobuf:"varint,5,opt,name=limit,proto3" json:"limit,omitempty"`
 	Offset         int32                  `protobuf:"varint,6,opt,name=offset,proto3" json:"offset,omitempty"`
+	Sort           ReviewSort             `protobuf:"varint,7,opt,name=sort,proto3,enum=avtoms.b2c.v1.ReviewSort" json:"sort,omitempty"`
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
 }
 
 func (x *ListReviewsRequest) Reset() {
 	*x = ListReviewsRequest{}
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[53]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[54]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5875,7 +6009,7 @@ func (x *ListReviewsRequest) String() string {
 func (*ListReviewsRequest) ProtoMessage() {}
 
 func (x *ListReviewsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[53]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[54]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5888,7 +6022,7 @@ func (x *ListReviewsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListReviewsRequest.ProtoReflect.Descriptor instead.
 func (*ListReviewsRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{53}
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{54}
 }
 
 func (x *ListReviewsRequest) GetProviderId() string {
@@ -5933,6 +6067,13 @@ func (x *ListReviewsRequest) GetOffset() int32 {
 	return 0
 }
 
+func (x *ListReviewsRequest) GetSort() ReviewSort {
+	if x != nil {
+		return x.Sort
+	}
+	return ReviewSort_REVIEW_SORT_UNSPECIFIED
+}
+
 type ListReviewsResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Reviews       []*Review              `protobuf:"bytes,1,rep,name=reviews,proto3" json:"reviews,omitempty"`
@@ -5944,7 +6085,7 @@ type ListReviewsResponse struct {
 
 func (x *ListReviewsResponse) Reset() {
 	*x = ListReviewsResponse{}
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[54]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[55]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5956,7 +6097,7 @@ func (x *ListReviewsResponse) String() string {
 func (*ListReviewsResponse) ProtoMessage() {}
 
 func (x *ListReviewsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[54]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[55]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5969,7 +6110,7 @@ func (x *ListReviewsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListReviewsResponse.ProtoReflect.Descriptor instead.
 func (*ListReviewsResponse) Descriptor() ([]byte, []int) {
-	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{54}
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{55}
 }
 
 func (x *ListReviewsResponse) GetReviews() []*Review {
@@ -6009,7 +6150,7 @@ type CreateReviewRequest struct {
 
 func (x *CreateReviewRequest) Reset() {
 	*x = CreateReviewRequest{}
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[55]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[56]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -6021,7 +6162,7 @@ func (x *CreateReviewRequest) String() string {
 func (*CreateReviewRequest) ProtoMessage() {}
 
 func (x *CreateReviewRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[55]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[56]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -6034,7 +6175,7 @@ func (x *CreateReviewRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateReviewRequest.ProtoReflect.Descriptor instead.
 func (*CreateReviewRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{55}
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{56}
 }
 
 func (x *CreateReviewRequest) GetPhone() string {
@@ -6104,7 +6245,7 @@ type SetReviewReplyRequest struct {
 
 func (x *SetReviewReplyRequest) Reset() {
 	*x = SetReviewReplyRequest{}
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[56]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[57]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -6116,7 +6257,7 @@ func (x *SetReviewReplyRequest) String() string {
 func (*SetReviewReplyRequest) ProtoMessage() {}
 
 func (x *SetReviewReplyRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[56]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[57]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -6129,7 +6270,7 @@ func (x *SetReviewReplyRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SetReviewReplyRequest.ProtoReflect.Descriptor instead.
 func (*SetReviewReplyRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{56}
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{57}
 }
 
 func (x *SetReviewReplyRequest) GetId() string {
@@ -6167,7 +6308,7 @@ type CreateComplaintRequest struct {
 
 func (x *CreateComplaintRequest) Reset() {
 	*x = CreateComplaintRequest{}
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[57]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[58]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -6179,7 +6320,7 @@ func (x *CreateComplaintRequest) String() string {
 func (*CreateComplaintRequest) ProtoMessage() {}
 
 func (x *CreateComplaintRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[57]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[58]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -6192,7 +6333,7 @@ func (x *CreateComplaintRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateComplaintRequest.ProtoReflect.Descriptor instead.
 func (*CreateComplaintRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{57}
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{58}
 }
 
 func (x *CreateComplaintRequest) GetPhone() string {
@@ -6249,7 +6390,7 @@ type ListComplaintsRequest struct {
 
 func (x *ListComplaintsRequest) Reset() {
 	*x = ListComplaintsRequest{}
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[58]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[59]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -6261,7 +6402,7 @@ func (x *ListComplaintsRequest) String() string {
 func (*ListComplaintsRequest) ProtoMessage() {}
 
 func (x *ListComplaintsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[58]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[59]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -6274,7 +6415,7 @@ func (x *ListComplaintsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListComplaintsRequest.ProtoReflect.Descriptor instead.
 func (*ListComplaintsRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{58}
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{59}
 }
 
 func (x *ListComplaintsRequest) GetPhone() string {
@@ -6315,7 +6456,7 @@ type ListComplaintsResponse struct {
 
 func (x *ListComplaintsResponse) Reset() {
 	*x = ListComplaintsResponse{}
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[59]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[60]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -6327,7 +6468,7 @@ func (x *ListComplaintsResponse) String() string {
 func (*ListComplaintsResponse) ProtoMessage() {}
 
 func (x *ListComplaintsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[59]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[60]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -6340,7 +6481,7 @@ func (x *ListComplaintsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListComplaintsResponse.ProtoReflect.Descriptor instead.
 func (*ListComplaintsResponse) Descriptor() ([]byte, []int) {
-	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{59}
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{60}
 }
 
 func (x *ListComplaintsResponse) GetComplaints() []*Complaint {
@@ -6368,7 +6509,7 @@ type ListFavoritesRequest struct {
 
 func (x *ListFavoritesRequest) Reset() {
 	*x = ListFavoritesRequest{}
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[60]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[61]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -6380,7 +6521,7 @@ func (x *ListFavoritesRequest) String() string {
 func (*ListFavoritesRequest) ProtoMessage() {}
 
 func (x *ListFavoritesRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[60]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[61]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -6393,7 +6534,7 @@ func (x *ListFavoritesRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListFavoritesRequest.ProtoReflect.Descriptor instead.
 func (*ListFavoritesRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{60}
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{61}
 }
 
 func (x *ListFavoritesRequest) GetPhone() string {
@@ -6426,7 +6567,7 @@ type ListFavoritesResponse struct {
 
 func (x *ListFavoritesResponse) Reset() {
 	*x = ListFavoritesResponse{}
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[61]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[62]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -6438,7 +6579,7 @@ func (x *ListFavoritesResponse) String() string {
 func (*ListFavoritesResponse) ProtoMessage() {}
 
 func (x *ListFavoritesResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[61]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[62]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -6451,7 +6592,7 @@ func (x *ListFavoritesResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListFavoritesResponse.ProtoReflect.Descriptor instead.
 func (*ListFavoritesResponse) Descriptor() ([]byte, []int) {
-	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{61}
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{62}
 }
 
 func (x *ListFavoritesResponse) GetProviders() []*Provider {
@@ -6472,7 +6613,7 @@ type SetFavoriteRequest struct {
 
 func (x *SetFavoriteRequest) Reset() {
 	*x = SetFavoriteRequest{}
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[62]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[63]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -6484,7 +6625,7 @@ func (x *SetFavoriteRequest) String() string {
 func (*SetFavoriteRequest) ProtoMessage() {}
 
 func (x *SetFavoriteRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[62]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[63]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -6497,7 +6638,7 @@ func (x *SetFavoriteRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SetFavoriteRequest.ProtoReflect.Descriptor instead.
 func (*SetFavoriteRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{62}
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{63}
 }
 
 func (x *SetFavoriteRequest) GetPhone() string {
@@ -6531,7 +6672,7 @@ type SetFavoriteResponse struct {
 
 func (x *SetFavoriteResponse) Reset() {
 	*x = SetFavoriteResponse{}
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[63]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[64]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -6543,7 +6684,7 @@ func (x *SetFavoriteResponse) String() string {
 func (*SetFavoriteResponse) ProtoMessage() {}
 
 func (x *SetFavoriteResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[63]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[64]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -6556,7 +6697,7 @@ func (x *SetFavoriteResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SetFavoriteResponse.ProtoReflect.Descriptor instead.
 func (*SetFavoriteResponse) Descriptor() ([]byte, []int) {
-	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{63}
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{64}
 }
 
 func (x *SetFavoriteResponse) GetFavorite() bool {
@@ -6582,7 +6723,7 @@ type ListCarsRequest struct {
 
 func (x *ListCarsRequest) Reset() {
 	*x = ListCarsRequest{}
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[64]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[65]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -6594,7 +6735,7 @@ func (x *ListCarsRequest) String() string {
 func (*ListCarsRequest) ProtoMessage() {}
 
 func (x *ListCarsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[64]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[65]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -6607,7 +6748,7 @@ func (x *ListCarsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListCarsRequest.ProtoReflect.Descriptor instead.
 func (*ListCarsRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{64}
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{65}
 }
 
 func (x *ListCarsRequest) GetPhone() string {
@@ -6626,7 +6767,7 @@ type ListCarsResponse struct {
 
 func (x *ListCarsResponse) Reset() {
 	*x = ListCarsResponse{}
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[65]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[66]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -6638,7 +6779,7 @@ func (x *ListCarsResponse) String() string {
 func (*ListCarsResponse) ProtoMessage() {}
 
 func (x *ListCarsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[65]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[66]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -6651,7 +6792,7 @@ func (x *ListCarsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListCarsResponse.ProtoReflect.Descriptor instead.
 func (*ListCarsResponse) Descriptor() ([]byte, []int) {
-	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{65}
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{66}
 }
 
 func (x *ListCarsResponse) GetCars() []*Car {
@@ -6671,7 +6812,7 @@ type GetCarRequest struct {
 
 func (x *GetCarRequest) Reset() {
 	*x = GetCarRequest{}
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[66]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[67]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -6683,7 +6824,7 @@ func (x *GetCarRequest) String() string {
 func (*GetCarRequest) ProtoMessage() {}
 
 func (x *GetCarRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[66]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[67]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -6696,7 +6837,7 @@ func (x *GetCarRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetCarRequest.ProtoReflect.Descriptor instead.
 func (*GetCarRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{66}
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{67}
 }
 
 func (x *GetCarRequest) GetPhone() string {
@@ -6733,7 +6874,7 @@ type CreateCarRequest struct {
 
 func (x *CreateCarRequest) Reset() {
 	*x = CreateCarRequest{}
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[67]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[68]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -6745,7 +6886,7 @@ func (x *CreateCarRequest) String() string {
 func (*CreateCarRequest) ProtoMessage() {}
 
 func (x *CreateCarRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[67]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[68]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -6758,7 +6899,7 @@ func (x *CreateCarRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateCarRequest.ProtoReflect.Descriptor instead.
 func (*CreateCarRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{67}
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{68}
 }
 
 func (x *CreateCarRequest) GetPhone() string {
@@ -6866,7 +7007,7 @@ type UpdateCarRequest struct {
 
 func (x *UpdateCarRequest) Reset() {
 	*x = UpdateCarRequest{}
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[68]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[69]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -6878,7 +7019,7 @@ func (x *UpdateCarRequest) String() string {
 func (*UpdateCarRequest) ProtoMessage() {}
 
 func (x *UpdateCarRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[68]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[69]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -6891,7 +7032,7 @@ func (x *UpdateCarRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateCarRequest.ProtoReflect.Descriptor instead.
 func (*UpdateCarRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{68}
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{69}
 }
 
 func (x *UpdateCarRequest) GetPhone() string {
@@ -6995,7 +7136,7 @@ type DeleteCarRequest struct {
 
 func (x *DeleteCarRequest) Reset() {
 	*x = DeleteCarRequest{}
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[69]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[70]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -7007,7 +7148,7 @@ func (x *DeleteCarRequest) String() string {
 func (*DeleteCarRequest) ProtoMessage() {}
 
 func (x *DeleteCarRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[69]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[70]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -7020,7 +7161,7 @@ func (x *DeleteCarRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteCarRequest.ProtoReflect.Descriptor instead.
 func (*DeleteCarRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{69}
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{70}
 }
 
 func (x *DeleteCarRequest) GetPhone() string {
@@ -7047,7 +7188,7 @@ type SetDefaultCarRequest struct {
 
 func (x *SetDefaultCarRequest) Reset() {
 	*x = SetDefaultCarRequest{}
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[70]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[71]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -7059,7 +7200,7 @@ func (x *SetDefaultCarRequest) String() string {
 func (*SetDefaultCarRequest) ProtoMessage() {}
 
 func (x *SetDefaultCarRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[70]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[71]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -7072,7 +7213,7 @@ func (x *SetDefaultCarRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SetDefaultCarRequest.ProtoReflect.Descriptor instead.
 func (*SetDefaultCarRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{70}
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{71}
 }
 
 func (x *SetDefaultCarRequest) GetPhone() string {
@@ -7101,7 +7242,7 @@ type ListSlotsRequest struct {
 
 func (x *ListSlotsRequest) Reset() {
 	*x = ListSlotsRequest{}
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[71]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[72]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -7113,7 +7254,7 @@ func (x *ListSlotsRequest) String() string {
 func (*ListSlotsRequest) ProtoMessage() {}
 
 func (x *ListSlotsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[71]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[72]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -7126,7 +7267,7 @@ func (x *ListSlotsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListSlotsRequest.ProtoReflect.Descriptor instead.
 func (*ListSlotsRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{71}
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{72}
 }
 
 func (x *ListSlotsRequest) GetProviderId() string {
@@ -7169,7 +7310,7 @@ type SlotDay struct {
 
 func (x *SlotDay) Reset() {
 	*x = SlotDay{}
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[72]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[73]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -7181,7 +7322,7 @@ func (x *SlotDay) String() string {
 func (*SlotDay) ProtoMessage() {}
 
 func (x *SlotDay) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[72]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[73]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -7194,7 +7335,7 @@ func (x *SlotDay) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SlotDay.ProtoReflect.Descriptor instead.
 func (*SlotDay) Descriptor() ([]byte, []int) {
-	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{72}
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{73}
 }
 
 func (x *SlotDay) GetDate() string {
@@ -7227,7 +7368,7 @@ type ListSlotsResponse struct {
 
 func (x *ListSlotsResponse) Reset() {
 	*x = ListSlotsResponse{}
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[73]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[74]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -7239,7 +7380,7 @@ func (x *ListSlotsResponse) String() string {
 func (*ListSlotsResponse) ProtoMessage() {}
 
 func (x *ListSlotsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[73]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[74]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -7252,7 +7393,7 @@ func (x *ListSlotsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListSlotsResponse.ProtoReflect.Descriptor instead.
 func (*ListSlotsResponse) Descriptor() ([]byte, []int) {
-	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{73}
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{74}
 }
 
 func (x *ListSlotsResponse) GetDays() []*SlotDay {
@@ -7280,7 +7421,7 @@ type CreateBookingRequest struct {
 
 func (x *CreateBookingRequest) Reset() {
 	*x = CreateBookingRequest{}
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[74]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[75]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -7292,7 +7433,7 @@ func (x *CreateBookingRequest) String() string {
 func (*CreateBookingRequest) ProtoMessage() {}
 
 func (x *CreateBookingRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[74]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[75]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -7305,7 +7446,7 @@ func (x *CreateBookingRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateBookingRequest.ProtoReflect.Descriptor instead.
 func (*CreateBookingRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{74}
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{75}
 }
 
 func (x *CreateBookingRequest) GetPhone() string {
@@ -7381,7 +7522,7 @@ type GetBookingRequest struct {
 
 func (x *GetBookingRequest) Reset() {
 	*x = GetBookingRequest{}
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[75]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[76]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -7393,7 +7534,7 @@ func (x *GetBookingRequest) String() string {
 func (*GetBookingRequest) ProtoMessage() {}
 
 func (x *GetBookingRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[75]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[76]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -7406,7 +7547,7 @@ func (x *GetBookingRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetBookingRequest.ProtoReflect.Descriptor instead.
 func (*GetBookingRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{75}
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{76}
 }
 
 func (x *GetBookingRequest) GetPhone() string {
@@ -7424,19 +7565,22 @@ func (x *GetBookingRequest) GetId() string {
 }
 
 type ListBookingsRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Phone         string                 `protobuf:"bytes,1,opt,name=phone,proto3" json:"phone,omitempty"`
-	States        []BookingState         `protobuf:"varint,2,rep,packed,name=states,proto3,enum=avtoms.b2c.v1.BookingState" json:"states,omitempty"`
-	ActiveOnly    bool                   `protobuf:"varint,3,opt,name=active_only,json=activeOnly,proto3" json:"active_only,omitempty"` // NEW, CONFIRMED, IN_WORK, READY
-	Limit         int32                  `protobuf:"varint,4,opt,name=limit,proto3" json:"limit,omitempty"`
-	Offset        int32                  `protobuf:"varint,5,opt,name=offset,proto3" json:"offset,omitempty"`
+	state      protoimpl.MessageState `protogen:"open.v1"`
+	Phone      string                 `protobuf:"bytes,1,opt,name=phone,proto3" json:"phone,omitempty"`
+	States     []BookingState         `protobuf:"varint,2,rep,packed,name=states,proto3,enum=avtoms.b2c.v1.BookingState" json:"states,omitempty"`
+	ActiveOnly bool                   `protobuf:"varint,3,opt,name=active_only,json=activeOnly,proto3" json:"active_only,omitempty"` // NEW, CONFIRMED, IN_WORK, READY
+	Limit      int32                  `protobuf:"varint,4,opt,name=limit,proto3" json:"limit,omitempty"`
+	Offset     int32                  `protobuf:"varint,5,opt,name=offset,proto3" json:"offset,omitempty"`
+	// One car's history, for the car page. Filtering here rather than in the app matters
+	// once a driver has years of visits: the page wants ten rows, not all of them.
+	CarId         string `protobuf:"bytes,6,opt,name=car_id,json=carId,proto3" json:"car_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *ListBookingsRequest) Reset() {
 	*x = ListBookingsRequest{}
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[76]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[77]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -7448,7 +7592,7 @@ func (x *ListBookingsRequest) String() string {
 func (*ListBookingsRequest) ProtoMessage() {}
 
 func (x *ListBookingsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[76]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[77]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -7461,7 +7605,7 @@ func (x *ListBookingsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListBookingsRequest.ProtoReflect.Descriptor instead.
 func (*ListBookingsRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{76}
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{77}
 }
 
 func (x *ListBookingsRequest) GetPhone() string {
@@ -7499,6 +7643,13 @@ func (x *ListBookingsRequest) GetOffset() int32 {
 	return 0
 }
 
+func (x *ListBookingsRequest) GetCarId() string {
+	if x != nil {
+		return x.CarId
+	}
+	return ""
+}
+
 type ListBookingsResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Bookings      []*Booking             `protobuf:"bytes,1,rep,name=bookings,proto3" json:"bookings,omitempty"`
@@ -7509,7 +7660,7 @@ type ListBookingsResponse struct {
 
 func (x *ListBookingsResponse) Reset() {
 	*x = ListBookingsResponse{}
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[77]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[78]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -7521,7 +7672,7 @@ func (x *ListBookingsResponse) String() string {
 func (*ListBookingsResponse) ProtoMessage() {}
 
 func (x *ListBookingsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[77]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[78]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -7534,7 +7685,7 @@ func (x *ListBookingsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListBookingsResponse.ProtoReflect.Descriptor instead.
 func (*ListBookingsResponse) Descriptor() ([]byte, []int) {
-	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{77}
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{78}
 }
 
 func (x *ListBookingsResponse) GetBookings() []*Booking {
@@ -7562,7 +7713,7 @@ type CancelBookingRequest struct {
 
 func (x *CancelBookingRequest) Reset() {
 	*x = CancelBookingRequest{}
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[78]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[79]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -7574,7 +7725,7 @@ func (x *CancelBookingRequest) String() string {
 func (*CancelBookingRequest) ProtoMessage() {}
 
 func (x *CancelBookingRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[78]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[79]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -7587,7 +7738,7 @@ func (x *CancelBookingRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CancelBookingRequest.ProtoReflect.Descriptor instead.
 func (*CancelBookingRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{78}
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{79}
 }
 
 func (x *CancelBookingRequest) GetPhone() string {
@@ -7622,7 +7773,7 @@ type RescheduleBookingRequest struct {
 
 func (x *RescheduleBookingRequest) Reset() {
 	*x = RescheduleBookingRequest{}
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[79]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[80]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -7634,7 +7785,7 @@ func (x *RescheduleBookingRequest) String() string {
 func (*RescheduleBookingRequest) ProtoMessage() {}
 
 func (x *RescheduleBookingRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[79]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[80]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -7647,7 +7798,7 @@ func (x *RescheduleBookingRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RescheduleBookingRequest.ProtoReflect.Descriptor instead.
 func (*RescheduleBookingRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{79}
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{80}
 }
 
 func (x *RescheduleBookingRequest) GetPhone() string {
@@ -7682,7 +7833,7 @@ type SetBookingStateRequest struct {
 
 func (x *SetBookingStateRequest) Reset() {
 	*x = SetBookingStateRequest{}
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[80]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[81]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -7694,7 +7845,7 @@ func (x *SetBookingStateRequest) String() string {
 func (*SetBookingStateRequest) ProtoMessage() {}
 
 func (x *SetBookingStateRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[80]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[81]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -7707,7 +7858,7 @@ func (x *SetBookingStateRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SetBookingStateRequest.ProtoReflect.Descriptor instead.
 func (*SetBookingStateRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{80}
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{81}
 }
 
 func (x *SetBookingStateRequest) GetId() string {
@@ -7742,7 +7893,7 @@ type LinkBookingAppointmentRequest struct {
 
 func (x *LinkBookingAppointmentRequest) Reset() {
 	*x = LinkBookingAppointmentRequest{}
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[81]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[82]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -7754,7 +7905,7 @@ func (x *LinkBookingAppointmentRequest) String() string {
 func (*LinkBookingAppointmentRequest) ProtoMessage() {}
 
 func (x *LinkBookingAppointmentRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[81]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[82]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -7767,7 +7918,7 @@ func (x *LinkBookingAppointmentRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LinkBookingAppointmentRequest.ProtoReflect.Descriptor instead.
 func (*LinkBookingAppointmentRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{81}
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{82}
 }
 
 func (x *LinkBookingAppointmentRequest) GetId() string {
@@ -7800,7 +7951,7 @@ type ListCardsRequest struct {
 
 func (x *ListCardsRequest) Reset() {
 	*x = ListCardsRequest{}
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[82]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[83]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -7812,7 +7963,7 @@ func (x *ListCardsRequest) String() string {
 func (*ListCardsRequest) ProtoMessage() {}
 
 func (x *ListCardsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[82]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[83]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -7825,7 +7976,7 @@ func (x *ListCardsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListCardsRequest.ProtoReflect.Descriptor instead.
 func (*ListCardsRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{82}
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{83}
 }
 
 func (x *ListCardsRequest) GetPhone() string {
@@ -7844,7 +7995,7 @@ type ListCardsResponse struct {
 
 func (x *ListCardsResponse) Reset() {
 	*x = ListCardsResponse{}
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[83]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[84]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -7856,7 +8007,7 @@ func (x *ListCardsResponse) String() string {
 func (*ListCardsResponse) ProtoMessage() {}
 
 func (x *ListCardsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[83]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[84]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -7869,7 +8020,7 @@ func (x *ListCardsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListCardsResponse.ProtoReflect.Descriptor instead.
 func (*ListCardsResponse) Descriptor() ([]byte, []int) {
-	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{83}
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{84}
 }
 
 func (x *ListCardsResponse) GetCards() []*Card {
@@ -7896,7 +8047,7 @@ type AddCardRequest struct {
 
 func (x *AddCardRequest) Reset() {
 	*x = AddCardRequest{}
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[84]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[85]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -7908,7 +8059,7 @@ func (x *AddCardRequest) String() string {
 func (*AddCardRequest) ProtoMessage() {}
 
 func (x *AddCardRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[84]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[85]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -7921,7 +8072,7 @@ func (x *AddCardRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AddCardRequest.ProtoReflect.Descriptor instead.
 func (*AddCardRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{84}
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{85}
 }
 
 func (x *AddCardRequest) GetPhone() string {
@@ -7969,7 +8120,7 @@ type DeleteCardRequest struct {
 
 func (x *DeleteCardRequest) Reset() {
 	*x = DeleteCardRequest{}
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[85]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[86]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -7981,7 +8132,7 @@ func (x *DeleteCardRequest) String() string {
 func (*DeleteCardRequest) ProtoMessage() {}
 
 func (x *DeleteCardRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[85]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[86]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -7994,7 +8145,7 @@ func (x *DeleteCardRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteCardRequest.ProtoReflect.Descriptor instead.
 func (*DeleteCardRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{85}
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{86}
 }
 
 func (x *DeleteCardRequest) GetPhone() string {
@@ -8021,7 +8172,7 @@ type SetDefaultCardRequest struct {
 
 func (x *SetDefaultCardRequest) Reset() {
 	*x = SetDefaultCardRequest{}
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[86]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[87]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -8033,7 +8184,7 @@ func (x *SetDefaultCardRequest) String() string {
 func (*SetDefaultCardRequest) ProtoMessage() {}
 
 func (x *SetDefaultCardRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[86]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[87]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -8046,7 +8197,7 @@ func (x *SetDefaultCardRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SetDefaultCardRequest.ProtoReflect.Descriptor instead.
 func (*SetDefaultCardRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{86}
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{87}
 }
 
 func (x *SetDefaultCardRequest) GetPhone() string {
@@ -8079,7 +8230,7 @@ type ValidatePromoCodeRequest struct {
 
 func (x *ValidatePromoCodeRequest) Reset() {
 	*x = ValidatePromoCodeRequest{}
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[87]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[88]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -8091,7 +8242,7 @@ func (x *ValidatePromoCodeRequest) String() string {
 func (*ValidatePromoCodeRequest) ProtoMessage() {}
 
 func (x *ValidatePromoCodeRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[87]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[88]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -8104,7 +8255,7 @@ func (x *ValidatePromoCodeRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ValidatePromoCodeRequest.ProtoReflect.Descriptor instead.
 func (*ValidatePromoCodeRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{87}
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{88}
 }
 
 func (x *ValidatePromoCodeRequest) GetCode() string {
@@ -8154,7 +8305,7 @@ type ValidatePromoCodeResponse struct {
 
 func (x *ValidatePromoCodeResponse) Reset() {
 	*x = ValidatePromoCodeResponse{}
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[88]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[89]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -8166,7 +8317,7 @@ func (x *ValidatePromoCodeResponse) String() string {
 func (*ValidatePromoCodeResponse) ProtoMessage() {}
 
 func (x *ValidatePromoCodeResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[88]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[89]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -8179,7 +8330,7 @@ func (x *ValidatePromoCodeResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ValidatePromoCodeResponse.ProtoReflect.Descriptor instead.
 func (*ValidatePromoCodeResponse) Descriptor() ([]byte, []int) {
-	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{88}
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{89}
 }
 
 func (x *ValidatePromoCodeResponse) GetValid() bool {
@@ -8227,7 +8378,7 @@ type CreatePaymentRequest struct {
 
 func (x *CreatePaymentRequest) Reset() {
 	*x = CreatePaymentRequest{}
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[89]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[90]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -8239,7 +8390,7 @@ func (x *CreatePaymentRequest) String() string {
 func (*CreatePaymentRequest) ProtoMessage() {}
 
 func (x *CreatePaymentRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[89]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[90]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -8252,7 +8403,7 @@ func (x *CreatePaymentRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreatePaymentRequest.ProtoReflect.Descriptor instead.
 func (*CreatePaymentRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{89}
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{90}
 }
 
 func (x *CreatePaymentRequest) GetPhone() string {
@@ -8314,7 +8465,7 @@ type GetPaymentRequest struct {
 
 func (x *GetPaymentRequest) Reset() {
 	*x = GetPaymentRequest{}
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[90]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[91]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -8326,7 +8477,7 @@ func (x *GetPaymentRequest) String() string {
 func (*GetPaymentRequest) ProtoMessage() {}
 
 func (x *GetPaymentRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[90]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[91]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -8339,7 +8490,7 @@ func (x *GetPaymentRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetPaymentRequest.ProtoReflect.Descriptor instead.
 func (*GetPaymentRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{90}
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{91}
 }
 
 func (x *GetPaymentRequest) GetPhone() string {
@@ -8367,7 +8518,7 @@ type ListPaymentsRequest struct {
 
 func (x *ListPaymentsRequest) Reset() {
 	*x = ListPaymentsRequest{}
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[91]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[92]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -8379,7 +8530,7 @@ func (x *ListPaymentsRequest) String() string {
 func (*ListPaymentsRequest) ProtoMessage() {}
 
 func (x *ListPaymentsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[91]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[92]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -8392,7 +8543,7 @@ func (x *ListPaymentsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListPaymentsRequest.ProtoReflect.Descriptor instead.
 func (*ListPaymentsRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{91}
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{92}
 }
 
 func (x *ListPaymentsRequest) GetPhone() string {
@@ -8426,7 +8577,7 @@ type ListPaymentsResponse struct {
 
 func (x *ListPaymentsResponse) Reset() {
 	*x = ListPaymentsResponse{}
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[92]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[93]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -8438,7 +8589,7 @@ func (x *ListPaymentsResponse) String() string {
 func (*ListPaymentsResponse) ProtoMessage() {}
 
 func (x *ListPaymentsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[92]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[93]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -8451,7 +8602,7 @@ func (x *ListPaymentsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListPaymentsResponse.ProtoReflect.Descriptor instead.
 func (*ListPaymentsResponse) Descriptor() ([]byte, []int) {
-	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{92}
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{93}
 }
 
 func (x *ListPaymentsResponse) GetPayments() []*Payment {
@@ -8480,7 +8631,7 @@ type ListPromosRequest struct {
 
 func (x *ListPromosRequest) Reset() {
 	*x = ListPromosRequest{}
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[93]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[94]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -8492,7 +8643,7 @@ func (x *ListPromosRequest) String() string {
 func (*ListPromosRequest) ProtoMessage() {}
 
 func (x *ListPromosRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[93]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[94]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -8505,7 +8656,7 @@ func (x *ListPromosRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListPromosRequest.ProtoReflect.Descriptor instead.
 func (*ListPromosRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{93}
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{94}
 }
 
 func (x *ListPromosRequest) GetProviderId() string {
@@ -8545,7 +8696,7 @@ type ListPromosResponse struct {
 
 func (x *ListPromosResponse) Reset() {
 	*x = ListPromosResponse{}
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[94]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[95]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -8557,7 +8708,7 @@ func (x *ListPromosResponse) String() string {
 func (*ListPromosResponse) ProtoMessage() {}
 
 func (x *ListPromosResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[94]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[95]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -8570,7 +8721,7 @@ func (x *ListPromosResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListPromosResponse.ProtoReflect.Descriptor instead.
 func (*ListPromosResponse) Descriptor() ([]byte, []int) {
-	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{94}
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{95}
 }
 
 func (x *ListPromosResponse) GetPromos() []*Promo {
@@ -8589,7 +8740,7 @@ type GetPromoRequest struct {
 
 func (x *GetPromoRequest) Reset() {
 	*x = GetPromoRequest{}
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[95]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[96]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -8601,7 +8752,7 @@ func (x *GetPromoRequest) String() string {
 func (*GetPromoRequest) ProtoMessage() {}
 
 func (x *GetPromoRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[95]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[96]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -8614,7 +8765,7 @@ func (x *GetPromoRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetPromoRequest.ProtoReflect.Descriptor instead.
 func (*GetPromoRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{95}
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{96}
 }
 
 func (x *GetPromoRequest) GetCode() string {
@@ -8633,7 +8784,7 @@ type ListStoriesRequest struct {
 
 func (x *ListStoriesRequest) Reset() {
 	*x = ListStoriesRequest{}
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[96]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[97]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -8645,7 +8796,7 @@ func (x *ListStoriesRequest) String() string {
 func (*ListStoriesRequest) ProtoMessage() {}
 
 func (x *ListStoriesRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[96]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[97]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -8658,7 +8809,7 @@ func (x *ListStoriesRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListStoriesRequest.ProtoReflect.Descriptor instead.
 func (*ListStoriesRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{96}
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{97}
 }
 
 func (x *ListStoriesRequest) GetPhone() string {
@@ -8677,7 +8828,7 @@ type ListStoriesResponse struct {
 
 func (x *ListStoriesResponse) Reset() {
 	*x = ListStoriesResponse{}
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[97]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[98]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -8689,7 +8840,7 @@ func (x *ListStoriesResponse) String() string {
 func (*ListStoriesResponse) ProtoMessage() {}
 
 func (x *ListStoriesResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[97]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[98]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -8702,7 +8853,7 @@ func (x *ListStoriesResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListStoriesResponse.ProtoReflect.Descriptor instead.
 func (*ListStoriesResponse) Descriptor() ([]byte, []int) {
-	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{97}
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{98}
 }
 
 func (x *ListStoriesResponse) GetStories() []*Story {
@@ -8722,7 +8873,7 @@ type MarkStorySeenRequest struct {
 
 func (x *MarkStorySeenRequest) Reset() {
 	*x = MarkStorySeenRequest{}
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[98]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[99]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -8734,7 +8885,7 @@ func (x *MarkStorySeenRequest) String() string {
 func (*MarkStorySeenRequest) ProtoMessage() {}
 
 func (x *MarkStorySeenRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[98]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[99]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -8747,7 +8898,7 @@ func (x *MarkStorySeenRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MarkStorySeenRequest.ProtoReflect.Descriptor instead.
 func (*MarkStorySeenRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{98}
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{99}
 }
 
 func (x *MarkStorySeenRequest) GetPhone() string {
@@ -8773,7 +8924,7 @@ type GetBonusAccountRequest struct {
 
 func (x *GetBonusAccountRequest) Reset() {
 	*x = GetBonusAccountRequest{}
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[99]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[100]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -8785,7 +8936,7 @@ func (x *GetBonusAccountRequest) String() string {
 func (*GetBonusAccountRequest) ProtoMessage() {}
 
 func (x *GetBonusAccountRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[99]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[100]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -8798,7 +8949,7 @@ func (x *GetBonusAccountRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetBonusAccountRequest.ProtoReflect.Descriptor instead.
 func (*GetBonusAccountRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{99}
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{100}
 }
 
 func (x *GetBonusAccountRequest) GetPhone() string {
@@ -8806,6 +8957,127 @@ func (x *GetBonusAccountRequest) GetPhone() string {
 		return x.Phone
 	}
 	return ""
+}
+
+type ApplyReferralCodeRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Phone         string                 `protobuf:"bytes,1,opt,name=phone,proto3" json:"phone,omitempty"`
+	Code          string                 `protobuf:"bytes,2,opt,name=code,proto3" json:"code,omitempty"` // the inviter's referral_code
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ApplyReferralCodeRequest) Reset() {
+	*x = ApplyReferralCodeRequest{}
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[101]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ApplyReferralCodeRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ApplyReferralCodeRequest) ProtoMessage() {}
+
+func (x *ApplyReferralCodeRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[101]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ApplyReferralCodeRequest.ProtoReflect.Descriptor instead.
+func (*ApplyReferralCodeRequest) Descriptor() ([]byte, []int) {
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{101}
+}
+
+func (x *ApplyReferralCodeRequest) GetPhone() string {
+	if x != nil {
+		return x.Phone
+	}
+	return ""
+}
+
+func (x *ApplyReferralCodeRequest) GetCode() string {
+	if x != nil {
+		return x.Code
+	}
+	return ""
+}
+
+type ApplyReferralCodeResponse struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	Ok    bool                   `protobuf:"varint,1,opt,name=ok,proto3" json:"ok,omitempty"`
+	// Why not, when it was refused: "unknown", "own_code", "already_referred", "has_bookings".
+	Reason        string `protobuf:"bytes,2,opt,name=reason,proto3" json:"reason,omitempty"`
+	InviterName   string `protobuf:"bytes,3,opt,name=inviter_name,json=inviterName,proto3" json:"inviter_name,omitempty"` // to say "invited by Bekzod" on the screen
+	Reward        int64  `protobuf:"varint,4,opt,name=reward,proto3" json:"reward,omitempty"`                             // what the inviter will get once this driver pays
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ApplyReferralCodeResponse) Reset() {
+	*x = ApplyReferralCodeResponse{}
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[102]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ApplyReferralCodeResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ApplyReferralCodeResponse) ProtoMessage() {}
+
+func (x *ApplyReferralCodeResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[102]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ApplyReferralCodeResponse.ProtoReflect.Descriptor instead.
+func (*ApplyReferralCodeResponse) Descriptor() ([]byte, []int) {
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{102}
+}
+
+func (x *ApplyReferralCodeResponse) GetOk() bool {
+	if x != nil {
+		return x.Ok
+	}
+	return false
+}
+
+func (x *ApplyReferralCodeResponse) GetReason() string {
+	if x != nil {
+		return x.Reason
+	}
+	return ""
+}
+
+func (x *ApplyReferralCodeResponse) GetInviterName() string {
+	if x != nil {
+		return x.InviterName
+	}
+	return ""
+}
+
+func (x *ApplyReferralCodeResponse) GetReward() int64 {
+	if x != nil {
+		return x.Reward
+	}
+	return 0
 }
 
 type ListBonusEntriesRequest struct {
@@ -8819,7 +9091,7 @@ type ListBonusEntriesRequest struct {
 
 func (x *ListBonusEntriesRequest) Reset() {
 	*x = ListBonusEntriesRequest{}
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[100]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[103]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -8831,7 +9103,7 @@ func (x *ListBonusEntriesRequest) String() string {
 func (*ListBonusEntriesRequest) ProtoMessage() {}
 
 func (x *ListBonusEntriesRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[100]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[103]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -8844,7 +9116,7 @@ func (x *ListBonusEntriesRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListBonusEntriesRequest.ProtoReflect.Descriptor instead.
 func (*ListBonusEntriesRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{100}
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{103}
 }
 
 func (x *ListBonusEntriesRequest) GetPhone() string {
@@ -8878,7 +9150,7 @@ type ListBonusEntriesResponse struct {
 
 func (x *ListBonusEntriesResponse) Reset() {
 	*x = ListBonusEntriesResponse{}
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[101]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[104]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -8890,7 +9162,7 @@ func (x *ListBonusEntriesResponse) String() string {
 func (*ListBonusEntriesResponse) ProtoMessage() {}
 
 func (x *ListBonusEntriesResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[101]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[104]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -8903,7 +9175,7 @@ func (x *ListBonusEntriesResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListBonusEntriesResponse.ProtoReflect.Descriptor instead.
 func (*ListBonusEntriesResponse) Descriptor() ([]byte, []int) {
-	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{101}
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{104}
 }
 
 func (x *ListBonusEntriesResponse) GetEntries() []*BonusEntry {
@@ -8929,7 +9201,7 @@ type ListChatsRequest struct {
 
 func (x *ListChatsRequest) Reset() {
 	*x = ListChatsRequest{}
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[102]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[105]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -8941,7 +9213,7 @@ func (x *ListChatsRequest) String() string {
 func (*ListChatsRequest) ProtoMessage() {}
 
 func (x *ListChatsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[102]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[105]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -8954,7 +9226,7 @@ func (x *ListChatsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListChatsRequest.ProtoReflect.Descriptor instead.
 func (*ListChatsRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{102}
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{105}
 }
 
 func (x *ListChatsRequest) GetPhone() string {
@@ -8974,7 +9246,7 @@ type ListChatsResponse struct {
 
 func (x *ListChatsResponse) Reset() {
 	*x = ListChatsResponse{}
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[103]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[106]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -8986,7 +9258,7 @@ func (x *ListChatsResponse) String() string {
 func (*ListChatsResponse) ProtoMessage() {}
 
 func (x *ListChatsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[103]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[106]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -8999,7 +9271,7 @@ func (x *ListChatsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListChatsResponse.ProtoReflect.Descriptor instead.
 func (*ListChatsResponse) Descriptor() ([]byte, []int) {
-	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{103}
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{106}
 }
 
 func (x *ListChatsResponse) GetChats() []*Chat {
@@ -9033,7 +9305,7 @@ type GetChatRequest struct {
 
 func (x *GetChatRequest) Reset() {
 	*x = GetChatRequest{}
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[104]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[107]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -9045,7 +9317,7 @@ func (x *GetChatRequest) String() string {
 func (*GetChatRequest) ProtoMessage() {}
 
 func (x *GetChatRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[104]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[107]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -9058,7 +9330,7 @@ func (x *GetChatRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetChatRequest.ProtoReflect.Descriptor instead.
 func (*GetChatRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{104}
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{107}
 }
 
 func (x *GetChatRequest) GetPhone() string {
@@ -9113,7 +9385,7 @@ type GetChatResponse struct {
 
 func (x *GetChatResponse) Reset() {
 	*x = GetChatResponse{}
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[105]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[108]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -9125,7 +9397,7 @@ func (x *GetChatResponse) String() string {
 func (*GetChatResponse) ProtoMessage() {}
 
 func (x *GetChatResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[105]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[108]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -9138,7 +9410,7 @@ func (x *GetChatResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetChatResponse.ProtoReflect.Descriptor instead.
 func (*GetChatResponse) Descriptor() ([]byte, []int) {
-	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{105}
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{108}
 }
 
 func (x *GetChatResponse) GetChat() *Chat {
@@ -9169,7 +9441,7 @@ type SendChatMessageRequest struct {
 
 func (x *SendChatMessageRequest) Reset() {
 	*x = SendChatMessageRequest{}
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[106]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[109]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -9181,7 +9453,7 @@ func (x *SendChatMessageRequest) String() string {
 func (*SendChatMessageRequest) ProtoMessage() {}
 
 func (x *SendChatMessageRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[106]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[109]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -9194,7 +9466,7 @@ func (x *SendChatMessageRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SendChatMessageRequest.ProtoReflect.Descriptor instead.
 func (*SendChatMessageRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{106}
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{109}
 }
 
 func (x *SendChatMessageRequest) GetPhone() string {
@@ -9249,7 +9521,7 @@ type MarkChatReadRequest struct {
 
 func (x *MarkChatReadRequest) Reset() {
 	*x = MarkChatReadRequest{}
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[107]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[110]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -9261,7 +9533,7 @@ func (x *MarkChatReadRequest) String() string {
 func (*MarkChatReadRequest) ProtoMessage() {}
 
 func (x *MarkChatReadRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[107]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[110]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -9274,7 +9546,7 @@ func (x *MarkChatReadRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MarkChatReadRequest.ProtoReflect.Descriptor instead.
 func (*MarkChatReadRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{107}
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{110}
 }
 
 func (x *MarkChatReadRequest) GetPhone() string {
@@ -9303,7 +9575,7 @@ type ListNotificationsRequest struct {
 
 func (x *ListNotificationsRequest) Reset() {
 	*x = ListNotificationsRequest{}
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[108]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[111]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -9315,7 +9587,7 @@ func (x *ListNotificationsRequest) String() string {
 func (*ListNotificationsRequest) ProtoMessage() {}
 
 func (x *ListNotificationsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[108]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[111]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -9328,7 +9600,7 @@ func (x *ListNotificationsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListNotificationsRequest.ProtoReflect.Descriptor instead.
 func (*ListNotificationsRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{108}
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{111}
 }
 
 func (x *ListNotificationsRequest) GetPhone() string {
@@ -9370,7 +9642,7 @@ type ListNotificationsResponse struct {
 
 func (x *ListNotificationsResponse) Reset() {
 	*x = ListNotificationsResponse{}
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[109]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[112]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -9382,7 +9654,7 @@ func (x *ListNotificationsResponse) String() string {
 func (*ListNotificationsResponse) ProtoMessage() {}
 
 func (x *ListNotificationsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[109]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[112]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -9395,7 +9667,7 @@ func (x *ListNotificationsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListNotificationsResponse.ProtoReflect.Descriptor instead.
 func (*ListNotificationsResponse) Descriptor() ([]byte, []int) {
-	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{109}
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{112}
 }
 
 func (x *ListNotificationsResponse) GetNotifications() []*Notification {
@@ -9429,7 +9701,7 @@ type MarkNotificationReadRequest struct {
 
 func (x *MarkNotificationReadRequest) Reset() {
 	*x = MarkNotificationReadRequest{}
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[110]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[113]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -9441,7 +9713,7 @@ func (x *MarkNotificationReadRequest) String() string {
 func (*MarkNotificationReadRequest) ProtoMessage() {}
 
 func (x *MarkNotificationReadRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[110]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[113]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -9454,7 +9726,7 @@ func (x *MarkNotificationReadRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MarkNotificationReadRequest.ProtoReflect.Descriptor instead.
 func (*MarkNotificationReadRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{110}
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{113}
 }
 
 func (x *MarkNotificationReadRequest) GetPhone() string {
@@ -9480,7 +9752,7 @@ type MarkAllNotificationsReadRequest struct {
 
 func (x *MarkAllNotificationsReadRequest) Reset() {
 	*x = MarkAllNotificationsReadRequest{}
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[111]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[114]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -9492,7 +9764,7 @@ func (x *MarkAllNotificationsReadRequest) String() string {
 func (*MarkAllNotificationsReadRequest) ProtoMessage() {}
 
 func (x *MarkAllNotificationsReadRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[111]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[114]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -9505,7 +9777,7 @@ func (x *MarkAllNotificationsReadRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MarkAllNotificationsReadRequest.ProtoReflect.Descriptor instead.
 func (*MarkAllNotificationsReadRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{111}
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{114}
 }
 
 func (x *MarkAllNotificationsReadRequest) GetPhone() string {
@@ -9524,7 +9796,7 @@ type GetBadgesRequest struct {
 
 func (x *GetBadgesRequest) Reset() {
 	*x = GetBadgesRequest{}
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[112]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[115]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -9536,7 +9808,7 @@ func (x *GetBadgesRequest) String() string {
 func (*GetBadgesRequest) ProtoMessage() {}
 
 func (x *GetBadgesRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[112]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[115]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -9549,7 +9821,7 @@ func (x *GetBadgesRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetBadgesRequest.ProtoReflect.Descriptor instead.
 func (*GetBadgesRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{112}
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{115}
 }
 
 func (x *GetBadgesRequest) GetPhone() string {
@@ -9571,7 +9843,7 @@ type GetBadgesResponse struct {
 
 func (x *GetBadgesResponse) Reset() {
 	*x = GetBadgesResponse{}
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[113]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[116]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -9583,7 +9855,7 @@ func (x *GetBadgesResponse) String() string {
 func (*GetBadgesResponse) ProtoMessage() {}
 
 func (x *GetBadgesResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[113]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[116]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -9596,7 +9868,7 @@ func (x *GetBadgesResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetBadgesResponse.ProtoReflect.Descriptor instead.
 func (*GetBadgesResponse) Descriptor() ([]byte, []int) {
-	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{113}
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{116}
 }
 
 func (x *GetBadgesResponse) GetUnreadNotifications() int32 {
@@ -9636,7 +9908,7 @@ type ListEmergencyTypesRequest struct {
 
 func (x *ListEmergencyTypesRequest) Reset() {
 	*x = ListEmergencyTypesRequest{}
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[114]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[117]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -9648,7 +9920,7 @@ func (x *ListEmergencyTypesRequest) String() string {
 func (*ListEmergencyTypesRequest) ProtoMessage() {}
 
 func (x *ListEmergencyTypesRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[114]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[117]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -9661,7 +9933,7 @@ func (x *ListEmergencyTypesRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListEmergencyTypesRequest.ProtoReflect.Descriptor instead.
 func (*ListEmergencyTypesRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{114}
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{117}
 }
 
 func (x *ListEmergencyTypesRequest) GetIncludeInactive() bool {
@@ -9680,7 +9952,7 @@ type ListEmergencyTypesResponse struct {
 
 func (x *ListEmergencyTypesResponse) Reset() {
 	*x = ListEmergencyTypesResponse{}
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[115]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[118]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -9692,7 +9964,7 @@ func (x *ListEmergencyTypesResponse) String() string {
 func (*ListEmergencyTypesResponse) ProtoMessage() {}
 
 func (x *ListEmergencyTypesResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[115]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[118]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -9705,7 +9977,7 @@ func (x *ListEmergencyTypesResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListEmergencyTypesResponse.ProtoReflect.Descriptor instead.
 func (*ListEmergencyTypesResponse) Descriptor() ([]byte, []int) {
-	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{115}
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{118}
 }
 
 func (x *ListEmergencyTypesResponse) GetTypes() []*EmergencyType {
@@ -9730,7 +10002,7 @@ type CreateEmergencyRequestRequest struct {
 
 func (x *CreateEmergencyRequestRequest) Reset() {
 	*x = CreateEmergencyRequestRequest{}
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[116]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[119]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -9742,7 +10014,7 @@ func (x *CreateEmergencyRequestRequest) String() string {
 func (*CreateEmergencyRequestRequest) ProtoMessage() {}
 
 func (x *CreateEmergencyRequestRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[116]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[119]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -9755,7 +10027,7 @@ func (x *CreateEmergencyRequestRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateEmergencyRequestRequest.ProtoReflect.Descriptor instead.
 func (*CreateEmergencyRequestRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{116}
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{119}
 }
 
 func (x *CreateEmergencyRequestRequest) GetPhone() string {
@@ -9817,7 +10089,7 @@ type GetEmergencyRequestRequest struct {
 
 func (x *GetEmergencyRequestRequest) Reset() {
 	*x = GetEmergencyRequestRequest{}
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[117]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[120]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -9829,7 +10101,7 @@ func (x *GetEmergencyRequestRequest) String() string {
 func (*GetEmergencyRequestRequest) ProtoMessage() {}
 
 func (x *GetEmergencyRequestRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[117]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[120]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -9842,7 +10114,7 @@ func (x *GetEmergencyRequestRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetEmergencyRequestRequest.ProtoReflect.Descriptor instead.
 func (*GetEmergencyRequestRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{117}
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{120}
 }
 
 func (x *GetEmergencyRequestRequest) GetPhone() string {
@@ -9870,7 +10142,7 @@ type ListEmergencyRequestsRequest struct {
 
 func (x *ListEmergencyRequestsRequest) Reset() {
 	*x = ListEmergencyRequestsRequest{}
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[118]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[121]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -9882,7 +10154,7 @@ func (x *ListEmergencyRequestsRequest) String() string {
 func (*ListEmergencyRequestsRequest) ProtoMessage() {}
 
 func (x *ListEmergencyRequestsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[118]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[121]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -9895,7 +10167,7 @@ func (x *ListEmergencyRequestsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListEmergencyRequestsRequest.ProtoReflect.Descriptor instead.
 func (*ListEmergencyRequestsRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{118}
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{121}
 }
 
 func (x *ListEmergencyRequestsRequest) GetPhone() string {
@@ -9928,7 +10200,7 @@ type ListEmergencyRequestsResponse struct {
 
 func (x *ListEmergencyRequestsResponse) Reset() {
 	*x = ListEmergencyRequestsResponse{}
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[119]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[122]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -9940,7 +10212,7 @@ func (x *ListEmergencyRequestsResponse) String() string {
 func (*ListEmergencyRequestsResponse) ProtoMessage() {}
 
 func (x *ListEmergencyRequestsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[119]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[122]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -9953,7 +10225,7 @@ func (x *ListEmergencyRequestsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListEmergencyRequestsResponse.ProtoReflect.Descriptor instead.
 func (*ListEmergencyRequestsResponse) Descriptor() ([]byte, []int) {
-	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{119}
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{122}
 }
 
 func (x *ListEmergencyRequestsResponse) GetRequests() []*EmergencyRequest {
@@ -9974,7 +10246,7 @@ type CancelEmergencyRequestRequest struct {
 
 func (x *CancelEmergencyRequestRequest) Reset() {
 	*x = CancelEmergencyRequestRequest{}
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[120]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[123]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -9986,7 +10258,7 @@ func (x *CancelEmergencyRequestRequest) String() string {
 func (*CancelEmergencyRequestRequest) ProtoMessage() {}
 
 func (x *CancelEmergencyRequestRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[120]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[123]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -9999,7 +10271,7 @@ func (x *CancelEmergencyRequestRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CancelEmergencyRequestRequest.ProtoReflect.Descriptor instead.
 func (*CancelEmergencyRequestRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{120}
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{123}
 }
 
 func (x *CancelEmergencyRequestRequest) GetPhone() string {
@@ -10032,7 +10304,7 @@ type CreateProviderRequest struct {
 
 func (x *CreateProviderRequest) Reset() {
 	*x = CreateProviderRequest{}
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[121]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[124]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -10044,7 +10316,7 @@ func (x *CreateProviderRequest) String() string {
 func (*CreateProviderRequest) ProtoMessage() {}
 
 func (x *CreateProviderRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[121]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[124]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -10057,7 +10329,7 @@ func (x *CreateProviderRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateProviderRequest.ProtoReflect.Descriptor instead.
 func (*CreateProviderRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{121}
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{124}
 }
 
 func (x *CreateProviderRequest) GetProvider() *Provider {
@@ -10077,7 +10349,7 @@ type UpdateProviderRequest struct {
 
 func (x *UpdateProviderRequest) Reset() {
 	*x = UpdateProviderRequest{}
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[122]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[125]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -10089,7 +10361,7 @@ func (x *UpdateProviderRequest) String() string {
 func (*UpdateProviderRequest) ProtoMessage() {}
 
 func (x *UpdateProviderRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[122]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[125]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -10102,7 +10374,7 @@ func (x *UpdateProviderRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateProviderRequest.ProtoReflect.Descriptor instead.
 func (*UpdateProviderRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{122}
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{125}
 }
 
 func (x *UpdateProviderRequest) GetProvider() *Provider {
@@ -10128,7 +10400,7 @@ type DeleteProviderRequest struct {
 
 func (x *DeleteProviderRequest) Reset() {
 	*x = DeleteProviderRequest{}
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[123]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[126]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -10140,7 +10412,7 @@ func (x *DeleteProviderRequest) String() string {
 func (*DeleteProviderRequest) ProtoMessage() {}
 
 func (x *DeleteProviderRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[123]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[126]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -10153,7 +10425,7 @@ func (x *DeleteProviderRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteProviderRequest.ProtoReflect.Descriptor instead.
 func (*DeleteProviderRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{123}
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{126}
 }
 
 func (x *DeleteProviderRequest) GetId() string {
@@ -10172,7 +10444,7 @@ type UpsertProviderServiceRequest struct {
 
 func (x *UpsertProviderServiceRequest) Reset() {
 	*x = UpsertProviderServiceRequest{}
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[124]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[127]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -10184,7 +10456,7 @@ func (x *UpsertProviderServiceRequest) String() string {
 func (*UpsertProviderServiceRequest) ProtoMessage() {}
 
 func (x *UpsertProviderServiceRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[124]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[127]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -10197,7 +10469,7 @@ func (x *UpsertProviderServiceRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpsertProviderServiceRequest.ProtoReflect.Descriptor instead.
 func (*UpsertProviderServiceRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{124}
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{127}
 }
 
 func (x *UpsertProviderServiceRequest) GetService() *ProviderService {
@@ -10216,7 +10488,7 @@ type DeleteProviderServiceRequest struct {
 
 func (x *DeleteProviderServiceRequest) Reset() {
 	*x = DeleteProviderServiceRequest{}
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[125]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[128]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -10228,7 +10500,7 @@ func (x *DeleteProviderServiceRequest) String() string {
 func (*DeleteProviderServiceRequest) ProtoMessage() {}
 
 func (x *DeleteProviderServiceRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[125]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[128]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -10241,7 +10513,7 @@ func (x *DeleteProviderServiceRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteProviderServiceRequest.ProtoReflect.Descriptor instead.
 func (*DeleteProviderServiceRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{125}
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{128}
 }
 
 func (x *DeleteProviderServiceRequest) GetId() string {
@@ -10260,7 +10532,7 @@ type UpsertPromoRequest struct {
 
 func (x *UpsertPromoRequest) Reset() {
 	*x = UpsertPromoRequest{}
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[126]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[129]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -10272,7 +10544,7 @@ func (x *UpsertPromoRequest) String() string {
 func (*UpsertPromoRequest) ProtoMessage() {}
 
 func (x *UpsertPromoRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[126]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[129]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -10285,7 +10557,7 @@ func (x *UpsertPromoRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpsertPromoRequest.ProtoReflect.Descriptor instead.
 func (*UpsertPromoRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{126}
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{129}
 }
 
 func (x *UpsertPromoRequest) GetPromo() *Promo {
@@ -10304,7 +10576,7 @@ type DeletePromoRequest struct {
 
 func (x *DeletePromoRequest) Reset() {
 	*x = DeletePromoRequest{}
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[127]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[130]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -10316,7 +10588,7 @@ func (x *DeletePromoRequest) String() string {
 func (*DeletePromoRequest) ProtoMessage() {}
 
 func (x *DeletePromoRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[127]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[130]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -10329,7 +10601,7 @@ func (x *DeletePromoRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeletePromoRequest.ProtoReflect.Descriptor instead.
 func (*DeletePromoRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{127}
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{130}
 }
 
 func (x *DeletePromoRequest) GetCode() string {
@@ -10348,7 +10620,7 @@ type UpsertFuelStationRequest struct {
 
 func (x *UpsertFuelStationRequest) Reset() {
 	*x = UpsertFuelStationRequest{}
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[128]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[131]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -10360,7 +10632,7 @@ func (x *UpsertFuelStationRequest) String() string {
 func (*UpsertFuelStationRequest) ProtoMessage() {}
 
 func (x *UpsertFuelStationRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[128]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[131]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -10373,7 +10645,7 @@ func (x *UpsertFuelStationRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpsertFuelStationRequest.ProtoReflect.Descriptor instead.
 func (*UpsertFuelStationRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{128}
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{131}
 }
 
 func (x *UpsertFuelStationRequest) GetStation() *FuelStation {
@@ -10392,7 +10664,7 @@ type UpsertCityRequest struct {
 
 func (x *UpsertCityRequest) Reset() {
 	*x = UpsertCityRequest{}
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[129]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[132]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -10404,7 +10676,7 @@ func (x *UpsertCityRequest) String() string {
 func (*UpsertCityRequest) ProtoMessage() {}
 
 func (x *UpsertCityRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[129]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[132]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -10417,7 +10689,7 @@ func (x *UpsertCityRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpsertCityRequest.ProtoReflect.Descriptor instead.
 func (*UpsertCityRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{129}
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{132}
 }
 
 func (x *UpsertCityRequest) GetCity() *City {
@@ -10436,7 +10708,7 @@ type UpsertCategoryRequest struct {
 
 func (x *UpsertCategoryRequest) Reset() {
 	*x = UpsertCategoryRequest{}
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[130]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[133]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -10448,7 +10720,7 @@ func (x *UpsertCategoryRequest) String() string {
 func (*UpsertCategoryRequest) ProtoMessage() {}
 
 func (x *UpsertCategoryRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[130]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[133]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -10461,7 +10733,7 @@ func (x *UpsertCategoryRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpsertCategoryRequest.ProtoReflect.Descriptor instead.
 func (*UpsertCategoryRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{130}
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{133}
 }
 
 func (x *UpsertCategoryRequest) GetCategory() *Category {
@@ -10484,7 +10756,7 @@ type SeedDemoDataRequest struct {
 
 func (x *SeedDemoDataRequest) Reset() {
 	*x = SeedDemoDataRequest{}
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[131]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[134]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -10496,7 +10768,7 @@ func (x *SeedDemoDataRequest) String() string {
 func (*SeedDemoDataRequest) ProtoMessage() {}
 
 func (x *SeedDemoDataRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[131]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[134]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -10509,7 +10781,7 @@ func (x *SeedDemoDataRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SeedDemoDataRequest.ProtoReflect.Descriptor instead.
 func (*SeedDemoDataRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{131}
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{134}
 }
 
 func (x *SeedDemoDataRequest) GetForce() bool {
@@ -10544,7 +10816,7 @@ type SeedDemoDataResponse struct {
 
 func (x *SeedDemoDataResponse) Reset() {
 	*x = SeedDemoDataResponse{}
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[132]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[135]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -10556,7 +10828,7 @@ func (x *SeedDemoDataResponse) String() string {
 func (*SeedDemoDataResponse) ProtoMessage() {}
 
 func (x *SeedDemoDataResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[132]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[135]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -10569,7 +10841,7 @@ func (x *SeedDemoDataResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SeedDemoDataResponse.ProtoReflect.Descriptor instead.
 func (*SeedDemoDataResponse) Descriptor() ([]byte, []int) {
-	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{132}
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{135}
 }
 
 func (x *SeedDemoDataResponse) GetProviders() int32 {
@@ -10651,7 +10923,7 @@ type PurgeDemoDataRequest struct {
 
 func (x *PurgeDemoDataRequest) Reset() {
 	*x = PurgeDemoDataRequest{}
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[133]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[136]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -10663,7 +10935,7 @@ func (x *PurgeDemoDataRequest) String() string {
 func (*PurgeDemoDataRequest) ProtoMessage() {}
 
 func (x *PurgeDemoDataRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[133]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[136]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -10676,7 +10948,7 @@ func (x *PurgeDemoDataRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PurgeDemoDataRequest.ProtoReflect.Descriptor instead.
 func (*PurgeDemoDataRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{133}
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{136}
 }
 
 func (x *PurgeDemoDataRequest) GetPhone() string {
@@ -10695,7 +10967,7 @@ type PurgeDemoDataResponse struct {
 
 func (x *PurgeDemoDataResponse) Reset() {
 	*x = PurgeDemoDataResponse{}
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[134]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[137]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -10707,7 +10979,7 @@ func (x *PurgeDemoDataResponse) String() string {
 func (*PurgeDemoDataResponse) ProtoMessage() {}
 
 func (x *PurgeDemoDataResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[134]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[137]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -10720,7 +10992,7 @@ func (x *PurgeDemoDataResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PurgeDemoDataResponse.ProtoReflect.Descriptor instead.
 func (*PurgeDemoDataResponse) Descriptor() ([]byte, []int) {
-	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{134}
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{137}
 }
 
 func (x *PurgeDemoDataResponse) GetDeleted() int32 {
@@ -10736,7 +11008,7 @@ const file_avtoms_b2c_v1_b2c_proto_rawDesc = "" +
 	"\n" +
 	"\x17avtoms/b2c/v1/b2c.proto\x12\ravtoms.b2c.v1\x1a\x1davtoms/common/v1/common.proto\" \n" +
 	"\x0eDeleteResponse\x12\x0e\n" +
-	"\x02ok\x18\x01 \x01(\bR\x02ok\"\xc5\x03\n" +
+	"\x02ok\x18\x01 \x01(\bR\x02ok\"\xe6\x03\n" +
 	"\aAppUser\x12\x14\n" +
 	"\x05phone\x18\x01 \x01(\tR\x05phone\x12\x1d\n" +
 	"\n" +
@@ -10755,7 +11027,9 @@ const file_avtoms_b2c_v1_b2c_proto_rawDesc = "" +
 	"\fpush_allowed\x18\f \x01(\bR\vpushAllowed\x12\x1d\n" +
 	"\n" +
 	"created_at\x18\r \x01(\tR\tcreatedAt\x12#\n" +
-	"\rreferral_code\x18\x0e \x01(\tR\freferralCode\"\xb8\x01\n" +
+	"\rreferral_code\x18\x0e \x01(\tR\freferralCode\x12\x1f\n" +
+	"\vreferred_by\x18\x0f \x01(\tR\n" +
+	"referredBy\"\xb8\x01\n" +
 	"\x06Device\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x14\n" +
 	"\x05phone\x18\x02 \x01(\tR\x05phone\x12\x1a\n" +
@@ -10916,7 +11190,11 @@ const file_avtoms_b2c_v1_b2c_proto_rawDesc = "" +
 	"\aname_uz\x18\x02 \x01(\tR\x06nameUz\x12\x17\n" +
 	"\aname_ru\x18\x03 \x01(\tR\x06nameRu\x12\x14\n" +
 	"\x05price\x18\x04 \x01(\x03R\x05price\x12)\n" +
-	"\x10duration_minutes\x18\x05 \x01(\x05R\x0fdurationMinutes\"\xd0\x06\n" +
+	"\x10duration_minutes\x18\x05 \x01(\x05R\x0fdurationMinutes\"e\n" +
+	"\fBookingEvent\x121\n" +
+	"\x05state\x18\x01 \x01(\x0e2\x1b.avtoms.b2c.v1.BookingStateR\x05state\x12\x0e\n" +
+	"\x02at\x18\x02 \x01(\tR\x02at\x12\x12\n" +
+	"\x04note\x18\x03 \x01(\tR\x04note\"\x87\a\n" +
 	"\aBooking\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
 	"\x04code\x18\x02 \x01(\tR\x04code\x12\x14\n" +
@@ -10950,7 +11228,8 @@ const file_avtoms_b2c_v1_b2c_proto_rawDesc = "" +
 	"created_at\x18\x19 \x01(\tR\tcreatedAt\x12\x1d\n" +
 	"\n" +
 	"updated_at\x18\x1a \x01(\tR\tupdatedAt\x12\x12\n" +
-	"\x04demo\x18\x1b \x01(\bR\x04demo\"8\n" +
+	"\x04demo\x18\x1b \x01(\bR\x04demo\x125\n" +
+	"\ahistory\x18\x1c \x03(\v2\x1b.avtoms.b2c.v1.BookingEventR\ahistory\"8\n" +
 	"\x04Slot\x12\x12\n" +
 	"\x04time\x18\x01 \x01(\tR\x04time\x12\x1c\n" +
 	"\tavailable\x18\x02 \x01(\bR\tavailable\"\xdc\x01\n" +
@@ -11308,7 +11587,7 @@ const file_avtoms_b2c_v1_b2c_proto_rawDesc = "" +
 	"\funread_chats\x18\n" +
 	" \x01(\x05R\vunreadChats\x12#\n" +
 	"\rbonus_balance\x18\v \x01(\x03R\fbonusBalance\x12$\n" +
-	"\rauthenticated\x18\f \x01(\bR\rauthenticated\"\xc2\x01\n" +
+	"\rauthenticated\x18\f \x01(\bR\rauthenticated\"\xf1\x01\n" +
 	"\x12ListReviewsRequest\x12\x1f\n" +
 	"\vprovider_id\x18\x01 \x01(\tR\n" +
 	"providerId\x12\x14\n" +
@@ -11317,7 +11596,8 @@ const file_avtoms_b2c_v1_b2c_proto_rawDesc = "" +
 	"min_rating\x18\x03 \x01(\x05R\tminRating\x12(\n" +
 	"\x10with_photos_only\x18\x04 \x01(\bR\x0ewithPhotosOnly\x12\x14\n" +
 	"\x05limit\x18\x05 \x01(\x05R\x05limit\x12\x16\n" +
-	"\x06offset\x18\x06 \x01(\x05R\x06offset\"\x9a\x01\n" +
+	"\x06offset\x18\x06 \x01(\x05R\x06offset\x12-\n" +
+	"\x04sort\x18\a \x01(\x0e2\x19.avtoms.b2c.v1.ReviewSortR\x04sort\"\x9a\x01\n" +
 	"\x13ListReviewsResponse\x12/\n" +
 	"\areviews\x18\x01 \x03(\v2\x15.avtoms.b2c.v1.ReviewR\areviews\x12\x14\n" +
 	"\x05total\x18\x02 \x01(\x05R\x05total\x12<\n" +
@@ -11449,14 +11729,15 @@ const file_avtoms_b2c_v1_b2c_proto_rawDesc = "" +
 	"\tuse_bonus\x18\t \x01(\x03R\buseBonus\"9\n" +
 	"\x11GetBookingRequest\x12\x14\n" +
 	"\x05phone\x18\x01 \x01(\tR\x05phone\x12\x0e\n" +
-	"\x02id\x18\x02 \x01(\tR\x02id\"\xaf\x01\n" +
+	"\x02id\x18\x02 \x01(\tR\x02id\"\xc6\x01\n" +
 	"\x13ListBookingsRequest\x12\x14\n" +
 	"\x05phone\x18\x01 \x01(\tR\x05phone\x123\n" +
 	"\x06states\x18\x02 \x03(\x0e2\x1b.avtoms.b2c.v1.BookingStateR\x06states\x12\x1f\n" +
 	"\vactive_only\x18\x03 \x01(\bR\n" +
 	"activeOnly\x12\x14\n" +
 	"\x05limit\x18\x04 \x01(\x05R\x05limit\x12\x16\n" +
-	"\x06offset\x18\x05 \x01(\x05R\x06offset\"`\n" +
+	"\x06offset\x18\x05 \x01(\x05R\x06offset\x12\x15\n" +
+	"\x06car_id\x18\x06 \x01(\tR\x05carId\"`\n" +
 	"\x14ListBookingsResponse\x122\n" +
 	"\bbookings\x18\x01 \x03(\v2\x16.avtoms.b2c.v1.BookingR\bbookings\x12\x14\n" +
 	"\x05total\x18\x02 \x01(\x05R\x05total\"T\n" +
@@ -11544,7 +11825,15 @@ const file_avtoms_b2c_v1_b2c_proto_rawDesc = "" +
 	"\x05phone\x18\x01 \x01(\tR\x05phone\x12\x0e\n" +
 	"\x02id\x18\x02 \x01(\tR\x02id\".\n" +
 	"\x16GetBonusAccountRequest\x12\x14\n" +
-	"\x05phone\x18\x01 \x01(\tR\x05phone\"]\n" +
+	"\x05phone\x18\x01 \x01(\tR\x05phone\"D\n" +
+	"\x18ApplyReferralCodeRequest\x12\x14\n" +
+	"\x05phone\x18\x01 \x01(\tR\x05phone\x12\x12\n" +
+	"\x04code\x18\x02 \x01(\tR\x04code\"~\n" +
+	"\x19ApplyReferralCodeResponse\x12\x0e\n" +
+	"\x02ok\x18\x01 \x01(\bR\x02ok\x12\x16\n" +
+	"\x06reason\x18\x02 \x01(\tR\x06reason\x12!\n" +
+	"\finviter_name\x18\x03 \x01(\tR\vinviterName\x12\x16\n" +
+	"\x06reward\x18\x04 \x01(\x03R\x06reward\"]\n" +
 	"\x17ListBonusEntriesRequest\x12\x14\n" +
 	"\x05phone\x18\x01 \x01(\tR\x05phone\x12\x14\n" +
 	"\x05limit\x18\x02 \x01(\x05R\x05limit\x12\x16\n" +
@@ -11718,13 +12007,19 @@ const file_avtoms_b2c_v1_b2c_proto_rawDesc = "" +
 	"\fMapPointKind\x12\x1e\n" +
 	"\x1aMAP_POINT_KIND_UNSPECIFIED\x10\x00\x12\x1b\n" +
 	"\x17MAP_POINT_KIND_PROVIDER\x10\x01\x12\x17\n" +
-	"\x13MAP_POINT_KIND_FUEL\x10\x02*\x98\x01\n" +
+	"\x13MAP_POINT_KIND_FUEL\x10\x02*r\n" +
+	"\n" +
+	"ReviewSort\x12\x1b\n" +
+	"\x17REVIEW_SORT_UNSPECIFIED\x10\x00\x12\x16\n" +
+	"\x12REVIEW_SORT_NEWEST\x10\x01\x12\x17\n" +
+	"\x13REVIEW_SORT_HIGHEST\x10\x02\x12\x16\n" +
+	"\x12REVIEW_SORT_LOWEST\x10\x03*\x98\x01\n" +
 	"\fProviderSort\x12\x1d\n" +
 	"\x19PROVIDER_SORT_UNSPECIFIED\x10\x00\x12\x19\n" +
 	"\x15PROVIDER_SORT_NEAREST\x10\x01\x12\x18\n" +
 	"\x14PROVIDER_SORT_RATING\x10\x02\x12\x1b\n" +
 	"\x17PROVIDER_SORT_PRICE_ASC\x10\x03\x12\x17\n" +
-	"\x13PROVIDER_SORT_PROMO\x10\x042\xc42\n" +
+	"\x13PROVIDER_SORT_PROMO\x10\x042\xac3\n" +
 	"\n" +
 	"B2CService\x12F\n" +
 	"\n" +
@@ -11783,7 +12078,8 @@ const file_avtoms_b2c_v1_b2c_proto_rawDesc = "" +
 	"\vListStories\x12!.avtoms.b2c.v1.ListStoriesRequest\x1a\".avtoms.b2c.v1.ListStoriesResponse\x12S\n" +
 	"\rMarkStorySeen\x12#.avtoms.b2c.v1.MarkStorySeenRequest\x1a\x1d.avtoms.b2c.v1.DeleteResponse\x12U\n" +
 	"\x0fGetBonusAccount\x12%.avtoms.b2c.v1.GetBonusAccountRequest\x1a\x1b.avtoms.b2c.v1.BonusAccount\x12c\n" +
-	"\x10ListBonusEntries\x12&.avtoms.b2c.v1.ListBonusEntriesRequest\x1a'.avtoms.b2c.v1.ListBonusEntriesResponse\x12N\n" +
+	"\x10ListBonusEntries\x12&.avtoms.b2c.v1.ListBonusEntriesRequest\x1a'.avtoms.b2c.v1.ListBonusEntriesResponse\x12f\n" +
+	"\x11ApplyReferralCode\x12'.avtoms.b2c.v1.ApplyReferralCodeRequest\x1a(.avtoms.b2c.v1.ApplyReferralCodeResponse\x12N\n" +
 	"\tListChats\x12\x1f.avtoms.b2c.v1.ListChatsRequest\x1a .avtoms.b2c.v1.ListChatsResponse\x12H\n" +
 	"\aGetChat\x12\x1d.avtoms.b2c.v1.GetChatRequest\x1a\x1e.avtoms.b2c.v1.GetChatResponse\x12T\n" +
 	"\x0fSendChatMessage\x12%.avtoms.b2c.v1.SendChatMessageRequest\x1a\x1a.avtoms.b2c.v1.ChatMessage\x12G\n" +
@@ -11823,8 +12119,8 @@ func file_avtoms_b2c_v1_b2c_proto_rawDescGZIP() []byte {
 	return file_avtoms_b2c_v1_b2c_proto_rawDescData
 }
 
-var file_avtoms_b2c_v1_b2c_proto_enumTypes = make([]protoimpl.EnumInfo, 9)
-var file_avtoms_b2c_v1_b2c_proto_msgTypes = make([]protoimpl.MessageInfo, 135)
+var file_avtoms_b2c_v1_b2c_proto_enumTypes = make([]protoimpl.EnumInfo, 10)
+var file_avtoms_b2c_v1_b2c_proto_msgTypes = make([]protoimpl.MessageInfo, 138)
 var file_avtoms_b2c_v1_b2c_proto_goTypes = []any{
 	(BookingState)(0),                       // 0: avtoms.b2c.v1.BookingState
 	(PaymentMethod)(0),                      // 1: avtoms.b2c.v1.PaymentMethod
@@ -11834,367 +12130,376 @@ var file_avtoms_b2c_v1_b2c_proto_goTypes = []any{
 	(ChatKind)(0),                           // 5: avtoms.b2c.v1.ChatKind
 	(BonusKind)(0),                          // 6: avtoms.b2c.v1.BonusKind
 	(MapPointKind)(0),                       // 7: avtoms.b2c.v1.MapPointKind
-	(ProviderSort)(0),                       // 8: avtoms.b2c.v1.ProviderSort
-	(*DeleteResponse)(nil),                  // 9: avtoms.b2c.v1.DeleteResponse
-	(*AppUser)(nil),                         // 10: avtoms.b2c.v1.AppUser
-	(*Device)(nil),                          // 11: avtoms.b2c.v1.Device
-	(*City)(nil),                            // 12: avtoms.b2c.v1.City
-	(*Category)(nil),                        // 13: avtoms.b2c.v1.Category
-	(*OpeningHours)(nil),                    // 14: avtoms.b2c.v1.OpeningHours
-	(*Provider)(nil),                        // 15: avtoms.b2c.v1.Provider
-	(*ProviderService)(nil),                 // 16: avtoms.b2c.v1.ProviderService
-	(*Review)(nil),                          // 17: avtoms.b2c.v1.Review
-	(*RatingBreakdown)(nil),                 // 18: avtoms.b2c.v1.RatingBreakdown
-	(*Complaint)(nil),                       // 19: avtoms.b2c.v1.Complaint
-	(*Car)(nil),                             // 20: avtoms.b2c.v1.Car
-	(*BookingItem)(nil),                     // 21: avtoms.b2c.v1.BookingItem
-	(*Booking)(nil),                         // 22: avtoms.b2c.v1.Booking
-	(*Slot)(nil),                            // 23: avtoms.b2c.v1.Slot
-	(*Card)(nil),                            // 24: avtoms.b2c.v1.Card
-	(*Payment)(nil),                         // 25: avtoms.b2c.v1.Payment
-	(*Promo)(nil),                           // 26: avtoms.b2c.v1.Promo
-	(*Story)(nil),                           // 27: avtoms.b2c.v1.Story
-	(*BonusAccount)(nil),                    // 28: avtoms.b2c.v1.BonusAccount
-	(*BonusEntry)(nil),                      // 29: avtoms.b2c.v1.BonusEntry
-	(*Chat)(nil),                            // 30: avtoms.b2c.v1.Chat
-	(*ChatMessage)(nil),                     // 31: avtoms.b2c.v1.ChatMessage
-	(*Notification)(nil),                    // 32: avtoms.b2c.v1.Notification
-	(*EmergencyType)(nil),                   // 33: avtoms.b2c.v1.EmergencyType
-	(*EmergencyRequest)(nil),                // 34: avtoms.b2c.v1.EmergencyRequest
-	(*FuelPrice)(nil),                       // 35: avtoms.b2c.v1.FuelPrice
-	(*FuelStation)(nil),                     // 36: avtoms.b2c.v1.FuelStation
-	(*MapPoint)(nil),                        // 37: avtoms.b2c.v1.MapPoint
-	(*GetProfileRequest)(nil),               // 38: avtoms.b2c.v1.GetProfileRequest
-	(*UpdateProfileRequest)(nil),            // 39: avtoms.b2c.v1.UpdateProfileRequest
-	(*DeleteProfileRequest)(nil),            // 40: avtoms.b2c.v1.DeleteProfileRequest
-	(*RegisterDeviceRequest)(nil),           // 41: avtoms.b2c.v1.RegisterDeviceRequest
-	(*DeleteDeviceRequest)(nil),             // 42: avtoms.b2c.v1.DeleteDeviceRequest
-	(*ListCitiesRequest)(nil),               // 43: avtoms.b2c.v1.ListCitiesRequest
-	(*ListCitiesResponse)(nil),              // 44: avtoms.b2c.v1.ListCitiesResponse
-	(*ListCategoriesRequest)(nil),           // 45: avtoms.b2c.v1.ListCategoriesRequest
-	(*ListCategoriesResponse)(nil),          // 46: avtoms.b2c.v1.ListCategoriesResponse
-	(*ListProvidersRequest)(nil),            // 47: avtoms.b2c.v1.ListProvidersRequest
-	(*ListProvidersResponse)(nil),           // 48: avtoms.b2c.v1.ListProvidersResponse
-	(*GetProviderRequest)(nil),              // 49: avtoms.b2c.v1.GetProviderRequest
-	(*ListProviderServicesRequest)(nil),     // 50: avtoms.b2c.v1.ListProviderServicesRequest
-	(*ListProviderServicesResponse)(nil),    // 51: avtoms.b2c.v1.ListProviderServicesResponse
-	(*ListMapPointsRequest)(nil),            // 52: avtoms.b2c.v1.ListMapPointsRequest
-	(*ListMapPointsResponse)(nil),           // 53: avtoms.b2c.v1.ListMapPointsResponse
-	(*ListFuelStationsRequest)(nil),         // 54: avtoms.b2c.v1.ListFuelStationsRequest
-	(*ListFuelStationsResponse)(nil),        // 55: avtoms.b2c.v1.ListFuelStationsResponse
-	(*GetFuelStationRequest)(nil),           // 56: avtoms.b2c.v1.GetFuelStationRequest
-	(*SearchRequest)(nil),                   // 57: avtoms.b2c.v1.SearchRequest
-	(*SearchResponse)(nil),                  // 58: avtoms.b2c.v1.SearchResponse
-	(*ClearSearchHistoryRequest)(nil),       // 59: avtoms.b2c.v1.ClearSearchHistoryRequest
-	(*GetHomeRequest)(nil),                  // 60: avtoms.b2c.v1.GetHomeRequest
-	(*HomeResponse)(nil),                    // 61: avtoms.b2c.v1.HomeResponse
-	(*ListReviewsRequest)(nil),              // 62: avtoms.b2c.v1.ListReviewsRequest
-	(*ListReviewsResponse)(nil),             // 63: avtoms.b2c.v1.ListReviewsResponse
-	(*CreateReviewRequest)(nil),             // 64: avtoms.b2c.v1.CreateReviewRequest
-	(*SetReviewReplyRequest)(nil),           // 65: avtoms.b2c.v1.SetReviewReplyRequest
-	(*CreateComplaintRequest)(nil),          // 66: avtoms.b2c.v1.CreateComplaintRequest
-	(*ListComplaintsRequest)(nil),           // 67: avtoms.b2c.v1.ListComplaintsRequest
-	(*ListComplaintsResponse)(nil),          // 68: avtoms.b2c.v1.ListComplaintsResponse
-	(*ListFavoritesRequest)(nil),            // 69: avtoms.b2c.v1.ListFavoritesRequest
-	(*ListFavoritesResponse)(nil),           // 70: avtoms.b2c.v1.ListFavoritesResponse
-	(*SetFavoriteRequest)(nil),              // 71: avtoms.b2c.v1.SetFavoriteRequest
-	(*SetFavoriteResponse)(nil),             // 72: avtoms.b2c.v1.SetFavoriteResponse
-	(*ListCarsRequest)(nil),                 // 73: avtoms.b2c.v1.ListCarsRequest
-	(*ListCarsResponse)(nil),                // 74: avtoms.b2c.v1.ListCarsResponse
-	(*GetCarRequest)(nil),                   // 75: avtoms.b2c.v1.GetCarRequest
-	(*CreateCarRequest)(nil),                // 76: avtoms.b2c.v1.CreateCarRequest
-	(*UpdateCarRequest)(nil),                // 77: avtoms.b2c.v1.UpdateCarRequest
-	(*DeleteCarRequest)(nil),                // 78: avtoms.b2c.v1.DeleteCarRequest
-	(*SetDefaultCarRequest)(nil),            // 79: avtoms.b2c.v1.SetDefaultCarRequest
-	(*ListSlotsRequest)(nil),                // 80: avtoms.b2c.v1.ListSlotsRequest
-	(*SlotDay)(nil),                         // 81: avtoms.b2c.v1.SlotDay
-	(*ListSlotsResponse)(nil),               // 82: avtoms.b2c.v1.ListSlotsResponse
-	(*CreateBookingRequest)(nil),            // 83: avtoms.b2c.v1.CreateBookingRequest
-	(*GetBookingRequest)(nil),               // 84: avtoms.b2c.v1.GetBookingRequest
-	(*ListBookingsRequest)(nil),             // 85: avtoms.b2c.v1.ListBookingsRequest
-	(*ListBookingsResponse)(nil),            // 86: avtoms.b2c.v1.ListBookingsResponse
-	(*CancelBookingRequest)(nil),            // 87: avtoms.b2c.v1.CancelBookingRequest
-	(*RescheduleBookingRequest)(nil),        // 88: avtoms.b2c.v1.RescheduleBookingRequest
-	(*SetBookingStateRequest)(nil),          // 89: avtoms.b2c.v1.SetBookingStateRequest
-	(*LinkBookingAppointmentRequest)(nil),   // 90: avtoms.b2c.v1.LinkBookingAppointmentRequest
-	(*ListCardsRequest)(nil),                // 91: avtoms.b2c.v1.ListCardsRequest
-	(*ListCardsResponse)(nil),               // 92: avtoms.b2c.v1.ListCardsResponse
-	(*AddCardRequest)(nil),                  // 93: avtoms.b2c.v1.AddCardRequest
-	(*DeleteCardRequest)(nil),               // 94: avtoms.b2c.v1.DeleteCardRequest
-	(*SetDefaultCardRequest)(nil),           // 95: avtoms.b2c.v1.SetDefaultCardRequest
-	(*ValidatePromoCodeRequest)(nil),        // 96: avtoms.b2c.v1.ValidatePromoCodeRequest
-	(*ValidatePromoCodeResponse)(nil),       // 97: avtoms.b2c.v1.ValidatePromoCodeResponse
-	(*CreatePaymentRequest)(nil),            // 98: avtoms.b2c.v1.CreatePaymentRequest
-	(*GetPaymentRequest)(nil),               // 99: avtoms.b2c.v1.GetPaymentRequest
-	(*ListPaymentsRequest)(nil),             // 100: avtoms.b2c.v1.ListPaymentsRequest
-	(*ListPaymentsResponse)(nil),            // 101: avtoms.b2c.v1.ListPaymentsResponse
-	(*ListPromosRequest)(nil),               // 102: avtoms.b2c.v1.ListPromosRequest
-	(*ListPromosResponse)(nil),              // 103: avtoms.b2c.v1.ListPromosResponse
-	(*GetPromoRequest)(nil),                 // 104: avtoms.b2c.v1.GetPromoRequest
-	(*ListStoriesRequest)(nil),              // 105: avtoms.b2c.v1.ListStoriesRequest
-	(*ListStoriesResponse)(nil),             // 106: avtoms.b2c.v1.ListStoriesResponse
-	(*MarkStorySeenRequest)(nil),            // 107: avtoms.b2c.v1.MarkStorySeenRequest
-	(*GetBonusAccountRequest)(nil),          // 108: avtoms.b2c.v1.GetBonusAccountRequest
-	(*ListBonusEntriesRequest)(nil),         // 109: avtoms.b2c.v1.ListBonusEntriesRequest
-	(*ListBonusEntriesResponse)(nil),        // 110: avtoms.b2c.v1.ListBonusEntriesResponse
-	(*ListChatsRequest)(nil),                // 111: avtoms.b2c.v1.ListChatsRequest
-	(*ListChatsResponse)(nil),               // 112: avtoms.b2c.v1.ListChatsResponse
-	(*GetChatRequest)(nil),                  // 113: avtoms.b2c.v1.GetChatRequest
-	(*GetChatResponse)(nil),                 // 114: avtoms.b2c.v1.GetChatResponse
-	(*SendChatMessageRequest)(nil),          // 115: avtoms.b2c.v1.SendChatMessageRequest
-	(*MarkChatReadRequest)(nil),             // 116: avtoms.b2c.v1.MarkChatReadRequest
-	(*ListNotificationsRequest)(nil),        // 117: avtoms.b2c.v1.ListNotificationsRequest
-	(*ListNotificationsResponse)(nil),       // 118: avtoms.b2c.v1.ListNotificationsResponse
-	(*MarkNotificationReadRequest)(nil),     // 119: avtoms.b2c.v1.MarkNotificationReadRequest
-	(*MarkAllNotificationsReadRequest)(nil), // 120: avtoms.b2c.v1.MarkAllNotificationsReadRequest
-	(*GetBadgesRequest)(nil),                // 121: avtoms.b2c.v1.GetBadgesRequest
-	(*GetBadgesResponse)(nil),               // 122: avtoms.b2c.v1.GetBadgesResponse
-	(*ListEmergencyTypesRequest)(nil),       // 123: avtoms.b2c.v1.ListEmergencyTypesRequest
-	(*ListEmergencyTypesResponse)(nil),      // 124: avtoms.b2c.v1.ListEmergencyTypesResponse
-	(*CreateEmergencyRequestRequest)(nil),   // 125: avtoms.b2c.v1.CreateEmergencyRequestRequest
-	(*GetEmergencyRequestRequest)(nil),      // 126: avtoms.b2c.v1.GetEmergencyRequestRequest
-	(*ListEmergencyRequestsRequest)(nil),    // 127: avtoms.b2c.v1.ListEmergencyRequestsRequest
-	(*ListEmergencyRequestsResponse)(nil),   // 128: avtoms.b2c.v1.ListEmergencyRequestsResponse
-	(*CancelEmergencyRequestRequest)(nil),   // 129: avtoms.b2c.v1.CancelEmergencyRequestRequest
-	(*CreateProviderRequest)(nil),           // 130: avtoms.b2c.v1.CreateProviderRequest
-	(*UpdateProviderRequest)(nil),           // 131: avtoms.b2c.v1.UpdateProviderRequest
-	(*DeleteProviderRequest)(nil),           // 132: avtoms.b2c.v1.DeleteProviderRequest
-	(*UpsertProviderServiceRequest)(nil),    // 133: avtoms.b2c.v1.UpsertProviderServiceRequest
-	(*DeleteProviderServiceRequest)(nil),    // 134: avtoms.b2c.v1.DeleteProviderServiceRequest
-	(*UpsertPromoRequest)(nil),              // 135: avtoms.b2c.v1.UpsertPromoRequest
-	(*DeletePromoRequest)(nil),              // 136: avtoms.b2c.v1.DeletePromoRequest
-	(*UpsertFuelStationRequest)(nil),        // 137: avtoms.b2c.v1.UpsertFuelStationRequest
-	(*UpsertCityRequest)(nil),               // 138: avtoms.b2c.v1.UpsertCityRequest
-	(*UpsertCategoryRequest)(nil),           // 139: avtoms.b2c.v1.UpsertCategoryRequest
-	(*SeedDemoDataRequest)(nil),             // 140: avtoms.b2c.v1.SeedDemoDataRequest
-	(*SeedDemoDataResponse)(nil),            // 141: avtoms.b2c.v1.SeedDemoDataResponse
-	(*PurgeDemoDataRequest)(nil),            // 142: avtoms.b2c.v1.PurgeDemoDataRequest
-	(*PurgeDemoDataResponse)(nil),           // 143: avtoms.b2c.v1.PurgeDemoDataResponse
-	(v1.Language)(0),                        // 144: avtoms.common.v1.Language
+	(ReviewSort)(0),                         // 8: avtoms.b2c.v1.ReviewSort
+	(ProviderSort)(0),                       // 9: avtoms.b2c.v1.ProviderSort
+	(*DeleteResponse)(nil),                  // 10: avtoms.b2c.v1.DeleteResponse
+	(*AppUser)(nil),                         // 11: avtoms.b2c.v1.AppUser
+	(*Device)(nil),                          // 12: avtoms.b2c.v1.Device
+	(*City)(nil),                            // 13: avtoms.b2c.v1.City
+	(*Category)(nil),                        // 14: avtoms.b2c.v1.Category
+	(*OpeningHours)(nil),                    // 15: avtoms.b2c.v1.OpeningHours
+	(*Provider)(nil),                        // 16: avtoms.b2c.v1.Provider
+	(*ProviderService)(nil),                 // 17: avtoms.b2c.v1.ProviderService
+	(*Review)(nil),                          // 18: avtoms.b2c.v1.Review
+	(*RatingBreakdown)(nil),                 // 19: avtoms.b2c.v1.RatingBreakdown
+	(*Complaint)(nil),                       // 20: avtoms.b2c.v1.Complaint
+	(*Car)(nil),                             // 21: avtoms.b2c.v1.Car
+	(*BookingItem)(nil),                     // 22: avtoms.b2c.v1.BookingItem
+	(*BookingEvent)(nil),                    // 23: avtoms.b2c.v1.BookingEvent
+	(*Booking)(nil),                         // 24: avtoms.b2c.v1.Booking
+	(*Slot)(nil),                            // 25: avtoms.b2c.v1.Slot
+	(*Card)(nil),                            // 26: avtoms.b2c.v1.Card
+	(*Payment)(nil),                         // 27: avtoms.b2c.v1.Payment
+	(*Promo)(nil),                           // 28: avtoms.b2c.v1.Promo
+	(*Story)(nil),                           // 29: avtoms.b2c.v1.Story
+	(*BonusAccount)(nil),                    // 30: avtoms.b2c.v1.BonusAccount
+	(*BonusEntry)(nil),                      // 31: avtoms.b2c.v1.BonusEntry
+	(*Chat)(nil),                            // 32: avtoms.b2c.v1.Chat
+	(*ChatMessage)(nil),                     // 33: avtoms.b2c.v1.ChatMessage
+	(*Notification)(nil),                    // 34: avtoms.b2c.v1.Notification
+	(*EmergencyType)(nil),                   // 35: avtoms.b2c.v1.EmergencyType
+	(*EmergencyRequest)(nil),                // 36: avtoms.b2c.v1.EmergencyRequest
+	(*FuelPrice)(nil),                       // 37: avtoms.b2c.v1.FuelPrice
+	(*FuelStation)(nil),                     // 38: avtoms.b2c.v1.FuelStation
+	(*MapPoint)(nil),                        // 39: avtoms.b2c.v1.MapPoint
+	(*GetProfileRequest)(nil),               // 40: avtoms.b2c.v1.GetProfileRequest
+	(*UpdateProfileRequest)(nil),            // 41: avtoms.b2c.v1.UpdateProfileRequest
+	(*DeleteProfileRequest)(nil),            // 42: avtoms.b2c.v1.DeleteProfileRequest
+	(*RegisterDeviceRequest)(nil),           // 43: avtoms.b2c.v1.RegisterDeviceRequest
+	(*DeleteDeviceRequest)(nil),             // 44: avtoms.b2c.v1.DeleteDeviceRequest
+	(*ListCitiesRequest)(nil),               // 45: avtoms.b2c.v1.ListCitiesRequest
+	(*ListCitiesResponse)(nil),              // 46: avtoms.b2c.v1.ListCitiesResponse
+	(*ListCategoriesRequest)(nil),           // 47: avtoms.b2c.v1.ListCategoriesRequest
+	(*ListCategoriesResponse)(nil),          // 48: avtoms.b2c.v1.ListCategoriesResponse
+	(*ListProvidersRequest)(nil),            // 49: avtoms.b2c.v1.ListProvidersRequest
+	(*ListProvidersResponse)(nil),           // 50: avtoms.b2c.v1.ListProvidersResponse
+	(*GetProviderRequest)(nil),              // 51: avtoms.b2c.v1.GetProviderRequest
+	(*ListProviderServicesRequest)(nil),     // 52: avtoms.b2c.v1.ListProviderServicesRequest
+	(*ListProviderServicesResponse)(nil),    // 53: avtoms.b2c.v1.ListProviderServicesResponse
+	(*ListMapPointsRequest)(nil),            // 54: avtoms.b2c.v1.ListMapPointsRequest
+	(*ListMapPointsResponse)(nil),           // 55: avtoms.b2c.v1.ListMapPointsResponse
+	(*ListFuelStationsRequest)(nil),         // 56: avtoms.b2c.v1.ListFuelStationsRequest
+	(*ListFuelStationsResponse)(nil),        // 57: avtoms.b2c.v1.ListFuelStationsResponse
+	(*GetFuelStationRequest)(nil),           // 58: avtoms.b2c.v1.GetFuelStationRequest
+	(*SearchRequest)(nil),                   // 59: avtoms.b2c.v1.SearchRequest
+	(*SearchResponse)(nil),                  // 60: avtoms.b2c.v1.SearchResponse
+	(*ClearSearchHistoryRequest)(nil),       // 61: avtoms.b2c.v1.ClearSearchHistoryRequest
+	(*GetHomeRequest)(nil),                  // 62: avtoms.b2c.v1.GetHomeRequest
+	(*HomeResponse)(nil),                    // 63: avtoms.b2c.v1.HomeResponse
+	(*ListReviewsRequest)(nil),              // 64: avtoms.b2c.v1.ListReviewsRequest
+	(*ListReviewsResponse)(nil),             // 65: avtoms.b2c.v1.ListReviewsResponse
+	(*CreateReviewRequest)(nil),             // 66: avtoms.b2c.v1.CreateReviewRequest
+	(*SetReviewReplyRequest)(nil),           // 67: avtoms.b2c.v1.SetReviewReplyRequest
+	(*CreateComplaintRequest)(nil),          // 68: avtoms.b2c.v1.CreateComplaintRequest
+	(*ListComplaintsRequest)(nil),           // 69: avtoms.b2c.v1.ListComplaintsRequest
+	(*ListComplaintsResponse)(nil),          // 70: avtoms.b2c.v1.ListComplaintsResponse
+	(*ListFavoritesRequest)(nil),            // 71: avtoms.b2c.v1.ListFavoritesRequest
+	(*ListFavoritesResponse)(nil),           // 72: avtoms.b2c.v1.ListFavoritesResponse
+	(*SetFavoriteRequest)(nil),              // 73: avtoms.b2c.v1.SetFavoriteRequest
+	(*SetFavoriteResponse)(nil),             // 74: avtoms.b2c.v1.SetFavoriteResponse
+	(*ListCarsRequest)(nil),                 // 75: avtoms.b2c.v1.ListCarsRequest
+	(*ListCarsResponse)(nil),                // 76: avtoms.b2c.v1.ListCarsResponse
+	(*GetCarRequest)(nil),                   // 77: avtoms.b2c.v1.GetCarRequest
+	(*CreateCarRequest)(nil),                // 78: avtoms.b2c.v1.CreateCarRequest
+	(*UpdateCarRequest)(nil),                // 79: avtoms.b2c.v1.UpdateCarRequest
+	(*DeleteCarRequest)(nil),                // 80: avtoms.b2c.v1.DeleteCarRequest
+	(*SetDefaultCarRequest)(nil),            // 81: avtoms.b2c.v1.SetDefaultCarRequest
+	(*ListSlotsRequest)(nil),                // 82: avtoms.b2c.v1.ListSlotsRequest
+	(*SlotDay)(nil),                         // 83: avtoms.b2c.v1.SlotDay
+	(*ListSlotsResponse)(nil),               // 84: avtoms.b2c.v1.ListSlotsResponse
+	(*CreateBookingRequest)(nil),            // 85: avtoms.b2c.v1.CreateBookingRequest
+	(*GetBookingRequest)(nil),               // 86: avtoms.b2c.v1.GetBookingRequest
+	(*ListBookingsRequest)(nil),             // 87: avtoms.b2c.v1.ListBookingsRequest
+	(*ListBookingsResponse)(nil),            // 88: avtoms.b2c.v1.ListBookingsResponse
+	(*CancelBookingRequest)(nil),            // 89: avtoms.b2c.v1.CancelBookingRequest
+	(*RescheduleBookingRequest)(nil),        // 90: avtoms.b2c.v1.RescheduleBookingRequest
+	(*SetBookingStateRequest)(nil),          // 91: avtoms.b2c.v1.SetBookingStateRequest
+	(*LinkBookingAppointmentRequest)(nil),   // 92: avtoms.b2c.v1.LinkBookingAppointmentRequest
+	(*ListCardsRequest)(nil),                // 93: avtoms.b2c.v1.ListCardsRequest
+	(*ListCardsResponse)(nil),               // 94: avtoms.b2c.v1.ListCardsResponse
+	(*AddCardRequest)(nil),                  // 95: avtoms.b2c.v1.AddCardRequest
+	(*DeleteCardRequest)(nil),               // 96: avtoms.b2c.v1.DeleteCardRequest
+	(*SetDefaultCardRequest)(nil),           // 97: avtoms.b2c.v1.SetDefaultCardRequest
+	(*ValidatePromoCodeRequest)(nil),        // 98: avtoms.b2c.v1.ValidatePromoCodeRequest
+	(*ValidatePromoCodeResponse)(nil),       // 99: avtoms.b2c.v1.ValidatePromoCodeResponse
+	(*CreatePaymentRequest)(nil),            // 100: avtoms.b2c.v1.CreatePaymentRequest
+	(*GetPaymentRequest)(nil),               // 101: avtoms.b2c.v1.GetPaymentRequest
+	(*ListPaymentsRequest)(nil),             // 102: avtoms.b2c.v1.ListPaymentsRequest
+	(*ListPaymentsResponse)(nil),            // 103: avtoms.b2c.v1.ListPaymentsResponse
+	(*ListPromosRequest)(nil),               // 104: avtoms.b2c.v1.ListPromosRequest
+	(*ListPromosResponse)(nil),              // 105: avtoms.b2c.v1.ListPromosResponse
+	(*GetPromoRequest)(nil),                 // 106: avtoms.b2c.v1.GetPromoRequest
+	(*ListStoriesRequest)(nil),              // 107: avtoms.b2c.v1.ListStoriesRequest
+	(*ListStoriesResponse)(nil),             // 108: avtoms.b2c.v1.ListStoriesResponse
+	(*MarkStorySeenRequest)(nil),            // 109: avtoms.b2c.v1.MarkStorySeenRequest
+	(*GetBonusAccountRequest)(nil),          // 110: avtoms.b2c.v1.GetBonusAccountRequest
+	(*ApplyReferralCodeRequest)(nil),        // 111: avtoms.b2c.v1.ApplyReferralCodeRequest
+	(*ApplyReferralCodeResponse)(nil),       // 112: avtoms.b2c.v1.ApplyReferralCodeResponse
+	(*ListBonusEntriesRequest)(nil),         // 113: avtoms.b2c.v1.ListBonusEntriesRequest
+	(*ListBonusEntriesResponse)(nil),        // 114: avtoms.b2c.v1.ListBonusEntriesResponse
+	(*ListChatsRequest)(nil),                // 115: avtoms.b2c.v1.ListChatsRequest
+	(*ListChatsResponse)(nil),               // 116: avtoms.b2c.v1.ListChatsResponse
+	(*GetChatRequest)(nil),                  // 117: avtoms.b2c.v1.GetChatRequest
+	(*GetChatResponse)(nil),                 // 118: avtoms.b2c.v1.GetChatResponse
+	(*SendChatMessageRequest)(nil),          // 119: avtoms.b2c.v1.SendChatMessageRequest
+	(*MarkChatReadRequest)(nil),             // 120: avtoms.b2c.v1.MarkChatReadRequest
+	(*ListNotificationsRequest)(nil),        // 121: avtoms.b2c.v1.ListNotificationsRequest
+	(*ListNotificationsResponse)(nil),       // 122: avtoms.b2c.v1.ListNotificationsResponse
+	(*MarkNotificationReadRequest)(nil),     // 123: avtoms.b2c.v1.MarkNotificationReadRequest
+	(*MarkAllNotificationsReadRequest)(nil), // 124: avtoms.b2c.v1.MarkAllNotificationsReadRequest
+	(*GetBadgesRequest)(nil),                // 125: avtoms.b2c.v1.GetBadgesRequest
+	(*GetBadgesResponse)(nil),               // 126: avtoms.b2c.v1.GetBadgesResponse
+	(*ListEmergencyTypesRequest)(nil),       // 127: avtoms.b2c.v1.ListEmergencyTypesRequest
+	(*ListEmergencyTypesResponse)(nil),      // 128: avtoms.b2c.v1.ListEmergencyTypesResponse
+	(*CreateEmergencyRequestRequest)(nil),   // 129: avtoms.b2c.v1.CreateEmergencyRequestRequest
+	(*GetEmergencyRequestRequest)(nil),      // 130: avtoms.b2c.v1.GetEmergencyRequestRequest
+	(*ListEmergencyRequestsRequest)(nil),    // 131: avtoms.b2c.v1.ListEmergencyRequestsRequest
+	(*ListEmergencyRequestsResponse)(nil),   // 132: avtoms.b2c.v1.ListEmergencyRequestsResponse
+	(*CancelEmergencyRequestRequest)(nil),   // 133: avtoms.b2c.v1.CancelEmergencyRequestRequest
+	(*CreateProviderRequest)(nil),           // 134: avtoms.b2c.v1.CreateProviderRequest
+	(*UpdateProviderRequest)(nil),           // 135: avtoms.b2c.v1.UpdateProviderRequest
+	(*DeleteProviderRequest)(nil),           // 136: avtoms.b2c.v1.DeleteProviderRequest
+	(*UpsertProviderServiceRequest)(nil),    // 137: avtoms.b2c.v1.UpsertProviderServiceRequest
+	(*DeleteProviderServiceRequest)(nil),    // 138: avtoms.b2c.v1.DeleteProviderServiceRequest
+	(*UpsertPromoRequest)(nil),              // 139: avtoms.b2c.v1.UpsertPromoRequest
+	(*DeletePromoRequest)(nil),              // 140: avtoms.b2c.v1.DeletePromoRequest
+	(*UpsertFuelStationRequest)(nil),        // 141: avtoms.b2c.v1.UpsertFuelStationRequest
+	(*UpsertCityRequest)(nil),               // 142: avtoms.b2c.v1.UpsertCityRequest
+	(*UpsertCategoryRequest)(nil),           // 143: avtoms.b2c.v1.UpsertCategoryRequest
+	(*SeedDemoDataRequest)(nil),             // 144: avtoms.b2c.v1.SeedDemoDataRequest
+	(*SeedDemoDataResponse)(nil),            // 145: avtoms.b2c.v1.SeedDemoDataResponse
+	(*PurgeDemoDataRequest)(nil),            // 146: avtoms.b2c.v1.PurgeDemoDataRequest
+	(*PurgeDemoDataResponse)(nil),           // 147: avtoms.b2c.v1.PurgeDemoDataResponse
+	(v1.Language)(0),                        // 148: avtoms.common.v1.Language
 }
 var file_avtoms_b2c_v1_b2c_proto_depIdxs = []int32{
-	144, // 0: avtoms.b2c.v1.AppUser.language:type_name -> avtoms.common.v1.Language
-	14,  // 1: avtoms.b2c.v1.Provider.hours:type_name -> avtoms.b2c.v1.OpeningHours
-	21,  // 2: avtoms.b2c.v1.Booking.items:type_name -> avtoms.b2c.v1.BookingItem
-	0,   // 3: avtoms.b2c.v1.Booking.state:type_name -> avtoms.b2c.v1.BookingState
-	1,   // 4: avtoms.b2c.v1.Booking.payment_method:type_name -> avtoms.b2c.v1.PaymentMethod
-	1,   // 5: avtoms.b2c.v1.Payment.method:type_name -> avtoms.b2c.v1.PaymentMethod
-	2,   // 6: avtoms.b2c.v1.Payment.status:type_name -> avtoms.b2c.v1.PaymentStatus
-	6,   // 7: avtoms.b2c.v1.BonusEntry.kind:type_name -> avtoms.b2c.v1.BonusKind
-	5,   // 8: avtoms.b2c.v1.Chat.kind:type_name -> avtoms.b2c.v1.ChatKind
-	4,   // 9: avtoms.b2c.v1.Notification.kind:type_name -> avtoms.b2c.v1.NotificationKind
-	3,   // 10: avtoms.b2c.v1.EmergencyRequest.state:type_name -> avtoms.b2c.v1.EmergencyState
-	14,  // 11: avtoms.b2c.v1.FuelStation.hours:type_name -> avtoms.b2c.v1.OpeningHours
-	35,  // 12: avtoms.b2c.v1.FuelStation.prices:type_name -> avtoms.b2c.v1.FuelPrice
-	7,   // 13: avtoms.b2c.v1.MapPoint.kind:type_name -> avtoms.b2c.v1.MapPointKind
-	144, // 14: avtoms.b2c.v1.UpdateProfileRequest.language:type_name -> avtoms.common.v1.Language
-	12,  // 15: avtoms.b2c.v1.ListCitiesResponse.cities:type_name -> avtoms.b2c.v1.City
-	13,  // 16: avtoms.b2c.v1.ListCategoriesResponse.categories:type_name -> avtoms.b2c.v1.Category
-	8,   // 17: avtoms.b2c.v1.ListProvidersRequest.sort:type_name -> avtoms.b2c.v1.ProviderSort
-	15,  // 18: avtoms.b2c.v1.ListProvidersResponse.providers:type_name -> avtoms.b2c.v1.Provider
-	16,  // 19: avtoms.b2c.v1.ListProviderServicesResponse.services:type_name -> avtoms.b2c.v1.ProviderService
-	37,  // 20: avtoms.b2c.v1.ListMapPointsResponse.points:type_name -> avtoms.b2c.v1.MapPoint
-	36,  // 21: avtoms.b2c.v1.ListFuelStationsResponse.stations:type_name -> avtoms.b2c.v1.FuelStation
-	15,  // 22: avtoms.b2c.v1.SearchResponse.providers:type_name -> avtoms.b2c.v1.Provider
-	13,  // 23: avtoms.b2c.v1.SearchResponse.categories:type_name -> avtoms.b2c.v1.Category
-	12,  // 24: avtoms.b2c.v1.HomeResponse.city:type_name -> avtoms.b2c.v1.City
-	27,  // 25: avtoms.b2c.v1.HomeResponse.stories:type_name -> avtoms.b2c.v1.Story
-	13,  // 26: avtoms.b2c.v1.HomeResponse.categories:type_name -> avtoms.b2c.v1.Category
-	15,  // 27: avtoms.b2c.v1.HomeResponse.nearby:type_name -> avtoms.b2c.v1.Provider
-	15,  // 28: avtoms.b2c.v1.HomeResponse.top_rated:type_name -> avtoms.b2c.v1.Provider
-	26,  // 29: avtoms.b2c.v1.HomeResponse.promos:type_name -> avtoms.b2c.v1.Promo
-	22,  // 30: avtoms.b2c.v1.HomeResponse.active_booking:type_name -> avtoms.b2c.v1.Booking
-	20,  // 31: avtoms.b2c.v1.HomeResponse.service_due_car:type_name -> avtoms.b2c.v1.Car
-	17,  // 32: avtoms.b2c.v1.ListReviewsResponse.reviews:type_name -> avtoms.b2c.v1.Review
-	18,  // 33: avtoms.b2c.v1.ListReviewsResponse.breakdown:type_name -> avtoms.b2c.v1.RatingBreakdown
-	19,  // 34: avtoms.b2c.v1.ListComplaintsResponse.complaints:type_name -> avtoms.b2c.v1.Complaint
-	15,  // 35: avtoms.b2c.v1.ListFavoritesResponse.providers:type_name -> avtoms.b2c.v1.Provider
-	20,  // 36: avtoms.b2c.v1.ListCarsResponse.cars:type_name -> avtoms.b2c.v1.Car
-	23,  // 37: avtoms.b2c.v1.SlotDay.slots:type_name -> avtoms.b2c.v1.Slot
-	81,  // 38: avtoms.b2c.v1.ListSlotsResponse.days:type_name -> avtoms.b2c.v1.SlotDay
-	1,   // 39: avtoms.b2c.v1.CreateBookingRequest.payment_method:type_name -> avtoms.b2c.v1.PaymentMethod
-	0,   // 40: avtoms.b2c.v1.ListBookingsRequest.states:type_name -> avtoms.b2c.v1.BookingState
-	22,  // 41: avtoms.b2c.v1.ListBookingsResponse.bookings:type_name -> avtoms.b2c.v1.Booking
-	0,   // 42: avtoms.b2c.v1.SetBookingStateRequest.state:type_name -> avtoms.b2c.v1.BookingState
-	24,  // 43: avtoms.b2c.v1.ListCardsResponse.cards:type_name -> avtoms.b2c.v1.Card
-	26,  // 44: avtoms.b2c.v1.ValidatePromoCodeResponse.promo:type_name -> avtoms.b2c.v1.Promo
-	1,   // 45: avtoms.b2c.v1.CreatePaymentRequest.method:type_name -> avtoms.b2c.v1.PaymentMethod
-	25,  // 46: avtoms.b2c.v1.ListPaymentsResponse.payments:type_name -> avtoms.b2c.v1.Payment
-	26,  // 47: avtoms.b2c.v1.ListPromosResponse.promos:type_name -> avtoms.b2c.v1.Promo
-	27,  // 48: avtoms.b2c.v1.ListStoriesResponse.stories:type_name -> avtoms.b2c.v1.Story
-	29,  // 49: avtoms.b2c.v1.ListBonusEntriesResponse.entries:type_name -> avtoms.b2c.v1.BonusEntry
-	30,  // 50: avtoms.b2c.v1.ListChatsResponse.chats:type_name -> avtoms.b2c.v1.Chat
-	5,   // 51: avtoms.b2c.v1.GetChatRequest.kind:type_name -> avtoms.b2c.v1.ChatKind
-	30,  // 52: avtoms.b2c.v1.GetChatResponse.chat:type_name -> avtoms.b2c.v1.Chat
-	31,  // 53: avtoms.b2c.v1.GetChatResponse.messages:type_name -> avtoms.b2c.v1.ChatMessage
-	5,   // 54: avtoms.b2c.v1.SendChatMessageRequest.kind:type_name -> avtoms.b2c.v1.ChatKind
-	32,  // 55: avtoms.b2c.v1.ListNotificationsResponse.notifications:type_name -> avtoms.b2c.v1.Notification
-	33,  // 56: avtoms.b2c.v1.ListEmergencyTypesResponse.types:type_name -> avtoms.b2c.v1.EmergencyType
-	34,  // 57: avtoms.b2c.v1.ListEmergencyRequestsResponse.requests:type_name -> avtoms.b2c.v1.EmergencyRequest
-	15,  // 58: avtoms.b2c.v1.CreateProviderRequest.provider:type_name -> avtoms.b2c.v1.Provider
-	15,  // 59: avtoms.b2c.v1.UpdateProviderRequest.provider:type_name -> avtoms.b2c.v1.Provider
-	16,  // 60: avtoms.b2c.v1.UpsertProviderServiceRequest.service:type_name -> avtoms.b2c.v1.ProviderService
-	26,  // 61: avtoms.b2c.v1.UpsertPromoRequest.promo:type_name -> avtoms.b2c.v1.Promo
-	36,  // 62: avtoms.b2c.v1.UpsertFuelStationRequest.station:type_name -> avtoms.b2c.v1.FuelStation
-	12,  // 63: avtoms.b2c.v1.UpsertCityRequest.city:type_name -> avtoms.b2c.v1.City
-	13,  // 64: avtoms.b2c.v1.UpsertCategoryRequest.category:type_name -> avtoms.b2c.v1.Category
-	38,  // 65: avtoms.b2c.v1.B2CService.GetProfile:input_type -> avtoms.b2c.v1.GetProfileRequest
-	39,  // 66: avtoms.b2c.v1.B2CService.UpdateProfile:input_type -> avtoms.b2c.v1.UpdateProfileRequest
-	40,  // 67: avtoms.b2c.v1.B2CService.DeleteProfile:input_type -> avtoms.b2c.v1.DeleteProfileRequest
-	41,  // 68: avtoms.b2c.v1.B2CService.RegisterDevice:input_type -> avtoms.b2c.v1.RegisterDeviceRequest
-	42,  // 69: avtoms.b2c.v1.B2CService.DeleteDevice:input_type -> avtoms.b2c.v1.DeleteDeviceRequest
-	43,  // 70: avtoms.b2c.v1.B2CService.ListCities:input_type -> avtoms.b2c.v1.ListCitiesRequest
-	45,  // 71: avtoms.b2c.v1.B2CService.ListCategories:input_type -> avtoms.b2c.v1.ListCategoriesRequest
-	47,  // 72: avtoms.b2c.v1.B2CService.ListProviders:input_type -> avtoms.b2c.v1.ListProvidersRequest
-	49,  // 73: avtoms.b2c.v1.B2CService.GetProvider:input_type -> avtoms.b2c.v1.GetProviderRequest
-	50,  // 74: avtoms.b2c.v1.B2CService.ListProviderServices:input_type -> avtoms.b2c.v1.ListProviderServicesRequest
-	52,  // 75: avtoms.b2c.v1.B2CService.ListMapPoints:input_type -> avtoms.b2c.v1.ListMapPointsRequest
-	54,  // 76: avtoms.b2c.v1.B2CService.ListFuelStations:input_type -> avtoms.b2c.v1.ListFuelStationsRequest
-	56,  // 77: avtoms.b2c.v1.B2CService.GetFuelStation:input_type -> avtoms.b2c.v1.GetFuelStationRequest
-	57,  // 78: avtoms.b2c.v1.B2CService.Search:input_type -> avtoms.b2c.v1.SearchRequest
-	59,  // 79: avtoms.b2c.v1.B2CService.ClearSearchHistory:input_type -> avtoms.b2c.v1.ClearSearchHistoryRequest
-	60,  // 80: avtoms.b2c.v1.B2CService.GetHome:input_type -> avtoms.b2c.v1.GetHomeRequest
-	62,  // 81: avtoms.b2c.v1.B2CService.ListReviews:input_type -> avtoms.b2c.v1.ListReviewsRequest
-	64,  // 82: avtoms.b2c.v1.B2CService.CreateReview:input_type -> avtoms.b2c.v1.CreateReviewRequest
-	65,  // 83: avtoms.b2c.v1.B2CService.SetReviewReply:input_type -> avtoms.b2c.v1.SetReviewReplyRequest
-	66,  // 84: avtoms.b2c.v1.B2CService.CreateComplaint:input_type -> avtoms.b2c.v1.CreateComplaintRequest
-	67,  // 85: avtoms.b2c.v1.B2CService.ListComplaints:input_type -> avtoms.b2c.v1.ListComplaintsRequest
-	69,  // 86: avtoms.b2c.v1.B2CService.ListFavorites:input_type -> avtoms.b2c.v1.ListFavoritesRequest
-	71,  // 87: avtoms.b2c.v1.B2CService.SetFavorite:input_type -> avtoms.b2c.v1.SetFavoriteRequest
-	73,  // 88: avtoms.b2c.v1.B2CService.ListCars:input_type -> avtoms.b2c.v1.ListCarsRequest
-	75,  // 89: avtoms.b2c.v1.B2CService.GetCar:input_type -> avtoms.b2c.v1.GetCarRequest
-	76,  // 90: avtoms.b2c.v1.B2CService.CreateCar:input_type -> avtoms.b2c.v1.CreateCarRequest
-	77,  // 91: avtoms.b2c.v1.B2CService.UpdateCar:input_type -> avtoms.b2c.v1.UpdateCarRequest
-	78,  // 92: avtoms.b2c.v1.B2CService.DeleteCar:input_type -> avtoms.b2c.v1.DeleteCarRequest
-	79,  // 93: avtoms.b2c.v1.B2CService.SetDefaultCar:input_type -> avtoms.b2c.v1.SetDefaultCarRequest
-	80,  // 94: avtoms.b2c.v1.B2CService.ListSlots:input_type -> avtoms.b2c.v1.ListSlotsRequest
-	83,  // 95: avtoms.b2c.v1.B2CService.CreateBooking:input_type -> avtoms.b2c.v1.CreateBookingRequest
-	84,  // 96: avtoms.b2c.v1.B2CService.GetBooking:input_type -> avtoms.b2c.v1.GetBookingRequest
-	85,  // 97: avtoms.b2c.v1.B2CService.ListBookings:input_type -> avtoms.b2c.v1.ListBookingsRequest
-	87,  // 98: avtoms.b2c.v1.B2CService.CancelBooking:input_type -> avtoms.b2c.v1.CancelBookingRequest
-	88,  // 99: avtoms.b2c.v1.B2CService.RescheduleBooking:input_type -> avtoms.b2c.v1.RescheduleBookingRequest
-	89,  // 100: avtoms.b2c.v1.B2CService.SetBookingState:input_type -> avtoms.b2c.v1.SetBookingStateRequest
-	90,  // 101: avtoms.b2c.v1.B2CService.LinkBookingAppointment:input_type -> avtoms.b2c.v1.LinkBookingAppointmentRequest
-	91,  // 102: avtoms.b2c.v1.B2CService.ListCards:input_type -> avtoms.b2c.v1.ListCardsRequest
-	93,  // 103: avtoms.b2c.v1.B2CService.AddCard:input_type -> avtoms.b2c.v1.AddCardRequest
-	94,  // 104: avtoms.b2c.v1.B2CService.DeleteCard:input_type -> avtoms.b2c.v1.DeleteCardRequest
-	95,  // 105: avtoms.b2c.v1.B2CService.SetDefaultCard:input_type -> avtoms.b2c.v1.SetDefaultCardRequest
-	96,  // 106: avtoms.b2c.v1.B2CService.ValidatePromoCode:input_type -> avtoms.b2c.v1.ValidatePromoCodeRequest
-	98,  // 107: avtoms.b2c.v1.B2CService.CreatePayment:input_type -> avtoms.b2c.v1.CreatePaymentRequest
-	99,  // 108: avtoms.b2c.v1.B2CService.GetPayment:input_type -> avtoms.b2c.v1.GetPaymentRequest
-	100, // 109: avtoms.b2c.v1.B2CService.ListPayments:input_type -> avtoms.b2c.v1.ListPaymentsRequest
-	102, // 110: avtoms.b2c.v1.B2CService.ListPromos:input_type -> avtoms.b2c.v1.ListPromosRequest
-	104, // 111: avtoms.b2c.v1.B2CService.GetPromo:input_type -> avtoms.b2c.v1.GetPromoRequest
-	105, // 112: avtoms.b2c.v1.B2CService.ListStories:input_type -> avtoms.b2c.v1.ListStoriesRequest
-	107, // 113: avtoms.b2c.v1.B2CService.MarkStorySeen:input_type -> avtoms.b2c.v1.MarkStorySeenRequest
-	108, // 114: avtoms.b2c.v1.B2CService.GetBonusAccount:input_type -> avtoms.b2c.v1.GetBonusAccountRequest
-	109, // 115: avtoms.b2c.v1.B2CService.ListBonusEntries:input_type -> avtoms.b2c.v1.ListBonusEntriesRequest
-	111, // 116: avtoms.b2c.v1.B2CService.ListChats:input_type -> avtoms.b2c.v1.ListChatsRequest
-	113, // 117: avtoms.b2c.v1.B2CService.GetChat:input_type -> avtoms.b2c.v1.GetChatRequest
-	115, // 118: avtoms.b2c.v1.B2CService.SendChatMessage:input_type -> avtoms.b2c.v1.SendChatMessageRequest
-	116, // 119: avtoms.b2c.v1.B2CService.MarkChatRead:input_type -> avtoms.b2c.v1.MarkChatReadRequest
-	117, // 120: avtoms.b2c.v1.B2CService.ListNotifications:input_type -> avtoms.b2c.v1.ListNotificationsRequest
-	119, // 121: avtoms.b2c.v1.B2CService.MarkNotificationRead:input_type -> avtoms.b2c.v1.MarkNotificationReadRequest
-	120, // 122: avtoms.b2c.v1.B2CService.MarkAllNotificationsRead:input_type -> avtoms.b2c.v1.MarkAllNotificationsReadRequest
-	121, // 123: avtoms.b2c.v1.B2CService.GetBadges:input_type -> avtoms.b2c.v1.GetBadgesRequest
-	123, // 124: avtoms.b2c.v1.B2CService.ListEmergencyTypes:input_type -> avtoms.b2c.v1.ListEmergencyTypesRequest
-	125, // 125: avtoms.b2c.v1.B2CService.CreateEmergencyRequest:input_type -> avtoms.b2c.v1.CreateEmergencyRequestRequest
-	126, // 126: avtoms.b2c.v1.B2CService.GetEmergencyRequest:input_type -> avtoms.b2c.v1.GetEmergencyRequestRequest
-	127, // 127: avtoms.b2c.v1.B2CService.ListEmergencyRequests:input_type -> avtoms.b2c.v1.ListEmergencyRequestsRequest
-	129, // 128: avtoms.b2c.v1.B2CService.CancelEmergencyRequest:input_type -> avtoms.b2c.v1.CancelEmergencyRequestRequest
-	130, // 129: avtoms.b2c.v1.B2CService.CreateProvider:input_type -> avtoms.b2c.v1.CreateProviderRequest
-	131, // 130: avtoms.b2c.v1.B2CService.UpdateProvider:input_type -> avtoms.b2c.v1.UpdateProviderRequest
-	132, // 131: avtoms.b2c.v1.B2CService.DeleteProvider:input_type -> avtoms.b2c.v1.DeleteProviderRequest
-	133, // 132: avtoms.b2c.v1.B2CService.UpsertProviderService:input_type -> avtoms.b2c.v1.UpsertProviderServiceRequest
-	134, // 133: avtoms.b2c.v1.B2CService.DeleteProviderService:input_type -> avtoms.b2c.v1.DeleteProviderServiceRequest
-	135, // 134: avtoms.b2c.v1.B2CService.UpsertPromo:input_type -> avtoms.b2c.v1.UpsertPromoRequest
-	136, // 135: avtoms.b2c.v1.B2CService.DeletePromo:input_type -> avtoms.b2c.v1.DeletePromoRequest
-	137, // 136: avtoms.b2c.v1.B2CService.UpsertFuelStation:input_type -> avtoms.b2c.v1.UpsertFuelStationRequest
-	138, // 137: avtoms.b2c.v1.B2CService.UpsertCity:input_type -> avtoms.b2c.v1.UpsertCityRequest
-	139, // 138: avtoms.b2c.v1.B2CService.UpsertCategory:input_type -> avtoms.b2c.v1.UpsertCategoryRequest
-	140, // 139: avtoms.b2c.v1.B2CService.SeedDemoData:input_type -> avtoms.b2c.v1.SeedDemoDataRequest
-	142, // 140: avtoms.b2c.v1.B2CService.PurgeDemoData:input_type -> avtoms.b2c.v1.PurgeDemoDataRequest
-	10,  // 141: avtoms.b2c.v1.B2CService.GetProfile:output_type -> avtoms.b2c.v1.AppUser
-	10,  // 142: avtoms.b2c.v1.B2CService.UpdateProfile:output_type -> avtoms.b2c.v1.AppUser
-	9,   // 143: avtoms.b2c.v1.B2CService.DeleteProfile:output_type -> avtoms.b2c.v1.DeleteResponse
-	11,  // 144: avtoms.b2c.v1.B2CService.RegisterDevice:output_type -> avtoms.b2c.v1.Device
-	9,   // 145: avtoms.b2c.v1.B2CService.DeleteDevice:output_type -> avtoms.b2c.v1.DeleteResponse
-	44,  // 146: avtoms.b2c.v1.B2CService.ListCities:output_type -> avtoms.b2c.v1.ListCitiesResponse
-	46,  // 147: avtoms.b2c.v1.B2CService.ListCategories:output_type -> avtoms.b2c.v1.ListCategoriesResponse
-	48,  // 148: avtoms.b2c.v1.B2CService.ListProviders:output_type -> avtoms.b2c.v1.ListProvidersResponse
-	15,  // 149: avtoms.b2c.v1.B2CService.GetProvider:output_type -> avtoms.b2c.v1.Provider
-	51,  // 150: avtoms.b2c.v1.B2CService.ListProviderServices:output_type -> avtoms.b2c.v1.ListProviderServicesResponse
-	53,  // 151: avtoms.b2c.v1.B2CService.ListMapPoints:output_type -> avtoms.b2c.v1.ListMapPointsResponse
-	55,  // 152: avtoms.b2c.v1.B2CService.ListFuelStations:output_type -> avtoms.b2c.v1.ListFuelStationsResponse
-	36,  // 153: avtoms.b2c.v1.B2CService.GetFuelStation:output_type -> avtoms.b2c.v1.FuelStation
-	58,  // 154: avtoms.b2c.v1.B2CService.Search:output_type -> avtoms.b2c.v1.SearchResponse
-	9,   // 155: avtoms.b2c.v1.B2CService.ClearSearchHistory:output_type -> avtoms.b2c.v1.DeleteResponse
-	61,  // 156: avtoms.b2c.v1.B2CService.GetHome:output_type -> avtoms.b2c.v1.HomeResponse
-	63,  // 157: avtoms.b2c.v1.B2CService.ListReviews:output_type -> avtoms.b2c.v1.ListReviewsResponse
-	17,  // 158: avtoms.b2c.v1.B2CService.CreateReview:output_type -> avtoms.b2c.v1.Review
-	17,  // 159: avtoms.b2c.v1.B2CService.SetReviewReply:output_type -> avtoms.b2c.v1.Review
-	19,  // 160: avtoms.b2c.v1.B2CService.CreateComplaint:output_type -> avtoms.b2c.v1.Complaint
-	68,  // 161: avtoms.b2c.v1.B2CService.ListComplaints:output_type -> avtoms.b2c.v1.ListComplaintsResponse
-	70,  // 162: avtoms.b2c.v1.B2CService.ListFavorites:output_type -> avtoms.b2c.v1.ListFavoritesResponse
-	72,  // 163: avtoms.b2c.v1.B2CService.SetFavorite:output_type -> avtoms.b2c.v1.SetFavoriteResponse
-	74,  // 164: avtoms.b2c.v1.B2CService.ListCars:output_type -> avtoms.b2c.v1.ListCarsResponse
-	20,  // 165: avtoms.b2c.v1.B2CService.GetCar:output_type -> avtoms.b2c.v1.Car
-	20,  // 166: avtoms.b2c.v1.B2CService.CreateCar:output_type -> avtoms.b2c.v1.Car
-	20,  // 167: avtoms.b2c.v1.B2CService.UpdateCar:output_type -> avtoms.b2c.v1.Car
-	9,   // 168: avtoms.b2c.v1.B2CService.DeleteCar:output_type -> avtoms.b2c.v1.DeleteResponse
-	20,  // 169: avtoms.b2c.v1.B2CService.SetDefaultCar:output_type -> avtoms.b2c.v1.Car
-	82,  // 170: avtoms.b2c.v1.B2CService.ListSlots:output_type -> avtoms.b2c.v1.ListSlotsResponse
-	22,  // 171: avtoms.b2c.v1.B2CService.CreateBooking:output_type -> avtoms.b2c.v1.Booking
-	22,  // 172: avtoms.b2c.v1.B2CService.GetBooking:output_type -> avtoms.b2c.v1.Booking
-	86,  // 173: avtoms.b2c.v1.B2CService.ListBookings:output_type -> avtoms.b2c.v1.ListBookingsResponse
-	22,  // 174: avtoms.b2c.v1.B2CService.CancelBooking:output_type -> avtoms.b2c.v1.Booking
-	22,  // 175: avtoms.b2c.v1.B2CService.RescheduleBooking:output_type -> avtoms.b2c.v1.Booking
-	22,  // 176: avtoms.b2c.v1.B2CService.SetBookingState:output_type -> avtoms.b2c.v1.Booking
-	22,  // 177: avtoms.b2c.v1.B2CService.LinkBookingAppointment:output_type -> avtoms.b2c.v1.Booking
-	92,  // 178: avtoms.b2c.v1.B2CService.ListCards:output_type -> avtoms.b2c.v1.ListCardsResponse
-	24,  // 179: avtoms.b2c.v1.B2CService.AddCard:output_type -> avtoms.b2c.v1.Card
-	9,   // 180: avtoms.b2c.v1.B2CService.DeleteCard:output_type -> avtoms.b2c.v1.DeleteResponse
-	24,  // 181: avtoms.b2c.v1.B2CService.SetDefaultCard:output_type -> avtoms.b2c.v1.Card
-	97,  // 182: avtoms.b2c.v1.B2CService.ValidatePromoCode:output_type -> avtoms.b2c.v1.ValidatePromoCodeResponse
-	25,  // 183: avtoms.b2c.v1.B2CService.CreatePayment:output_type -> avtoms.b2c.v1.Payment
-	25,  // 184: avtoms.b2c.v1.B2CService.GetPayment:output_type -> avtoms.b2c.v1.Payment
-	101, // 185: avtoms.b2c.v1.B2CService.ListPayments:output_type -> avtoms.b2c.v1.ListPaymentsResponse
-	103, // 186: avtoms.b2c.v1.B2CService.ListPromos:output_type -> avtoms.b2c.v1.ListPromosResponse
-	26,  // 187: avtoms.b2c.v1.B2CService.GetPromo:output_type -> avtoms.b2c.v1.Promo
-	106, // 188: avtoms.b2c.v1.B2CService.ListStories:output_type -> avtoms.b2c.v1.ListStoriesResponse
-	9,   // 189: avtoms.b2c.v1.B2CService.MarkStorySeen:output_type -> avtoms.b2c.v1.DeleteResponse
-	28,  // 190: avtoms.b2c.v1.B2CService.GetBonusAccount:output_type -> avtoms.b2c.v1.BonusAccount
-	110, // 191: avtoms.b2c.v1.B2CService.ListBonusEntries:output_type -> avtoms.b2c.v1.ListBonusEntriesResponse
-	112, // 192: avtoms.b2c.v1.B2CService.ListChats:output_type -> avtoms.b2c.v1.ListChatsResponse
-	114, // 193: avtoms.b2c.v1.B2CService.GetChat:output_type -> avtoms.b2c.v1.GetChatResponse
-	31,  // 194: avtoms.b2c.v1.B2CService.SendChatMessage:output_type -> avtoms.b2c.v1.ChatMessage
-	30,  // 195: avtoms.b2c.v1.B2CService.MarkChatRead:output_type -> avtoms.b2c.v1.Chat
-	118, // 196: avtoms.b2c.v1.B2CService.ListNotifications:output_type -> avtoms.b2c.v1.ListNotificationsResponse
-	32,  // 197: avtoms.b2c.v1.B2CService.MarkNotificationRead:output_type -> avtoms.b2c.v1.Notification
-	9,   // 198: avtoms.b2c.v1.B2CService.MarkAllNotificationsRead:output_type -> avtoms.b2c.v1.DeleteResponse
-	122, // 199: avtoms.b2c.v1.B2CService.GetBadges:output_type -> avtoms.b2c.v1.GetBadgesResponse
-	124, // 200: avtoms.b2c.v1.B2CService.ListEmergencyTypes:output_type -> avtoms.b2c.v1.ListEmergencyTypesResponse
-	34,  // 201: avtoms.b2c.v1.B2CService.CreateEmergencyRequest:output_type -> avtoms.b2c.v1.EmergencyRequest
-	34,  // 202: avtoms.b2c.v1.B2CService.GetEmergencyRequest:output_type -> avtoms.b2c.v1.EmergencyRequest
-	128, // 203: avtoms.b2c.v1.B2CService.ListEmergencyRequests:output_type -> avtoms.b2c.v1.ListEmergencyRequestsResponse
-	34,  // 204: avtoms.b2c.v1.B2CService.CancelEmergencyRequest:output_type -> avtoms.b2c.v1.EmergencyRequest
-	15,  // 205: avtoms.b2c.v1.B2CService.CreateProvider:output_type -> avtoms.b2c.v1.Provider
-	15,  // 206: avtoms.b2c.v1.B2CService.UpdateProvider:output_type -> avtoms.b2c.v1.Provider
-	9,   // 207: avtoms.b2c.v1.B2CService.DeleteProvider:output_type -> avtoms.b2c.v1.DeleteResponse
-	16,  // 208: avtoms.b2c.v1.B2CService.UpsertProviderService:output_type -> avtoms.b2c.v1.ProviderService
-	9,   // 209: avtoms.b2c.v1.B2CService.DeleteProviderService:output_type -> avtoms.b2c.v1.DeleteResponse
-	26,  // 210: avtoms.b2c.v1.B2CService.UpsertPromo:output_type -> avtoms.b2c.v1.Promo
-	9,   // 211: avtoms.b2c.v1.B2CService.DeletePromo:output_type -> avtoms.b2c.v1.DeleteResponse
-	36,  // 212: avtoms.b2c.v1.B2CService.UpsertFuelStation:output_type -> avtoms.b2c.v1.FuelStation
-	12,  // 213: avtoms.b2c.v1.B2CService.UpsertCity:output_type -> avtoms.b2c.v1.City
-	13,  // 214: avtoms.b2c.v1.B2CService.UpsertCategory:output_type -> avtoms.b2c.v1.Category
-	141, // 215: avtoms.b2c.v1.B2CService.SeedDemoData:output_type -> avtoms.b2c.v1.SeedDemoDataResponse
-	143, // 216: avtoms.b2c.v1.B2CService.PurgeDemoData:output_type -> avtoms.b2c.v1.PurgeDemoDataResponse
-	141, // [141:217] is the sub-list for method output_type
-	65,  // [65:141] is the sub-list for method input_type
-	65,  // [65:65] is the sub-list for extension type_name
-	65,  // [65:65] is the sub-list for extension extendee
-	0,   // [0:65] is the sub-list for field type_name
+	148, // 0: avtoms.b2c.v1.AppUser.language:type_name -> avtoms.common.v1.Language
+	15,  // 1: avtoms.b2c.v1.Provider.hours:type_name -> avtoms.b2c.v1.OpeningHours
+	0,   // 2: avtoms.b2c.v1.BookingEvent.state:type_name -> avtoms.b2c.v1.BookingState
+	22,  // 3: avtoms.b2c.v1.Booking.items:type_name -> avtoms.b2c.v1.BookingItem
+	0,   // 4: avtoms.b2c.v1.Booking.state:type_name -> avtoms.b2c.v1.BookingState
+	1,   // 5: avtoms.b2c.v1.Booking.payment_method:type_name -> avtoms.b2c.v1.PaymentMethod
+	23,  // 6: avtoms.b2c.v1.Booking.history:type_name -> avtoms.b2c.v1.BookingEvent
+	1,   // 7: avtoms.b2c.v1.Payment.method:type_name -> avtoms.b2c.v1.PaymentMethod
+	2,   // 8: avtoms.b2c.v1.Payment.status:type_name -> avtoms.b2c.v1.PaymentStatus
+	6,   // 9: avtoms.b2c.v1.BonusEntry.kind:type_name -> avtoms.b2c.v1.BonusKind
+	5,   // 10: avtoms.b2c.v1.Chat.kind:type_name -> avtoms.b2c.v1.ChatKind
+	4,   // 11: avtoms.b2c.v1.Notification.kind:type_name -> avtoms.b2c.v1.NotificationKind
+	3,   // 12: avtoms.b2c.v1.EmergencyRequest.state:type_name -> avtoms.b2c.v1.EmergencyState
+	15,  // 13: avtoms.b2c.v1.FuelStation.hours:type_name -> avtoms.b2c.v1.OpeningHours
+	37,  // 14: avtoms.b2c.v1.FuelStation.prices:type_name -> avtoms.b2c.v1.FuelPrice
+	7,   // 15: avtoms.b2c.v1.MapPoint.kind:type_name -> avtoms.b2c.v1.MapPointKind
+	148, // 16: avtoms.b2c.v1.UpdateProfileRequest.language:type_name -> avtoms.common.v1.Language
+	13,  // 17: avtoms.b2c.v1.ListCitiesResponse.cities:type_name -> avtoms.b2c.v1.City
+	14,  // 18: avtoms.b2c.v1.ListCategoriesResponse.categories:type_name -> avtoms.b2c.v1.Category
+	9,   // 19: avtoms.b2c.v1.ListProvidersRequest.sort:type_name -> avtoms.b2c.v1.ProviderSort
+	16,  // 20: avtoms.b2c.v1.ListProvidersResponse.providers:type_name -> avtoms.b2c.v1.Provider
+	17,  // 21: avtoms.b2c.v1.ListProviderServicesResponse.services:type_name -> avtoms.b2c.v1.ProviderService
+	39,  // 22: avtoms.b2c.v1.ListMapPointsResponse.points:type_name -> avtoms.b2c.v1.MapPoint
+	38,  // 23: avtoms.b2c.v1.ListFuelStationsResponse.stations:type_name -> avtoms.b2c.v1.FuelStation
+	16,  // 24: avtoms.b2c.v1.SearchResponse.providers:type_name -> avtoms.b2c.v1.Provider
+	14,  // 25: avtoms.b2c.v1.SearchResponse.categories:type_name -> avtoms.b2c.v1.Category
+	13,  // 26: avtoms.b2c.v1.HomeResponse.city:type_name -> avtoms.b2c.v1.City
+	29,  // 27: avtoms.b2c.v1.HomeResponse.stories:type_name -> avtoms.b2c.v1.Story
+	14,  // 28: avtoms.b2c.v1.HomeResponse.categories:type_name -> avtoms.b2c.v1.Category
+	16,  // 29: avtoms.b2c.v1.HomeResponse.nearby:type_name -> avtoms.b2c.v1.Provider
+	16,  // 30: avtoms.b2c.v1.HomeResponse.top_rated:type_name -> avtoms.b2c.v1.Provider
+	28,  // 31: avtoms.b2c.v1.HomeResponse.promos:type_name -> avtoms.b2c.v1.Promo
+	24,  // 32: avtoms.b2c.v1.HomeResponse.active_booking:type_name -> avtoms.b2c.v1.Booking
+	21,  // 33: avtoms.b2c.v1.HomeResponse.service_due_car:type_name -> avtoms.b2c.v1.Car
+	8,   // 34: avtoms.b2c.v1.ListReviewsRequest.sort:type_name -> avtoms.b2c.v1.ReviewSort
+	18,  // 35: avtoms.b2c.v1.ListReviewsResponse.reviews:type_name -> avtoms.b2c.v1.Review
+	19,  // 36: avtoms.b2c.v1.ListReviewsResponse.breakdown:type_name -> avtoms.b2c.v1.RatingBreakdown
+	20,  // 37: avtoms.b2c.v1.ListComplaintsResponse.complaints:type_name -> avtoms.b2c.v1.Complaint
+	16,  // 38: avtoms.b2c.v1.ListFavoritesResponse.providers:type_name -> avtoms.b2c.v1.Provider
+	21,  // 39: avtoms.b2c.v1.ListCarsResponse.cars:type_name -> avtoms.b2c.v1.Car
+	25,  // 40: avtoms.b2c.v1.SlotDay.slots:type_name -> avtoms.b2c.v1.Slot
+	83,  // 41: avtoms.b2c.v1.ListSlotsResponse.days:type_name -> avtoms.b2c.v1.SlotDay
+	1,   // 42: avtoms.b2c.v1.CreateBookingRequest.payment_method:type_name -> avtoms.b2c.v1.PaymentMethod
+	0,   // 43: avtoms.b2c.v1.ListBookingsRequest.states:type_name -> avtoms.b2c.v1.BookingState
+	24,  // 44: avtoms.b2c.v1.ListBookingsResponse.bookings:type_name -> avtoms.b2c.v1.Booking
+	0,   // 45: avtoms.b2c.v1.SetBookingStateRequest.state:type_name -> avtoms.b2c.v1.BookingState
+	26,  // 46: avtoms.b2c.v1.ListCardsResponse.cards:type_name -> avtoms.b2c.v1.Card
+	28,  // 47: avtoms.b2c.v1.ValidatePromoCodeResponse.promo:type_name -> avtoms.b2c.v1.Promo
+	1,   // 48: avtoms.b2c.v1.CreatePaymentRequest.method:type_name -> avtoms.b2c.v1.PaymentMethod
+	27,  // 49: avtoms.b2c.v1.ListPaymentsResponse.payments:type_name -> avtoms.b2c.v1.Payment
+	28,  // 50: avtoms.b2c.v1.ListPromosResponse.promos:type_name -> avtoms.b2c.v1.Promo
+	29,  // 51: avtoms.b2c.v1.ListStoriesResponse.stories:type_name -> avtoms.b2c.v1.Story
+	31,  // 52: avtoms.b2c.v1.ListBonusEntriesResponse.entries:type_name -> avtoms.b2c.v1.BonusEntry
+	32,  // 53: avtoms.b2c.v1.ListChatsResponse.chats:type_name -> avtoms.b2c.v1.Chat
+	5,   // 54: avtoms.b2c.v1.GetChatRequest.kind:type_name -> avtoms.b2c.v1.ChatKind
+	32,  // 55: avtoms.b2c.v1.GetChatResponse.chat:type_name -> avtoms.b2c.v1.Chat
+	33,  // 56: avtoms.b2c.v1.GetChatResponse.messages:type_name -> avtoms.b2c.v1.ChatMessage
+	5,   // 57: avtoms.b2c.v1.SendChatMessageRequest.kind:type_name -> avtoms.b2c.v1.ChatKind
+	34,  // 58: avtoms.b2c.v1.ListNotificationsResponse.notifications:type_name -> avtoms.b2c.v1.Notification
+	35,  // 59: avtoms.b2c.v1.ListEmergencyTypesResponse.types:type_name -> avtoms.b2c.v1.EmergencyType
+	36,  // 60: avtoms.b2c.v1.ListEmergencyRequestsResponse.requests:type_name -> avtoms.b2c.v1.EmergencyRequest
+	16,  // 61: avtoms.b2c.v1.CreateProviderRequest.provider:type_name -> avtoms.b2c.v1.Provider
+	16,  // 62: avtoms.b2c.v1.UpdateProviderRequest.provider:type_name -> avtoms.b2c.v1.Provider
+	17,  // 63: avtoms.b2c.v1.UpsertProviderServiceRequest.service:type_name -> avtoms.b2c.v1.ProviderService
+	28,  // 64: avtoms.b2c.v1.UpsertPromoRequest.promo:type_name -> avtoms.b2c.v1.Promo
+	38,  // 65: avtoms.b2c.v1.UpsertFuelStationRequest.station:type_name -> avtoms.b2c.v1.FuelStation
+	13,  // 66: avtoms.b2c.v1.UpsertCityRequest.city:type_name -> avtoms.b2c.v1.City
+	14,  // 67: avtoms.b2c.v1.UpsertCategoryRequest.category:type_name -> avtoms.b2c.v1.Category
+	40,  // 68: avtoms.b2c.v1.B2CService.GetProfile:input_type -> avtoms.b2c.v1.GetProfileRequest
+	41,  // 69: avtoms.b2c.v1.B2CService.UpdateProfile:input_type -> avtoms.b2c.v1.UpdateProfileRequest
+	42,  // 70: avtoms.b2c.v1.B2CService.DeleteProfile:input_type -> avtoms.b2c.v1.DeleteProfileRequest
+	43,  // 71: avtoms.b2c.v1.B2CService.RegisterDevice:input_type -> avtoms.b2c.v1.RegisterDeviceRequest
+	44,  // 72: avtoms.b2c.v1.B2CService.DeleteDevice:input_type -> avtoms.b2c.v1.DeleteDeviceRequest
+	45,  // 73: avtoms.b2c.v1.B2CService.ListCities:input_type -> avtoms.b2c.v1.ListCitiesRequest
+	47,  // 74: avtoms.b2c.v1.B2CService.ListCategories:input_type -> avtoms.b2c.v1.ListCategoriesRequest
+	49,  // 75: avtoms.b2c.v1.B2CService.ListProviders:input_type -> avtoms.b2c.v1.ListProvidersRequest
+	51,  // 76: avtoms.b2c.v1.B2CService.GetProvider:input_type -> avtoms.b2c.v1.GetProviderRequest
+	52,  // 77: avtoms.b2c.v1.B2CService.ListProviderServices:input_type -> avtoms.b2c.v1.ListProviderServicesRequest
+	54,  // 78: avtoms.b2c.v1.B2CService.ListMapPoints:input_type -> avtoms.b2c.v1.ListMapPointsRequest
+	56,  // 79: avtoms.b2c.v1.B2CService.ListFuelStations:input_type -> avtoms.b2c.v1.ListFuelStationsRequest
+	58,  // 80: avtoms.b2c.v1.B2CService.GetFuelStation:input_type -> avtoms.b2c.v1.GetFuelStationRequest
+	59,  // 81: avtoms.b2c.v1.B2CService.Search:input_type -> avtoms.b2c.v1.SearchRequest
+	61,  // 82: avtoms.b2c.v1.B2CService.ClearSearchHistory:input_type -> avtoms.b2c.v1.ClearSearchHistoryRequest
+	62,  // 83: avtoms.b2c.v1.B2CService.GetHome:input_type -> avtoms.b2c.v1.GetHomeRequest
+	64,  // 84: avtoms.b2c.v1.B2CService.ListReviews:input_type -> avtoms.b2c.v1.ListReviewsRequest
+	66,  // 85: avtoms.b2c.v1.B2CService.CreateReview:input_type -> avtoms.b2c.v1.CreateReviewRequest
+	67,  // 86: avtoms.b2c.v1.B2CService.SetReviewReply:input_type -> avtoms.b2c.v1.SetReviewReplyRequest
+	68,  // 87: avtoms.b2c.v1.B2CService.CreateComplaint:input_type -> avtoms.b2c.v1.CreateComplaintRequest
+	69,  // 88: avtoms.b2c.v1.B2CService.ListComplaints:input_type -> avtoms.b2c.v1.ListComplaintsRequest
+	71,  // 89: avtoms.b2c.v1.B2CService.ListFavorites:input_type -> avtoms.b2c.v1.ListFavoritesRequest
+	73,  // 90: avtoms.b2c.v1.B2CService.SetFavorite:input_type -> avtoms.b2c.v1.SetFavoriteRequest
+	75,  // 91: avtoms.b2c.v1.B2CService.ListCars:input_type -> avtoms.b2c.v1.ListCarsRequest
+	77,  // 92: avtoms.b2c.v1.B2CService.GetCar:input_type -> avtoms.b2c.v1.GetCarRequest
+	78,  // 93: avtoms.b2c.v1.B2CService.CreateCar:input_type -> avtoms.b2c.v1.CreateCarRequest
+	79,  // 94: avtoms.b2c.v1.B2CService.UpdateCar:input_type -> avtoms.b2c.v1.UpdateCarRequest
+	80,  // 95: avtoms.b2c.v1.B2CService.DeleteCar:input_type -> avtoms.b2c.v1.DeleteCarRequest
+	81,  // 96: avtoms.b2c.v1.B2CService.SetDefaultCar:input_type -> avtoms.b2c.v1.SetDefaultCarRequest
+	82,  // 97: avtoms.b2c.v1.B2CService.ListSlots:input_type -> avtoms.b2c.v1.ListSlotsRequest
+	85,  // 98: avtoms.b2c.v1.B2CService.CreateBooking:input_type -> avtoms.b2c.v1.CreateBookingRequest
+	86,  // 99: avtoms.b2c.v1.B2CService.GetBooking:input_type -> avtoms.b2c.v1.GetBookingRequest
+	87,  // 100: avtoms.b2c.v1.B2CService.ListBookings:input_type -> avtoms.b2c.v1.ListBookingsRequest
+	89,  // 101: avtoms.b2c.v1.B2CService.CancelBooking:input_type -> avtoms.b2c.v1.CancelBookingRequest
+	90,  // 102: avtoms.b2c.v1.B2CService.RescheduleBooking:input_type -> avtoms.b2c.v1.RescheduleBookingRequest
+	91,  // 103: avtoms.b2c.v1.B2CService.SetBookingState:input_type -> avtoms.b2c.v1.SetBookingStateRequest
+	92,  // 104: avtoms.b2c.v1.B2CService.LinkBookingAppointment:input_type -> avtoms.b2c.v1.LinkBookingAppointmentRequest
+	93,  // 105: avtoms.b2c.v1.B2CService.ListCards:input_type -> avtoms.b2c.v1.ListCardsRequest
+	95,  // 106: avtoms.b2c.v1.B2CService.AddCard:input_type -> avtoms.b2c.v1.AddCardRequest
+	96,  // 107: avtoms.b2c.v1.B2CService.DeleteCard:input_type -> avtoms.b2c.v1.DeleteCardRequest
+	97,  // 108: avtoms.b2c.v1.B2CService.SetDefaultCard:input_type -> avtoms.b2c.v1.SetDefaultCardRequest
+	98,  // 109: avtoms.b2c.v1.B2CService.ValidatePromoCode:input_type -> avtoms.b2c.v1.ValidatePromoCodeRequest
+	100, // 110: avtoms.b2c.v1.B2CService.CreatePayment:input_type -> avtoms.b2c.v1.CreatePaymentRequest
+	101, // 111: avtoms.b2c.v1.B2CService.GetPayment:input_type -> avtoms.b2c.v1.GetPaymentRequest
+	102, // 112: avtoms.b2c.v1.B2CService.ListPayments:input_type -> avtoms.b2c.v1.ListPaymentsRequest
+	104, // 113: avtoms.b2c.v1.B2CService.ListPromos:input_type -> avtoms.b2c.v1.ListPromosRequest
+	106, // 114: avtoms.b2c.v1.B2CService.GetPromo:input_type -> avtoms.b2c.v1.GetPromoRequest
+	107, // 115: avtoms.b2c.v1.B2CService.ListStories:input_type -> avtoms.b2c.v1.ListStoriesRequest
+	109, // 116: avtoms.b2c.v1.B2CService.MarkStorySeen:input_type -> avtoms.b2c.v1.MarkStorySeenRequest
+	110, // 117: avtoms.b2c.v1.B2CService.GetBonusAccount:input_type -> avtoms.b2c.v1.GetBonusAccountRequest
+	113, // 118: avtoms.b2c.v1.B2CService.ListBonusEntries:input_type -> avtoms.b2c.v1.ListBonusEntriesRequest
+	111, // 119: avtoms.b2c.v1.B2CService.ApplyReferralCode:input_type -> avtoms.b2c.v1.ApplyReferralCodeRequest
+	115, // 120: avtoms.b2c.v1.B2CService.ListChats:input_type -> avtoms.b2c.v1.ListChatsRequest
+	117, // 121: avtoms.b2c.v1.B2CService.GetChat:input_type -> avtoms.b2c.v1.GetChatRequest
+	119, // 122: avtoms.b2c.v1.B2CService.SendChatMessage:input_type -> avtoms.b2c.v1.SendChatMessageRequest
+	120, // 123: avtoms.b2c.v1.B2CService.MarkChatRead:input_type -> avtoms.b2c.v1.MarkChatReadRequest
+	121, // 124: avtoms.b2c.v1.B2CService.ListNotifications:input_type -> avtoms.b2c.v1.ListNotificationsRequest
+	123, // 125: avtoms.b2c.v1.B2CService.MarkNotificationRead:input_type -> avtoms.b2c.v1.MarkNotificationReadRequest
+	124, // 126: avtoms.b2c.v1.B2CService.MarkAllNotificationsRead:input_type -> avtoms.b2c.v1.MarkAllNotificationsReadRequest
+	125, // 127: avtoms.b2c.v1.B2CService.GetBadges:input_type -> avtoms.b2c.v1.GetBadgesRequest
+	127, // 128: avtoms.b2c.v1.B2CService.ListEmergencyTypes:input_type -> avtoms.b2c.v1.ListEmergencyTypesRequest
+	129, // 129: avtoms.b2c.v1.B2CService.CreateEmergencyRequest:input_type -> avtoms.b2c.v1.CreateEmergencyRequestRequest
+	130, // 130: avtoms.b2c.v1.B2CService.GetEmergencyRequest:input_type -> avtoms.b2c.v1.GetEmergencyRequestRequest
+	131, // 131: avtoms.b2c.v1.B2CService.ListEmergencyRequests:input_type -> avtoms.b2c.v1.ListEmergencyRequestsRequest
+	133, // 132: avtoms.b2c.v1.B2CService.CancelEmergencyRequest:input_type -> avtoms.b2c.v1.CancelEmergencyRequestRequest
+	134, // 133: avtoms.b2c.v1.B2CService.CreateProvider:input_type -> avtoms.b2c.v1.CreateProviderRequest
+	135, // 134: avtoms.b2c.v1.B2CService.UpdateProvider:input_type -> avtoms.b2c.v1.UpdateProviderRequest
+	136, // 135: avtoms.b2c.v1.B2CService.DeleteProvider:input_type -> avtoms.b2c.v1.DeleteProviderRequest
+	137, // 136: avtoms.b2c.v1.B2CService.UpsertProviderService:input_type -> avtoms.b2c.v1.UpsertProviderServiceRequest
+	138, // 137: avtoms.b2c.v1.B2CService.DeleteProviderService:input_type -> avtoms.b2c.v1.DeleteProviderServiceRequest
+	139, // 138: avtoms.b2c.v1.B2CService.UpsertPromo:input_type -> avtoms.b2c.v1.UpsertPromoRequest
+	140, // 139: avtoms.b2c.v1.B2CService.DeletePromo:input_type -> avtoms.b2c.v1.DeletePromoRequest
+	141, // 140: avtoms.b2c.v1.B2CService.UpsertFuelStation:input_type -> avtoms.b2c.v1.UpsertFuelStationRequest
+	142, // 141: avtoms.b2c.v1.B2CService.UpsertCity:input_type -> avtoms.b2c.v1.UpsertCityRequest
+	143, // 142: avtoms.b2c.v1.B2CService.UpsertCategory:input_type -> avtoms.b2c.v1.UpsertCategoryRequest
+	144, // 143: avtoms.b2c.v1.B2CService.SeedDemoData:input_type -> avtoms.b2c.v1.SeedDemoDataRequest
+	146, // 144: avtoms.b2c.v1.B2CService.PurgeDemoData:input_type -> avtoms.b2c.v1.PurgeDemoDataRequest
+	11,  // 145: avtoms.b2c.v1.B2CService.GetProfile:output_type -> avtoms.b2c.v1.AppUser
+	11,  // 146: avtoms.b2c.v1.B2CService.UpdateProfile:output_type -> avtoms.b2c.v1.AppUser
+	10,  // 147: avtoms.b2c.v1.B2CService.DeleteProfile:output_type -> avtoms.b2c.v1.DeleteResponse
+	12,  // 148: avtoms.b2c.v1.B2CService.RegisterDevice:output_type -> avtoms.b2c.v1.Device
+	10,  // 149: avtoms.b2c.v1.B2CService.DeleteDevice:output_type -> avtoms.b2c.v1.DeleteResponse
+	46,  // 150: avtoms.b2c.v1.B2CService.ListCities:output_type -> avtoms.b2c.v1.ListCitiesResponse
+	48,  // 151: avtoms.b2c.v1.B2CService.ListCategories:output_type -> avtoms.b2c.v1.ListCategoriesResponse
+	50,  // 152: avtoms.b2c.v1.B2CService.ListProviders:output_type -> avtoms.b2c.v1.ListProvidersResponse
+	16,  // 153: avtoms.b2c.v1.B2CService.GetProvider:output_type -> avtoms.b2c.v1.Provider
+	53,  // 154: avtoms.b2c.v1.B2CService.ListProviderServices:output_type -> avtoms.b2c.v1.ListProviderServicesResponse
+	55,  // 155: avtoms.b2c.v1.B2CService.ListMapPoints:output_type -> avtoms.b2c.v1.ListMapPointsResponse
+	57,  // 156: avtoms.b2c.v1.B2CService.ListFuelStations:output_type -> avtoms.b2c.v1.ListFuelStationsResponse
+	38,  // 157: avtoms.b2c.v1.B2CService.GetFuelStation:output_type -> avtoms.b2c.v1.FuelStation
+	60,  // 158: avtoms.b2c.v1.B2CService.Search:output_type -> avtoms.b2c.v1.SearchResponse
+	10,  // 159: avtoms.b2c.v1.B2CService.ClearSearchHistory:output_type -> avtoms.b2c.v1.DeleteResponse
+	63,  // 160: avtoms.b2c.v1.B2CService.GetHome:output_type -> avtoms.b2c.v1.HomeResponse
+	65,  // 161: avtoms.b2c.v1.B2CService.ListReviews:output_type -> avtoms.b2c.v1.ListReviewsResponse
+	18,  // 162: avtoms.b2c.v1.B2CService.CreateReview:output_type -> avtoms.b2c.v1.Review
+	18,  // 163: avtoms.b2c.v1.B2CService.SetReviewReply:output_type -> avtoms.b2c.v1.Review
+	20,  // 164: avtoms.b2c.v1.B2CService.CreateComplaint:output_type -> avtoms.b2c.v1.Complaint
+	70,  // 165: avtoms.b2c.v1.B2CService.ListComplaints:output_type -> avtoms.b2c.v1.ListComplaintsResponse
+	72,  // 166: avtoms.b2c.v1.B2CService.ListFavorites:output_type -> avtoms.b2c.v1.ListFavoritesResponse
+	74,  // 167: avtoms.b2c.v1.B2CService.SetFavorite:output_type -> avtoms.b2c.v1.SetFavoriteResponse
+	76,  // 168: avtoms.b2c.v1.B2CService.ListCars:output_type -> avtoms.b2c.v1.ListCarsResponse
+	21,  // 169: avtoms.b2c.v1.B2CService.GetCar:output_type -> avtoms.b2c.v1.Car
+	21,  // 170: avtoms.b2c.v1.B2CService.CreateCar:output_type -> avtoms.b2c.v1.Car
+	21,  // 171: avtoms.b2c.v1.B2CService.UpdateCar:output_type -> avtoms.b2c.v1.Car
+	10,  // 172: avtoms.b2c.v1.B2CService.DeleteCar:output_type -> avtoms.b2c.v1.DeleteResponse
+	21,  // 173: avtoms.b2c.v1.B2CService.SetDefaultCar:output_type -> avtoms.b2c.v1.Car
+	84,  // 174: avtoms.b2c.v1.B2CService.ListSlots:output_type -> avtoms.b2c.v1.ListSlotsResponse
+	24,  // 175: avtoms.b2c.v1.B2CService.CreateBooking:output_type -> avtoms.b2c.v1.Booking
+	24,  // 176: avtoms.b2c.v1.B2CService.GetBooking:output_type -> avtoms.b2c.v1.Booking
+	88,  // 177: avtoms.b2c.v1.B2CService.ListBookings:output_type -> avtoms.b2c.v1.ListBookingsResponse
+	24,  // 178: avtoms.b2c.v1.B2CService.CancelBooking:output_type -> avtoms.b2c.v1.Booking
+	24,  // 179: avtoms.b2c.v1.B2CService.RescheduleBooking:output_type -> avtoms.b2c.v1.Booking
+	24,  // 180: avtoms.b2c.v1.B2CService.SetBookingState:output_type -> avtoms.b2c.v1.Booking
+	24,  // 181: avtoms.b2c.v1.B2CService.LinkBookingAppointment:output_type -> avtoms.b2c.v1.Booking
+	94,  // 182: avtoms.b2c.v1.B2CService.ListCards:output_type -> avtoms.b2c.v1.ListCardsResponse
+	26,  // 183: avtoms.b2c.v1.B2CService.AddCard:output_type -> avtoms.b2c.v1.Card
+	10,  // 184: avtoms.b2c.v1.B2CService.DeleteCard:output_type -> avtoms.b2c.v1.DeleteResponse
+	26,  // 185: avtoms.b2c.v1.B2CService.SetDefaultCard:output_type -> avtoms.b2c.v1.Card
+	99,  // 186: avtoms.b2c.v1.B2CService.ValidatePromoCode:output_type -> avtoms.b2c.v1.ValidatePromoCodeResponse
+	27,  // 187: avtoms.b2c.v1.B2CService.CreatePayment:output_type -> avtoms.b2c.v1.Payment
+	27,  // 188: avtoms.b2c.v1.B2CService.GetPayment:output_type -> avtoms.b2c.v1.Payment
+	103, // 189: avtoms.b2c.v1.B2CService.ListPayments:output_type -> avtoms.b2c.v1.ListPaymentsResponse
+	105, // 190: avtoms.b2c.v1.B2CService.ListPromos:output_type -> avtoms.b2c.v1.ListPromosResponse
+	28,  // 191: avtoms.b2c.v1.B2CService.GetPromo:output_type -> avtoms.b2c.v1.Promo
+	108, // 192: avtoms.b2c.v1.B2CService.ListStories:output_type -> avtoms.b2c.v1.ListStoriesResponse
+	10,  // 193: avtoms.b2c.v1.B2CService.MarkStorySeen:output_type -> avtoms.b2c.v1.DeleteResponse
+	30,  // 194: avtoms.b2c.v1.B2CService.GetBonusAccount:output_type -> avtoms.b2c.v1.BonusAccount
+	114, // 195: avtoms.b2c.v1.B2CService.ListBonusEntries:output_type -> avtoms.b2c.v1.ListBonusEntriesResponse
+	112, // 196: avtoms.b2c.v1.B2CService.ApplyReferralCode:output_type -> avtoms.b2c.v1.ApplyReferralCodeResponse
+	116, // 197: avtoms.b2c.v1.B2CService.ListChats:output_type -> avtoms.b2c.v1.ListChatsResponse
+	118, // 198: avtoms.b2c.v1.B2CService.GetChat:output_type -> avtoms.b2c.v1.GetChatResponse
+	33,  // 199: avtoms.b2c.v1.B2CService.SendChatMessage:output_type -> avtoms.b2c.v1.ChatMessage
+	32,  // 200: avtoms.b2c.v1.B2CService.MarkChatRead:output_type -> avtoms.b2c.v1.Chat
+	122, // 201: avtoms.b2c.v1.B2CService.ListNotifications:output_type -> avtoms.b2c.v1.ListNotificationsResponse
+	34,  // 202: avtoms.b2c.v1.B2CService.MarkNotificationRead:output_type -> avtoms.b2c.v1.Notification
+	10,  // 203: avtoms.b2c.v1.B2CService.MarkAllNotificationsRead:output_type -> avtoms.b2c.v1.DeleteResponse
+	126, // 204: avtoms.b2c.v1.B2CService.GetBadges:output_type -> avtoms.b2c.v1.GetBadgesResponse
+	128, // 205: avtoms.b2c.v1.B2CService.ListEmergencyTypes:output_type -> avtoms.b2c.v1.ListEmergencyTypesResponse
+	36,  // 206: avtoms.b2c.v1.B2CService.CreateEmergencyRequest:output_type -> avtoms.b2c.v1.EmergencyRequest
+	36,  // 207: avtoms.b2c.v1.B2CService.GetEmergencyRequest:output_type -> avtoms.b2c.v1.EmergencyRequest
+	132, // 208: avtoms.b2c.v1.B2CService.ListEmergencyRequests:output_type -> avtoms.b2c.v1.ListEmergencyRequestsResponse
+	36,  // 209: avtoms.b2c.v1.B2CService.CancelEmergencyRequest:output_type -> avtoms.b2c.v1.EmergencyRequest
+	16,  // 210: avtoms.b2c.v1.B2CService.CreateProvider:output_type -> avtoms.b2c.v1.Provider
+	16,  // 211: avtoms.b2c.v1.B2CService.UpdateProvider:output_type -> avtoms.b2c.v1.Provider
+	10,  // 212: avtoms.b2c.v1.B2CService.DeleteProvider:output_type -> avtoms.b2c.v1.DeleteResponse
+	17,  // 213: avtoms.b2c.v1.B2CService.UpsertProviderService:output_type -> avtoms.b2c.v1.ProviderService
+	10,  // 214: avtoms.b2c.v1.B2CService.DeleteProviderService:output_type -> avtoms.b2c.v1.DeleteResponse
+	28,  // 215: avtoms.b2c.v1.B2CService.UpsertPromo:output_type -> avtoms.b2c.v1.Promo
+	10,  // 216: avtoms.b2c.v1.B2CService.DeletePromo:output_type -> avtoms.b2c.v1.DeleteResponse
+	38,  // 217: avtoms.b2c.v1.B2CService.UpsertFuelStation:output_type -> avtoms.b2c.v1.FuelStation
+	13,  // 218: avtoms.b2c.v1.B2CService.UpsertCity:output_type -> avtoms.b2c.v1.City
+	14,  // 219: avtoms.b2c.v1.B2CService.UpsertCategory:output_type -> avtoms.b2c.v1.Category
+	145, // 220: avtoms.b2c.v1.B2CService.SeedDemoData:output_type -> avtoms.b2c.v1.SeedDemoDataResponse
+	147, // 221: avtoms.b2c.v1.B2CService.PurgeDemoData:output_type -> avtoms.b2c.v1.PurgeDemoDataResponse
+	145, // [145:222] is the sub-list for method output_type
+	68,  // [68:145] is the sub-list for method input_type
+	68,  // [68:68] is the sub-list for extension type_name
+	68,  // [68:68] is the sub-list for extension extendee
+	0,   // [0:68] is the sub-list for field type_name
 }
 
 func init() { file_avtoms_b2c_v1_b2c_proto_init() }
@@ -12207,8 +12512,8 @@ func file_avtoms_b2c_v1_b2c_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_avtoms_b2c_v1_b2c_proto_rawDesc), len(file_avtoms_b2c_v1_b2c_proto_rawDesc)),
-			NumEnums:      9,
-			NumMessages:   135,
+			NumEnums:      10,
+			NumMessages:   138,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
