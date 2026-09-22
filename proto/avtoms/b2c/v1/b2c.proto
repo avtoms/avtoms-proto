@@ -205,11 +205,13 @@ enum NotificationKind {
   NOTIFICATION_KIND_PROMO = 4;
 }
 
-// ChatKind separates a thread with a shop from the one with support.
+// ChatKind separates a thread with a shop, the one with support, and the one with the
+// master driving out to a roadside call.
 enum ChatKind {
   CHAT_KIND_UNSPECIFIED = 0;
   CHAT_KIND_PROVIDER = 1;
   CHAT_KIND_SUPPORT = 2;
+  CHAT_KIND_MASTER = 3;
 }
 
 // BonusKind is why cashback moved.
@@ -600,12 +602,13 @@ message Chat {
   string phone = 2;
   ChatKind kind = 3;
   string provider_id = 4;
-  string provider_name = 5;
+  string provider_name = 5;   // or the master's name, on a roadside thread
   string booking_id = 6;
   int32 unread = 7;
   string last_message = 8;
   string last_message_at = 9;
   string created_at = 10;
+  string emergency_id = 11;   // the roadside call this thread belongs to
 }
 
 // ChatMessage is one bubble.
@@ -1283,6 +1286,9 @@ message GetChatRequest {
   ChatKind kind = 4;
   string booking_id = 5;
   int32 limit = 6;
+  // Opens the thread with the master on this roadside call. The thread is made when a
+  // master is assigned, so this finds it rather than creating one.
+  string emergency_id = 7;
 }
 
 message GetChatResponse {

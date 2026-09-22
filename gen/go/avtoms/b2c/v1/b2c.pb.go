@@ -316,13 +316,15 @@ func (NotificationKind) EnumDescriptor() ([]byte, []int) {
 	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{4}
 }
 
-// ChatKind separates a thread with a shop from the one with support.
+// ChatKind separates a thread with a shop, the one with support, and the one with the
+// master driving out to a roadside call.
 type ChatKind int32
 
 const (
 	ChatKind_CHAT_KIND_UNSPECIFIED ChatKind = 0
 	ChatKind_CHAT_KIND_PROVIDER    ChatKind = 1
 	ChatKind_CHAT_KIND_SUPPORT     ChatKind = 2
+	ChatKind_CHAT_KIND_MASTER      ChatKind = 3
 )
 
 // Enum value maps for ChatKind.
@@ -331,11 +333,13 @@ var (
 		0: "CHAT_KIND_UNSPECIFIED",
 		1: "CHAT_KIND_PROVIDER",
 		2: "CHAT_KIND_SUPPORT",
+		3: "CHAT_KIND_MASTER",
 	}
 	ChatKind_value = map[string]int32{
 		"CHAT_KIND_UNSPECIFIED": 0,
 		"CHAT_KIND_PROVIDER":    1,
 		"CHAT_KIND_SUPPORT":     2,
+		"CHAT_KIND_MASTER":      3,
 	}
 )
 
@@ -3292,12 +3296,13 @@ type Chat struct {
 	Phone         string                 `protobuf:"bytes,2,opt,name=phone,proto3" json:"phone,omitempty"`
 	Kind          ChatKind               `protobuf:"varint,3,opt,name=kind,proto3,enum=avtoms.b2c.v1.ChatKind" json:"kind,omitempty"`
 	ProviderId    string                 `protobuf:"bytes,4,opt,name=provider_id,json=providerId,proto3" json:"provider_id,omitempty"`
-	ProviderName  string                 `protobuf:"bytes,5,opt,name=provider_name,json=providerName,proto3" json:"provider_name,omitempty"`
+	ProviderName  string                 `protobuf:"bytes,5,opt,name=provider_name,json=providerName,proto3" json:"provider_name,omitempty"` // or the master's name, on a roadside thread
 	BookingId     string                 `protobuf:"bytes,6,opt,name=booking_id,json=bookingId,proto3" json:"booking_id,omitempty"`
 	Unread        int32                  `protobuf:"varint,7,opt,name=unread,proto3" json:"unread,omitempty"`
 	LastMessage   string                 `protobuf:"bytes,8,opt,name=last_message,json=lastMessage,proto3" json:"last_message,omitempty"`
 	LastMessageAt string                 `protobuf:"bytes,9,opt,name=last_message_at,json=lastMessageAt,proto3" json:"last_message_at,omitempty"`
 	CreatedAt     string                 `protobuf:"bytes,10,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	EmergencyId   string                 `protobuf:"bytes,11,opt,name=emergency_id,json=emergencyId,proto3" json:"emergency_id,omitempty"` // the roadside call this thread belongs to
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -3398,6 +3403,13 @@ func (x *Chat) GetLastMessageAt() string {
 func (x *Chat) GetCreatedAt() string {
 	if x != nil {
 		return x.CreatedAt
+	}
+	return ""
+}
+
+func (x *Chat) GetEmergencyId() string {
+	if x != nil {
+		return x.EmergencyId
 	}
 	return ""
 }
@@ -9292,13 +9304,16 @@ func (x *ListChatsResponse) GetUnreadTotal() int32 {
 // thread is created on the spot, because tapping "write to the shop" cannot fail for want
 // of a thread that nobody has made yet.
 type GetChatRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Phone         string                 `protobuf:"bytes,1,opt,name=phone,proto3" json:"phone,omitempty"`
-	Id            string                 `protobuf:"bytes,2,opt,name=id,proto3" json:"id,omitempty"`
-	ProviderId    string                 `protobuf:"bytes,3,opt,name=provider_id,json=providerId,proto3" json:"provider_id,omitempty"`
-	Kind          ChatKind               `protobuf:"varint,4,opt,name=kind,proto3,enum=avtoms.b2c.v1.ChatKind" json:"kind,omitempty"`
-	BookingId     string                 `protobuf:"bytes,5,opt,name=booking_id,json=bookingId,proto3" json:"booking_id,omitempty"`
-	Limit         int32                  `protobuf:"varint,6,opt,name=limit,proto3" json:"limit,omitempty"`
+	state      protoimpl.MessageState `protogen:"open.v1"`
+	Phone      string                 `protobuf:"bytes,1,opt,name=phone,proto3" json:"phone,omitempty"`
+	Id         string                 `protobuf:"bytes,2,opt,name=id,proto3" json:"id,omitempty"`
+	ProviderId string                 `protobuf:"bytes,3,opt,name=provider_id,json=providerId,proto3" json:"provider_id,omitempty"`
+	Kind       ChatKind               `protobuf:"varint,4,opt,name=kind,proto3,enum=avtoms.b2c.v1.ChatKind" json:"kind,omitempty"`
+	BookingId  string                 `protobuf:"bytes,5,opt,name=booking_id,json=bookingId,proto3" json:"booking_id,omitempty"`
+	Limit      int32                  `protobuf:"varint,6,opt,name=limit,proto3" json:"limit,omitempty"`
+	// Opens the thread with the master on this roadside call. The thread is made when a
+	// master is assigned, so this finds it rather than creating one.
+	EmergencyId   string `protobuf:"bytes,7,opt,name=emergency_id,json=emergencyId,proto3" json:"emergency_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -9373,6 +9388,13 @@ func (x *GetChatRequest) GetLimit() int32 {
 		return x.Limit
 	}
 	return 0
+}
+
+func (x *GetChatRequest) GetEmergencyId() string {
+	if x != nil {
+		return x.EmergencyId
+	}
+	return ""
 }
 
 type GetChatResponse struct {
@@ -11324,7 +11346,7 @@ const file_avtoms_b2c_v1_b2c_proto_rawDesc = "" +
 	"\n" +
 	"booking_id\x18\a \x01(\tR\tbookingId\x12\x1d\n" +
 	"\n" +
-	"created_at\x18\b \x01(\tR\tcreatedAt\"\xc0\x02\n" +
+	"created_at\x18\b \x01(\tR\tcreatedAt\"\xe3\x02\n" +
 	"\x04Chat\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x14\n" +
 	"\x05phone\x18\x02 \x01(\tR\x05phone\x12+\n" +
@@ -11339,7 +11361,8 @@ const file_avtoms_b2c_v1_b2c_proto_rawDesc = "" +
 	"\x0flast_message_at\x18\t \x01(\tR\rlastMessageAt\x12\x1d\n" +
 	"\n" +
 	"created_at\x18\n" +
-	" \x01(\tR\tcreatedAt\"\xe0\x01\n" +
+	" \x01(\tR\tcreatedAt\x12!\n" +
+	"\femergency_id\x18\v \x01(\tR\vemergencyId\"\xe0\x01\n" +
 	"\vChatMessage\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x17\n" +
 	"\achat_id\x18\x02 \x01(\tR\x06chatId\x12\x18\n" +
@@ -11845,7 +11868,7 @@ const file_avtoms_b2c_v1_b2c_proto_rawDesc = "" +
 	"\x05phone\x18\x01 \x01(\tR\x05phone\"a\n" +
 	"\x11ListChatsResponse\x12)\n" +
 	"\x05chats\x18\x01 \x03(\v2\x13.avtoms.b2c.v1.ChatR\x05chats\x12!\n" +
-	"\funread_total\x18\x02 \x01(\x05R\vunreadTotal\"\xb9\x01\n" +
+	"\funread_total\x18\x02 \x01(\x05R\vunreadTotal\"\xdc\x01\n" +
 	"\x0eGetChatRequest\x12\x14\n" +
 	"\x05phone\x18\x01 \x01(\tR\x05phone\x12\x0e\n" +
 	"\x02id\x18\x02 \x01(\tR\x02id\x12\x1f\n" +
@@ -11854,7 +11877,8 @@ const file_avtoms_b2c_v1_b2c_proto_rawDesc = "" +
 	"\x04kind\x18\x04 \x01(\x0e2\x17.avtoms.b2c.v1.ChatKindR\x04kind\x12\x1d\n" +
 	"\n" +
 	"booking_id\x18\x05 \x01(\tR\tbookingId\x12\x14\n" +
-	"\x05limit\x18\x06 \x01(\x05R\x05limit\"r\n" +
+	"\x05limit\x18\x06 \x01(\x05R\x05limit\x12!\n" +
+	"\femergency_id\x18\a \x01(\tR\vemergencyId\"r\n" +
 	"\x0fGetChatResponse\x12'\n" +
 	"\x04chat\x18\x01 \x01(\v2\x13.avtoms.b2c.v1.ChatR\x04chat\x126\n" +
 	"\bmessages\x18\x02 \x03(\v2\x1a.avtoms.b2c.v1.ChatMessageR\bmessages\"\xd0\x01\n" +
@@ -11993,11 +12017,12 @@ const file_avtoms_b2c_v1_b2c_proto_rawDesc = "" +
 	"\x16NOTIFICATION_KIND_INFO\x10\x01\x12\x18\n" +
 	"\x14NOTIFICATION_KIND_OK\x10\x02\x12\x1a\n" +
 	"\x16NOTIFICATION_KIND_WARN\x10\x03\x12\x1b\n" +
-	"\x17NOTIFICATION_KIND_PROMO\x10\x04*T\n" +
+	"\x17NOTIFICATION_KIND_PROMO\x10\x04*j\n" +
 	"\bChatKind\x12\x19\n" +
 	"\x15CHAT_KIND_UNSPECIFIED\x10\x00\x12\x16\n" +
 	"\x12CHAT_KIND_PROVIDER\x10\x01\x12\x15\n" +
-	"\x11CHAT_KIND_SUPPORT\x10\x02*\x86\x01\n" +
+	"\x11CHAT_KIND_SUPPORT\x10\x02\x12\x14\n" +
+	"\x10CHAT_KIND_MASTER\x10\x03*\x86\x01\n" +
 	"\tBonusKind\x12\x1a\n" +
 	"\x16BONUS_KIND_UNSPECIFIED\x10\x00\x12\x17\n" +
 	"\x13BONUS_KIND_CASHBACK\x10\x01\x12\x17\n" +
