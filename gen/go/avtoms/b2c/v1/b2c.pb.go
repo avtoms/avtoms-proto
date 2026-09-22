@@ -8064,11 +8064,15 @@ func (x *SetDefaultCardRequest) GetId() string {
 }
 
 type ValidatePromoCodeRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Code          string                 `protobuf:"bytes,1,opt,name=code,proto3" json:"code,omitempty"`
-	Phone         string                 `protobuf:"bytes,2,opt,name=phone,proto3" json:"phone,omitempty"`
-	ProviderId    string                 `protobuf:"bytes,3,opt,name=provider_id,json=providerId,proto3" json:"provider_id,omitempty"`
-	Amount        int64                  `protobuf:"varint,4,opt,name=amount,proto3" json:"amount,omitempty"` // the subtotal the discount applies to
+	state      protoimpl.MessageState `protogen:"open.v1"`
+	Code       string                 `protobuf:"bytes,1,opt,name=code,proto3" json:"code,omitempty"`
+	Phone      string                 `protobuf:"bytes,2,opt,name=phone,proto3" json:"phone,omitempty"`
+	ProviderId string                 `protobuf:"bytes,3,opt,name=provider_id,json=providerId,proto3" json:"provider_id,omitempty"`
+	Amount     int64                  `protobuf:"varint,4,opt,name=amount,proto3" json:"amount,omitempty"` // the subtotal the discount applies to
+	// The booking this code is being checked for, when there is one. A booking made with a
+	// once-per-customer code has already spent it, and checking the code again while paying
+	// for that same booking must not find it used up — so its own redemption is left out.
+	BookingId     string `protobuf:"bytes,5,opt,name=booking_id,json=bookingId,proto3" json:"booking_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -8129,6 +8133,13 @@ func (x *ValidatePromoCodeRequest) GetAmount() int64 {
 		return x.Amount
 	}
 	return 0
+}
+
+func (x *ValidatePromoCodeRequest) GetBookingId() string {
+	if x != nil {
+		return x.BookingId
+	}
+	return ""
 }
 
 type ValidatePromoCodeResponse struct {
@@ -11481,13 +11492,15 @@ const file_avtoms_b2c_v1_b2c_proto_rawDesc = "" +
 	"\x02id\x18\x02 \x01(\tR\x02id\"=\n" +
 	"\x15SetDefaultCardRequest\x12\x14\n" +
 	"\x05phone\x18\x01 \x01(\tR\x05phone\x12\x0e\n" +
-	"\x02id\x18\x02 \x01(\tR\x02id\"}\n" +
+	"\x02id\x18\x02 \x01(\tR\x02id\"\x9c\x01\n" +
 	"\x18ValidatePromoCodeRequest\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\tR\x04code\x12\x14\n" +
 	"\x05phone\x18\x02 \x01(\tR\x05phone\x12\x1f\n" +
 	"\vprovider_id\x18\x03 \x01(\tR\n" +
 	"providerId\x12\x16\n" +
-	"\x06amount\x18\x04 \x01(\x03R\x06amount\"\x91\x01\n" +
+	"\x06amount\x18\x04 \x01(\x03R\x06amount\x12\x1d\n" +
+	"\n" +
+	"booking_id\x18\x05 \x01(\tR\tbookingId\"\x91\x01\n" +
 	"\x19ValidatePromoCodeResponse\x12\x14\n" +
 	"\x05valid\x18\x01 \x01(\bR\x05valid\x12\x16\n" +
 	"\x06reason\x18\x02 \x01(\tR\x06reason\x12\x1a\n" +

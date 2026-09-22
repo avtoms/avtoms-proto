@@ -1133,6 +1133,10 @@ message ValidatePromoCodeRequest {
   string phone = 2;
   string provider_id = 3;
   int64 amount = 4;               // the subtotal the discount applies to
+  // The booking this code is being checked for, when there is one. A booking made with a
+  // once-per-customer code has already spent it, and checking the code again while paying
+  // for that same booking must not find it used up — so its own redemption is left out.
+  string booking_id = 5;
 }
 
 message ValidatePromoCodeResponse {
