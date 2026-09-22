@@ -1,0 +1,1402 @@
+syntax = "proto3";
+
+package avtoms.b2c.v1;
+
+import "avtoms/common/v1/common.proto";
+
+option go_package = "github.com/avtoms/proto/gen/go/avtoms/b2c/v1;b2cv1";
+
+// B2CService is everything the Auto-Garaj consumer mobile app needs and the shop-management
+// side of the product does not have: the public directory of services, the garage a driver
+// keeps across shops, bookings made from a phone, reviews, favourites, promos, cashback,
+// chats, notifications and roadside help.
+//
+// It is deliberately self-contained — it calls no other service. Where a record has a real
+// counterpart on the B2B side the link is kept as an id (Provider.shop_id,
+// Booking.appointment_id) and filled in by the gateway, so the two halves can be joined
+// later without this service having to reach across.
+//
+// Two conventions run through the whole file:
+//   * Money is whole so'm, like everywhere else in AvtoMS. Never tiyin.
+//   * The caller is a phone number in E.164-ish form ("998901234567"), taken from the
+//     client's token by the gateway and never from the request body.
+service B2CService {
+  // ── Profile and devices ────────────────────────────────────────────────────────────
+  // GetProfile returns the app user for a phone, creating the record on first sight — a
+  // driver who has just verified an OTP has no profile yet and must not get a 404.
+  rpc GetProfile(GetProfileRequest) returns (AppUser);
+  rpc UpdateProfile(UpdateProfileRequest) returns (AppUser);
+  // DeleteProfile erases the account and everything hanging off it. The "delete my account"
+  // button in the profile screen is a real promise, so this is a real delete.
+  rpc DeleteProfile(DeleteProfileRequest) returns (DeleteResponse);
+  rpc RegisterDevice(RegisterDeviceRequest) returns (Device);
+  rpc DeleteDevice(DeleteDeviceRequest) returns (DeleteResponse);
+
+  // ── Reference data ─────────────────────────────────────────────────────────────────
+  rpc ListCities(ListCitiesRequest) returns (ListCitiesResponse);
+  rpc ListCategories(ListCategoriesRequest) returns (ListCategoriesResponse);
+
+  // ── Directory ──────────────────────────────────────────────────────────────────────
+  rpc ListProviders(ListProvidersRequest) returns (ListProvidersResponse);
+  rpc GetProvider(GetProviderRequest) returns (Provider);
+  rpc ListProviderServices(ListProviderServicesRequest) returns (ListProviderServicesResponse);
+  rpc ListMapPoints(ListMapPointsRequest) returns (ListMapPointsResponse);
+  rpc ListFuelStations(ListFuelStationsRequest) returns (ListFuelStationsResponse);
+  rpc GetFuelStation(GetFuelStationRequest) returns (FuelStation);
+  // Search covers the search screen: providers, matching categories, the caller's recent
+  // queries and what everyone else is looking for.
+  rpc Search(SearchRequest) returns (SearchResponse);
+  rpc ClearSearchHistory(ClearSearchHistoryRequest) returns (DeleteResponse);
+  // GetHome is the home screen in one call — stories, categories, nearby, promos, the
+  // booking in flight and the car that is due an oil change. A phone on a bad connection
+  // should not need eight round trips to draw its first screen.
+  rpc GetHome(GetHomeRequest) returns (HomeResponse);
+
+  // ── Reviews and complaints ─────────────────────────────────────────────────────────
+  rpc ListReviews(ListReviewsRequest) returns (ListReviewsResponse);
+  rpc CreateReview(CreateReviewRequest) returns (Review);
+  // SetReviewReply is the shop's answer under a review. Written from the B2B side later;
+  // it exists now so the mobile app can render replies it will eventually receive.
+  rpc SetReviewReply(SetReviewReplyRequest) returns (Review);
+  rpc CreateComplaint(CreateComplaintRequest) returns (Complaint);
+  rpc ListComplaints(ListComplaintsRequest) returns (ListComplaintsResponse);
+
+  // ── Favourites ─────────────────────────────────────────────────────────────────────
+  rpc ListFavorites(ListFavoritesRequest) returns (ListFavoritesResponse);
+  rpc SetFavorite(SetFavoriteRequest) returns (SetFavoriteResponse);
+
+  // ── The driver's garage ────────────────────────────────────────────────────────────
+  rpc ListCars(ListCarsRequest) returns (ListCarsResponse);
+  rpc GetCar(GetCarRequest) returns (Car);
+  rpc CreateCar(CreateCarRequest) returns (Car);
+  rpc UpdateCar(UpdateCarRequest) returns (Car);
+  rpc DeleteCar(DeleteCarRequest) returns (DeleteResponse);
+  rpc SetDefaultCar(SetDefaultCarRequest) returns (Car);
+
+  // ── Booking ────────────────────────────────────────────────────────────────────────
+  rpc ListSlots(ListSlotsRequest) returns (ListSlotsResponse);
+  rpc CreateBooking(CreateBookingRequest) returns (Booking);
+  rpc GetBooking(GetBookingRequest) returns (Booking);
+  rpc ListBookings(ListBookingsRequest) returns (ListBookingsResponse);
+  rpc CancelBooking(CancelBookingRequest) returns (Booking);
+  rpc RescheduleBooking(RescheduleBookingRequest) returns (Booking);
+  // SetBookingState is the shop moving a booking along. Until the B2B side drives it, the
+  // gateway's admin route and the demo seed are what call it.
+  rpc SetBookingState(SetBookingStateRequest) returns (Booking);
+  // LinkBookingAppointment records the work-order appointment a booking became. Called by
+  // the gateway right after it creates that appointment, best-effort: a booking with no
+  // appointment is still a booking.
+  rpc LinkBookingAppointment(LinkBookingAppointmentRequest) returns (Booking);
+
+  // ── Cards, promo codes and payment ─────────────────────────────────────────────────
+  rpc ListCards(ListCardsRequest) returns (ListCardsResponse);
+  rpc AddCard(AddCardRequest) returns (Card);
+  rpc DeleteCard(DeleteCardRequest) returns (DeleteResponse);
+  rpc SetDefaultCard(SetDefaultCardRequest) returns (Card);
+  rpc ValidatePromoCode(ValidatePromoCodeRequest) returns (ValidatePromoCodeResponse);
+  rpc CreatePayment(CreatePaymentRequest) returns (Payment);
+  rpc GetPayment(GetPaymentRequest) returns (Payment);
+  rpc ListPayments(ListPaymentsRequest) returns (ListPaymentsResponse);
+
+  // ── Promos and stories ─────────────────────────────────────────────────────────────
+  rpc ListPromos(ListPromosRequest) returns (ListPromosResponse);
+  rpc GetPromo(GetPromoRequest) returns (Promo);
+  rpc ListStories(ListStoriesRequest) returns (ListStoriesResponse);
+  rpc MarkStorySeen(MarkStorySeenRequest) returns (DeleteResponse);
+
+  // ── Cashback ───────────────────────────────────────────────────────────────────────
+  rpc GetBonusAccount(GetBonusAccountRequest) returns (BonusAccount);
+  rpc ListBonusEntries(ListBonusEntriesRequest) returns (ListBonusEntriesResponse);
+
+  // ── Chats and support ──────────────────────────────────────────────────────────────
+  rpc ListChats(ListChatsRequest) returns (ListChatsResponse);
+  rpc GetChat(GetChatRequest) returns (GetChatResponse);
+  rpc SendChatMessage(SendChatMessageRequest) returns (ChatMessage);
+  rpc MarkChatRead(MarkChatReadRequest) returns (Chat);
+
+  // ── Notifications ──────────────────────────────────────────────────────────────────
+  rpc ListNotifications(ListNotificationsRequest) returns (ListNotificationsResponse);
+  rpc MarkNotificationRead(MarkNotificationReadRequest) returns (Notification);
+  rpc MarkAllNotificationsRead(MarkAllNotificationsReadRequest) returns (DeleteResponse);
+  // GetBadges is the number on the bell and the number on the chat tab, in one cheap call
+  // the app can poll.
+  rpc GetBadges(GetBadgesRequest) returns (GetBadgesResponse);
+
+  // ── Roadside help (SOS) ────────────────────────────────────────────────────────────
+  rpc ListEmergencyTypes(ListEmergencyTypesRequest) returns (ListEmergencyTypesResponse);
+  rpc CreateEmergencyRequest(CreateEmergencyRequestRequest) returns (EmergencyRequest);
+  rpc GetEmergencyRequest(GetEmergencyRequestRequest) returns (EmergencyRequest);
+  rpc ListEmergencyRequests(ListEmergencyRequestsRequest) returns (ListEmergencyRequestsResponse);
+  rpc CancelEmergencyRequest(CancelEmergencyRequestRequest) returns (EmergencyRequest);
+
+  // ── Operator side ──────────────────────────────────────────────────────────────────
+  // Writing the directory. Reached through the gateway's admin routes only.
+  rpc CreateProvider(CreateProviderRequest) returns (Provider);
+  rpc UpdateProvider(UpdateProviderRequest) returns (Provider);
+  rpc DeleteProvider(DeleteProviderRequest) returns (DeleteResponse);
+  rpc UpsertProviderService(UpsertProviderServiceRequest) returns (ProviderService);
+  rpc DeleteProviderService(DeleteProviderServiceRequest) returns (DeleteResponse);
+  rpc UpsertPromo(UpsertPromoRequest) returns (Promo);
+  rpc DeletePromo(DeletePromoRequest) returns (DeleteResponse);
+  rpc UpsertFuelStation(UpsertFuelStationRequest) returns (FuelStation);
+  rpc UpsertCity(UpsertCityRequest) returns (City);
+  rpc UpsertCategory(UpsertCategoryRequest) returns (Category);
+  // SeedDemoData fills an empty directory with the demo set the mobile app is designed
+  // against. Idempotent, and everything it writes is marked demo so PurgeDemoData can take
+  // it all away again — staging is a place to look at the app, not a place to keep rubbish.
+  rpc SeedDemoData(SeedDemoDataRequest) returns (SeedDemoDataResponse);
+  rpc PurgeDemoData(PurgeDemoDataRequest) returns (PurgeDemoDataResponse);
+}
+
+// ── Enums ────────────────────────────────────────────────────────────────────────────
+
+// BookingState is the life of a booking as the driver sees it on the orders screen.
+enum BookingState {
+  BOOKING_STATE_UNSPECIFIED = 0;
+  BOOKING_STATE_NEW = 1;        // sent, the shop has not answered yet
+  BOOKING_STATE_CONFIRMED = 2;  // the shop expects the car
+  BOOKING_STATE_IN_WORK = 3;
+  BOOKING_STATE_READY = 4;      // done, waiting to be collected
+  BOOKING_STATE_DONE = 5;
+  BOOKING_STATE_CANCELLED = 6;
+}
+
+// PaymentMethod is what the driver chose on the payment screen.
+enum PaymentMethod {
+  PAYMENT_METHOD_UNSPECIFIED = 0;
+  PAYMENT_METHOD_CARD = 1;   // a saved Uzcard/Humo/Visa card
+  PAYMENT_METHOD_CLICK = 2;
+  PAYMENT_METHOD_PAYME = 3;
+  PAYMENT_METHOD_CASH = 4;   // pay at the shop; nothing is charged here
+}
+
+// PaymentStatus is where a payment got to. Until a real PSP is wired in, a card/Click/Payme
+// payment is created already SUCCEEDED and carries mocked=true, so the app can be built
+// against the finished shape and the switch to a real charge changes no client code.
+enum PaymentStatus {
+  PAYMENT_STATUS_UNSPECIFIED = 0;
+  PAYMENT_STATUS_PENDING = 1;
+  PAYMENT_STATUS_SUCCEEDED = 2;
+  PAYMENT_STATUS_FAILED = 3;
+  PAYMENT_STATUS_REFUNDED = 4;
+}
+
+// EmergencyState is the SOS flow: the app asks, a master is found, they drive over.
+enum EmergencyState {
+  EMERGENCY_STATE_UNSPECIFIED = 0;
+  EMERGENCY_STATE_SEARCHING = 1;
+  EMERGENCY_STATE_ASSIGNED = 2;
+  EMERGENCY_STATE_EN_ROUTE = 3;
+  EMERGENCY_STATE_ARRIVED = 4;
+  EMERGENCY_STATE_DONE = 5;
+  EMERGENCY_STATE_CANCELLED = 6;
+}
+
+// NotificationKind decides the colour of the dot in the notification list.
+enum NotificationKind {
+  NOTIFICATION_KIND_UNSPECIFIED = 0;
+  NOTIFICATION_KIND_INFO = 1;
+  NOTIFICATION_KIND_OK = 2;
+  NOTIFICATION_KIND_WARN = 3;
+  NOTIFICATION_KIND_PROMO = 4;
+}
+
+// ChatKind separates a thread with a shop from the one with support.
+enum ChatKind {
+  CHAT_KIND_UNSPECIFIED = 0;
+  CHAT_KIND_PROVIDER = 1;
+  CHAT_KIND_SUPPORT = 2;
+}
+
+// BonusKind is why cashback moved.
+enum BonusKind {
+  BONUS_KIND_UNSPECIFIED = 0;
+  BONUS_KIND_CASHBACK = 1;   // earned on a paid booking
+  BONUS_KIND_REFERRAL = 2;   // a friend signed up with the code
+  BONUS_KIND_SPEND = 3;      // spent on a booking (negative amount)
+  BONUS_KIND_ADJUST = 4;     // an operator put it right by hand
+}
+
+// MapPointKind is what a pin on the map is.
+enum MapPointKind {
+  MAP_POINT_KIND_UNSPECIFIED = 0;
+  MAP_POINT_KIND_PROVIDER = 1;
+  MAP_POINT_KIND_FUEL = 2;
+}
+
+// ProviderSort orders the directory. Distance needs the caller's coordinates; without them
+// the service falls back to rating so a list is never empty for want of a GPS fix.
+enum ProviderSort {
+  PROVIDER_SORT_UNSPECIFIED = 0;
+  PROVIDER_SORT_NEAREST = 1;
+  PROVIDER_SORT_RATING = 2;
+  PROVIDER_SORT_PRICE_ASC = 3;
+  PROVIDER_SORT_PROMO = 4;
+}
+
+// ── Core messages ────────────────────────────────────────────────────────────────────
+
+// DeleteResponse is the uniform answer for anything that removes or acknowledges.
+message DeleteResponse {
+  bool ok = 1;
+}
+
+// AppUser is the driver's account in the consumer app, keyed by the phone in their token.
+// Distinct from a Customer, which belongs to one shop: this person exists before they have
+// ever visited anybody.
+message AppUser {
+  string phone = 1;
+  string first_name = 2;
+  string last_name = 3;
+  string email = 4;
+  string birthday = 5;           // YYYY-MM-DD, as typed
+  string gender = 6;             // "m" | "f" | "n" (not stated)
+  string avatar_url = 7;
+  string city_id = 8;
+  avtoms.common.v1.Language language = 9;
+  bool onboarded = 10;           // the intro slides have been seen
+  bool location_allowed = 11;    // the driver granted the OS location permission
+  bool push_allowed = 12;
+  string created_at = 13;        // RFC3339
+  string referral_code = 14;     // the code they share; also the key friends type in
+}
+
+// Device is one installation that can receive a push.
+message Device {
+  string id = 1;
+  string phone = 2;
+  string platform = 3;   // "ios" | "android" | "web"
+  string token = 4;      // APNs/FCM token
+  string locale = 5;
+  string app_version = 6;
+  string created_at = 7;
+}
+
+// City is a place the app works in — the list behind the city picker.
+message City {
+  string id = 1;         // slug: "tashkent"
+  string name_uz = 2;
+  string name_ru = 3;
+  double latitude = 4;
+  double longitude = 5;
+  int32 position = 6;
+  bool active = 7;
+}
+
+// Category is a kind of work: oil, tyres, wash, diagnostics.
+message Category {
+  string id = 1;         // slug: "oil"
+  string icon = 2;       // icon key the app already ships
+  string name_uz = 3;
+  string name_ru = 4;
+  int32 position = 5;
+  bool active = 6;
+  int32 provider_count = 7;  // computed, active providers in the requested city
+}
+
+// OpeningHours is one weekday's opening times.
+message OpeningHours {
+  int32 weekday = 1;     // 0 = Sunday … 6 = Saturday, like JavaScript's getDay()
+  string opens = 2;      // "08:00"
+  string closes = 3;     // "21:00"
+  bool closed = 4;       // shut that day
+  bool round_clock = 5;  // open 24 hours; opens/closes are then ignored
+}
+
+// Provider is a service centre in the public directory.
+//
+// It is NOT the same record as auth's Shop. A shop is a tenant of the management product;
+// a provider is a business a driver can find on the map, which may or may not run AvtoMS.
+// shop_id links the two when it does, and is what a later sync would key on.
+message Provider {
+  string id = 1;
+  string shop_id = 2;             // the AvtoMS tenant behind it, when there is one
+  string name = 3;
+  string city_id = 4;
+  repeated string category_ids = 5;  // first one is the headline category
+  string address_uz = 6;
+  string address_ru = 7;
+  double latitude = 8;
+  double longitude = 9;
+  string phone = 10;
+  repeated OpeningHours hours = 11;
+  string about_uz = 12;
+  string about_ru = 13;
+  repeated string photo_urls = 14;
+  // Amenity codes the app renders as chips: "card", "wait", "wifi", "coffee", "tow",
+  // "warranty". Free-form on purpose — a new amenity should not need a schema change.
+  repeated string amenities = 15;
+  bool verified = 16;             // the operator checked the paperwork
+  bool active = 17;
+  string created_at = 18;
+  // Aggregates, maintained on write rather than counted on read: the directory list is the
+  // hottest query in the app and must not fan out into reviews.
+  double rating = 19;
+  int32 review_count = 20;
+  int64 price_from = 21;          // cheapest active service, so'm
+  string promo_label = 22;        // "-20%" ribbon, derived from the live promo
+  // Per-request, not stored.
+  double distance_km = 23;        // from the coordinates in the request; 0 when unknown
+  bool open_now = 24;
+  bool favorite = 25;             // for the signed-in caller
+  bool demo = 26;                 // seeded sample data, removable by PurgeDemoData
+}
+
+// ProviderService is one line of a provider's price list.
+message ProviderService {
+  string id = 1;
+  string provider_id = 2;
+  string category_id = 3;
+  string name_uz = 4;
+  string name_ru = 5;
+  int64 price = 6;                // so'm
+  int32 duration_minutes = 7;
+  int32 position = 8;
+  bool active = 9;
+}
+
+// Review is a driver's rating of a visit.
+message Review {
+  string id = 1;
+  string provider_id = 2;
+  string booking_id = 3;          // the visit it is about, when the review came from one
+  string phone = 4;
+  string author_name = 5;         // display name at the time of writing
+  int32 rating = 6;               // 1..5
+  string text = 7;
+  string text_ru = 8;             // optional translation; filled for seeded content only
+  repeated string tags = 9;       // "fast", "price", "clean", "polite", "quality"
+  repeated string photo_urls = 10;
+  string reply_text = 11;         // the shop's answer
+  string reply_text_ru = 12;
+  string replied_at = 13;
+  string created_at = 14;
+  bool demo = 15;
+}
+
+// RatingBreakdown is the histogram above the review list.
+message RatingBreakdown {
+  double average = 1;
+  int32 total = 2;
+  int32 five = 3;
+  int32 four = 4;
+  int32 three = 5;
+  int32 two = 6;
+  int32 one = 7;
+}
+
+// Complaint is the formal version of a bad review: it goes to the operator, not the shop.
+message Complaint {
+  string id = 1;
+  string number = 2;              // human reference read back to the driver
+  string phone = 3;
+  string booking_id = 4;
+  string provider_id = 5;
+  int32 reason_code = 6;          // 1..5, the radio list on the complaint screen
+  string text = 7;
+  repeated string photo_urls = 8;
+  string status = 9;              // "open" | "in_review" | "resolved" | "rejected"
+  string resolution = 10;
+  string created_at = 11;
+}
+
+// Car is a vehicle in the driver's garage. Independent of a shop's vehicle record: the
+// driver owns this one, and vehicle_id points at a shop's copy once they have visited.
+message Car {
+  string id = 1;
+  string phone = 2;
+  string make = 3;
+  string model = 4;
+  int32 year = 5;
+  string plate = 6;
+  string color = 7;               // hex, for the card in the garage
+  int64 mileage_km = 8;
+  int64 oil_changed_at_km = 9;
+  int64 oil_interval_km = 10;     // 0 means the driver has not set a schedule
+  bool is_default = 11;
+  string vehicle_id = 12;         // customer-service vehicle, when linked
+  string image_url = 13;
+  string vin = 14;
+  string created_at = 15;
+  // Computed: how far until the next oil change. Negative means overdue, which is what the
+  // amber card on the home screen is for.
+  int64 oil_left_km = 16;
+}
+
+// BookingItem is one service on a booking, frozen at the price it was booked at.
+message BookingItem {
+  string service_id = 1;
+  string name_uz = 2;
+  string name_ru = 3;
+  int64 price = 4;
+  int32 duration_minutes = 5;
+}
+
+// Booking is an appointment a driver made from the app.
+message Booking {
+  string id = 1;
+  string code = 2;                // "AG-1048", what the driver reads out on the phone
+  string phone = 3;
+  string provider_id = 4;
+  string provider_name = 5;
+  string car_id = 6;
+  string plate = 7;
+  repeated BookingItem items = 8;
+  string scheduled_at = 9;        // RFC3339
+  int32 duration_minutes = 10;
+  BookingState state = 11;
+  int64 subtotal = 12;
+  int64 discount = 13;
+  int64 total = 14;
+  string promo_code = 15;
+  PaymentMethod payment_method = 16;
+  bool paid = 17;
+  string payment_id = 18;
+  string notes = 19;
+  string cancel_reason = 20;
+  int32 rating = 21;              // 0 until the driver reviews it
+  string review_id = 22;
+  // The B2B side of the same visit, when the provider runs AvtoMS. Filled by the gateway.
+  string shop_id = 23;
+  string appointment_id = 24;
+  string created_at = 25;
+  string updated_at = 26;
+  bool demo = 27;
+}
+
+// Slot is one bookable time on the booking screen.
+message Slot {
+  string time = 1;                // "09:30", shop-local
+  bool available = 2;
+}
+
+// Card is a saved payment card.
+//
+// Only the last four digits, brand and expiry are stored — a PAN never reaches this
+// database. `token` is what a PSP would hand back for the saved card; while payments are
+// mocked it holds a locally generated reference, so the column that will carry the real
+// token already exists and nothing has to migrate later.
+message Card {
+  string id = 1;
+  string phone = 2;
+  string brand = 3;               // "uzcard" | "humo" | "visa" | "mastercard"
+  string last4 = 4;
+  string expiry = 5;              // "09/28"
+  string holder = 6;
+  bool is_default = 7;
+  string token = 8;
+  string created_at = 9;
+}
+
+// Payment is one attempt to pay for a booking.
+message Payment {
+  string id = 1;
+  string booking_id = 2;
+  string phone = 3;
+  PaymentMethod method = 4;
+  string card_id = 5;
+  int64 amount = 6;               // what was charged, after discount, so'm
+  int64 discount = 7;
+  string promo_code = 8;
+  PaymentStatus status = 9;
+  string provider_ref = 10;       // the PSP's id for this charge
+  string receipt_url = 11;
+  string failure_reason = 12;
+  // True while no real payment provider is connected. The app should show nothing different;
+  // it is here so support can tell a test charge from a real one at a glance.
+  bool mocked = 13;
+  string created_at = 14;
+  int64 bonus_earned = 15;        // cashback credited by this payment
+}
+
+// Promo is a discount campaign, entered as a code on the payment screen.
+message Promo {
+  string code = 1;                // "OIL30", the primary key — it is what people type
+  string provider_id = 2;         // empty = valid at every provider
+  int32 discount_percent = 3;
+  int64 max_discount = 4;         // cap in so'm; 0 = uncapped
+  string title_uz = 5;
+  string title_ru = 6;
+  string description_uz = 7;
+  string description_ru = 8;
+  repeated string conditions_uz = 9;
+  repeated string conditions_ru = 10;
+  string valid_from = 11;         // RFC3339
+  string valid_until = 12;
+  bool first_booking_only = 13;
+  int32 per_user_limit = 14;      // 0 = unlimited
+  string image_key = 15;          // gradient key the app already has ("p1".."p4")
+  bool active = 16;
+  bool demo = 17;
+}
+
+// Story is a card in the stories rail at the top of the home screen.
+message Story {
+  string id = 1;
+  string image_key = 2;
+  string label_uz = 3;
+  string label_ru = 4;
+  string title_uz = 5;
+  string title_ru = 6;
+  string cta_key = 7;             // translation key for the button
+  string target = 8;              // in-app route, e.g. "#/promo/OIL30"
+  int32 position = 9;
+  bool active = 10;
+  string valid_until = 11;
+  bool seen = 12;                 // for the signed-in caller
+  bool demo = 13;
+}
+
+// BonusAccount is the driver's cashback balance.
+message BonusAccount {
+  string phone = 1;
+  int64 balance = 2;              // so'm
+  int64 earned_total = 3;
+  int64 spent_total = 4;
+  string referral_code = 5;
+  int32 referred_count = 6;
+  int32 cashback_percent = 7;     // the rate currently earned on a paid booking
+}
+
+// BonusEntry is one line of the cashback history.
+message BonusEntry {
+  string id = 1;
+  string phone = 2;
+  int64 amount = 3;               // negative when spent
+  BonusKind kind = 4;
+  string title_uz = 5;
+  string title_ru = 6;
+  string booking_id = 7;
+  string created_at = 8;
+}
+
+// Chat is a thread with a shop or with support.
+message Chat {
+  string id = 1;
+  string phone = 2;
+  ChatKind kind = 3;
+  string provider_id = 4;
+  string provider_name = 5;
+  string booking_id = 6;
+  int32 unread = 7;
+  string last_message = 8;
+  string last_message_at = 9;
+  string created_at = 10;
+}
+
+// ChatMessage is one bubble.
+message ChatMessage {
+  string id = 1;
+  string chat_id = 2;
+  // True when it came from the shop or support (left side in the app), false when the
+  // driver wrote it.
+  bool inbound = 3;
+  string text = 4;
+  string attachment_url = 5;
+  string author = 6;              // display name of the sender, for support agents
+  bool automated = 7;             // written by the canned-answer bot, not a person
+  string created_at = 8;
+}
+
+// Notification is one line in the bell list; it is also what a push carries.
+message Notification {
+  string id = 1;
+  string phone = 2;
+  NotificationKind kind = 3;
+  string title_uz = 4;
+  string title_ru = 5;
+  string body_uz = 6;
+  string body_ru = 7;
+  string target = 8;              // in-app route to open when tapped
+  bool read = 9;
+  string created_at = 10;
+}
+
+// EmergencyType is one kind of roadside help, with the price shown before asking.
+message EmergencyType {
+  string code = 1;                // "tow" | "bat" | "tyre" | "fuel" | "lock" | "other"
+  string icon = 2;
+  string name_uz = 3;
+  string name_ru = 4;
+  string description_uz = 5;
+  string description_ru = 6;
+  int64 base_price = 7;           // "from", so'm
+  int32 position = 8;
+  bool active = 9;
+}
+
+// EmergencyRequest is one SOS call.
+//
+// With no dispatch partner connected, a request is assigned to a mock master a few seconds
+// after it is made and its ETA counts down on read. mocked says so plainly.
+message EmergencyRequest {
+  string id = 1;
+  string number = 2;              // "SOS-2291"
+  string phone = 3;
+  string type_code = 4;
+  string car_id = 5;
+  string plate = 6;
+  double latitude = 7;
+  double longitude = 8;
+  string address = 9;
+  EmergencyState state = 10;
+  string master_name = 11;
+  string master_phone = 12;
+  double master_rating = 13;
+  string master_plate = 14;
+  int32 master_jobs = 15;
+  int32 eta_minutes = 16;
+  int64 price_estimate = 17;
+  string chat_id = 18;
+  string cancel_reason = 19;
+  bool mocked = 20;
+  string created_at = 21;
+  string assigned_at = 22;
+  string closed_at = 23;
+}
+
+// FuelPrice is one fuel grade at one station.
+message FuelPrice {
+  string fuel_code = 1;           // "AI-92" | "AI-95" | "DT" | "Propan" | "Metan"
+  int64 price = 2;                // so'm per unit
+  string unit = 3;                // "l" | "m3"
+}
+
+// FuelStation is a filling station on the map.
+message FuelStation {
+  string id = 1;
+  string name = 2;
+  string brand = 3;
+  string city_id = 4;
+  string address_uz = 5;
+  string address_ru = 6;
+  double latitude = 7;
+  double longitude = 8;
+  repeated OpeningHours hours = 9;
+  repeated FuelPrice prices = 10;
+  bool active = 11;
+  string updated_at = 12;
+  double distance_km = 13;        // per-request
+  bool open_now = 14;
+  bool demo = 15;
+}
+
+// MapPoint is a pin: either a provider or a filling station, flattened for the map screen.
+message MapPoint {
+  string id = 1;
+  MapPointKind kind = 2;
+  string name = 3;
+  double latitude = 4;
+  double longitude = 5;
+  string subtitle = 6;
+  string price_label = 7;
+  bool open_now = 8;
+  string target = 9;              // in-app route for the bubble
+  string category_id = 10;
+  double distance_km = 11;
+}
+
+// ── Profile ──────────────────────────────────────────────────────────────────────────
+
+message GetProfileRequest {
+  string phone = 1;
+}
+
+message UpdateProfileRequest {
+  string phone = 1;
+  // Only the fields present are written; an empty string clears a text field, which is what
+  // a driver emptying the e-mail box means.
+  string first_name = 2;
+  string last_name = 3;
+  string email = 4;
+  string birthday = 5;
+  string gender = 6;
+  string avatar_url = 7;
+  string city_id = 8;
+  avtoms.common.v1.Language language = 9;
+  bool onboarded = 10;
+  bool location_allowed = 11;
+  bool push_allowed = 12;
+  // Which of the above to apply. Without it a client sending only a city would blank the
+  // driver's name, because proto3 cannot tell "" from "not sent".
+  repeated string update_mask = 13;
+}
+
+message DeleteProfileRequest {
+  string phone = 1;
+}
+
+message RegisterDeviceRequest {
+  string phone = 1;
+  string platform = 2;
+  string token = 3;
+  string locale = 4;
+  string app_version = 5;
+}
+
+message DeleteDeviceRequest {
+  string phone = 1;
+  string token = 2;
+}
+
+// ── Reference ────────────────────────────────────────────────────────────────────────
+
+message ListCitiesRequest {
+  bool include_inactive = 1;
+}
+
+message ListCitiesResponse {
+  repeated City cities = 1;
+}
+
+message ListCategoriesRequest {
+  string city_id = 1;             // scopes provider_count
+  bool include_inactive = 2;
+}
+
+message ListCategoriesResponse {
+  repeated Category categories = 1;
+}
+
+// ── Directory ────────────────────────────────────────────────────────────────────────
+
+// ListProvidersRequest is the filter panel of the catalog screen, one field per control.
+message ListProvidersRequest {
+  string city_id = 1;
+  repeated string category_ids = 2;
+  string query = 3;
+  double latitude = 4;
+  double longitude = 5;
+  ProviderSort sort = 6;
+  bool open_now = 7;
+  bool promo_only = 8;
+  bool verified_only = 9;
+  double min_rating = 10;
+  int64 max_price = 11;           // ceiling on price_from, so'm
+  double max_distance_km = 12;
+  repeated string amenities = 13; // every one listed must be present
+  bool favorites_only = 14;
+  string phone = 15;              // the caller, for the favourite flag
+  int32 limit = 16;
+  int32 offset = 17;
+}
+
+message ListProvidersResponse {
+  repeated Provider providers = 1;
+  int32 total = 2;
+}
+
+message GetProviderRequest {
+  string id = 1;
+  string phone = 2;
+  double latitude = 3;
+  double longitude = 4;
+}
+
+message ListProviderServicesRequest {
+  string provider_id = 1;
+  bool include_inactive = 2;
+}
+
+message ListProviderServicesResponse {
+  repeated ProviderService services = 1;
+}
+
+message ListMapPointsRequest {
+  string city_id = 1;
+  repeated string category_ids = 2;
+  bool include_fuel = 3;
+  bool fuel_only = 4;
+  double latitude = 5;
+  double longitude = 6;
+  double max_distance_km = 7;
+  int32 limit = 8;
+}
+
+message ListMapPointsResponse {
+  repeated MapPoint points = 1;
+}
+
+message ListFuelStationsRequest {
+  string city_id = 1;
+  string fuel_code = 2;           // only stations selling this grade
+  double latitude = 3;
+  double longitude = 4;
+  int32 limit = 5;
+}
+
+message ListFuelStationsResponse {
+  repeated FuelStation stations = 1;
+}
+
+message GetFuelStationRequest {
+  string id = 1;
+  double latitude = 2;
+  double longitude = 3;
+}
+
+message SearchRequest {
+  string query = 1;
+  string city_id = 2;
+  double latitude = 3;
+  double longitude = 4;
+  string phone = 5;               // remembers the query as a recent search
+  int32 limit = 6;
+}
+
+message SearchResponse {
+  repeated Provider providers = 1;
+  repeated Category categories = 2;
+  repeated string recent = 3;     // the caller's last queries, newest first
+  repeated string popular = 4;    // what everyone searches for
+}
+
+message ClearSearchHistoryRequest {
+  string phone = 1;
+}
+
+message GetHomeRequest {
+  string phone = 1;
+  string city_id = 2;
+  double latitude = 3;
+  double longitude = 4;
+}
+
+// HomeResponse is one screen's worth of everything.
+message HomeResponse {
+  City city = 1;
+  repeated Story stories = 2;
+  repeated Category categories = 3;
+  repeated Provider nearby = 4;
+  repeated Provider top_rated = 5;
+  repeated Promo promos = 6;
+  // The booking the driver is currently living with — the confirmed or in-work one, soonest
+  // first. Absent when there is none.
+  Booking active_booking = 7;
+  // The car closest to needing an oil change, when one is due or overdue.
+  Car service_due_car = 8;
+  int32 unread_notifications = 9;
+  int32 unread_chats = 10;
+  int64 bonus_balance = 11;
+  bool authenticated = 12;        // false for a guest; the app hides personal blocks
+}
+
+// ── Reviews ──────────────────────────────────────────────────────────────────────────
+
+message ListReviewsRequest {
+  string provider_id = 1;
+  string phone = 2;               // set instead of provider_id to list one's own reviews
+  int32 min_rating = 3;
+  bool with_photos_only = 4;
+  int32 limit = 5;
+  int32 offset = 6;
+}
+
+message ListReviewsResponse {
+  repeated Review reviews = 1;
+  int32 total = 2;
+  RatingBreakdown breakdown = 3;
+}
+
+message CreateReviewRequest {
+  string phone = 1;
+  string provider_id = 2;
+  string booking_id = 3;
+  int32 rating = 4;
+  string text = 5;
+  repeated string tags = 6;
+  repeated string photo_urls = 7;
+  string author_name = 8;
+}
+
+message SetReviewReplyRequest {
+  string id = 1;
+  string reply_text = 2;
+  string reply_text_ru = 3;
+}
+
+message CreateComplaintRequest {
+  string phone = 1;
+  string booking_id = 2;
+  string provider_id = 3;
+  int32 reason_code = 4;
+  string text = 5;
+  repeated string photo_urls = 6;
+}
+
+message ListComplaintsRequest {
+  string phone = 1;
+  string status = 2;
+  int32 limit = 3;
+  int32 offset = 4;
+}
+
+message ListComplaintsResponse {
+  repeated Complaint complaints = 1;
+  int32 total = 2;
+}
+
+// ── Favourites ───────────────────────────────────────────────────────────────────────
+
+message ListFavoritesRequest {
+  string phone = 1;
+  double latitude = 2;
+  double longitude = 3;
+}
+
+message ListFavoritesResponse {
+  repeated Provider providers = 1;
+}
+
+message SetFavoriteRequest {
+  string phone = 1;
+  string provider_id = 2;
+  bool favorite = 3;
+}
+
+message SetFavoriteResponse {
+  bool favorite = 1;
+  int32 count = 2;                // how many the driver now has, for the profile counter
+}
+
+// ── Garage ───────────────────────────────────────────────────────────────────────────
+
+message ListCarsRequest {
+  string phone = 1;
+}
+
+message ListCarsResponse {
+  repeated Car cars = 1;
+}
+
+message GetCarRequest {
+  string phone = 1;
+  string id = 2;
+}
+
+message CreateCarRequest {
+  string phone = 1;
+  string make = 2;
+  string model = 3;
+  int32 year = 4;
+  string plate = 5;
+  string color = 6;
+  int64 mileage_km = 7;
+  int64 oil_changed_at_km = 8;
+  int64 oil_interval_km = 9;
+  string image_url = 10;
+  string vin = 11;
+  bool is_default = 12;
+}
+
+message UpdateCarRequest {
+  string phone = 1;
+  string id = 2;
+  string make = 3;
+  string model = 4;
+  int32 year = 5;
+  string plate = 6;
+  string color = 7;
+  int64 mileage_km = 8;
+  int64 oil_changed_at_km = 9;
+  int64 oil_interval_km = 10;
+  string image_url = 11;
+  string vin = 12;
+  repeated string update_mask = 13;
+}
+
+message DeleteCarRequest {
+  string phone = 1;
+  string id = 2;
+}
+
+message SetDefaultCarRequest {
+  string phone = 1;
+  string id = 2;
+}
+
+// ── Booking ──────────────────────────────────────────────────────────────────────────
+
+message ListSlotsRequest {
+  string provider_id = 1;
+  string date = 2;                // YYYY-MM-DD
+  string service_id = 3;          // sizes the slot to the job when given
+  int32 days = 4;                 // > 1 returns that many days from `date`
+}
+
+// SlotDay is one day of the booking calendar.
+message SlotDay {
+  string date = 1;
+  bool closed = 2;                // the provider does not work that day
+  repeated Slot slots = 3;
+}
+
+message ListSlotsResponse {
+  repeated SlotDay days = 1;
+}
+
+message CreateBookingRequest {
+  string phone = 1;
+  string provider_id = 2;
+  repeated string service_ids = 3;
+  string car_id = 4;
+  string scheduled_at = 5;        // RFC3339
+  string notes = 6;
+  string promo_code = 7;
+  PaymentMethod payment_method = 8;
+  // Spend cashback on this booking, up to the balance and the total.
+  int64 use_bonus = 9;
+}
+
+message GetBookingRequest {
+  string phone = 1;
+  string id = 2;                  // id or code ("AG-1048")
+}
+
+message ListBookingsRequest {
+  string phone = 1;
+  repeated BookingState states = 2;
+  bool active_only = 3;           // NEW, CONFIRMED, IN_WORK, READY
+  int32 limit = 4;
+  int32 offset = 5;
+}
+
+message ListBookingsResponse {
+  repeated Booking bookings = 1;
+  int32 total = 2;
+}
+
+message CancelBookingRequest {
+  string phone = 1;
+  string id = 2;
+  string reason = 3;
+}
+
+message RescheduleBookingRequest {
+  string phone = 1;
+  string id = 2;
+  string scheduled_at = 3;
+}
+
+message SetBookingStateRequest {
+  string id = 1;
+  BookingState state = 2;
+  string note = 3;
+}
+
+message LinkBookingAppointmentRequest {
+  string id = 1;
+  string shop_id = 2;
+  string appointment_id = 3;
+}
+
+// ── Cards and payment ────────────────────────────────────────────────────────────────
+
+message ListCardsRequest {
+  string phone = 1;
+}
+
+message ListCardsResponse {
+  repeated Card cards = 1;
+}
+
+// AddCardRequest carries the PAN only long enough to read its brand and last four digits.
+// Nothing keeps it: the service stores brand, last4, expiry and a token, and the number is
+// gone the moment the response is built. When a real PSP arrives this request becomes its
+// binding call and the stored shape does not change.
+message AddCardRequest {
+  string phone = 1;
+  string pan = 2;
+  string expiry = 3;              // "09/28"
+  string holder = 4;
+  bool is_default = 5;
+}
+
+message DeleteCardRequest {
+  string phone = 1;
+  string id = 2;
+}
+
+message SetDefaultCardRequest {
+  string phone = 1;
+  string id = 2;
+}
+
+message ValidatePromoCodeRequest {
+  string code = 1;
+  string phone = 2;
+  string provider_id = 3;
+  int64 amount = 4;               // the subtotal the discount applies to
+}
+
+message ValidatePromoCodeResponse {
+  bool valid = 1;
+  string reason = 2;              // why not, when invalid: "expired", "used", "other_shop"
+  int64 discount = 3;             // in so'm, capped
+  Promo promo = 4;
+}
+
+message CreatePaymentRequest {
+  string phone = 1;
+  string booking_id = 2;
+  PaymentMethod method = 3;
+  string card_id = 4;
+  string promo_code = 5;
+  int64 use_bonus = 6;
+  // A client-generated key that makes a retried tap the same payment rather than a second
+  // one. A phone loses its network exactly at the moment it matters.
+  string idempotency_key = 7;
+}
+
+message GetPaymentRequest {
+  string phone = 1;
+  string id = 2;
+}
+
+message ListPaymentsRequest {
+  string phone = 1;
+  int32 limit = 2;
+  int32 offset = 3;
+}
+
+message ListPaymentsResponse {
+  repeated Payment payments = 1;
+  int32 total = 2;
+}
+
+// ── Promos and stories ───────────────────────────────────────────────────────────────
+
+message ListPromosRequest {
+  string provider_id = 1;
+  string city_id = 2;
+  bool include_expired = 3;
+  int32 limit = 4;
+}
+
+message ListPromosResponse {
+  repeated Promo promos = 1;
+}
+
+message GetPromoRequest {
+  string code = 1;
+}
+
+message ListStoriesRequest {
+  string phone = 1;
+}
+
+message ListStoriesResponse {
+  repeated Story stories = 1;
+}
+
+message MarkStorySeenRequest {
+  string phone = 1;
+  string id = 2;
+}
+
+// ── Cashback ─────────────────────────────────────────────────────────────────────────
+
+message GetBonusAccountRequest {
+  string phone = 1;
+}
+
+message ListBonusEntriesRequest {
+  string phone = 1;
+  int32 limit = 2;
+  int32 offset = 3;
+}
+
+message ListBonusEntriesResponse {
+  repeated BonusEntry entries = 1;
+  int32 total = 2;
+}
+
+// ── Chats ────────────────────────────────────────────────────────────────────────────
+
+message ListChatsRequest {
+  string phone = 1;
+}
+
+message ListChatsResponse {
+  repeated Chat chats = 1;
+  int32 unread_total = 2;
+}
+
+// GetChatRequest opens a thread. With no id but a provider_id — or kind = SUPPORT — the
+// thread is created on the spot, because tapping "write to the shop" cannot fail for want
+// of a thread that nobody has made yet.
+message GetChatRequest {
+  string phone = 1;
+  string id = 2;
+  string provider_id = 3;
+  ChatKind kind = 4;
+  string booking_id = 5;
+  int32 limit = 6;
+}
+
+message GetChatResponse {
+  Chat chat = 1;
+  repeated ChatMessage messages = 2;
+}
+
+message SendChatMessageRequest {
+  string phone = 1;
+  string chat_id = 2;
+  string provider_id = 3;         // starts a thread when chat_id is empty
+  ChatKind kind = 4;
+  string text = 5;
+  string attachment_url = 6;
+}
+
+message MarkChatReadRequest {
+  string phone = 1;
+  string chat_id = 2;
+}
+
+// ── Notifications ────────────────────────────────────────────────────────────────────
+
+message ListNotificationsRequest {
+  string phone = 1;
+  bool unread_only = 2;
+  int32 limit = 3;
+  int32 offset = 4;
+}
+
+message ListNotificationsResponse {
+  repeated Notification notifications = 1;
+  int32 total = 2;
+  int32 unread = 3;
+}
+
+message MarkNotificationReadRequest {
+  string phone = 1;
+  string id = 2;
+}
+
+message MarkAllNotificationsReadRequest {
+  string phone = 1;
+}
+
+message GetBadgesRequest {
+  string phone = 1;
+}
+
+message GetBadgesResponse {
+  int32 unread_notifications = 1;
+  int32 unread_chats = 2;
+  int32 active_bookings = 3;
+  int32 favorites = 4;
+}
+
+// ── SOS ──────────────────────────────────────────────────────────────────────────────
+
+message ListEmergencyTypesRequest {
+  bool include_inactive = 1;
+}
+
+message ListEmergencyTypesResponse {
+  repeated EmergencyType types = 1;
+}
+
+message CreateEmergencyRequestRequest {
+  string phone = 1;
+  string type_code = 2;
+  string car_id = 3;
+  double latitude = 4;
+  double longitude = 5;
+  string address = 6;
+  string note = 7;
+}
+
+message GetEmergencyRequestRequest {
+  string phone = 1;
+  string id = 2;
+}
+
+message ListEmergencyRequestsRequest {
+  string phone = 1;
+  bool active_only = 2;
+  int32 limit = 3;
+}
+
+message ListEmergencyRequestsResponse {
+  repeated EmergencyRequest requests = 1;
+}
+
+message CancelEmergencyRequestRequest {
+  string phone = 1;
+  string id = 2;
+  string reason = 3;
+}
+
+// ── Operator side ────────────────────────────────────────────────────────────────────
+
+message CreateProviderRequest {
+  Provider provider = 1;
+}
+
+message UpdateProviderRequest {
+  Provider provider = 1;
+  repeated string update_mask = 2;
+}
+
+message DeleteProviderRequest {
+  string id = 1;
+}
+
+message UpsertProviderServiceRequest {
+  ProviderService service = 1;
+}
+
+message DeleteProviderServiceRequest {
+  string id = 1;
+}
+
+message UpsertPromoRequest {
+  Promo promo = 1;
+}
+
+message DeletePromoRequest {
+  string code = 1;
+}
+
+message UpsertFuelStationRequest {
+  FuelStation station = 1;
+}
+
+message UpsertCityRequest {
+  City city = 1;
+}
+
+message UpsertCategoryRequest {
+  Category category = 1;
+}
+
+message SeedDemoDataRequest {
+  // Re-seed even when demo rows are already there: drops the old demo set first.
+  bool force = 1;
+  // Seed a driver's own side too — a garage, past bookings, cashback and notifications for
+  // this phone, so the personal screens have something in them.
+  string phone = 2;
+}
+
+message SeedDemoDataResponse {
+  int32 providers = 1;
+  int32 services = 2;
+  int32 reviews = 3;
+  int32 promos = 4;
+  int32 stories = 5;
+  int32 fuel_stations = 6;
+  int32 cities = 7;
+  int32 categories = 8;
+  int32 bookings = 9;
+  bool already_seeded = 10;
+}
+
+message PurgeDemoDataRequest {
+  string phone = 1;               // also clear this driver's demo bookings/cars
+}
+
+message PurgeDemoDataResponse {
+  int32 deleted = 1;
+}
