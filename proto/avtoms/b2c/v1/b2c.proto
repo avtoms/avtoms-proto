@@ -806,6 +806,9 @@ message ListProvidersRequest {
   bool verified_only = 9;
   double min_rating = 10;
   int64 max_price = 11;           // ceiling on price_from, so'm
+  // Floor on price_from, so'm. With max_price it makes the price band the filters screen
+  // offers ("100–300 ming"), which a ceiling alone cannot express.
+  int64 min_price = 18;
   double max_distance_km = 12;
   repeated string amenities = 13; // every one listed must be present
   bool favorites_only = 14;

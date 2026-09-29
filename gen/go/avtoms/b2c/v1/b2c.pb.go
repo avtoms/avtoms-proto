@@ -4883,24 +4883,27 @@ func (x *ListCategoriesResponse) GetCategories() []*Category {
 
 // ListProvidersRequest is the filter panel of the catalog screen, one field per control.
 type ListProvidersRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	CityId        string                 `protobuf:"bytes,1,opt,name=city_id,json=cityId,proto3" json:"city_id,omitempty"`
-	CategoryIds   []string               `protobuf:"bytes,2,rep,name=category_ids,json=categoryIds,proto3" json:"category_ids,omitempty"`
-	Query         string                 `protobuf:"bytes,3,opt,name=query,proto3" json:"query,omitempty"`
-	Latitude      float64                `protobuf:"fixed64,4,opt,name=latitude,proto3" json:"latitude,omitempty"`
-	Longitude     float64                `protobuf:"fixed64,5,opt,name=longitude,proto3" json:"longitude,omitempty"`
-	Sort          ProviderSort           `protobuf:"varint,6,opt,name=sort,proto3,enum=avtoms.b2c.v1.ProviderSort" json:"sort,omitempty"`
-	OpenNow       bool                   `protobuf:"varint,7,opt,name=open_now,json=openNow,proto3" json:"open_now,omitempty"`
-	PromoOnly     bool                   `protobuf:"varint,8,opt,name=promo_only,json=promoOnly,proto3" json:"promo_only,omitempty"`
-	VerifiedOnly  bool                   `protobuf:"varint,9,opt,name=verified_only,json=verifiedOnly,proto3" json:"verified_only,omitempty"`
-	MinRating     float64                `protobuf:"fixed64,10,opt,name=min_rating,json=minRating,proto3" json:"min_rating,omitempty"`
-	MaxPrice      int64                  `protobuf:"varint,11,opt,name=max_price,json=maxPrice,proto3" json:"max_price,omitempty"` // ceiling on price_from, so'm
-	MaxDistanceKm float64                `protobuf:"fixed64,12,opt,name=max_distance_km,json=maxDistanceKm,proto3" json:"max_distance_km,omitempty"`
-	Amenities     []string               `protobuf:"bytes,13,rep,name=amenities,proto3" json:"amenities,omitempty"` // every one listed must be present
-	FavoritesOnly bool                   `protobuf:"varint,14,opt,name=favorites_only,json=favoritesOnly,proto3" json:"favorites_only,omitempty"`
-	Phone         string                 `protobuf:"bytes,15,opt,name=phone,proto3" json:"phone,omitempty"` // the caller, for the favourite flag
-	Limit         int32                  `protobuf:"varint,16,opt,name=limit,proto3" json:"limit,omitempty"`
-	Offset        int32                  `protobuf:"varint,17,opt,name=offset,proto3" json:"offset,omitempty"`
+	state        protoimpl.MessageState `protogen:"open.v1"`
+	CityId       string                 `protobuf:"bytes,1,opt,name=city_id,json=cityId,proto3" json:"city_id,omitempty"`
+	CategoryIds  []string               `protobuf:"bytes,2,rep,name=category_ids,json=categoryIds,proto3" json:"category_ids,omitempty"`
+	Query        string                 `protobuf:"bytes,3,opt,name=query,proto3" json:"query,omitempty"`
+	Latitude     float64                `protobuf:"fixed64,4,opt,name=latitude,proto3" json:"latitude,omitempty"`
+	Longitude    float64                `protobuf:"fixed64,5,opt,name=longitude,proto3" json:"longitude,omitempty"`
+	Sort         ProviderSort           `protobuf:"varint,6,opt,name=sort,proto3,enum=avtoms.b2c.v1.ProviderSort" json:"sort,omitempty"`
+	OpenNow      bool                   `protobuf:"varint,7,opt,name=open_now,json=openNow,proto3" json:"open_now,omitempty"`
+	PromoOnly    bool                   `protobuf:"varint,8,opt,name=promo_only,json=promoOnly,proto3" json:"promo_only,omitempty"`
+	VerifiedOnly bool                   `protobuf:"varint,9,opt,name=verified_only,json=verifiedOnly,proto3" json:"verified_only,omitempty"`
+	MinRating    float64                `protobuf:"fixed64,10,opt,name=min_rating,json=minRating,proto3" json:"min_rating,omitempty"`
+	MaxPrice     int64                  `protobuf:"varint,11,opt,name=max_price,json=maxPrice,proto3" json:"max_price,omitempty"` // ceiling on price_from, so'm
+	// Floor on price_from, so'm. With max_price it makes the price band the filters screen
+	// offers ("100–300 ming"), which a ceiling alone cannot express.
+	MinPrice      int64    `protobuf:"varint,18,opt,name=min_price,json=minPrice,proto3" json:"min_price,omitempty"`
+	MaxDistanceKm float64  `protobuf:"fixed64,12,opt,name=max_distance_km,json=maxDistanceKm,proto3" json:"max_distance_km,omitempty"`
+	Amenities     []string `protobuf:"bytes,13,rep,name=amenities,proto3" json:"amenities,omitempty"` // every one listed must be present
+	FavoritesOnly bool     `protobuf:"varint,14,opt,name=favorites_only,json=favoritesOnly,proto3" json:"favorites_only,omitempty"`
+	Phone         string   `protobuf:"bytes,15,opt,name=phone,proto3" json:"phone,omitempty"` // the caller, for the favourite flag
+	Limit         int32    `protobuf:"varint,16,opt,name=limit,proto3" json:"limit,omitempty"`
+	Offset        int32    `protobuf:"varint,17,opt,name=offset,proto3" json:"offset,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -5008,6 +5011,13 @@ func (x *ListProvidersRequest) GetMinRating() float64 {
 func (x *ListProvidersRequest) GetMaxPrice() int64 {
 	if x != nil {
 		return x.MaxPrice
+	}
+	return 0
+}
+
+func (x *ListProvidersRequest) GetMinPrice() int64 {
+	if x != nil {
+		return x.MinPrice
 	}
 	return 0
 }
@@ -11515,7 +11525,7 @@ const file_avtoms_b2c_v1_b2c_proto_rawDesc = "" +
 	"\x16ListCategoriesResponse\x127\n" +
 	"\n" +
 	"categories\x18\x01 \x03(\v2\x17.avtoms.b2c.v1.CategoryR\n" +
-	"categories\"\x9f\x04\n" +
+	"categories\"\xbc\x04\n" +
 	"\x14ListProvidersRequest\x12\x17\n" +
 	"\acity_id\x18\x01 \x01(\tR\x06cityId\x12!\n" +
 	"\fcategory_ids\x18\x02 \x03(\tR\vcategoryIds\x12\x14\n" +
@@ -11530,7 +11540,8 @@ const file_avtoms_b2c_v1_b2c_proto_rawDesc = "" +
 	"\n" +
 	"min_rating\x18\n" +
 	" \x01(\x01R\tminRating\x12\x1b\n" +
-	"\tmax_price\x18\v \x01(\x03R\bmaxPrice\x12&\n" +
+	"\tmax_price\x18\v \x01(\x03R\bmaxPrice\x12\x1b\n" +
+	"\tmin_price\x18\x12 \x01(\x03R\bminPrice\x12&\n" +
 	"\x0fmax_distance_km\x18\f \x01(\x01R\rmaxDistanceKm\x12\x1c\n" +
 	"\tamenities\x18\r \x03(\tR\tamenities\x12%\n" +
 	"\x0efavorites_only\x18\x0e \x01(\bR\rfavoritesOnly\x12\x14\n" +
