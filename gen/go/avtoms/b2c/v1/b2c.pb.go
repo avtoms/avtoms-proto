@@ -3772,8 +3772,19 @@ type EmergencyRequest struct {
 	CreatedAt     string                 `protobuf:"bytes,21,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
 	AssignedAt    string                 `protobuf:"bytes,22,opt,name=assigned_at,json=assignedAt,proto3" json:"assigned_at,omitempty"`
 	ClosedAt      string                 `protobuf:"bytes,23,opt,name=closed_at,json=closedAt,proto3" json:"closed_at,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	// Where the master is now, so the app can draw them moving towards the driver. 0/0 means
+	// nobody has reported a position yet — before assignment, or from a partner who does not
+	// share one. The driver's own coordinates are latitude/longitude above, and the app has
+	// both ends of the line it draws.
+	MasterLatitude  float64 `protobuf:"fixed64,24,opt,name=master_latitude,json=masterLatitude,proto3" json:"master_latitude,omitempty"`
+	MasterLongitude float64 `protobuf:"fixed64,25,opt,name=master_longitude,json=masterLongitude,proto3" json:"master_longitude,omitempty"`
+	// Bearing in degrees, 0 = north, clockwise. Which way to point the vehicle icon.
+	MasterHeading float64 `protobuf:"fixed64,26,opt,name=master_heading,json=masterHeading,proto3" json:"master_heading,omitempty"`
+	// When that position was true (RFC3339). A position without a time cannot be judged
+	// stale, and a stale pin on a map is worse than no pin.
+	MasterLocationAt string `protobuf:"bytes,27,opt,name=master_location_at,json=masterLocationAt,proto3" json:"master_location_at,omitempty"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
 }
 
 func (x *EmergencyRequest) Reset() {
@@ -3963,6 +3974,34 @@ func (x *EmergencyRequest) GetAssignedAt() string {
 func (x *EmergencyRequest) GetClosedAt() string {
 	if x != nil {
 		return x.ClosedAt
+	}
+	return ""
+}
+
+func (x *EmergencyRequest) GetMasterLatitude() float64 {
+	if x != nil {
+		return x.MasterLatitude
+	}
+	return 0
+}
+
+func (x *EmergencyRequest) GetMasterLongitude() float64 {
+	if x != nil {
+		return x.MasterLongitude
+	}
+	return 0
+}
+
+func (x *EmergencyRequest) GetMasterHeading() float64 {
+	if x != nil {
+		return x.MasterHeading
+	}
+	return 0
+}
+
+func (x *EmergencyRequest) GetMasterLocationAt() string {
+	if x != nil {
+		return x.MasterLocationAt
 	}
 	return ""
 }
@@ -11406,7 +11445,7 @@ const file_avtoms_b2c_v1_b2c_proto_rawDesc = "" +
 	"\n" +
 	"base_price\x18\a \x01(\x03R\tbasePrice\x12\x1a\n" +
 	"\bposition\x18\b \x01(\x05R\bposition\x12\x16\n" +
-	"\x06active\x18\t \x01(\bR\x06active\"\xcb\x05\n" +
+	"\x06active\x18\t \x01(\bR\x06active\"\xf4\x06\n" +
 	"\x10EmergencyRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x16\n" +
 	"\x06number\x18\x02 \x01(\tR\x06number\x12\x14\n" +
@@ -11436,7 +11475,11 @@ const file_avtoms_b2c_v1_b2c_proto_rawDesc = "" +
 	"created_at\x18\x15 \x01(\tR\tcreatedAt\x12\x1f\n" +
 	"\vassigned_at\x18\x16 \x01(\tR\n" +
 	"assignedAt\x12\x1b\n" +
-	"\tclosed_at\x18\x17 \x01(\tR\bclosedAt\"R\n" +
+	"\tclosed_at\x18\x17 \x01(\tR\bclosedAt\x12'\n" +
+	"\x0fmaster_latitude\x18\x18 \x01(\x01R\x0emasterLatitude\x12)\n" +
+	"\x10master_longitude\x18\x19 \x01(\x01R\x0fmasterLongitude\x12%\n" +
+	"\x0emaster_heading\x18\x1a \x01(\x01R\rmasterHeading\x12,\n" +
+	"\x12master_location_at\x18\x1b \x01(\tR\x10masterLocationAt\"R\n" +
 	"\tFuelPrice\x12\x1b\n" +
 	"\tfuel_code\x18\x01 \x01(\tR\bfuelCode\x12\x14\n" +
 	"\x05price\x18\x02 \x01(\x03R\x05price\x12\x12\n" +

@@ -680,6 +680,17 @@ message EmergencyRequest {
   string created_at = 21;
   string assigned_at = 22;
   string closed_at = 23;
+  // Where the master is now, so the app can draw them moving towards the driver. 0/0 means
+  // nobody has reported a position yet — before assignment, or from a partner who does not
+  // share one. The driver's own coordinates are latitude/longitude above, and the app has
+  // both ends of the line it draws.
+  double master_latitude = 24;
+  double master_longitude = 25;
+  // Bearing in degrees, 0 = north, clockwise. Which way to point the vehicle icon.
+  double master_heading = 26;
+  // When that position was true (RFC3339). A position without a time cannot be judged
+  // stale, and a stale pin on a map is worse than no pin.
+  string master_location_at = 27;
 }
 
 // FuelPrice is one fuel grade at one station.
