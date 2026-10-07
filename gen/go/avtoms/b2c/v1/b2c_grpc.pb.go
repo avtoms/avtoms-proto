@@ -95,6 +95,7 @@ const (
 	B2CService_UpsertCity_FullMethodName               = "/avtoms.b2c.v1.B2CService/UpsertCity"
 	B2CService_UpsertCategory_FullMethodName           = "/avtoms.b2c.v1.B2CService/UpsertCategory"
 	B2CService_SeedDemoData_FullMethodName             = "/avtoms.b2c.v1.B2CService/SeedDemoData"
+	B2CService_SeedDemoDriver_FullMethodName           = "/avtoms.b2c.v1.B2CService/SeedDemoDriver"
 	B2CService_PurgeDemoData_FullMethodName            = "/avtoms.b2c.v1.B2CService/PurgeDemoData"
 )
 
@@ -232,6 +233,11 @@ type B2CServiceClient interface {
 	// against. Idempotent, and everything it writes is marked demo so PurgeDemoData can take
 	// it all away again — staging is a place to look at the app, not a place to keep rubbish.
 	SeedDemoData(ctx context.Context, in *SeedDemoDataRequest, opts ...grpc.CallOption) (*SeedDemoDataResponse, error)
+	// SeedDemoDriver fills one phone's own side — a garage, bookings in every state, cashback
+	// and notifications — against the demo directory that is already there. It is what a
+	// tester needs: an account with something in it, including a finished visit to review,
+	// without re-seeding the whole catalogue underneath everybody else.
+	SeedDemoDriver(ctx context.Context, in *SeedDemoDriverRequest, opts ...grpc.CallOption) (*SeedDemoDataResponse, error)
 	PurgeDemoData(ctx context.Context, in *PurgeDemoDataRequest, opts ...grpc.CallOption) (*PurgeDemoDataResponse, error)
 }
 
@@ -1003,6 +1009,16 @@ func (c *b2CServiceClient) SeedDemoData(ctx context.Context, in *SeedDemoDataReq
 	return out, nil
 }
 
+func (c *b2CServiceClient) SeedDemoDriver(ctx context.Context, in *SeedDemoDriverRequest, opts ...grpc.CallOption) (*SeedDemoDataResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(SeedDemoDataResponse)
+	err := c.cc.Invoke(ctx, B2CService_SeedDemoDriver_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *b2CServiceClient) PurgeDemoData(ctx context.Context, in *PurgeDemoDataRequest, opts ...grpc.CallOption) (*PurgeDemoDataResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(PurgeDemoDataResponse)
@@ -1147,6 +1163,11 @@ type B2CServiceServer interface {
 	// against. Idempotent, and everything it writes is marked demo so PurgeDemoData can take
 	// it all away again — staging is a place to look at the app, not a place to keep rubbish.
 	SeedDemoData(context.Context, *SeedDemoDataRequest) (*SeedDemoDataResponse, error)
+	// SeedDemoDriver fills one phone's own side — a garage, bookings in every state, cashback
+	// and notifications — against the demo directory that is already there. It is what a
+	// tester needs: an account with something in it, including a finished visit to review,
+	// without re-seeding the whole catalogue underneath everybody else.
+	SeedDemoDriver(context.Context, *SeedDemoDriverRequest) (*SeedDemoDataResponse, error)
 	PurgeDemoData(context.Context, *PurgeDemoDataRequest) (*PurgeDemoDataResponse, error)
 	mustEmbedUnimplementedB2CServiceServer()
 }
@@ -1385,6 +1406,9 @@ func (UnimplementedB2CServiceServer) UpsertCategory(context.Context, *UpsertCate
 }
 func (UnimplementedB2CServiceServer) SeedDemoData(context.Context, *SeedDemoDataRequest) (*SeedDemoDataResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method SeedDemoData not implemented")
+}
+func (UnimplementedB2CServiceServer) SeedDemoDriver(context.Context, *SeedDemoDriverRequest) (*SeedDemoDataResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method SeedDemoDriver not implemented")
 }
 func (UnimplementedB2CServiceServer) PurgeDemoData(context.Context, *PurgeDemoDataRequest) (*PurgeDemoDataResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method PurgeDemoData not implemented")
@@ -2778,6 +2802,24 @@ func _B2CService_SeedDemoData_Handler(srv interface{}, ctx context.Context, dec 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _B2CService_SeedDemoDriver_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SeedDemoDriverRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(B2CServiceServer).SeedDemoDriver(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: B2CService_SeedDemoDriver_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(B2CServiceServer).SeedDemoDriver(ctx, req.(*SeedDemoDriverRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _B2CService_PurgeDemoData_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(PurgeDemoDataRequest)
 	if err := dec(in); err != nil {
@@ -3106,6 +3148,10 @@ var B2CService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "SeedDemoData",
 			Handler:    _B2CService_SeedDemoData_Handler,
+		},
+		{
+			MethodName: "SeedDemoDriver",
+			Handler:    _B2CService_SeedDemoDriver_Handler,
 		},
 		{
 			MethodName: "PurgeDemoData",

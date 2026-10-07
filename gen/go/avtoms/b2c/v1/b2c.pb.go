@@ -3303,6 +3303,13 @@ type Chat struct {
 	LastMessageAt string                 `protobuf:"bytes,9,opt,name=last_message_at,json=lastMessageAt,proto3" json:"last_message_at,omitempty"`
 	CreatedAt     string                 `protobuf:"bytes,10,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
 	EmergencyId   string                 `protobuf:"bytes,11,opt,name=emergency_id,json=emergencyId,proto3" json:"emergency_id,omitempty"` // the roadside call this thread belongs to
+	// The number the call button dials: the service centre's public number, or the master's
+	// on a roadside thread. `phone` above is the driver's own and is no use to them.
+	//
+	// Resolved on read rather than copied in when the thread is opened, so a shop that
+	// changes its number does not leave old threads dialling the old one. Empty on the
+	// support thread, which is answered in the app.
+	ProviderPhone string `protobuf:"bytes,12,opt,name=provider_phone,json=providerPhone,proto3" json:"provider_phone,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -3410,6 +3417,13 @@ func (x *Chat) GetCreatedAt() string {
 func (x *Chat) GetEmergencyId() string {
 	if x != nil {
 		return x.EmergencyId
+	}
+	return ""
+}
+
+func (x *Chat) GetProviderPhone() string {
+	if x != nil {
+		return x.ProviderPhone
 	}
 	return ""
 }
@@ -10985,6 +10999,60 @@ func (x *SeedDemoDataResponse) GetAlreadySeeded() bool {
 	return false
 }
 
+type SeedDemoDriverRequest struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	Phone string                 `protobuf:"bytes,1,opt,name=phone,proto3" json:"phone,omitempty"`
+	// Clear this phone's demo cars and bookings first, so a tester who has already used up
+	// the finished visit can have a fresh set rather than a second pile.
+	Force         bool `protobuf:"varint,2,opt,name=force,proto3" json:"force,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SeedDemoDriverRequest) Reset() {
+	*x = SeedDemoDriverRequest{}
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[136]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SeedDemoDriverRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SeedDemoDriverRequest) ProtoMessage() {}
+
+func (x *SeedDemoDriverRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[136]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SeedDemoDriverRequest.ProtoReflect.Descriptor instead.
+func (*SeedDemoDriverRequest) Descriptor() ([]byte, []int) {
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{136}
+}
+
+func (x *SeedDemoDriverRequest) GetPhone() string {
+	if x != nil {
+		return x.Phone
+	}
+	return ""
+}
+
+func (x *SeedDemoDriverRequest) GetForce() bool {
+	if x != nil {
+		return x.Force
+	}
+	return false
+}
+
 type PurgeDemoDataRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Phone         string                 `protobuf:"bytes,1,opt,name=phone,proto3" json:"phone,omitempty"` // also clear this driver's demo bookings/cars
@@ -10994,7 +11062,7 @@ type PurgeDemoDataRequest struct {
 
 func (x *PurgeDemoDataRequest) Reset() {
 	*x = PurgeDemoDataRequest{}
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[136]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[137]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -11006,7 +11074,7 @@ func (x *PurgeDemoDataRequest) String() string {
 func (*PurgeDemoDataRequest) ProtoMessage() {}
 
 func (x *PurgeDemoDataRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[136]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[137]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -11019,7 +11087,7 @@ func (x *PurgeDemoDataRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PurgeDemoDataRequest.ProtoReflect.Descriptor instead.
 func (*PurgeDemoDataRequest) Descriptor() ([]byte, []int) {
-	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{136}
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{137}
 }
 
 func (x *PurgeDemoDataRequest) GetPhone() string {
@@ -11038,7 +11106,7 @@ type PurgeDemoDataResponse struct {
 
 func (x *PurgeDemoDataResponse) Reset() {
 	*x = PurgeDemoDataResponse{}
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[137]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[138]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -11050,7 +11118,7 @@ func (x *PurgeDemoDataResponse) String() string {
 func (*PurgeDemoDataResponse) ProtoMessage() {}
 
 func (x *PurgeDemoDataResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[137]
+	mi := &file_avtoms_b2c_v1_b2c_proto_msgTypes[138]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -11063,7 +11131,7 @@ func (x *PurgeDemoDataResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PurgeDemoDataResponse.ProtoReflect.Descriptor instead.
 func (*PurgeDemoDataResponse) Descriptor() ([]byte, []int) {
-	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{137}
+	return file_avtoms_b2c_v1_b2c_proto_rawDescGZIP(), []int{138}
 }
 
 func (x *PurgeDemoDataResponse) GetDeleted() int32 {
@@ -11395,7 +11463,7 @@ const file_avtoms_b2c_v1_b2c_proto_rawDesc = "" +
 	"\n" +
 	"booking_id\x18\a \x01(\tR\tbookingId\x12\x1d\n" +
 	"\n" +
-	"created_at\x18\b \x01(\tR\tcreatedAt\"\xe3\x02\n" +
+	"created_at\x18\b \x01(\tR\tcreatedAt\"\x8a\x03\n" +
 	"\x04Chat\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x14\n" +
 	"\x05phone\x18\x02 \x01(\tR\x05phone\x12+\n" +
@@ -11411,7 +11479,8 @@ const file_avtoms_b2c_v1_b2c_proto_rawDesc = "" +
 	"\n" +
 	"created_at\x18\n" +
 	" \x01(\tR\tcreatedAt\x12!\n" +
-	"\femergency_id\x18\v \x01(\tR\vemergencyId\"\xe0\x01\n" +
+	"\femergency_id\x18\v \x01(\tR\vemergencyId\x12%\n" +
+	"\x0eprovider_phone\x18\f \x01(\tR\rproviderPhone\"\xe0\x01\n" +
 	"\vChatMessage\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x17\n" +
 	"\achat_id\x18\x02 \x01(\tR\x06chatId\x12\x18\n" +
@@ -12033,7 +12102,10 @@ const file_avtoms_b2c_v1_b2c_proto_rawDesc = "" +
 	"categories\x12\x1a\n" +
 	"\bbookings\x18\t \x01(\x05R\bbookings\x12%\n" +
 	"\x0ealready_seeded\x18\n" +
-	" \x01(\bR\ralreadySeeded\",\n" +
+	" \x01(\bR\ralreadySeeded\"C\n" +
+	"\x15SeedDemoDriverRequest\x12\x14\n" +
+	"\x05phone\x18\x01 \x01(\tR\x05phone\x12\x14\n" +
+	"\x05force\x18\x02 \x01(\bR\x05force\",\n" +
 	"\x14PurgeDemoDataRequest\x12\x14\n" +
 	"\x05phone\x18\x01 \x01(\tR\x05phone\"1\n" +
 	"\x15PurgeDemoDataResponse\x12\x18\n" +
@@ -12098,7 +12170,7 @@ const file_avtoms_b2c_v1_b2c_proto_rawDesc = "" +
 	"\x15PROVIDER_SORT_NEAREST\x10\x01\x12\x18\n" +
 	"\x14PROVIDER_SORT_RATING\x10\x02\x12\x1b\n" +
 	"\x17PROVIDER_SORT_PRICE_ASC\x10\x03\x12\x17\n" +
-	"\x13PROVIDER_SORT_PROMO\x10\x042\xac3\n" +
+	"\x13PROVIDER_SORT_PROMO\x10\x042\x894\n" +
 	"\n" +
 	"B2CService\x12F\n" +
 	"\n" +
@@ -12183,7 +12255,8 @@ const file_avtoms_b2c_v1_b2c_proto_rawDesc = "" +
 	"\n" +
 	"UpsertCity\x12 .avtoms.b2c.v1.UpsertCityRequest\x1a\x13.avtoms.b2c.v1.City\x12O\n" +
 	"\x0eUpsertCategory\x12$.avtoms.b2c.v1.UpsertCategoryRequest\x1a\x17.avtoms.b2c.v1.Category\x12W\n" +
-	"\fSeedDemoData\x12\".avtoms.b2c.v1.SeedDemoDataRequest\x1a#.avtoms.b2c.v1.SeedDemoDataResponse\x12Z\n" +
+	"\fSeedDemoData\x12\".avtoms.b2c.v1.SeedDemoDataRequest\x1a#.avtoms.b2c.v1.SeedDemoDataResponse\x12[\n" +
+	"\x0eSeedDemoDriver\x12$.avtoms.b2c.v1.SeedDemoDriverRequest\x1a#.avtoms.b2c.v1.SeedDemoDataResponse\x12Z\n" +
 	"\rPurgeDemoData\x12#.avtoms.b2c.v1.PurgeDemoDataRequest\x1a$.avtoms.b2c.v1.PurgeDemoDataResponseB4Z2github.com/avtoms/proto/gen/go/avtoms/b2c/v1;b2cv1b\x06proto3"
 
 var (
@@ -12199,7 +12272,7 @@ func file_avtoms_b2c_v1_b2c_proto_rawDescGZIP() []byte {
 }
 
 var file_avtoms_b2c_v1_b2c_proto_enumTypes = make([]protoimpl.EnumInfo, 10)
-var file_avtoms_b2c_v1_b2c_proto_msgTypes = make([]protoimpl.MessageInfo, 138)
+var file_avtoms_b2c_v1_b2c_proto_msgTypes = make([]protoimpl.MessageInfo, 139)
 var file_avtoms_b2c_v1_b2c_proto_goTypes = []any{
 	(BookingState)(0),                       // 0: avtoms.b2c.v1.BookingState
 	(PaymentMethod)(0),                      // 1: avtoms.b2c.v1.PaymentMethod
@@ -12347,12 +12420,13 @@ var file_avtoms_b2c_v1_b2c_proto_goTypes = []any{
 	(*UpsertCategoryRequest)(nil),           // 143: avtoms.b2c.v1.UpsertCategoryRequest
 	(*SeedDemoDataRequest)(nil),             // 144: avtoms.b2c.v1.SeedDemoDataRequest
 	(*SeedDemoDataResponse)(nil),            // 145: avtoms.b2c.v1.SeedDemoDataResponse
-	(*PurgeDemoDataRequest)(nil),            // 146: avtoms.b2c.v1.PurgeDemoDataRequest
-	(*PurgeDemoDataResponse)(nil),           // 147: avtoms.b2c.v1.PurgeDemoDataResponse
-	(v1.Language)(0),                        // 148: avtoms.common.v1.Language
+	(*SeedDemoDriverRequest)(nil),           // 146: avtoms.b2c.v1.SeedDemoDriverRequest
+	(*PurgeDemoDataRequest)(nil),            // 147: avtoms.b2c.v1.PurgeDemoDataRequest
+	(*PurgeDemoDataResponse)(nil),           // 148: avtoms.b2c.v1.PurgeDemoDataResponse
+	(v1.Language)(0),                        // 149: avtoms.common.v1.Language
 }
 var file_avtoms_b2c_v1_b2c_proto_depIdxs = []int32{
-	148, // 0: avtoms.b2c.v1.AppUser.language:type_name -> avtoms.common.v1.Language
+	149, // 0: avtoms.b2c.v1.AppUser.language:type_name -> avtoms.common.v1.Language
 	15,  // 1: avtoms.b2c.v1.Provider.hours:type_name -> avtoms.b2c.v1.OpeningHours
 	0,   // 2: avtoms.b2c.v1.BookingEvent.state:type_name -> avtoms.b2c.v1.BookingState
 	22,  // 3: avtoms.b2c.v1.Booking.items:type_name -> avtoms.b2c.v1.BookingItem
@@ -12368,7 +12442,7 @@ var file_avtoms_b2c_v1_b2c_proto_depIdxs = []int32{
 	15,  // 13: avtoms.b2c.v1.FuelStation.hours:type_name -> avtoms.b2c.v1.OpeningHours
 	37,  // 14: avtoms.b2c.v1.FuelStation.prices:type_name -> avtoms.b2c.v1.FuelPrice
 	7,   // 15: avtoms.b2c.v1.MapPoint.kind:type_name -> avtoms.b2c.v1.MapPointKind
-	148, // 16: avtoms.b2c.v1.UpdateProfileRequest.language:type_name -> avtoms.common.v1.Language
+	149, // 16: avtoms.b2c.v1.UpdateProfileRequest.language:type_name -> avtoms.common.v1.Language
 	13,  // 17: avtoms.b2c.v1.ListCitiesResponse.cities:type_name -> avtoms.b2c.v1.City
 	14,  // 18: avtoms.b2c.v1.ListCategoriesResponse.categories:type_name -> avtoms.b2c.v1.Category
 	9,   // 19: avtoms.b2c.v1.ListProvidersRequest.sort:type_name -> avtoms.b2c.v1.ProviderSort
@@ -12496,86 +12570,88 @@ var file_avtoms_b2c_v1_b2c_proto_depIdxs = []int32{
 	142, // 141: avtoms.b2c.v1.B2CService.UpsertCity:input_type -> avtoms.b2c.v1.UpsertCityRequest
 	143, // 142: avtoms.b2c.v1.B2CService.UpsertCategory:input_type -> avtoms.b2c.v1.UpsertCategoryRequest
 	144, // 143: avtoms.b2c.v1.B2CService.SeedDemoData:input_type -> avtoms.b2c.v1.SeedDemoDataRequest
-	146, // 144: avtoms.b2c.v1.B2CService.PurgeDemoData:input_type -> avtoms.b2c.v1.PurgeDemoDataRequest
-	11,  // 145: avtoms.b2c.v1.B2CService.GetProfile:output_type -> avtoms.b2c.v1.AppUser
-	11,  // 146: avtoms.b2c.v1.B2CService.UpdateProfile:output_type -> avtoms.b2c.v1.AppUser
-	10,  // 147: avtoms.b2c.v1.B2CService.DeleteProfile:output_type -> avtoms.b2c.v1.DeleteResponse
-	12,  // 148: avtoms.b2c.v1.B2CService.RegisterDevice:output_type -> avtoms.b2c.v1.Device
-	10,  // 149: avtoms.b2c.v1.B2CService.DeleteDevice:output_type -> avtoms.b2c.v1.DeleteResponse
-	46,  // 150: avtoms.b2c.v1.B2CService.ListCities:output_type -> avtoms.b2c.v1.ListCitiesResponse
-	48,  // 151: avtoms.b2c.v1.B2CService.ListCategories:output_type -> avtoms.b2c.v1.ListCategoriesResponse
-	50,  // 152: avtoms.b2c.v1.B2CService.ListProviders:output_type -> avtoms.b2c.v1.ListProvidersResponse
-	16,  // 153: avtoms.b2c.v1.B2CService.GetProvider:output_type -> avtoms.b2c.v1.Provider
-	53,  // 154: avtoms.b2c.v1.B2CService.ListProviderServices:output_type -> avtoms.b2c.v1.ListProviderServicesResponse
-	55,  // 155: avtoms.b2c.v1.B2CService.ListMapPoints:output_type -> avtoms.b2c.v1.ListMapPointsResponse
-	57,  // 156: avtoms.b2c.v1.B2CService.ListFuelStations:output_type -> avtoms.b2c.v1.ListFuelStationsResponse
-	38,  // 157: avtoms.b2c.v1.B2CService.GetFuelStation:output_type -> avtoms.b2c.v1.FuelStation
-	60,  // 158: avtoms.b2c.v1.B2CService.Search:output_type -> avtoms.b2c.v1.SearchResponse
-	10,  // 159: avtoms.b2c.v1.B2CService.ClearSearchHistory:output_type -> avtoms.b2c.v1.DeleteResponse
-	63,  // 160: avtoms.b2c.v1.B2CService.GetHome:output_type -> avtoms.b2c.v1.HomeResponse
-	65,  // 161: avtoms.b2c.v1.B2CService.ListReviews:output_type -> avtoms.b2c.v1.ListReviewsResponse
-	18,  // 162: avtoms.b2c.v1.B2CService.CreateReview:output_type -> avtoms.b2c.v1.Review
-	18,  // 163: avtoms.b2c.v1.B2CService.SetReviewReply:output_type -> avtoms.b2c.v1.Review
-	20,  // 164: avtoms.b2c.v1.B2CService.CreateComplaint:output_type -> avtoms.b2c.v1.Complaint
-	70,  // 165: avtoms.b2c.v1.B2CService.ListComplaints:output_type -> avtoms.b2c.v1.ListComplaintsResponse
-	72,  // 166: avtoms.b2c.v1.B2CService.ListFavorites:output_type -> avtoms.b2c.v1.ListFavoritesResponse
-	74,  // 167: avtoms.b2c.v1.B2CService.SetFavorite:output_type -> avtoms.b2c.v1.SetFavoriteResponse
-	76,  // 168: avtoms.b2c.v1.B2CService.ListCars:output_type -> avtoms.b2c.v1.ListCarsResponse
-	21,  // 169: avtoms.b2c.v1.B2CService.GetCar:output_type -> avtoms.b2c.v1.Car
-	21,  // 170: avtoms.b2c.v1.B2CService.CreateCar:output_type -> avtoms.b2c.v1.Car
-	21,  // 171: avtoms.b2c.v1.B2CService.UpdateCar:output_type -> avtoms.b2c.v1.Car
-	10,  // 172: avtoms.b2c.v1.B2CService.DeleteCar:output_type -> avtoms.b2c.v1.DeleteResponse
-	21,  // 173: avtoms.b2c.v1.B2CService.SetDefaultCar:output_type -> avtoms.b2c.v1.Car
-	84,  // 174: avtoms.b2c.v1.B2CService.ListSlots:output_type -> avtoms.b2c.v1.ListSlotsResponse
-	24,  // 175: avtoms.b2c.v1.B2CService.CreateBooking:output_type -> avtoms.b2c.v1.Booking
-	24,  // 176: avtoms.b2c.v1.B2CService.GetBooking:output_type -> avtoms.b2c.v1.Booking
-	88,  // 177: avtoms.b2c.v1.B2CService.ListBookings:output_type -> avtoms.b2c.v1.ListBookingsResponse
-	24,  // 178: avtoms.b2c.v1.B2CService.CancelBooking:output_type -> avtoms.b2c.v1.Booking
-	24,  // 179: avtoms.b2c.v1.B2CService.RescheduleBooking:output_type -> avtoms.b2c.v1.Booking
-	24,  // 180: avtoms.b2c.v1.B2CService.SetBookingState:output_type -> avtoms.b2c.v1.Booking
-	24,  // 181: avtoms.b2c.v1.B2CService.LinkBookingAppointment:output_type -> avtoms.b2c.v1.Booking
-	94,  // 182: avtoms.b2c.v1.B2CService.ListCards:output_type -> avtoms.b2c.v1.ListCardsResponse
-	26,  // 183: avtoms.b2c.v1.B2CService.AddCard:output_type -> avtoms.b2c.v1.Card
-	10,  // 184: avtoms.b2c.v1.B2CService.DeleteCard:output_type -> avtoms.b2c.v1.DeleteResponse
-	26,  // 185: avtoms.b2c.v1.B2CService.SetDefaultCard:output_type -> avtoms.b2c.v1.Card
-	99,  // 186: avtoms.b2c.v1.B2CService.ValidatePromoCode:output_type -> avtoms.b2c.v1.ValidatePromoCodeResponse
-	27,  // 187: avtoms.b2c.v1.B2CService.CreatePayment:output_type -> avtoms.b2c.v1.Payment
-	27,  // 188: avtoms.b2c.v1.B2CService.GetPayment:output_type -> avtoms.b2c.v1.Payment
-	103, // 189: avtoms.b2c.v1.B2CService.ListPayments:output_type -> avtoms.b2c.v1.ListPaymentsResponse
-	105, // 190: avtoms.b2c.v1.B2CService.ListPromos:output_type -> avtoms.b2c.v1.ListPromosResponse
-	28,  // 191: avtoms.b2c.v1.B2CService.GetPromo:output_type -> avtoms.b2c.v1.Promo
-	108, // 192: avtoms.b2c.v1.B2CService.ListStories:output_type -> avtoms.b2c.v1.ListStoriesResponse
-	10,  // 193: avtoms.b2c.v1.B2CService.MarkStorySeen:output_type -> avtoms.b2c.v1.DeleteResponse
-	30,  // 194: avtoms.b2c.v1.B2CService.GetBonusAccount:output_type -> avtoms.b2c.v1.BonusAccount
-	114, // 195: avtoms.b2c.v1.B2CService.ListBonusEntries:output_type -> avtoms.b2c.v1.ListBonusEntriesResponse
-	112, // 196: avtoms.b2c.v1.B2CService.ApplyReferralCode:output_type -> avtoms.b2c.v1.ApplyReferralCodeResponse
-	116, // 197: avtoms.b2c.v1.B2CService.ListChats:output_type -> avtoms.b2c.v1.ListChatsResponse
-	118, // 198: avtoms.b2c.v1.B2CService.GetChat:output_type -> avtoms.b2c.v1.GetChatResponse
-	33,  // 199: avtoms.b2c.v1.B2CService.SendChatMessage:output_type -> avtoms.b2c.v1.ChatMessage
-	32,  // 200: avtoms.b2c.v1.B2CService.MarkChatRead:output_type -> avtoms.b2c.v1.Chat
-	122, // 201: avtoms.b2c.v1.B2CService.ListNotifications:output_type -> avtoms.b2c.v1.ListNotificationsResponse
-	34,  // 202: avtoms.b2c.v1.B2CService.MarkNotificationRead:output_type -> avtoms.b2c.v1.Notification
-	10,  // 203: avtoms.b2c.v1.B2CService.MarkAllNotificationsRead:output_type -> avtoms.b2c.v1.DeleteResponse
-	126, // 204: avtoms.b2c.v1.B2CService.GetBadges:output_type -> avtoms.b2c.v1.GetBadgesResponse
-	128, // 205: avtoms.b2c.v1.B2CService.ListEmergencyTypes:output_type -> avtoms.b2c.v1.ListEmergencyTypesResponse
-	36,  // 206: avtoms.b2c.v1.B2CService.CreateEmergencyRequest:output_type -> avtoms.b2c.v1.EmergencyRequest
-	36,  // 207: avtoms.b2c.v1.B2CService.GetEmergencyRequest:output_type -> avtoms.b2c.v1.EmergencyRequest
-	132, // 208: avtoms.b2c.v1.B2CService.ListEmergencyRequests:output_type -> avtoms.b2c.v1.ListEmergencyRequestsResponse
-	36,  // 209: avtoms.b2c.v1.B2CService.CancelEmergencyRequest:output_type -> avtoms.b2c.v1.EmergencyRequest
-	16,  // 210: avtoms.b2c.v1.B2CService.CreateProvider:output_type -> avtoms.b2c.v1.Provider
-	16,  // 211: avtoms.b2c.v1.B2CService.UpdateProvider:output_type -> avtoms.b2c.v1.Provider
-	10,  // 212: avtoms.b2c.v1.B2CService.DeleteProvider:output_type -> avtoms.b2c.v1.DeleteResponse
-	17,  // 213: avtoms.b2c.v1.B2CService.UpsertProviderService:output_type -> avtoms.b2c.v1.ProviderService
-	10,  // 214: avtoms.b2c.v1.B2CService.DeleteProviderService:output_type -> avtoms.b2c.v1.DeleteResponse
-	28,  // 215: avtoms.b2c.v1.B2CService.UpsertPromo:output_type -> avtoms.b2c.v1.Promo
-	10,  // 216: avtoms.b2c.v1.B2CService.DeletePromo:output_type -> avtoms.b2c.v1.DeleteResponse
-	38,  // 217: avtoms.b2c.v1.B2CService.UpsertFuelStation:output_type -> avtoms.b2c.v1.FuelStation
-	13,  // 218: avtoms.b2c.v1.B2CService.UpsertCity:output_type -> avtoms.b2c.v1.City
-	14,  // 219: avtoms.b2c.v1.B2CService.UpsertCategory:output_type -> avtoms.b2c.v1.Category
-	145, // 220: avtoms.b2c.v1.B2CService.SeedDemoData:output_type -> avtoms.b2c.v1.SeedDemoDataResponse
-	147, // 221: avtoms.b2c.v1.B2CService.PurgeDemoData:output_type -> avtoms.b2c.v1.PurgeDemoDataResponse
-	145, // [145:222] is the sub-list for method output_type
-	68,  // [68:145] is the sub-list for method input_type
+	146, // 144: avtoms.b2c.v1.B2CService.SeedDemoDriver:input_type -> avtoms.b2c.v1.SeedDemoDriverRequest
+	147, // 145: avtoms.b2c.v1.B2CService.PurgeDemoData:input_type -> avtoms.b2c.v1.PurgeDemoDataRequest
+	11,  // 146: avtoms.b2c.v1.B2CService.GetProfile:output_type -> avtoms.b2c.v1.AppUser
+	11,  // 147: avtoms.b2c.v1.B2CService.UpdateProfile:output_type -> avtoms.b2c.v1.AppUser
+	10,  // 148: avtoms.b2c.v1.B2CService.DeleteProfile:output_type -> avtoms.b2c.v1.DeleteResponse
+	12,  // 149: avtoms.b2c.v1.B2CService.RegisterDevice:output_type -> avtoms.b2c.v1.Device
+	10,  // 150: avtoms.b2c.v1.B2CService.DeleteDevice:output_type -> avtoms.b2c.v1.DeleteResponse
+	46,  // 151: avtoms.b2c.v1.B2CService.ListCities:output_type -> avtoms.b2c.v1.ListCitiesResponse
+	48,  // 152: avtoms.b2c.v1.B2CService.ListCategories:output_type -> avtoms.b2c.v1.ListCategoriesResponse
+	50,  // 153: avtoms.b2c.v1.B2CService.ListProviders:output_type -> avtoms.b2c.v1.ListProvidersResponse
+	16,  // 154: avtoms.b2c.v1.B2CService.GetProvider:output_type -> avtoms.b2c.v1.Provider
+	53,  // 155: avtoms.b2c.v1.B2CService.ListProviderServices:output_type -> avtoms.b2c.v1.ListProviderServicesResponse
+	55,  // 156: avtoms.b2c.v1.B2CService.ListMapPoints:output_type -> avtoms.b2c.v1.ListMapPointsResponse
+	57,  // 157: avtoms.b2c.v1.B2CService.ListFuelStations:output_type -> avtoms.b2c.v1.ListFuelStationsResponse
+	38,  // 158: avtoms.b2c.v1.B2CService.GetFuelStation:output_type -> avtoms.b2c.v1.FuelStation
+	60,  // 159: avtoms.b2c.v1.B2CService.Search:output_type -> avtoms.b2c.v1.SearchResponse
+	10,  // 160: avtoms.b2c.v1.B2CService.ClearSearchHistory:output_type -> avtoms.b2c.v1.DeleteResponse
+	63,  // 161: avtoms.b2c.v1.B2CService.GetHome:output_type -> avtoms.b2c.v1.HomeResponse
+	65,  // 162: avtoms.b2c.v1.B2CService.ListReviews:output_type -> avtoms.b2c.v1.ListReviewsResponse
+	18,  // 163: avtoms.b2c.v1.B2CService.CreateReview:output_type -> avtoms.b2c.v1.Review
+	18,  // 164: avtoms.b2c.v1.B2CService.SetReviewReply:output_type -> avtoms.b2c.v1.Review
+	20,  // 165: avtoms.b2c.v1.B2CService.CreateComplaint:output_type -> avtoms.b2c.v1.Complaint
+	70,  // 166: avtoms.b2c.v1.B2CService.ListComplaints:output_type -> avtoms.b2c.v1.ListComplaintsResponse
+	72,  // 167: avtoms.b2c.v1.B2CService.ListFavorites:output_type -> avtoms.b2c.v1.ListFavoritesResponse
+	74,  // 168: avtoms.b2c.v1.B2CService.SetFavorite:output_type -> avtoms.b2c.v1.SetFavoriteResponse
+	76,  // 169: avtoms.b2c.v1.B2CService.ListCars:output_type -> avtoms.b2c.v1.ListCarsResponse
+	21,  // 170: avtoms.b2c.v1.B2CService.GetCar:output_type -> avtoms.b2c.v1.Car
+	21,  // 171: avtoms.b2c.v1.B2CService.CreateCar:output_type -> avtoms.b2c.v1.Car
+	21,  // 172: avtoms.b2c.v1.B2CService.UpdateCar:output_type -> avtoms.b2c.v1.Car
+	10,  // 173: avtoms.b2c.v1.B2CService.DeleteCar:output_type -> avtoms.b2c.v1.DeleteResponse
+	21,  // 174: avtoms.b2c.v1.B2CService.SetDefaultCar:output_type -> avtoms.b2c.v1.Car
+	84,  // 175: avtoms.b2c.v1.B2CService.ListSlots:output_type -> avtoms.b2c.v1.ListSlotsResponse
+	24,  // 176: avtoms.b2c.v1.B2CService.CreateBooking:output_type -> avtoms.b2c.v1.Booking
+	24,  // 177: avtoms.b2c.v1.B2CService.GetBooking:output_type -> avtoms.b2c.v1.Booking
+	88,  // 178: avtoms.b2c.v1.B2CService.ListBookings:output_type -> avtoms.b2c.v1.ListBookingsResponse
+	24,  // 179: avtoms.b2c.v1.B2CService.CancelBooking:output_type -> avtoms.b2c.v1.Booking
+	24,  // 180: avtoms.b2c.v1.B2CService.RescheduleBooking:output_type -> avtoms.b2c.v1.Booking
+	24,  // 181: avtoms.b2c.v1.B2CService.SetBookingState:output_type -> avtoms.b2c.v1.Booking
+	24,  // 182: avtoms.b2c.v1.B2CService.LinkBookingAppointment:output_type -> avtoms.b2c.v1.Booking
+	94,  // 183: avtoms.b2c.v1.B2CService.ListCards:output_type -> avtoms.b2c.v1.ListCardsResponse
+	26,  // 184: avtoms.b2c.v1.B2CService.AddCard:output_type -> avtoms.b2c.v1.Card
+	10,  // 185: avtoms.b2c.v1.B2CService.DeleteCard:output_type -> avtoms.b2c.v1.DeleteResponse
+	26,  // 186: avtoms.b2c.v1.B2CService.SetDefaultCard:output_type -> avtoms.b2c.v1.Card
+	99,  // 187: avtoms.b2c.v1.B2CService.ValidatePromoCode:output_type -> avtoms.b2c.v1.ValidatePromoCodeResponse
+	27,  // 188: avtoms.b2c.v1.B2CService.CreatePayment:output_type -> avtoms.b2c.v1.Payment
+	27,  // 189: avtoms.b2c.v1.B2CService.GetPayment:output_type -> avtoms.b2c.v1.Payment
+	103, // 190: avtoms.b2c.v1.B2CService.ListPayments:output_type -> avtoms.b2c.v1.ListPaymentsResponse
+	105, // 191: avtoms.b2c.v1.B2CService.ListPromos:output_type -> avtoms.b2c.v1.ListPromosResponse
+	28,  // 192: avtoms.b2c.v1.B2CService.GetPromo:output_type -> avtoms.b2c.v1.Promo
+	108, // 193: avtoms.b2c.v1.B2CService.ListStories:output_type -> avtoms.b2c.v1.ListStoriesResponse
+	10,  // 194: avtoms.b2c.v1.B2CService.MarkStorySeen:output_type -> avtoms.b2c.v1.DeleteResponse
+	30,  // 195: avtoms.b2c.v1.B2CService.GetBonusAccount:output_type -> avtoms.b2c.v1.BonusAccount
+	114, // 196: avtoms.b2c.v1.B2CService.ListBonusEntries:output_type -> avtoms.b2c.v1.ListBonusEntriesResponse
+	112, // 197: avtoms.b2c.v1.B2CService.ApplyReferralCode:output_type -> avtoms.b2c.v1.ApplyReferralCodeResponse
+	116, // 198: avtoms.b2c.v1.B2CService.ListChats:output_type -> avtoms.b2c.v1.ListChatsResponse
+	118, // 199: avtoms.b2c.v1.B2CService.GetChat:output_type -> avtoms.b2c.v1.GetChatResponse
+	33,  // 200: avtoms.b2c.v1.B2CService.SendChatMessage:output_type -> avtoms.b2c.v1.ChatMessage
+	32,  // 201: avtoms.b2c.v1.B2CService.MarkChatRead:output_type -> avtoms.b2c.v1.Chat
+	122, // 202: avtoms.b2c.v1.B2CService.ListNotifications:output_type -> avtoms.b2c.v1.ListNotificationsResponse
+	34,  // 203: avtoms.b2c.v1.B2CService.MarkNotificationRead:output_type -> avtoms.b2c.v1.Notification
+	10,  // 204: avtoms.b2c.v1.B2CService.MarkAllNotificationsRead:output_type -> avtoms.b2c.v1.DeleteResponse
+	126, // 205: avtoms.b2c.v1.B2CService.GetBadges:output_type -> avtoms.b2c.v1.GetBadgesResponse
+	128, // 206: avtoms.b2c.v1.B2CService.ListEmergencyTypes:output_type -> avtoms.b2c.v1.ListEmergencyTypesResponse
+	36,  // 207: avtoms.b2c.v1.B2CService.CreateEmergencyRequest:output_type -> avtoms.b2c.v1.EmergencyRequest
+	36,  // 208: avtoms.b2c.v1.B2CService.GetEmergencyRequest:output_type -> avtoms.b2c.v1.EmergencyRequest
+	132, // 209: avtoms.b2c.v1.B2CService.ListEmergencyRequests:output_type -> avtoms.b2c.v1.ListEmergencyRequestsResponse
+	36,  // 210: avtoms.b2c.v1.B2CService.CancelEmergencyRequest:output_type -> avtoms.b2c.v1.EmergencyRequest
+	16,  // 211: avtoms.b2c.v1.B2CService.CreateProvider:output_type -> avtoms.b2c.v1.Provider
+	16,  // 212: avtoms.b2c.v1.B2CService.UpdateProvider:output_type -> avtoms.b2c.v1.Provider
+	10,  // 213: avtoms.b2c.v1.B2CService.DeleteProvider:output_type -> avtoms.b2c.v1.DeleteResponse
+	17,  // 214: avtoms.b2c.v1.B2CService.UpsertProviderService:output_type -> avtoms.b2c.v1.ProviderService
+	10,  // 215: avtoms.b2c.v1.B2CService.DeleteProviderService:output_type -> avtoms.b2c.v1.DeleteResponse
+	28,  // 216: avtoms.b2c.v1.B2CService.UpsertPromo:output_type -> avtoms.b2c.v1.Promo
+	10,  // 217: avtoms.b2c.v1.B2CService.DeletePromo:output_type -> avtoms.b2c.v1.DeleteResponse
+	38,  // 218: avtoms.b2c.v1.B2CService.UpsertFuelStation:output_type -> avtoms.b2c.v1.FuelStation
+	13,  // 219: avtoms.b2c.v1.B2CService.UpsertCity:output_type -> avtoms.b2c.v1.City
+	14,  // 220: avtoms.b2c.v1.B2CService.UpsertCategory:output_type -> avtoms.b2c.v1.Category
+	145, // 221: avtoms.b2c.v1.B2CService.SeedDemoData:output_type -> avtoms.b2c.v1.SeedDemoDataResponse
+	145, // 222: avtoms.b2c.v1.B2CService.SeedDemoDriver:output_type -> avtoms.b2c.v1.SeedDemoDataResponse
+	148, // 223: avtoms.b2c.v1.B2CService.PurgeDemoData:output_type -> avtoms.b2c.v1.PurgeDemoDataResponse
+	146, // [146:224] is the sub-list for method output_type
+	68,  // [68:146] is the sub-list for method input_type
 	68,  // [68:68] is the sub-list for extension type_name
 	68,  // [68:68] is the sub-list for extension extendee
 	0,   // [0:68] is the sub-list for field type_name
@@ -12592,7 +12668,7 @@ func file_avtoms_b2c_v1_b2c_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_avtoms_b2c_v1_b2c_proto_rawDesc), len(file_avtoms_b2c_v1_b2c_proto_rawDesc)),
 			NumEnums:      10,
-			NumMessages:   138,
+			NumMessages:   139,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

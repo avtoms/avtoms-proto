@@ -149,6 +149,11 @@ service B2CService {
   // against. Idempotent, and everything it writes is marked demo so PurgeDemoData can take
   // it all away again — staging is a place to look at the app, not a place to keep rubbish.
   rpc SeedDemoData(SeedDemoDataRequest) returns (SeedDemoDataResponse);
+  // SeedDemoDriver fills one phone's own side — a garage, bookings in every state, cashback
+  // and notifications — against the demo directory that is already there. It is what a
+  // tester needs: an account with something in it, including a finished visit to review,
+  // without re-seeding the whole catalogue underneath everybody else.
+  rpc SeedDemoDriver(SeedDemoDriverRequest) returns (SeedDemoDataResponse);
   rpc PurgeDemoData(PurgeDemoDataRequest) returns (PurgeDemoDataResponse);
 }
 
@@ -609,6 +614,13 @@ message Chat {
   string last_message_at = 9;
   string created_at = 10;
   string emergency_id = 11;   // the roadside call this thread belongs to
+  // The number the call button dials: the service centre's public number, or the master's
+  // on a roadside thread. `phone` above is the driver's own and is no use to them.
+  //
+  // Resolved on read rather than copied in when the thread is opened, so a shop that
+  // changes its number does not leave old threads dialling the old one. Empty on the
+  // support thread, which is answered in the app.
+  string provider_phone = 12;
 }
 
 // ChatMessage is one bubble.
@@ -1462,6 +1474,13 @@ message SeedDemoDataResponse {
   int32 categories = 8;
   int32 bookings = 9;
   bool already_seeded = 10;
+}
+
+message SeedDemoDriverRequest {
+  string phone = 1;
+  // Clear this phone's demo cars and bookings first, so a tester who has already used up
+  // the finished visit can have a fresh set rather than a second pile.
+  bool force = 2;
 }
 
 message PurgeDemoDataRequest {
