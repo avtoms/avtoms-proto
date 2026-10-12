@@ -5170,11 +5170,13 @@ func (x *ListProvidersResponse) GetTotal() int32 {
 }
 
 type GetProviderRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	Phone         string                 `protobuf:"bytes,2,opt,name=phone,proto3" json:"phone,omitempty"`
-	Latitude      float64                `protobuf:"fixed64,3,opt,name=latitude,proto3" json:"latitude,omitempty"`
-	Longitude     float64                `protobuf:"fixed64,4,opt,name=longitude,proto3" json:"longitude,omitempty"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// The provider's id, or its slug — a shared link carries the slug, and the page that
+	// opens it should not need a second call to turn one into the other.
+	Id            string  `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Phone         string  `protobuf:"bytes,2,opt,name=phone,proto3" json:"phone,omitempty"`
+	Latitude      float64 `protobuf:"fixed64,3,opt,name=latitude,proto3" json:"latitude,omitempty"`
+	Longitude     float64 `protobuf:"fixed64,4,opt,name=longitude,proto3" json:"longitude,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }

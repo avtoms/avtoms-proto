@@ -846,6 +846,8 @@ message ListProvidersResponse {
 }
 
 message GetProviderRequest {
+  // The provider's id, or its slug — a shared link carries the slug, and the page that
+  // opens it should not need a second call to turn one into the other.
   string id = 1;
   string phone = 2;
   double latitude = 3;
