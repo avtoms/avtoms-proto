@@ -332,6 +332,16 @@ message Provider {
   string id = 1;
   string shop_id = 2;             // the AvtoMS tenant behind it, when there is one
   string name = 3;
+  // A stable, readable key for this service centre: "avto-servis-premium". It is what a
+  // shared link carries, so it is minted once from the name and never changes afterwards —
+  // a shop that renames itself keeps its old links working. GetProvider takes either this
+  // or the id.
+  string slug = 27;
+  // The page to share: the public web page for this service centre. Filled in by the
+  // gateway, the only part of the system that knows the website's address; empty where no
+  // public site is configured, and the app should then share nothing rather than a broken
+  // link.
+  string share_url = 28;
   string city_id = 4;
   repeated string category_ids = 5;  // first one is the headline category
   string address_uz = 6;

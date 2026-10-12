@@ -1152,21 +1152,31 @@ func (x *OpeningHours) GetRoundClock() bool {
 // a provider is a business a driver can find on the map, which may or may not run AvtoMS.
 // shop_id links the two when it does, and is what a later sync would key on.
 type Provider struct {
-	state       protoimpl.MessageState `protogen:"open.v1"`
-	Id          string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	ShopId      string                 `protobuf:"bytes,2,opt,name=shop_id,json=shopId,proto3" json:"shop_id,omitempty"` // the AvtoMS tenant behind it, when there is one
-	Name        string                 `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
-	CityId      string                 `protobuf:"bytes,4,opt,name=city_id,json=cityId,proto3" json:"city_id,omitempty"`
-	CategoryIds []string               `protobuf:"bytes,5,rep,name=category_ids,json=categoryIds,proto3" json:"category_ids,omitempty"` // first one is the headline category
-	AddressUz   string                 `protobuf:"bytes,6,opt,name=address_uz,json=addressUz,proto3" json:"address_uz,omitempty"`
-	AddressRu   string                 `protobuf:"bytes,7,opt,name=address_ru,json=addressRu,proto3" json:"address_ru,omitempty"`
-	Latitude    float64                `protobuf:"fixed64,8,opt,name=latitude,proto3" json:"latitude,omitempty"`
-	Longitude   float64                `protobuf:"fixed64,9,opt,name=longitude,proto3" json:"longitude,omitempty"`
-	Phone       string                 `protobuf:"bytes,10,opt,name=phone,proto3" json:"phone,omitempty"`
-	Hours       []*OpeningHours        `protobuf:"bytes,11,rep,name=hours,proto3" json:"hours,omitempty"`
-	AboutUz     string                 `protobuf:"bytes,12,opt,name=about_uz,json=aboutUz,proto3" json:"about_uz,omitempty"`
-	AboutRu     string                 `protobuf:"bytes,13,opt,name=about_ru,json=aboutRu,proto3" json:"about_ru,omitempty"`
-	PhotoUrls   []string               `protobuf:"bytes,14,rep,name=photo_urls,json=photoUrls,proto3" json:"photo_urls,omitempty"`
+	state  protoimpl.MessageState `protogen:"open.v1"`
+	Id     string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	ShopId string                 `protobuf:"bytes,2,opt,name=shop_id,json=shopId,proto3" json:"shop_id,omitempty"` // the AvtoMS tenant behind it, when there is one
+	Name   string                 `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
+	// A stable, readable key for this service centre: "avto-servis-premium". It is what a
+	// shared link carries, so it is minted once from the name and never changes afterwards —
+	// a shop that renames itself keeps its old links working. GetProvider takes either this
+	// or the id.
+	Slug string `protobuf:"bytes,27,opt,name=slug,proto3" json:"slug,omitempty"`
+	// The page to share: the public web page for this service centre. Filled in by the
+	// gateway, the only part of the system that knows the website's address; empty where no
+	// public site is configured, and the app should then share nothing rather than a broken
+	// link.
+	ShareUrl    string          `protobuf:"bytes,28,opt,name=share_url,json=shareUrl,proto3" json:"share_url,omitempty"`
+	CityId      string          `protobuf:"bytes,4,opt,name=city_id,json=cityId,proto3" json:"city_id,omitempty"`
+	CategoryIds []string        `protobuf:"bytes,5,rep,name=category_ids,json=categoryIds,proto3" json:"category_ids,omitempty"` // first one is the headline category
+	AddressUz   string          `protobuf:"bytes,6,opt,name=address_uz,json=addressUz,proto3" json:"address_uz,omitempty"`
+	AddressRu   string          `protobuf:"bytes,7,opt,name=address_ru,json=addressRu,proto3" json:"address_ru,omitempty"`
+	Latitude    float64         `protobuf:"fixed64,8,opt,name=latitude,proto3" json:"latitude,omitempty"`
+	Longitude   float64         `protobuf:"fixed64,9,opt,name=longitude,proto3" json:"longitude,omitempty"`
+	Phone       string          `protobuf:"bytes,10,opt,name=phone,proto3" json:"phone,omitempty"`
+	Hours       []*OpeningHours `protobuf:"bytes,11,rep,name=hours,proto3" json:"hours,omitempty"`
+	AboutUz     string          `protobuf:"bytes,12,opt,name=about_uz,json=aboutUz,proto3" json:"about_uz,omitempty"`
+	AboutRu     string          `protobuf:"bytes,13,opt,name=about_ru,json=aboutRu,proto3" json:"about_ru,omitempty"`
+	PhotoUrls   []string        `protobuf:"bytes,14,rep,name=photo_urls,json=photoUrls,proto3" json:"photo_urls,omitempty"`
 	// Amenity codes the app renders as chips: "card", "wait", "wifi", "coffee", "tow",
 	// "warranty". Free-form on purpose — a new amenity should not need a schema change.
 	Amenities []string `protobuf:"bytes,15,rep,name=amenities,proto3" json:"amenities,omitempty"`
@@ -1235,6 +1245,20 @@ func (x *Provider) GetShopId() string {
 func (x *Provider) GetName() string {
 	if x != nil {
 		return x.Name
+	}
+	return ""
+}
+
+func (x *Provider) GetSlug() string {
+	if x != nil {
+		return x.Slug
+	}
+	return ""
+}
+
+func (x *Provider) GetShareUrl() string {
+	if x != nil {
+		return x.ShareUrl
 	}
 	return ""
 }
@@ -11203,11 +11227,13 @@ const file_avtoms_b2c_v1_b2c_proto_rawDesc = "" +
 	"\x06closes\x18\x03 \x01(\tR\x06closes\x12\x16\n" +
 	"\x06closed\x18\x04 \x01(\bR\x06closed\x12\x1f\n" +
 	"\vround_clock\x18\x05 \x01(\bR\n" +
-	"roundClock\"\xf1\x05\n" +
+	"roundClock\"\xa2\x06\n" +
 	"\bProvider\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x17\n" +
 	"\ashop_id\x18\x02 \x01(\tR\x06shopId\x12\x12\n" +
-	"\x04name\x18\x03 \x01(\tR\x04name\x12\x17\n" +
+	"\x04name\x18\x03 \x01(\tR\x04name\x12\x12\n" +
+	"\x04slug\x18\x1b \x01(\tR\x04slug\x12\x1b\n" +
+	"\tshare_url\x18\x1c \x01(\tR\bshareUrl\x12\x17\n" +
 	"\acity_id\x18\x04 \x01(\tR\x06cityId\x12!\n" +
 	"\fcategory_ids\x18\x05 \x03(\tR\vcategoryIds\x12\x1d\n" +
 	"\n" +
