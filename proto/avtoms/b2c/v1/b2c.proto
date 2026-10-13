@@ -569,11 +569,18 @@ message Promo {
   string image_key = 15;          // gradient key the app already has ("p1".."p4")
   bool active = 16;
   bool demo = 17;
+  // The page to share: this campaign's public web page. Filled in by the gateway, which is
+  // the only part of the system that knows the website's address; empty where no public
+  // site is configured, so the app shares nothing rather than a broken link. The code
+  // itself is still in `code`, for anyone who would rather type it.
+  string share_url = 18;
 }
 
 // Story is a card in the stories rail at the top of the home screen.
 message Story {
   string id = 1;
+  // A gradient key the app ships ("p1".."p4"), used when there is no picture — a story
+  // with neither is still a story and must not render as a hole.
   string image_key = 2;
   string label_uz = 3;
   string label_ru = 4;
@@ -586,6 +593,12 @@ message Story {
   string valid_until = 11;
   bool seen = 12;                 // for the signed-in caller
   bool demo = 13;
+  // The picture shown inside the story, full bleed. Empty falls back to image_key.
+  string image_url = 14;
+  // The small round preview on the home screen's rail. Empty falls back to image_url, and
+  // then to image_key — a rail of circles should not wait on a full-screen picture to
+  // download before it can be drawn.
+  string thumb_url = 15;
 }
 
 // BonusAccount is the driver's cashback balance.
@@ -597,6 +610,10 @@ message BonusAccount {
   string referral_code = 5;
   int32 referred_count = 6;
   int32 cashback_percent = 7;     // the rate currently earned on a paid booking
+  // The invitation to send: a page that names the reward and carries the code, so a friend
+  // taps rather than types. Filled in by the gateway; empty where no public site is
+  // configured, and referral_code alone is then all there is to share.
+  string referral_share_url = 8;
 }
 
 // BonusEntry is one line of the cashback history.

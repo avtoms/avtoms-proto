@@ -2825,8 +2825,13 @@ type Promo struct {
 	ImageKey         string                 `protobuf:"bytes,15,opt,name=image_key,json=imageKey,proto3" json:"image_key,omitempty"`                // gradient key the app already has ("p1".."p4")
 	Active           bool                   `protobuf:"varint,16,opt,name=active,proto3" json:"active,omitempty"`
 	Demo             bool                   `protobuf:"varint,17,opt,name=demo,proto3" json:"demo,omitempty"`
-	unknownFields    protoimpl.UnknownFields
-	sizeCache        protoimpl.SizeCache
+	// The page to share: this campaign's public web page. Filled in by the gateway, which is
+	// the only part of the system that knows the website's address; empty where no public
+	// site is configured, so the app shares nothing rather than a broken link. The code
+	// itself is still in `code`, for anyone who would rather type it.
+	ShareUrl      string `protobuf:"bytes,18,opt,name=share_url,json=shareUrl,proto3" json:"share_url,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *Promo) Reset() {
@@ -2978,22 +2983,37 @@ func (x *Promo) GetDemo() bool {
 	return false
 }
 
+func (x *Promo) GetShareUrl() string {
+	if x != nil {
+		return x.ShareUrl
+	}
+	return ""
+}
+
 // Story is a card in the stories rail at the top of the home screen.
 type Story struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	ImageKey      string                 `protobuf:"bytes,2,opt,name=image_key,json=imageKey,proto3" json:"image_key,omitempty"`
-	LabelUz       string                 `protobuf:"bytes,3,opt,name=label_uz,json=labelUz,proto3" json:"label_uz,omitempty"`
-	LabelRu       string                 `protobuf:"bytes,4,opt,name=label_ru,json=labelRu,proto3" json:"label_ru,omitempty"`
-	TitleUz       string                 `protobuf:"bytes,5,opt,name=title_uz,json=titleUz,proto3" json:"title_uz,omitempty"`
-	TitleRu       string                 `protobuf:"bytes,6,opt,name=title_ru,json=titleRu,proto3" json:"title_ru,omitempty"`
-	CtaKey        string                 `protobuf:"bytes,7,opt,name=cta_key,json=ctaKey,proto3" json:"cta_key,omitempty"` // translation key for the button
-	Target        string                 `protobuf:"bytes,8,opt,name=target,proto3" json:"target,omitempty"`               // in-app route, e.g. "#/promo/OIL30"
-	Position      int32                  `protobuf:"varint,9,opt,name=position,proto3" json:"position,omitempty"`
-	Active        bool                   `protobuf:"varint,10,opt,name=active,proto3" json:"active,omitempty"`
-	ValidUntil    string                 `protobuf:"bytes,11,opt,name=valid_until,json=validUntil,proto3" json:"valid_until,omitempty"`
-	Seen          bool                   `protobuf:"varint,12,opt,name=seen,proto3" json:"seen,omitempty"` // for the signed-in caller
-	Demo          bool                   `protobuf:"varint,13,opt,name=demo,proto3" json:"demo,omitempty"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	Id    string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	// A gradient key the app ships ("p1".."p4"), used when there is no picture — a story
+	// with neither is still a story and must not render as a hole.
+	ImageKey   string `protobuf:"bytes,2,opt,name=image_key,json=imageKey,proto3" json:"image_key,omitempty"`
+	LabelUz    string `protobuf:"bytes,3,opt,name=label_uz,json=labelUz,proto3" json:"label_uz,omitempty"`
+	LabelRu    string `protobuf:"bytes,4,opt,name=label_ru,json=labelRu,proto3" json:"label_ru,omitempty"`
+	TitleUz    string `protobuf:"bytes,5,opt,name=title_uz,json=titleUz,proto3" json:"title_uz,omitempty"`
+	TitleRu    string `protobuf:"bytes,6,opt,name=title_ru,json=titleRu,proto3" json:"title_ru,omitempty"`
+	CtaKey     string `protobuf:"bytes,7,opt,name=cta_key,json=ctaKey,proto3" json:"cta_key,omitempty"` // translation key for the button
+	Target     string `protobuf:"bytes,8,opt,name=target,proto3" json:"target,omitempty"`               // in-app route, e.g. "#/promo/OIL30"
+	Position   int32  `protobuf:"varint,9,opt,name=position,proto3" json:"position,omitempty"`
+	Active     bool   `protobuf:"varint,10,opt,name=active,proto3" json:"active,omitempty"`
+	ValidUntil string `protobuf:"bytes,11,opt,name=valid_until,json=validUntil,proto3" json:"valid_until,omitempty"`
+	Seen       bool   `protobuf:"varint,12,opt,name=seen,proto3" json:"seen,omitempty"` // for the signed-in caller
+	Demo       bool   `protobuf:"varint,13,opt,name=demo,proto3" json:"demo,omitempty"`
+	// The picture shown inside the story, full bleed. Empty falls back to image_key.
+	ImageUrl string `protobuf:"bytes,14,opt,name=image_url,json=imageUrl,proto3" json:"image_url,omitempty"`
+	// The small round preview on the home screen's rail. Empty falls back to image_url, and
+	// then to image_key — a rail of circles should not wait on a full-screen picture to
+	// download before it can be drawn.
+	ThumbUrl      string `protobuf:"bytes,15,opt,name=thumb_url,json=thumbUrl,proto3" json:"thumb_url,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -3119,6 +3139,20 @@ func (x *Story) GetDemo() bool {
 	return false
 }
 
+func (x *Story) GetImageUrl() string {
+	if x != nil {
+		return x.ImageUrl
+	}
+	return ""
+}
+
+func (x *Story) GetThumbUrl() string {
+	if x != nil {
+		return x.ThumbUrl
+	}
+	return ""
+}
+
 // BonusAccount is the driver's cashback balance.
 type BonusAccount struct {
 	state           protoimpl.MessageState `protogen:"open.v1"`
@@ -3129,8 +3163,12 @@ type BonusAccount struct {
 	ReferralCode    string                 `protobuf:"bytes,5,opt,name=referral_code,json=referralCode,proto3" json:"referral_code,omitempty"`
 	ReferredCount   int32                  `protobuf:"varint,6,opt,name=referred_count,json=referredCount,proto3" json:"referred_count,omitempty"`
 	CashbackPercent int32                  `protobuf:"varint,7,opt,name=cashback_percent,json=cashbackPercent,proto3" json:"cashback_percent,omitempty"` // the rate currently earned on a paid booking
-	unknownFields   protoimpl.UnknownFields
-	sizeCache       protoimpl.SizeCache
+	// The invitation to send: a page that names the reward and carries the code, so a friend
+	// taps rather than types. Filled in by the gateway; empty where no public site is
+	// configured, and referral_code alone is then all there is to share.
+	ReferralShareUrl string `protobuf:"bytes,8,opt,name=referral_share_url,json=referralShareUrl,proto3" json:"referral_share_url,omitempty"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
 }
 
 func (x *BonusAccount) Reset() {
@@ -3210,6 +3248,13 @@ func (x *BonusAccount) GetCashbackPercent() int32 {
 		return x.CashbackPercent
 	}
 	return 0
+}
+
+func (x *BonusAccount) GetReferralShareUrl() string {
+	if x != nil {
+		return x.ReferralShareUrl
+	}
+	return ""
 }
 
 // BonusEntry is one line of the cashback history.
@@ -11432,7 +11477,7 @@ const file_avtoms_b2c_v1_b2c_proto_rawDesc = "" +
 	"\x06mocked\x18\r \x01(\bR\x06mocked\x12\x1d\n" +
 	"\n" +
 	"created_at\x18\x0e \x01(\tR\tcreatedAt\x12!\n" +
-	"\fbonus_earned\x18\x0f \x01(\x03R\vbonusEarned\"\xb5\x04\n" +
+	"\fbonus_earned\x18\x0f \x01(\x03R\vbonusEarned\"\xd2\x04\n" +
 	"\x05Promo\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\tR\x04code\x12\x1f\n" +
 	"\vprovider_id\x18\x02 \x01(\tR\n" +
@@ -11454,7 +11499,8 @@ const file_avtoms_b2c_v1_b2c_proto_rawDesc = "" +
 	"\x0eper_user_limit\x18\x0e \x01(\x05R\fperUserLimit\x12\x1b\n" +
 	"\timage_key\x18\x0f \x01(\tR\bimageKey\x12\x16\n" +
 	"\x06active\x18\x10 \x01(\bR\x06active\x12\x12\n" +
-	"\x04demo\x18\x11 \x01(\bR\x04demo\"\xce\x02\n" +
+	"\x04demo\x18\x11 \x01(\bR\x04demo\x12\x1b\n" +
+	"\tshare_url\x18\x12 \x01(\tR\bshareUrl\"\x88\x03\n" +
 	"\x05Story\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1b\n" +
 	"\timage_key\x18\x02 \x01(\tR\bimageKey\x12\x19\n" +
@@ -11470,7 +11516,9 @@ const file_avtoms_b2c_v1_b2c_proto_rawDesc = "" +
 	"\vvalid_until\x18\v \x01(\tR\n" +
 	"validUntil\x12\x12\n" +
 	"\x04seen\x18\f \x01(\bR\x04seen\x12\x12\n" +
-	"\x04demo\x18\r \x01(\bR\x04demo\"\xf9\x01\n" +
+	"\x04demo\x18\r \x01(\bR\x04demo\x12\x1b\n" +
+	"\timage_url\x18\x0e \x01(\tR\bimageUrl\x12\x1b\n" +
+	"\tthumb_url\x18\x0f \x01(\tR\bthumbUrl\"\xa7\x02\n" +
 	"\fBonusAccount\x12\x14\n" +
 	"\x05phone\x18\x01 \x01(\tR\x05phone\x12\x18\n" +
 	"\abalance\x18\x02 \x01(\x03R\abalance\x12!\n" +
@@ -11479,7 +11527,8 @@ const file_avtoms_b2c_v1_b2c_proto_rawDesc = "" +
 	"spentTotal\x12#\n" +
 	"\rreferral_code\x18\x05 \x01(\tR\freferralCode\x12%\n" +
 	"\x0ereferred_count\x18\x06 \x01(\x05R\rreferredCount\x12)\n" +
-	"\x10cashback_percent\x18\a \x01(\x05R\x0fcashbackPercent\"\xec\x01\n" +
+	"\x10cashback_percent\x18\a \x01(\x05R\x0fcashbackPercent\x12,\n" +
+	"\x12referral_share_url\x18\b \x01(\tR\x10referralShareUrl\"\xec\x01\n" +
 	"\n" +
 	"BonusEntry\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x14\n" +
